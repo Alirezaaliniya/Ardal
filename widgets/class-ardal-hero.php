@@ -299,8 +299,12 @@ class Ardal_Widget_Hero extends Ardal_Widget_Base {
 				</div>
 
 				<?php if ( 'yes' === $s['show_arrows'] ) : ?>
-					<button type="button" class="ard-hero__arrow ard-hero__arrow--prev" data-ard-prev aria-label="اسلاید قبلی">›</button>
-					<button type="button" class="ard-hero__arrow ard-hero__arrow--next" data-ard-next aria-label="اسلاید بعدی">‹</button>
+					<button type="button" class="ard-hero__arrow ard-hero__arrow--prev" data-ard-prev aria-label="اسلاید قبلی">
+						<?php echo Ardal_Helpers::icon( 'chevron-right', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					</button>
+					<button type="button" class="ard-hero__arrow ard-hero__arrow--next" data-ard-next aria-label="اسلاید بعدی">
+						<?php echo Ardal_Helpers::icon( 'chevron-left', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					</button>
 				<?php endif; ?>
 			<?php endif; ?>
 		</section>

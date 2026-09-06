@@ -23,6 +23,7 @@ define( 'ARDAL_MIN_ELEMENTOR', '3.5.0' );
 define( 'ARDAL_MIN_PHP', '7.4' );
 
 require_once ARDAL_PATH . 'includes/class-ardal-palette.php';
+require_once ARDAL_PATH . 'includes/class-ardal-currency.php';
 require_once ARDAL_PATH . 'includes/class-ardal-settings.php';
 require_once ARDAL_PATH . 'includes/class-ardal-assets.php';
 require_once ARDAL_PATH . 'includes/class-ardal.php';

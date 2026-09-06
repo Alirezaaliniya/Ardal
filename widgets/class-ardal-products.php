@@ -238,6 +238,33 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'link_mode',
+			array(
+				'label'       => 'ناحیه قابل کلیک',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'button',
+				'options'     => array(
+					'button' => 'فقط عنوان و دکمه',
+					'box'    => 'کل کارت به محصول لینک شود',
+				),
+				'description' => 'در حالت «کل کارت»، دکمه همچنان کار خودش را انجام می‌دهد و کلیک روی آن به محصول نمی‌رود.',
+			)
+		);
+
+		$this->add_control(
+			'button_action',
+			array(
+				'label'   => 'کلیک روی دکمه',
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'add',
+				'options' => array(
+					'add'  => 'افزودن به سبد خرید',
+					'link' => 'رفتن به صفحه محصول',
+				),
+			)
+		);
+
+		$this->add_control(
 			'show_rating',
 			array(
 				'label'        => 'نمایش امتیاز',
@@ -351,8 +378,10 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			$this->render_product_card(
 				$item,
 				array(
-					'variant'     => $s['variant'],
-					'show_rating' => 'yes' === $s['show_rating'],
+					'variant'       => $s['variant'],
+					'link_mode'     => $s['link_mode'],
+					'button_action' => $s['button_action'],
+					'show_rating'   => 'yes' === $s['show_rating'],
 					'show_fab'    => $framed,
 					'show_button' => ! $framed,
 					'button_text' => $s['button_text'],

@@ -183,7 +183,7 @@ class Ardal_Widget_Newsletter extends Ardal_Widget_Base {
 					class="ard-news__form"
 					<?php echo '' !== $action ? ' action="' . esc_url( $action ) . '" method="post"' : ' onsubmit="return false"'; ?>
 				>
-					<label class="screen-reader-text" for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $s['placeholder'] ); ?></label>
+					<label class="ard-sr" for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $s['placeholder'] ); ?></label>
 					<input
 						type="<?php echo esc_attr( $s['field_type'] ); ?>"
 						id="<?php echo esc_attr( $id ); ?>"

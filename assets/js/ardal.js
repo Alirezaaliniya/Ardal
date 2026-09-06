@@ -199,6 +199,190 @@
 	}
 
 	/* --------------------------------------------------------
+	   کروسل افقی (اسکرول‌محور)
+	   -------------------------------------------------------- */
+
+	function initCarousel( root ) {
+		var viewport = root.querySelector( '[data-ard-viewport]' );
+
+		if ( ! viewport ) {
+			return;
+		}
+
+		var slides = Array.prototype.slice.call( viewport.children );
+
+		if ( ! slides.length ) {
+			return;
+		}
+
+		var dotsBox = root.querySelector( '[data-ard-dots]' );
+		var prev = root.parentNode ? root.parentNode.querySelector( '[data-ard-prev]' ) : null;
+		var next = root.parentNode ? root.parentNode.querySelector( '[data-ard-next]' ) : null;
+		var interval = parseInt( root.getAttribute( 'data-interval' ), 10 ) || 0;
+		var timer = null;
+		var dots = [];
+
+		function perView() {
+			var raw = window.getComputedStyle( viewport ).getPropertyValue( '--ard-per' );
+			var n = Math.round( parseFloat( raw ) );
+
+			return n > 0 ? n : 1;
+		}
+
+		function pageCount() {
+			return Math.max( 1, Math.ceil( slides.length / perView() ) );
+		}
+
+		// موقعیت با getBoundingClientRect سنجیده می‌شود تا در RTL هم درست باشد؛
+		// مقدار scrollLeft در حالت راست‌چین بین مرورگرها یکسان نیست.
+		function isRtl() {
+			return 'rtl' === window.getComputedStyle( viewport ).direction;
+		}
+
+		function currentPage() {
+			var box = viewport.getBoundingClientRect();
+			var rtl = isRtl();
+			var best = 0;
+			var bestDist = Infinity;
+
+			slides.forEach( function ( slide, i ) {
+				var r = slide.getBoundingClientRect();
+				var dist = Math.abs( rtl ? box.right - r.right : r.left - box.left );
+
+				if ( dist < bestDist - 1 ) {
+					bestDist = dist;
+					best = i;
+				}
+			} );
+
+			return Math.floor( best / perView() );
+		}
+
+		function goTo( page ) {
+			var per = perView();
+			var total = pageCount();
+			var wrapped = ( page + total ) % total;
+			var index = Math.min( slides.length - 1, wrapped * per );
+
+			slides[ index ].scrollIntoView( {
+				behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+				block: 'nearest',
+				inline: 'start'
+			} );
+		}
+
+		function paint() {
+			var active = currentPage();
+
+			dots.forEach( function ( dot, i ) {
+				dot.classList.toggle( 'is-active', i === active );
+				dot.setAttribute( 'aria-selected', i === active ? 'true' : 'false' );
+			} );
+		}
+
+		function buildDots() {
+			if ( ! dotsBox ) {
+				return;
+			}
+
+			var total = pageCount();
+
+			if ( dots.length === total ) {
+				paint();
+
+				return;
+			}
+
+			dotsBox.innerHTML = '';
+			dots = [];
+
+			if ( total < 2 ) {
+				return;
+			}
+
+			for ( var i = 0; i < total; i++ ) {
+				( function ( page ) {
+					var dot = document.createElement( 'button' );
+
+					dot.type = 'button';
+					dot.className = 'ard-deal__dot';
+					dot.setAttribute( 'role', 'tab' );
+					dot.setAttribute( 'aria-label', 'صفحه ' + toFa( page + 1 ) );
+					dot.addEventListener( 'click', function () {
+						goTo( page );
+						start();
+					} );
+
+					dotsBox.appendChild( dot );
+					dots.push( dot );
+				}( i ) );
+			}
+
+			paint();
+		}
+
+		function start() {
+			stop();
+
+			if ( ! interval || prefersReducedMotion() || pageCount() < 2 ) {
+				return;
+			}
+
+			timer = window.setInterval( function () {
+				goTo( currentPage() + 1 );
+			}, interval );
+		}
+
+		function stop() {
+			if ( timer ) {
+				window.clearInterval( timer );
+				timer = null;
+			}
+		}
+
+		if ( prev ) {
+			prev.addEventListener( 'click', function () {
+				goTo( currentPage() - 1 );
+				start();
+			} );
+		}
+
+		if ( next ) {
+			next.addEventListener( 'click', function () {
+				goTo( currentPage() + 1 );
+				start();
+			} );
+		}
+
+		var raf = null;
+
+		viewport.addEventListener( 'scroll', function () {
+			if ( raf ) {
+				return;
+			}
+
+			raf = window.requestAnimationFrame( function () {
+				raf = null;
+				paint();
+			} );
+		}, { passive: true } );
+
+		viewport.addEventListener( 'mouseenter', stop );
+		viewport.addEventListener( 'mouseleave', start );
+		viewport.addEventListener( 'focusin', stop );
+
+		var resizeTimer = null;
+
+		window.addEventListener( 'resize', function () {
+			window.clearTimeout( resizeTimer );
+			resizeTimer = window.setTimeout( buildDots, 150 );
+		} );
+
+		buildDots();
+		start();
+	}
+
+	/* --------------------------------------------------------
 	   فیلتر تب‌دار محصولات
 	   -------------------------------------------------------- */
 
@@ -286,6 +470,13 @@
 			if ( ! el.ardReady ) {
 				el.ardReady = true;
 				initSlider( el );
+			}
+		} );
+
+		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-carousel]' ), function ( el ) {
+			if ( ! el.ardReady ) {
+				el.ardReady = true;
+				initCarousel( el );
 			}
 		} );
 

@@ -56,6 +56,12 @@ class Ardal_Palette {
 				'desc'    => 'عنوان‌های روی زمینه سبز روشن',
 				'group'   => 'brand',
 			),
+			'toman'             => array(
+				'label'   => 'رنگ نماد تومان',
+				'default' => '#003061',
+				'desc'    => 'وقتی «نماد تومان» روشن باشد، رنگ آیکون کنار قیمت‌ها',
+				'group'   => 'brand',
+			),
 			'sale'              => array(
 				'label'   => 'قرمز حراج',
 				'default' => '#C0392B',
@@ -199,6 +205,24 @@ class Ardal_Palette {
 				'default' => '1440',
 				'type'    => 'number',
 				'desc'    => 'عرض کانتینر بخش‌ها بر حسب پیکسل. دیزاین برای ۱۴۴۰ پیکسل طراحی شده است.',
+			),
+			'toman_symbol'     => array(
+				'label'   => 'تغییر ساختار تومان',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'به‌جای نوشتن «تومان» کنار قیمت‌ها، نماد رسمی تومان نمایش داده می‌شود.',
+			),
+			'toman_woo'        => array(
+				'label'   => 'اعمال روی قیمت‌های خود ووکامرس',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'علاوه بر ویجت‌های اردال، روی قیمت محصول در فروشگاه، آرشیو، صفحه محصول، سبد خرید و تسویه هم اعمال می‌شود. ایمیل‌ها و پیشخوان دست‌نخورده می‌مانند.',
+			),
+			'toman_size'       => array(
+				'label'   => 'اندازه نماد تومان',
+				'default' => '170',
+				'type'    => 'number',
+				'desc'    => 'درصدِ اندازهٔ قلمِ قیمت. نماد تومان دوطبقه است، برای همین از خودِ رقم‌ها بلندتر تنظیم می‌شود.',
 			),
 			'persian_digits'   => array(
 				'label'   => 'تبدیل خودکار اعداد به فارسی',
@@ -344,6 +368,10 @@ class Ardal_Palette {
 		$lines[] = sprintf( '--ard-radius-xl:%dpx;', (int) round( $radius * 1.4 ) );
 		$lines[] = sprintf( '--ard-radius-pill:%dpx;', max( 20, (int) round( $radius * 1.6 ) ) );
 		$lines[] = sprintf( '--ard-container:%dpx;', max( 320, (int) $p['container'] ) );
+
+		$toman = max( 40, min( 400, (int) $p['toman_size'] ) );
+
+		$lines[] = sprintf( '--ard-toman-size:%.2fem;', $toman / 100 );
 
 		$font = trim( (string) $p['font_family'] );
 

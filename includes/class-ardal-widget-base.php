@@ -181,10 +181,13 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		echo '</div>';
 
 		if ( ! $center && ! empty( $s['more_link']['url'] ) && '' !== trim( (string) $s['more_text'] ) ) {
+			// آیکون SVG به‌جای کاراکتر «›»: آن کاراکتر bidi-mirrored است و
+			// جهتش را از راست‌چینی متن می‌گیرد، که قابل اتکا نیست.
 			printf(
-				'<a class="ard-shead__more"%s>%s <span aria-hidden="true">›</span></a>',
+				'<a class="ard-shead__more"%s>%s %s</a>',
 				Ardal_Helpers::link_attrs( $s['more_link'] ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی داخل تابع escape شده.
-				esc_html( $s['more_text'] )
+				esc_html( $s['more_text'] ),
+				Ardal_Helpers::icon( 'chevron-left', 15 ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			);
 		}
 
@@ -292,6 +295,8 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'placeholder' => '۸۰۰×۸۰۰',
 				'image_h'     => '',
 				'notch'       => null,
+				'link_mode'   => 'button',
+				'button_action' => 'add',
 			)
 		);
 
@@ -319,6 +324,14 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			$classes[] = 'ard-pcard--notch';
 		}
 
+		// «کل کارت لینک» با لینکِ کشیدهٔ روی عنوان ساخته می‌شود، نه با تگ a دور کل
+		// کارت؛ چون دکمهٔ داخل کارت خودش لینک است و a تودرتو HTML نامعتبر می‌سازد.
+		$box_link = 'box' === $opts['link_mode'] && ! empty( $link['url'] );
+
+		if ( $box_link ) {
+			$classes[] = 'ard-pcard--boxlink';
+		}
+
 		printf( '<article class="%s"%s>', esc_attr( implode( ' ', $classes ) ), $style ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '<div class="ard-pcard__box">';
 
@@ -335,7 +348,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 
 		echo '</div>';
 
-		if ( '' !== $title ) {
+		if ( '' !== $title || $box_link ) {
 			if ( ! empty( $link['url'] ) ) {
 				printf(
 					'<h3 class="ard-pcard__title"><a%s>%s</a></h3>',
@@ -365,38 +378,80 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		}
 
 		if ( '' !== $price ) {
-			printf( '<div class="ard-pcard__price">%s <span>تومان</span></div>', esc_html( $price ) );
+			printf(
+				'<div class="ard-pcard__price">%s %s</div>',
+				esc_html( $price ),
+				Ardal_Currency::unit() // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی ثابت و امن.
+			);
 		}
 
 		echo '</div>';
 
 		if ( $opts['show_button'] ) {
-			$target = ! empty( $add['url'] ) ? $add : $link;
-			$tag    = Ardal_Helpers::link_tag( $target );
-
-			printf(
-				'<%1$s class="ard-pcard__btn"%2$s>%3$s</%1$s>',
-				esc_html( $tag ),
-				Ardal_Helpers::link_attrs( $target ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				esc_html( $opts['button_text'] )
-			);
+			$this->render_card_action( $item, $opts, 'ard-pcard__btn', esc_html( $opts['button_text'] ), '' );
 		}
 
 		echo '</div>';
 
 		if ( $opts['show_fab'] ) {
-			$target = ! empty( $add['url'] ) ? $add : $link;
-			$tag    = Ardal_Helpers::link_tag( $target );
+			$label = 'add' === $opts['button_action']
+				? 'افزودن ' . $title . ' به سبد خرید'
+				: 'مشاهده ' . $title;
 
-			printf(
-				'<%1$s class="ard-pcard__fab"%2$s aria-label="%3$s"><span aria-hidden="true">+</span></%1$s>',
-				esc_html( $tag ),
-				Ardal_Helpers::link_attrs( $target ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				esc_attr( 'افزودن ' . $title . ' به سبد خرید' )
-			);
+			$this->render_card_action( $item, $opts, 'ard-pcard__fab', '<span aria-hidden="true">+</span>', $label );
 		}
 
 		echo '</article>';
+	}
+
+	/**
+	 * دکمهٔ کنش کارت (دکمه متنی یا دکمهٔ گرد).
+	 *
+	 * بسته به button_action یا به سبد اضافه می‌کند یا به صفحهٔ محصول می‌برد.
+	 * برای محصول ووکامرس، کلاس‌ها و data-attribute های خود ووکامرس هم چاپ می‌شوند
+	 * تا افزودن به سبد بدون رفرش صفحه (ایجکس) کار کند؛ اگر اسکریپت ووکامرس در آن
+	 * صفحه نباشد، href معمولی جواب می‌دهد و فقط صفحه رفرش می‌شود.
+	 *
+	 * @param array  $item
+	 * @param array  $opts
+	 * @param string $class
+	 * @param string $inner  HTML داخل دکمه (از قبل escape شده).
+	 * @param string $label  متن aria-label، خالی یعنی لازم نیست.
+	 */
+	private function render_card_action( $item, $opts, $class, $inner, $label ) {
+		$link = isset( $item['link'] ) ? $item['link'] : array( 'url' => '' );
+		$add  = isset( $item['add_url'] ) ? $item['add_url'] : array( 'url' => '' );
+
+		$to_cart = 'add' === $opts['button_action'] && ! empty( $add['url'] );
+		$target  = $to_cart ? $add : $link;
+
+		$attrs   = Ardal_Helpers::link_attrs( $target );
+		$classes = array( $class );
+
+		if ( $to_cart && ! empty( $item['product_id'] ) ) {
+			$classes[] = 'add_to_cart_button';
+
+			if ( ! empty( $item['ajax_add'] ) ) {
+				$classes[] = 'ajax_add_to_cart';
+
+				// اسکریپت ووکامرس در فوتر ثبت شده؛ همین‌جا صدا زدنش کافی است.
+				wp_enqueue_script( 'wc-add-to-cart' );
+			}
+
+			$attrs .= sprintf(
+				' data-product_id="%d" data-quantity="1" rel="nofollow"',
+				(int) $item['product_id']
+			);
+		}
+
+		printf(
+			'<%1$s class="%2$s"%3$s%4$s>%5$s</%1$s>',
+			esc_html( Ardal_Helpers::link_tag( $target ) ),
+			esc_attr( implode( ' ', $classes ) ),
+			$attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- داخل link_attrs escape شده.
+			'' !== $label ? ' aria-label="' . esc_attr( $label ) . '"' : '',
+			$inner // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- از قبل escape شده.
+		);
 	}
 
 	/**

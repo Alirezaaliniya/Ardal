@@ -315,7 +315,11 @@ class Ardal_Settings {
 									<div class="ardal-pv-name">کفش دویدن ران‌فلکس ایر پرو</div>
 									<div class="ardal-pv-stars">★★★★☆</div>
 									<div class="ardal-pv-old">۵٫۹۰۰٫۰۰۰</div>
-									<div class="ardal-pv-price">۴٫۸۵۰٫۰۰۰ <small>تومان</small></div>
+									<div class="ardal-pv-price">
+										۴٫۸۵۰٫۰۰۰
+										<span class="ard-currency ard-currency--text" data-toman="text">تومان</span>
+										<span class="ard-currency ard-currency--icon" data-toman="icon" hidden><?php echo Ardal_Currency::symbol(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+									</div>
 									<span class="ardal-pv-fab">+</span>
 								</div>
 								<div class="ardal-pv-deal">

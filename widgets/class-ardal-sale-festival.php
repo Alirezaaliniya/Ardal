@@ -326,7 +326,7 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 		<article class="ard-fest__card">
 			<div class="ard-fest__media">
 				<?php echo Ardal_Helpers::image( isset( $item['image'] ) ? $item['image'] : array(), $wide ? '۵۰۰×۵۰۰' : '۴۰۰×۴۰۰', $title, 'medium' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<?php if ( '' !== $off ) : ?>
+				<?php if ( $wide && '' !== $off ) : ?>
 					<span class="ard-badge ard-badge--sale"><?php echo esc_html( $off ); ?></span>
 				<?php endif; ?>
 			</div>
@@ -348,7 +348,7 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 						<del><?php echo esc_html( $old ); ?></del>
 					<?php endif; ?>
 					<?php if ( '' !== $price ) : ?>
-						<span class="ard-fest__price"><?php echo esc_html( $price ); ?> <small>تومان</small></span>
+						<span class="ard-fest__price"><?php echo esc_html( $price ); ?> <?php echo Ardal_Currency::unit(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 					<?php endif; ?>
 				</div>
 

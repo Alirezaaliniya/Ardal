@@ -161,6 +161,33 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'link_mode',
+			array(
+				'label'       => 'ناحیه قابل کلیک',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'button',
+				'options'     => array(
+					'button' => 'فقط عنوان و دکمه',
+					'box'    => 'کل کارت به محصول لینک شود',
+				),
+				'description' => 'در حالت «کل کارت»، دکمه همچنان کار خودش را انجام می‌دهد و کلیک روی آن به محصول نمی‌رود.',
+			)
+		);
+
+		$this->add_control(
+			'button_action',
+			array(
+				'label'   => 'کلیک روی دکمه',
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'add',
+				'options' => array(
+					'add'  => 'افزودن به سبد خرید',
+					'link' => 'رفتن به صفحه محصول',
+				),
+			)
+		);
+
+		$this->add_control(
 			'show_rating',
 			array(
 				'label'        => 'نمایش امتیاز',
@@ -252,7 +279,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
 				'range'      => array( 'px' => array( 'min' => 80, 'max' => 320 ) ),
-				'default'    => array( 'unit' => 'px', 'size' => 210 ),
+				'default'    => array( 'unit' => 'px', 'size' => 190 ),
 				'condition'  => array(
 					'variant' => 'framed',
 					'notch'   => 'yes',
@@ -270,7 +297,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
 				'range'      => array( 'px' => array( 'min' => 32, 'max' => 80 ) ),
-				'default'    => array( 'unit' => 'px', 'size' => 54 ),
+				'default'    => array( 'unit' => 'px', 'size' => 46 ),
 				'condition'  => array( 'variant' => 'framed' ),
 				'selectors'  => array(
 					'{{WRAPPER}} .ard-pcard' => '--ard-fab:{{SIZE}}{{UNIT}};',
@@ -339,9 +366,11 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 		$this->render_product_card(
 			$item,
 			array(
-				'variant'     => $s['variant'],
-				'show_rating' => 'yes' === $s['show_rating'],
-				'show_off'    => 'yes' === $s['show_off'],
+				'variant'       => $s['variant'],
+				'link_mode'     => $s['link_mode'],
+				'button_action' => $s['button_action'],
+				'show_rating'   => 'yes' === $s['show_rating'],
+				'show_off'      => 'yes' === $s['show_off'],
 				'show_fab'    => $framed,
 				'show_button' => ! $framed,
 				'button_text' => $s['button_text'],

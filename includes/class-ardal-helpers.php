@@ -209,7 +209,9 @@ class Ardal_Helpers {
 			'shield'   => '<path d="M12 3.5l7 2.6v5.4c0 4.3-3 7.4-7 9-4-1.6-7-4.7-7-9V6.1z"/><path d="M9 12l2.2 2.2L15.3 10"/>',
 			'refresh'  => '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4.5V10h-5.5"/>',
 			'wallet'   => '<rect x="3.5" y="6" width="17" height="12.5" rx="2.4"/><path d="M3.5 10h17"/><circle cx="16.5" cy="14" r="1.2"/>',
-			'chevron'  => '<path d="M14.5 6.5L9 12l5.5 5.5"/>',
+			'chevron'       => '<path d="M14.5 6.5L9 12l5.5 5.5"/>',
+			'chevron-left'  => '<path d="M14.5 6.5L9 12l5.5 5.5"/>',
+			'chevron-right' => '<path d="M9.5 6.5L15 12l-5.5 5.5"/>',
 			'play'     => '<path d="M9.5 7.5l7 4.5-7 4.5z"/>',
 			'phone'    => '<path d="M6 4h3l1.6 4-2 1.4a11 11 0 0 0 5.6 5.6l1.4-2 4 1.6v3a1.6 1.6 0 0 1-1.8 1.6C11.3 18.6 5.4 12.7 4.4 5.8A1.6 1.6 0 0 1 6 4z"/>',
 			'mail'     => '<rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3.6 7l8.4 6 8.4-6"/>',
@@ -364,6 +366,12 @@ class Ardal_Helpers {
 			'image'     => array( 'url' => $image ? $image[0] : '' ),
 			'badge'     => '',
 			'add_url'   => array( 'url' => $product->add_to_cart_url() ),
+			// برای نوار موجودی ویجت پیشنهاد ویژه.
+			'product_id' => $product->get_id(),
+			// ایجکس فقط وقتی معنا دارد که محصول واقعاً بشود مستقیم به سبد اضافه شود.
+			'ajax_add'  => $product->supports( 'ajax_add_to_cart' ) && $product->is_purchasable() && $product->is_in_stock(),
+			'wc_sold'   => (int) $product->get_total_sales(),
+			'wc_stock'  => $product->managing_stock() ? (int) $product->get_stock_quantity() : 0,
 		);
 	}
 

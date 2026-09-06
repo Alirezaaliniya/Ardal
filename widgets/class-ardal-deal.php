@@ -1,6 +1,6 @@
 <?php
 /**
- * ویجت پیشنهاد ویژه با شمارش معکوس و نوار موجودی.
+ * ویجت پیشنهاد ویژه — کروسل محصولات تخفیف‌دار با شمارش معکوس.
  *
  * @package Ardal
  */
@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Elementor\Controls_Manager;
+use Elementor\Repeater;
 
 class Ardal_Widget_Deal extends Ardal_Widget_Base {
 
@@ -26,13 +27,30 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 	}
 
 	public function get_keywords() {
-		return array( 'اردال', 'پیشنهاد', 'شمارش معکوس', 'تخفیف', 'deal', 'countdown' );
+		return array( 'اردال', 'پیشنهاد', 'شمارش معکوس', 'تخفیف', 'کروسل', 'deal', 'countdown', 'carousel' );
+	}
+
+	/**
+	 * کلاس روی wrapper خود ویجت.
+	 *
+	 * برای «هم‌ارتفاع با ستون» فقط block-size روی خود باکس کافی نیست؛ wrapperهای
+	 * المنتور بینشان ارتفاع auto دارند و زنجیره قطع می‌شود، پس اینجا هم کلاس لازم است.
+	 *
+	 * این متد را المنتور در get_initial_config() روی نمونه‌ای بدون داده هم صدا می‌زند،
+	 * بنابراین اینجا نباید سراغ تنظیمات رفت (get_settings_for_display روی داده خالی
+	 * خطا می‌دهد). کلاس همیشه چاپ می‌شود و تصمیمِ کشیده‌شدن به کلاس ard-deal--stretch
+	 * سپرده شده که در render() به‌صورت شرطی صادر می‌شود؛ بدون آن، استایل host بی‌اثر است.
+	 *
+	 * @return string
+	 */
+	protected function get_html_wrapper_class() {
+		return parent::get_html_wrapper_class() . ' ard-deal-host';
 	}
 
 	protected function register_controls() {
 		$this->start_controls_section(
-			'section_content',
-			array( 'label' => 'محصول' )
+			'section_head',
+			array( 'label' => 'سربرگ' )
 		);
 
 		$this->add_control(
@@ -47,33 +65,36 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 		$this->add_control(
 			'meta',
 			array(
-				'label'   => 'متن گوشه (تعداد کالا)',
-				'type'    => Controls_Manager::TEXT,
-				'default' => '۱۲ کالا',
+				'label'       => 'متن گوشه',
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '',
+				'placeholder' => 'مثلاً ۱۲ کالا',
+				'description' => 'خالی بگذارید تا به‌جایش تعداد محصولات همین ویجت نوشته شود.',
 			)
 		);
 
 		$this->add_control(
-			'wc_product',
+			'show_meta',
 			array(
-				'label'       => 'گرفتن اطلاعات از محصول ووکامرس',
-				'type'        => Controls_Manager::NUMBER,
-				'default'     => 0,
-				'min'         => 0,
-				'description' => 'شناسه محصول را وارد کنید تا عنوان، قیمت و تصویر خودکار پر شود. برای ورود دستی، صفر بگذارید.',
-				'condition'   => Ardal_Helpers::has_woo() ? array() : array( 'never' => 'never' ),
+				'label'        => 'نمایش متن گوشه',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
 			)
 		);
 
-		$this->add_control(
-			'image',
-			array(
-				'label' => 'تصویر محصول',
-				'type'  => Controls_Manager::MEDIA,
-			)
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_content',
+			array( 'label' => 'محصولات' )
 		);
 
-		$this->add_control(
+		$this->add_source_controls( 6 );
+
+		$repeater = new Repeater();
+
+		$repeater->add_control(
 			'title',
 			array(
 				'label'       => 'نام محصول',
@@ -84,16 +105,15 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'old_price',
+		$repeater->add_control(
+			'image',
 			array(
-				'label'   => 'قیمت قبل',
-				'type'    => Controls_Manager::TEXT,
-				'default' => '۲۸٫۹۰۰٫۰۰۰',
+				'label' => 'تصویر',
+				'type'  => Controls_Manager::MEDIA,
 			)
 		);
 
-		$this->add_control(
+		$repeater->add_control(
 			'price',
 			array(
 				'label'   => 'قیمت با تخفیف',
@@ -102,7 +122,16 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_control(
+		$repeater->add_control(
+			'old_price',
+			array(
+				'label'   => 'قیمت قبل',
+				'type'    => Controls_Manager::TEXT,
+				'default' => '۲۸٫۹۰۰٫۰۰۰',
+			)
+		);
+
+		$repeater->add_control(
 			'off',
 			array(
 				'label'       => 'درصد تخفیف',
@@ -112,12 +141,146 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_control(
+		$repeater->add_control(
+			'sold',
+			array(
+				'label'   => 'تعداد فروش‌رفته',
+				'type'    => Controls_Manager::NUMBER,
+				'default' => 8,
+				'min'     => 0,
+			)
+		);
+
+		$repeater->add_control(
+			'total',
+			array(
+				'label'   => 'کل موجودی',
+				'type'    => Controls_Manager::NUMBER,
+				'default' => 25,
+				'min'     => 1,
+			)
+		);
+
+		$repeater->add_control(
 			'link',
 			array(
 				'label'   => 'لینک محصول',
 				'type'    => Controls_Manager::URL,
 				'default' => array( 'url' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'items',
+			array(
+				'label'       => 'محصولات',
+				'type'        => Controls_Manager::REPEATER,
+				'fields'      => $repeater->get_controls(),
+				'title_field' => '{{{ title }}}',
+				'condition'   => array( 'source' => 'manual' ),
+				'default'     => array(
+					array(
+						'title'     => 'تردمیل خانگی پرو-فیت مدل T۹۰۰ تاشو',
+						'price'     => '۱۹٫۶۵۰٫۰۰۰',
+						'old_price' => '۲۸٫۹۰۰٫۰۰۰',
+						'sold'      => 8,
+						'total'     => 25,
+					),
+					array(
+						'title'     => 'دوچرخه ثابت مغناطیسی اسپین بایک',
+						'price'     => '۸٫۹۰۰٫۰۰۰',
+						'old_price' => '۱۲٫۴۰۰٫۰۰۰',
+						'sold'      => 14,
+						'total'     => 20,
+					),
+					array(
+						'title'     => 'ست دمبل هالتر ۳۰ کیلوگرمی روکش‌دار',
+						'price'     => '۳٫۲۵۰٫۰۰۰',
+						'old_price' => '۴٫۶۰۰٫۰۰۰',
+						'sold'      => 5,
+						'total'     => 30,
+					),
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_carousel',
+			array( 'label' => 'کروسل' )
+		);
+
+		$this->add_responsive_control(
+			'per_view',
+			array(
+				'label'          => 'تعداد نمایش هم‌زمان',
+				'type'           => Controls_Manager::NUMBER,
+				'min'            => 1,
+				'max'            => 6,
+				'default'        => 1,
+				'tablet_default' => 2,
+				'mobile_default' => 2,
+				'description'    => 'مثلاً دسکتاپ ۱ و موبایل ۲.',
+				'selectors'      => array(
+					'{{WRAPPER}} .ard-deal__viewport' => '--ard-per:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'gap',
+			array(
+				'label'      => 'فاصله بین اسلایدها',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 12 ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-deal__viewport' => '--ard-gap:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'show_dots',
+			array(
+				'label'        => 'نمایش نقطه‌ها',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+			)
+		);
+
+		$this->add_control(
+			'show_arrows',
+			array(
+				'label'        => 'نمایش فلش‌ها در سربرگ',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+			)
+		);
+
+		$this->add_control(
+			'autoplay',
+			array(
+				'label'        => 'چرخش خودکار',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+			)
+		);
+
+		$this->add_control(
+			'interval',
+			array(
+				'label'     => 'فاصله چرخش (ثانیه)',
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 2,
+				'max'       => 30,
+				'default'   => 6,
+				'condition' => array( 'autoplay' => 'yes' ),
 			)
 		);
 
@@ -164,6 +327,20 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'clock_position',
+			array(
+				'label'     => 'جای شمارنده',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'bottom',
+				'options'   => array(
+					'bottom' => 'پایین باکس',
+					'top'    => 'زیر عنوان',
+				),
+				'condition' => array( 'timer_mode!' => 'none' ),
+			)
+		);
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -178,28 +355,6 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 				'type'         => Controls_Manager::SWITCHER,
 				'default'      => 'yes',
 				'return_value' => 'yes',
-			)
-		);
-
-		$this->add_control(
-			'sold',
-			array(
-				'label'     => 'تعداد فروش‌رفته',
-				'type'      => Controls_Manager::NUMBER,
-				'default'   => 8,
-				'min'       => 0,
-				'condition' => array( 'show_stock' => 'yes' ),
-			)
-		);
-
-		$this->add_control(
-			'total',
-			array(
-				'label'     => 'کل موجودی',
-				'type'      => Controls_Manager::NUMBER,
-				'default'   => 25,
-				'min'       => 1,
-				'condition' => array( 'show_stock' => 'yes' ),
 			)
 		);
 
@@ -238,98 +393,210 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'stretch',
+			array(
+				'label'        => 'هم‌ارتفاع با ستون',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'باکس دقیقاً به اندازهٔ ستون کنارش (مثلاً اسلایدر) کشیده می‌شود و تصویر فضای باقی‌مانده را پر می‌کند.',
+				'condition'    => array( 'variant' => 'card' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'media_min',
+			array(
+				'label'          => 'حداقل ارتفاع تصویر',
+				'type'           => Controls_Manager::SLIDER,
+				'size_units'     => array( 'px' ),
+				'range'          => array( 'px' => array( 'min' => 60, 'max' => 260 ) ),
+				'default'        => array( 'unit' => 'px', 'size' => 110 ),
+				'mobile_default' => array( 'unit' => 'px', 'size' => 90 ),
+				'selectors'      => array(
+					'{{WRAPPER}} .ard-deal__media' => '--ard-deal-media:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'title_lines',
+			array(
+				'label'     => 'حداکثر خطوط عنوان',
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 1,
+				'max'       => 4,
+				'default'   => 2,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-deal__title' => '-webkit-line-clamp:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'padding',
+			array(
+				'label'      => 'فاصله داخلی باکس',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 6, 'max' => 32 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 14 ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-deal' => '--ard-deal-pad:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
 	protected function render() {
-		$s = $this->get_settings_for_display();
-		$s = $this->maybe_fill_from_woo( $s );
+		$s     = $this->get_settings_for_display();
+		$items = $this->get_deal_items( $s );
 
-		$price = Ardal_Helpers::price( $s['price'] );
-		$old   = Ardal_Helpers::price( $s['old_price'] );
-		$off   = '' !== trim( (string) $s['off'] )
-			? Ardal_Helpers::fa_digits( $s['off'] )
-			: Ardal_Helpers::discount( $old, $price );
+		if ( empty( $items ) ) {
+			$this->render_empty( 'محصولی برای پیشنهاد ویژه تعریف نشده است.' );
 
-		$sold  = max( 0, (int) $s['sold'] );
-		$total = max( 1, (int) $s['total'] );
-		$pct   = min( 100, (int) round( ( $sold / $total ) * 100 ) );
+			return;
+		}
+
+		$classes = array( 'ard-deal', 'ard-deal--' . $s['variant'] );
+
+		if ( 'card' === $s['variant'] && 'yes' === $s['stretch'] ) {
+			$classes[] = 'ard-deal--stretch';
+		}
+
+		$has_clock = 'none' !== $s['timer_mode'];
+		$interval  = 'yes' === $s['autoplay'] ? max( 2, (int) $s['interval'] ) * 1000 : 0;
 		?>
-		<section class="ard-deal ard-deal--<?php echo esc_attr( $s['variant'] ); ?>">
+		<section class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
 
-			<?php if ( 'card' === $s['variant'] ) : ?>
-				<div class="ard-deal__head">
-					<h2 class="ard-deal__label"><?php echo esc_html( $s['label'] ); ?></h2>
-					<?php if ( '' !== trim( (string) $s['meta'] ) ) : ?>
-						<span class="ard-deal__meta"><?php echo esc_html( $s['meta'] ); ?></span>
-					<?php endif; ?>
-				</div>
-			<?php endif; ?>
+			<div class="ard-deal__head">
+				<h2 class="ard-deal__label"><?php echo esc_html( $s['label'] ); ?></h2>
 
-			<div class="ard-deal__body">
-				<div class="ard-deal__media">
-					<?php echo Ardal_Helpers::image( $s['image'], '۴۰۰×۴۰۰', $s['title'], 'medium' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</div>
-
-				<div class="ard-deal__info">
-					<?php if ( 'bar' === $s['variant'] ) : ?>
-						<span class="ard-badge ard-badge--sale ard-deal__inline-badge">
-							<?php echo esc_html( trim( $s['label'] . ( '' !== $off ? ' — ' . $off : '' ) ) ); ?>
-						</span>
-					<?php endif; ?>
-
-					<h3 class="ard-deal__title">
-						<?php if ( ! empty( $s['link']['url'] ) ) : ?>
-							<a<?php echo Ardal_Helpers::link_attrs( $s['link'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $s['title'] ); ?></a>
-						<?php else : ?>
-							<?php echo esc_html( $s['title'] ); ?>
-						<?php endif; ?>
-					</h3>
-
-					<div class="ard-deal__prices">
-						<?php if ( '' !== $off && 'bar' !== $s['variant'] ) : ?>
-							<span class="ard-badge ard-badge--sale"><?php echo esc_html( $off ); ?></span>
-						<?php endif; ?>
-						<?php if ( '' !== $old ) : ?>
-							<del class="ard-deal__old"><?php echo esc_html( $old ); ?></del>
-						<?php endif; ?>
-						<?php if ( '' !== $price ) : ?>
-							<span class="ard-deal__price"><?php echo esc_html( $price ); ?> <small>تومان</small></span>
-						<?php endif; ?>
-					</div>
-				</div>
-
-				<?php if ( 'none' !== $s['timer_mode'] ) : ?>
-					<div class="ard-deal__timer">
-						<?php $this->render_clock( $s ); ?>
-					</div>
+				<?php if ( 'yes' === $s['show_meta'] ) : ?>
+					<span class="ard-deal__meta"><?php echo esc_html( $this->meta_text( $s, count( $items ) ) ); ?></span>
 				<?php endif; ?>
 
-				<?php if ( 'yes' === $s['show_stock'] ) : ?>
-					<div class="ard-deal__stock">
-						<?php if ( 'bar' === $s['variant'] ) : ?>
-							<div class="ard-deal__stock-head">
-								<span>فروش رفته</span>
-								<strong><?php echo esc_html( Ardal_Helpers::fa_digits( $sold ) . ' از ' . Ardal_Helpers::fa_digits( $total ) ); ?></strong>
-							</div>
-						<?php endif; ?>
-
-						<div class="ard-progress" role="progressbar" aria-valuenow="<?php echo esc_attr( $pct ); ?>" aria-valuemin="0" aria-valuemax="100">
-							<span style="width:<?php echo esc_attr( $pct ); ?>%"></span>
-						</div>
-
-						<?php if ( 'card' === $s['variant'] ) : ?>
-							<p class="ard-deal__stock-text"><?php echo esc_html( $this->stock_text( $s, $sold, $total ) ); ?></p>
-						<?php endif; ?>
+				<?php if ( 'yes' === $s['show_arrows'] && count( $items ) > 1 ) : ?>
+					<div class="ard-deal__nav">
+						<button type="button" class="ard-deal__arrow" data-ard-prev aria-label="قبلی">
+							<?php echo Ardal_Helpers::icon( 'chevron-right', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						</button>
+						<button type="button" class="ard-deal__arrow" data-ard-next aria-label="بعدی">
+							<?php echo Ardal_Helpers::icon( 'chevron-left', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						</button>
 					</div>
 				<?php endif; ?>
 			</div>
+
+			<?php
+			if ( $has_clock && 'top' === $s['clock_position'] ) {
+				$this->render_clock( $s );
+			}
+			?>
+
+			<div
+				class="ard-deal__carousel"
+				data-ard-carousel
+				data-interval="<?php echo esc_attr( $interval ); ?>"
+			>
+				<div class="ard-deal__viewport" data-ard-viewport>
+					<?php foreach ( $items as $item ) : ?>
+						<?php $this->render_item( $item, $s ); ?>
+					<?php endforeach; ?>
+				</div>
+
+				<?php if ( 'yes' === $s['show_dots'] && count( $items ) > 1 ) : ?>
+					<div class="ard-deal__dots" data-ard-dots role="tablist" aria-label="انتخاب محصول"></div>
+				<?php endif; ?>
+			</div>
+
+			<?php
+			if ( $has_clock && 'bottom' === $s['clock_position'] ) {
+				$this->render_clock( $s );
+			}
+			?>
 		</section>
 		<?php
 	}
 
 	/**
-	 * خانه‌های ساعت/دقیقه/ثانیه.
+	 * یک اسلاید محصول.
+	 *
+	 * @param array $item
+	 * @param array $s
+	 */
+	private function render_item( $item, $s ) {
+		$title = isset( $item['title'] ) ? $item['title'] : '';
+		$price = Ardal_Helpers::price( isset( $item['price'] ) ? $item['price'] : '' );
+		$old   = Ardal_Helpers::price( isset( $item['old_price'] ) ? $item['old_price'] : '' );
+		$off   = ! empty( $item['off'] )
+			? Ardal_Helpers::fa_digits( $item['off'] )
+			: Ardal_Helpers::discount( $old, $price );
+		$link  = isset( $item['link'] ) ? $item['link'] : array( 'url' => '' );
+
+		$sold  = isset( $item['sold'] ) ? max( 0, (int) $item['sold'] ) : 0;
+		$total = isset( $item['total'] ) ? max( 1, (int) $item['total'] ) : 1;
+		$pct   = min( 100, (int) round( ( $sold / $total ) * 100 ) );
+		?>
+		<article class="ard-deal__item">
+			<div class="ard-deal__media">
+				<?php echo Ardal_Helpers::image( isset( $item['image'] ) ? $item['image'] : array(), '۴۰۰×۴۰۰', $title, 'medium' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php if ( '' !== $off ) : ?>
+					<span class="ard-badge ard-badge--sale"><?php echo esc_html( $off ); ?></span>
+				<?php endif; ?>
+			</div>
+
+			<div class="ard-deal__info">
+				<h3 class="ard-deal__title">
+					<?php if ( ! empty( $link['url'] ) ) : ?>
+						<a<?php echo Ardal_Helpers::link_attrs( $link ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $title ); ?></a>
+					<?php else : ?>
+						<?php echo esc_html( $title ); ?>
+					<?php endif; ?>
+				</h3>
+
+				<div class="ard-deal__prices">
+					<?php if ( '' !== $old ) : ?>
+						<del class="ard-deal__old"><?php echo esc_html( $old ); ?></del>
+					<?php endif; ?>
+					<?php if ( '' !== $price ) : ?>
+						<span class="ard-deal__price"><?php echo esc_html( $price ); ?> <?php echo Ardal_Currency::unit(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<?php endif; ?>
+				</div>
+			</div>
+
+			<?php if ( 'yes' === $s['show_stock'] ) : ?>
+				<div class="ard-deal__stock">
+					<div class="ard-progress" role="progressbar" aria-valuenow="<?php echo esc_attr( $pct ); ?>" aria-valuemin="0" aria-valuemax="100">
+						<span style="width:<?php echo esc_attr( $pct ); ?>%"></span>
+					</div>
+					<p class="ard-deal__stock-text"><?php echo esc_html( $this->stock_text( $s, $sold, $total ) ); ?></p>
+				</div>
+			<?php endif; ?>
+		</article>
+		<?php
+	}
+
+	/**
+	 * @param array $s
+	 * @param int   $count
+	 * @return string
+	 */
+	private function meta_text( $s, $count ) {
+		$meta = trim( (string) $s['meta'] );
+
+		if ( '' !== $meta ) {
+			return $meta;
+		}
+
+		return Ardal_Helpers::fa_digits( $count ) . ' کالا';
+	}
+
+	/**
+	 * خانه‌های شمارنده.
 	 *
 	 * @param array $s
 	 */
@@ -351,7 +618,7 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 		$values = $this->split_time( $remaining, $show_days );
 		?>
 		<div
-			class="ard-clock"
+			class="ard-clock ard-deal__clock"
 			data-ard-countdown
 			data-remaining="<?php echo esc_attr( $remaining ); ?>"
 			data-mode="<?php echo esc_attr( $s['timer_mode'] ); ?>"
@@ -394,9 +661,7 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 		$now = (int) current_time( 'timestamp' ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested
 
 		if ( 'daily' === $s['timer_mode'] ) {
-			$midnight = strtotime( 'tomorrow', $now );
-
-			return max( 0, $midnight - $now );
+			return max( 0, strtotime( 'tomorrow', $now ) - $now );
 		}
 
 		if ( 'date' === $s['timer_mode'] && ! empty( $s['end_date'] ) ) {
@@ -415,8 +680,6 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 	 * @return string
 	 */
 	private function stock_text( $s, $sold, $total ) {
-		$text = (string) $s['stock_template'];
-
 		return str_replace(
 			array( '{sold}', '{total}', '{left}' ),
 			array(
@@ -424,49 +687,33 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 				Ardal_Helpers::fa_digits( $total ),
 				Ardal_Helpers::fa_digits( max( 0, $total - $sold ) ),
 			),
-			$text
+			(string) $s['stock_template']
 		);
 	}
 
 	/**
-	 * پر کردن فیلدها از یک محصول ووکامرس، اگر شناسه داده شده باشد.
+	 * آیتم‌ها با منبع دستی یا ووکامرس، به‌علاوهٔ داده‌های موجودی.
 	 *
 	 * @param array $s
 	 * @return array
 	 */
-	private function maybe_fill_from_woo( $s ) {
-		$id = isset( $s['wc_product'] ) ? (int) $s['wc_product'] : 0;
+	private function get_deal_items( $s ) {
+		$items = $this->get_product_items( $s );
 
-		if ( $id <= 0 || ! Ardal_Helpers::has_woo() || ! function_exists( 'wc_get_product' ) ) {
-			return $s;
-		}
+		// محصولات ووکامرس فیلد فروش‌رفته/کل ندارند؛ از آمار فروش و موجودی می‌سازیمشان.
+		foreach ( $items as $i => $item ) {
+			if ( ! isset( $item['sold'] ) ) {
+				$items[ $i ]['sold'] = isset( $item['wc_sold'] ) ? (int) $item['wc_sold'] : 0;
+			}
 
-		$product = wc_get_product( $id );
+			if ( ! isset( $item['total'] ) ) {
+				$stock = isset( $item['wc_stock'] ) ? (int) $item['wc_stock'] : 0;
+				$sold  = (int) $items[ $i ]['sold'];
 
-		if ( ! $product ) {
-			return $s;
-		}
-
-		$card = Ardal_Helpers::product_to_card( $product );
-
-		$s['title']     = $card['title'];
-		$s['price']     = $card['price'];
-		$s['old_price'] = $card['old_price'];
-		$s['off']       = $card['off'];
-		$s['link']      = $card['link'];
-
-		if ( empty( $s['image']['url'] ) || false !== strpos( (string) $s['image']['url'], 'placeholder' ) ) {
-			$s['image'] = $card['image'];
-		}
-
-		if ( $product->managing_stock() ) {
-			$stock = (int) $product->get_stock_quantity();
-
-			if ( $stock > 0 ) {
-				$s['total'] = max( $stock, (int) $s['sold'] + $stock );
+				$items[ $i ]['total'] = $stock > 0 ? $sold + $stock : max( 1, $sold );
 			}
 		}
 
-		return $s;
+		return $items;
 	}
 }

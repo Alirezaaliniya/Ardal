@@ -239,7 +239,7 @@ class Ardal_Widget_Bestsellers extends Ardal_Widget_Base {
 					<?php endif; ?>
 
 					<?php if ( '' !== $price ) : ?>
-						<div class="ard-best__price"><?php echo esc_html( $price ); ?> <small>تومان</small></div>
+						<div class="ard-best__price"><?php echo esc_html( $price ); ?> <?php echo Ardal_Currency::unit(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 					<?php endif; ?>
 				</article>
 			<?php endforeach; ?>

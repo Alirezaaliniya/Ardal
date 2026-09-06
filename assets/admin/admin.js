@@ -100,6 +100,21 @@
 			);
 		}
 
+		// واحد پول: متن یا نماد، بر اساس همان چک‌باکس تنظیمات.
+		var toggle = document.getElementById( 'ardal-field-toman_symbol' );
+		var useIcon = !! ( toggle && toggle.checked );
+
+		Array.prototype.forEach.call( node.querySelectorAll( '[data-toman]' ), function ( el ) {
+			el.hidden = ( 'icon' === el.getAttribute( 'data-toman' ) ) !== useIcon;
+		} );
+
+		var sizeField = document.getElementById( 'ardal-field-toman_size' );
+		var size = sizeField ? parseFloat( sizeField.value ) : 170;
+
+		if ( ! isNaN( size ) && size > 0 ) {
+			node.style.setProperty( '--ard-toman-size', ( size / 100 ) + 'em' );
+		}
+
 		// نشان بالای صفحه هم با رنگ برند هماهنگ می‌شود.
 		var mark = document.querySelector( '.ardal-title__mark' );
 
@@ -137,6 +152,9 @@
 		} );
 
 		$colors.on( 'input change', repaint );
+
+		// چک‌باکس نماد تومان و اندازه‌اش هم روی پیش‌نمایش اثر دارند.
+		$( '#ardal-field-toman_symbol, #ardal-field-toman_size' ).on( 'input change', repaint );
 
 		$( '.ardal-preset' ).on( 'click', function () {
 			var id = $( this ).data( 'preset' );

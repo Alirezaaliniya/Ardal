@@ -18,6 +18,7 @@ class Ardal_Assets {
 
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register' ), 5 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_for_woo' ), 20 );
 		add_action( 'elementor/frontend/after_enqueue_styles', array( $this, 'enqueue' ) );
 		add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'enqueue' ) );
 		add_action( 'elementor/preview/enqueue_styles', array( $this, 'enqueue' ) );
@@ -48,6 +49,19 @@ class Ardal_Assets {
 		wp_register_script( 'ardal', ARDAL_URL . 'assets/js/ardal.js', array(), ARDAL_VERSION, true );
 
 		wp_add_inline_style( 'ardal', Ardal_Palette::css_vars() );
+	}
+
+	/**
+	 * وقتی نماد تومان روی قیمت‌های خود ووکامرس اعمال می‌شود، استایل باید روی آن
+	 * صفحات هم باشد؛ حتی اگر هیچ ویجت اردالی در صفحه نباشد و المنتور استایلش را
+	 * لود نکند.
+	 */
+	public function maybe_enqueue_for_woo() {
+		if ( ! Ardal_Currency::use_symbol() || '1' !== Ardal_Palette::get( 'toman_woo' ) ) {
+			return;
+		}
+
+		$this->enqueue();
 	}
 
 	public function enqueue() {

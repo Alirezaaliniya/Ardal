@@ -31,6 +31,8 @@ final class Ardal {
 		new Ardal_Settings();
 		new Ardal_Assets();
 
+		Ardal_Currency::init();
+
 		add_action( 'plugins_loaded', array( $this, 'boot_elementor' ) );
 	}
 
