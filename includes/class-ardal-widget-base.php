@@ -1,0 +1,417 @@
+<?php
+/**
+ * کلاس پایه ویجت‌های اردال — کنترل‌ها و رندرهای مشترک.
+ *
+ * @package Ardal
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+use Elementor\Controls_Manager;
+use Elementor\Widget_Base;
+
+abstract class Ardal_Widget_Base extends Widget_Base {
+
+	/**
+	 * @return array
+	 */
+	public function get_categories() {
+		return array( 'ardal' );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_style_depends() {
+		return array( 'ardal' );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_script_depends() {
+		return array( 'ardal' );
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_icon() {
+		return 'eicon-blockquote';
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_custom_help_url() {
+		return '';
+	}
+
+	/**
+	 * بخش «عنوان بخش» که در چند ویجت تکرار می‌شود.
+	 *
+	 * @param string $default_title
+	 * @param string $accent پیش‌فرض رنگ خط کنار عنوان: accent یا primary.
+	 */
+	protected function add_heading_controls( $default_title, $accent = 'accent' ) {
+		$this->start_controls_section(
+			'section_heading',
+			array( 'label' => 'عنوان بخش' )
+		);
+
+		$this->add_control(
+			'show_heading',
+			array(
+				'label'        => 'نمایش عنوان',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+			)
+		);
+
+		$this->add_control(
+			'heading',
+			array(
+				'label'     => 'عنوان',
+				'type'      => Controls_Manager::TEXT,
+				'default'   => $default_title,
+				'condition' => array( 'show_heading' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'subheading',
+			array(
+				'label'       => 'زیرعنوان',
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '',
+				'description' => 'اختیاری — زیر عنوان اصلی نمایش داده می‌شود.',
+				'condition'   => array( 'show_heading' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'heading_rule',
+			array(
+				'label'     => 'خط کنار عنوان',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => $accent,
+				'options'   => array(
+					'accent'  => 'سبز',
+					'primary' => 'آبی',
+					'none'    => 'بدون خط',
+				),
+				'condition' => array( 'show_heading' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'heading_align',
+			array(
+				'label'     => 'چیدمان عنوان',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'start',
+				'options'   => array(
+					'start'  => 'راست‌چین',
+					'center' => 'وسط‌چین',
+				),
+				'condition' => array( 'show_heading' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'more_text',
+			array(
+				'label'     => 'متن لینک «مشاهده همه»',
+				'type'      => Controls_Manager::TEXT,
+				'default'   => 'مشاهده همه',
+				'condition' => array(
+					'show_heading'  => 'yes',
+					'heading_align' => 'start',
+				),
+			)
+		);
+
+		$this->add_control(
+			'more_link',
+			array(
+				'label'     => 'لینک «مشاهده همه»',
+				'type'      => Controls_Manager::URL,
+				'default'   => array( 'url' => '' ),
+				'condition' => array(
+					'show_heading'  => 'yes',
+					'heading_align' => 'start',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * رندر عنوان بخش.
+	 */
+	protected function render_heading() {
+		$s = $this->get_settings_for_display();
+
+		if ( 'yes' !== $s['show_heading'] || '' === trim( (string) $s['heading'] ) ) {
+			return;
+		}
+
+		$center = 'center' === $s['heading_align'];
+		$rule   = $s['heading_rule'];
+
+		printf( '<div class="ard-shead%s">', $center ? ' ard-shead--center' : '' );
+
+		if ( ! $center && 'none' !== $rule ) {
+			printf( '<span class="ard-shead__rule ard-shead__rule--%s"></span>', esc_attr( $rule ) );
+		}
+
+		echo '<div class="ard-shead__text">';
+		printf( '<h2 class="ard-shead__title">%s</h2>', esc_html( $s['heading'] ) );
+
+		if ( '' !== trim( (string) $s['subheading'] ) ) {
+			printf( '<p class="ard-shead__sub">%s</p>', esc_html( $s['subheading'] ) );
+		}
+
+		echo '</div>';
+
+		if ( ! $center && ! empty( $s['more_link']['url'] ) && '' !== trim( (string) $s['more_text'] ) ) {
+			printf(
+				'<a class="ard-shead__more"%s>%s <span aria-hidden="true">›</span></a>',
+				Ardal_Helpers::link_attrs( $s['more_link'] ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی داخل تابع escape شده.
+				esc_html( $s['more_text'] )
+			);
+		}
+
+		echo '</div>';
+	}
+
+	/**
+	 * کنترل‌های منبع داده محصول (دستی یا ووکامرس).
+	 *
+	 * @param int $default_limit
+	 */
+	protected function add_source_controls( $default_limit = 5 ) {
+		$this->add_control(
+			'source',
+			array(
+				'label'   => 'منبع محصولات',
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'manual',
+				'options' => Ardal_Helpers::has_woo()
+					? array(
+						'manual'   => 'دستی (وارد کردن در لیست زیر)',
+						'recent'   => 'ووکامرس — جدیدترین',
+						'best'     => 'ووکامرس — پرفروش‌ترین',
+						'sale'     => 'ووکامرس — تخفیف‌دار',
+						'featured' => 'ووکامرس — ویژه',
+						'rating'   => 'ووکامرس — پرامتیازترین',
+					)
+					: array( 'manual' => 'دستی (ووکامرس فعال نیست)' ),
+			)
+		);
+
+		if ( ! Ardal_Helpers::has_woo() ) {
+			return;
+		}
+
+		$this->add_control(
+			'wc_category',
+			array(
+				'label'       => 'محدود به دسته‌بندی',
+				'type'        => Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'options'     => Ardal_Helpers::product_category_options(),
+				'default'     => array(),
+				'label_block' => true,
+				'condition'   => array( 'source!' => 'manual' ),
+			)
+		);
+
+		$this->add_control(
+			'wc_limit',
+			array(
+				'label'     => 'تعداد محصولات',
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 1,
+				'max'       => 24,
+				'default'   => $default_limit,
+				'condition' => array( 'source!' => 'manual' ),
+			)
+		);
+	}
+
+	/**
+	 * لیست نهایی آیتم‌های محصول با توجه به منبع انتخاب‌شده.
+	 *
+	 * @param array  $settings
+	 * @param string $repeater_key
+	 * @return array
+	 */
+	protected function get_product_items( $settings, $repeater_key = 'items' ) {
+		$source = isset( $settings['source'] ) ? $settings['source'] : 'manual';
+
+		if ( 'manual' === $source || ! Ardal_Helpers::has_woo() ) {
+			return isset( $settings[ $repeater_key ] ) && is_array( $settings[ $repeater_key ] )
+				? $settings[ $repeater_key ]
+				: array();
+		}
+
+		$categories = isset( $settings['wc_category'] ) ? (array) $settings['wc_category'] : array();
+
+		return Ardal_Helpers::query_products(
+			array(
+				'source'   => $source,
+				'limit'    => isset( $settings['wc_limit'] ) ? (int) $settings['wc_limit'] : 5,
+				'category' => implode( ',', $categories ),
+			)
+		);
+	}
+
+	/**
+	 * کارت محصول استاندارد (سبک دیزاین ۱a — با دکمه گرد سبز).
+	 *
+	 * @param array $item
+	 * @param array $opts
+	 */
+	protected function render_product_card( $item, $opts = array() ) {
+		$opts = wp_parse_args(
+			$opts,
+			array(
+				'variant'     => 'framed',
+				'show_rating' => true,
+				'show_off'    => true,
+				'show_fab'    => true,
+				'show_button' => false,
+				'button_text' => 'افزودن به سبد',
+				'placeholder' => '۸۰۰×۸۰۰',
+				'image_h'     => '',
+				'notch'       => null,
+			)
+		);
+
+		// بریدگی گوشه فقط وقتی معنا دارد که دکمهٔ گرد روی همان گوشه بنشیند.
+		if ( null === $opts['notch'] ) {
+			$opts['notch'] = 'framed' === $opts['variant'] && $opts['show_fab'];
+		}
+
+		$title  = isset( $item['title'] ) ? $item['title'] : '';
+		$price  = isset( $item['price'] ) ? Ardal_Helpers::price( $item['price'] ) : '';
+		$old    = isset( $item['old_price'] ) ? Ardal_Helpers::price( $item['old_price'] ) : '';
+		$off    = isset( $item['off'] ) && '' !== $item['off']
+			? Ardal_Helpers::fa_digits( $item['off'] )
+			: Ardal_Helpers::discount( $old, $price );
+		$link   = isset( $item['link'] ) ? $item['link'] : array( 'url' => '' );
+		$rating = isset( $item['rating'] ) ? (float) $item['rating'] : 0;
+		$count  = isset( $item['count'] ) ? (int) $item['count'] : 0;
+		$add    = isset( $item['add_url'] ) ? $item['add_url'] : array( 'url' => '' );
+
+		$style = '' !== $opts['image_h'] ? ' style="--ard-card-img-h:' . esc_attr( $opts['image_h'] ) . 'px"' : '';
+
+		$classes = array( 'ard-pcard', 'ard-pcard--' . $opts['variant'] );
+
+		if ( $opts['notch'] ) {
+			$classes[] = 'ard-pcard--notch';
+		}
+
+		printf( '<article class="%s"%s>', esc_attr( implode( ' ', $classes ) ), $style ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<div class="ard-pcard__box">';
+
+		echo '<div class="ard-pcard__media">';
+		echo Ardal_Helpers::image( isset( $item['image'] ) ? $item['image'] : array(), $opts['placeholder'], $title, 'medium_large' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		if ( $opts['show_off'] && '' !== $off ) {
+			printf( '<span class="ard-badge ard-badge--sale">%s</span>', esc_html( $off ) );
+		}
+
+		if ( ! empty( $item['badge'] ) ) {
+			printf( '<span class="ard-badge ard-badge--rank">%s</span>', esc_html( Ardal_Helpers::fa_digits( $item['badge'] ) ) );
+		}
+
+		echo '</div>';
+
+		if ( '' !== $title ) {
+			if ( ! empty( $link['url'] ) ) {
+				printf(
+					'<h3 class="ard-pcard__title"><a%s>%s</a></h3>',
+					Ardal_Helpers::link_attrs( $link ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					esc_html( $title )
+				);
+			} else {
+				printf( '<h3 class="ard-pcard__title">%s</h3>', esc_html( $title ) );
+			}
+		}
+
+		if ( $opts['show_rating'] && $rating > 0 ) {
+			echo '<div class="ard-pcard__rate">';
+			echo Ardal_Helpers::stars( $rating ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+			if ( $count > 0 ) {
+				printf( '<span>(%s)</span>', esc_html( Ardal_Helpers::fa_digits( $count ) ) );
+			}
+
+			echo '</div>';
+		}
+
+		echo '<div class="ard-pcard__prices">';
+
+		if ( '' !== $old ) {
+			printf( '<del class="ard-pcard__old">%s</del>', esc_html( $old ) );
+		}
+
+		if ( '' !== $price ) {
+			printf( '<div class="ard-pcard__price">%s <span>تومان</span></div>', esc_html( $price ) );
+		}
+
+		echo '</div>';
+
+		if ( $opts['show_button'] ) {
+			$target = ! empty( $add['url'] ) ? $add : $link;
+			$tag    = Ardal_Helpers::link_tag( $target );
+
+			printf(
+				'<%1$s class="ard-pcard__btn"%2$s>%3$s</%1$s>',
+				esc_html( $tag ),
+				Ardal_Helpers::link_attrs( $target ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				esc_html( $opts['button_text'] )
+			);
+		}
+
+		echo '</div>';
+
+		if ( $opts['show_fab'] ) {
+			$target = ! empty( $add['url'] ) ? $add : $link;
+			$tag    = Ardal_Helpers::link_tag( $target );
+
+			printf(
+				'<%1$s class="ard-pcard__fab"%2$s aria-label="%3$s"><span aria-hidden="true">+</span></%1$s>',
+				esc_html( $tag ),
+				Ardal_Helpers::link_attrs( $target ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				esc_attr( 'افزودن ' . $title . ' به سبد خرید' )
+			);
+		}
+
+		echo '</article>';
+	}
+
+	/**
+	 * پیام راهنما وقتی هیچ آیتمی تنظیم نشده — فقط در ویرایشگر.
+	 *
+	 * @param string $message
+	 * @return bool آیا پیام نمایش داده شد.
+	 */
+	protected function render_empty( $message ) {
+		if ( ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
+			return true;
+		}
+
+		printf( '<div class="ard-empty">%s</div>', esc_html( $message ) );
+
+		return true;
+	}
+}

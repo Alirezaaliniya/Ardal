@@ -1,0 +1,428 @@
+/* Ardal — استایل صفحه تنظیمات پیشخوان */
+
+.ardal-wrap {
+	--a-fg: #1d2327;
+	--a-muted: #646970;
+	--a-border: #dcdcde;
+	--a-card: #fff;
+
+	max-width: 1360px;
+	font-family: Vazirmatn, Tahoma, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.ardal-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 22px;
+	font-weight: 800;
+}
+
+.ardal-title__mark {
+	width: 26px;
+	height: 26px;
+	border-radius: 8px;
+	background: linear-gradient(140deg, var(--ard-primary-dark, #0B3C8C), var(--ard-accent, #7DC61E));
+}
+
+.ardal-lede {
+	max-width: 760px;
+	margin: 6px 0 22px;
+	font-size: 13.5px;
+	line-height: 2;
+	color: var(--a-muted);
+}
+
+.ardal-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 360px;
+	gap: 20px;
+	align-items: start;
+}
+
+.ardal-main,
+.ardal-side {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
+}
+
+.ardal-card {
+	padding: 20px;
+	border: 1px solid var(--a-border);
+	border-radius: 10px;
+	background: var(--a-card);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+}
+
+.ardal-card h2 {
+	margin: 0 0 4px;
+	padding: 0;
+	font-size: 15px;
+	font-weight: 800;
+	color: var(--a-fg);
+}
+
+.ardal-hint {
+	margin: 4px 0 14px;
+	font-size: 12.5px;
+	line-height: 1.9;
+	color: var(--a-muted);
+}
+
+/* پالت‌های آماده */
+.ardal-presets {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 10px;
+}
+
+.ardal-preset {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border: 1px solid var(--a-border);
+	border-radius: 9px;
+	background: #fff;
+	cursor: pointer;
+	text-align: right;
+	transition: border-color .15s, box-shadow .15s;
+}
+
+.ardal-preset:hover {
+	border-color: #2271b1;
+	box-shadow: 0 2px 8px rgba(34, 113, 177, .14);
+}
+
+.ardal-preset__swatches {
+	display: flex;
+	flex: none;
+}
+
+.ardal-preset__swatches i {
+	width: 15px;
+	height: 24px;
+	border: 1px solid rgba(0, 0, 0, .08);
+}
+
+.ardal-preset__swatches i:first-child {
+	border-radius: 0 5px 5px 0;
+}
+
+.ardal-preset__swatches i:last-child {
+	border-radius: 5px 0 0 5px;
+}
+
+.ardal-preset__name {
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1.6;
+}
+
+/* فیلدها */
+.ardal-fields {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 14px 20px;
+	margin-top: 14px;
+}
+
+.ardal-fields--stack {
+	grid-template-columns: 1fr;
+	gap: 18px;
+}
+
+.ardal-field {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.ardal-fields--stack .ardal-field {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+}
+
+.ardal-field:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+.ardal-field label {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.ardal-field__label {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--a-fg);
+}
+
+.ardal-field__desc {
+	font-size: 11.5px;
+	line-height: 1.7;
+	color: var(--a-muted);
+}
+
+.ardal-check {
+	flex-direction: row !important;
+	align-items: flex-start;
+	gap: 10px !important;
+	cursor: pointer;
+}
+
+.ardal-check input {
+	margin-top: 3px;
+}
+
+.ardal-check > span {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+/* کد رنگ و اعداد همیشه چپ‌چین خوانده می‌شوند، حتی داخل صفحه RTL. */
+.ardal-color,
+.ardal-field--number input,
+.ardal-field--text input {
+	direction: ltr;
+	text-align: left;
+}
+
+.ardal-wrap .wp-picker-container {
+	flex: none;
+}
+
+.ardal-wrap .wp-color-result.button {
+	margin: 0;
+}
+
+.ardal-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	padding: 4px 0 20px;
+}
+
+.ardal-widget-list {
+	margin: 0;
+	padding-inline-start: 20px;
+	font-size: 12.5px;
+	line-height: 2.1;
+	color: var(--a-muted);
+}
+
+/* پیش‌نمایش */
+.ardal-preview-card {
+	position: sticky;
+	top: 42px;
+}
+
+.ardal-preview {
+	margin-top: 12px;
+	border: 1px solid var(--a-border);
+	border-radius: 12px;
+	overflow: hidden;
+	direction: rtl;
+	font-size: 12px;
+}
+
+.ardal-pv-topbar {
+	padding: 8px 12px;
+	background: var(--ard-primary-dark);
+	color: var(--ard-on-dark);
+	font-size: 10.5px;
+	text-align: center;
+}
+
+.ardal-pv-hero {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 9px;
+	padding: 16px 14px;
+	background: var(--ard-hero-gradient);
+}
+
+.ardal-pv-tag {
+	padding: 4px 9px;
+	border-radius: 20px;
+	background: var(--ard-accent);
+	color: var(--ard-accent-ink);
+	font-size: 10px;
+	font-weight: 800;
+}
+
+.ardal-pv-hero strong {
+	font-size: 16px;
+	font-weight: 900;
+	line-height: 1.5;
+	color: #fff;
+}
+
+.ardal-pv-btn {
+	padding: 8px 16px;
+	border-radius: 20px;
+	background: var(--ard-accent);
+	color: var(--ard-accent-ink);
+	font-size: 11px;
+	font-weight: 800;
+}
+
+.ardal-pv-card {
+	position: relative;
+	margin: 14px 14px 14px 22px;
+	padding: 10px;
+	border: 1px solid var(--ard-border);
+	border-radius: 14px;
+	background: var(--ard-base);
+}
+
+.ardal-pv-thumb {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 76px;
+	margin-bottom: 8px;
+	border-radius: 10px;
+	background: repeating-linear-gradient(45deg, var(--ard-surface) 0 9px, var(--ard-base) 9px 18px);
+	color: var(--ard-muted);
+	font: 600 9.5px ui-monospace, monospace;
+}
+
+.ardal-pv-off {
+	position: absolute;
+	top: 7px;
+	right: 7px;
+	padding: 3px 7px;
+	border-radius: 6px;
+	background: var(--ard-sale);
+	color: #fff;
+	font-size: 10px;
+	font-weight: 800;
+	font-style: normal;
+}
+
+.ardal-pv-name {
+	margin-bottom: 5px;
+	font-size: 11.5px;
+	font-weight: 700;
+	line-height: 1.7;
+	color: var(--ard-text);
+}
+
+.ardal-pv-stars {
+	color: var(--ard-star);
+	font-size: 10px;
+	letter-spacing: 1px;
+}
+
+.ardal-pv-old {
+	margin-top: 4px;
+	font-size: 10.5px;
+	color: var(--ard-muted);
+	text-decoration: line-through;
+}
+
+.ardal-pv-price {
+	font-size: 14px;
+	font-weight: 900;
+	color: var(--ard-primary-dark);
+}
+
+.ardal-pv-price small {
+	font-size: 9.5px;
+	font-weight: 500;
+	color: var(--ard-text-soft);
+}
+
+.ardal-pv-fab {
+	position: absolute;
+	bottom: -8px;
+	left: -8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: var(--ard-accent);
+	color: var(--ard-accent-ink);
+	font-size: 18px;
+	font-weight: 900;
+	box-shadow: 0 4px 12px rgba(var(--ard-accent-dark-rgb), .4);
+}
+
+.ardal-pv-deal {
+	margin: 0 14px 14px;
+	padding: 12px;
+	border: 1.5px solid var(--ard-tint-green-border);
+	border-radius: 14px;
+	background: linear-gradient(180deg, var(--ard-tint-green), var(--ard-base));
+}
+
+.ardal-pv-deal-title {
+	margin-bottom: 9px;
+	font-size: 12px;
+	font-weight: 900;
+	color: var(--ard-accent-deep);
+}
+
+.ardal-pv-clock {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 9px;
+}
+
+.ardal-pv-clock i {
+	flex: 1;
+	padding: 6px 0;
+	border-radius: 8px;
+	background: var(--ard-primary-dark);
+	color: #fff;
+	font: 900 14px ui-monospace, monospace;
+	font-style: normal;
+	text-align: center;
+}
+
+.ardal-pv-bar {
+	height: 6px;
+	border-radius: 4px;
+	background: var(--ard-surface);
+	overflow: hidden;
+}
+
+.ardal-pv-bar span {
+	display: block;
+	width: 64%;
+	height: 100%;
+	background: var(--ard-accent);
+}
+
+.ardal-pv-footer {
+	padding: 12px 14px;
+	background: var(--ard-primary-dark);
+	color: var(--ard-on-dark);
+	font-size: 10px;
+}
+
+@media (max-width: 1100px) {
+	.ardal-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.ardal-preview-card {
+		position: static;
+	}
+}
