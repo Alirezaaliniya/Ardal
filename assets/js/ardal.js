@@ -460,6 +460,246 @@
 	}
 
 	/* --------------------------------------------------------
+	   تایمر شمارش معکوس
+	   -------------------------------------------------------- */
+
+	function initCountdown( root ) {
+		var sec = parseInt( root.getAttribute( 'data-seconds' ), 10 ) || 0;
+		var hEl = root.querySelector( '[data-ard-clock-h]' );
+		var mEl = root.querySelector( '[data-ard-clock-m]' );
+		var sEl = root.querySelector( '[data-ard-clock-s]' );
+
+		if ( sec <= 0 || ( ! hEl && ! mEl && ! sEl ) ) {
+			return;
+		}
+
+		function render() {
+			var h = Math.floor( sec / 3600 );
+			var m = Math.floor( ( sec % 3600 ) / 60 );
+			var s = sec % 60;
+
+			if ( hEl ) {
+				hEl.textContent = toFa( pad( h ) );
+			}
+			if ( mEl ) {
+				mEl.textContent = toFa( pad( m ) );
+			}
+			if ( sEl ) {
+				sEl.textContent = toFa( pad( s ) );
+			}
+		}
+
+		render();
+
+		var timer = window.setInterval( function () {
+			if ( sec > 0 ) {
+				sec--;
+				render();
+			} else {
+				window.clearInterval( timer );
+			}
+		}, 1000 );
+	}
+
+	/* --------------------------------------------------------
+	   گالری تصویر صفحه محصول
+	   -------------------------------------------------------- */
+
+	function initProductGallery( root ) {
+		var thumbs = Array.prototype.slice.call( root.querySelectorAll( '.ard-prod-gallery__thumb' ) );
+		var mainImg = root.querySelector( '.ard-prod-gallery__active-img' );
+		var placeholder = root.querySelector( '.ard-prod-gallery__placeholder' );
+
+		thumbs.forEach( function ( thumb, idx ) {
+			thumb.addEventListener( 'click', function () {
+				thumbs.forEach( function ( t ) {
+					t.classList.remove( 'is-active' );
+				} );
+				thumb.classList.add( 'is-active' );
+
+				var imgUrl = thumb.getAttribute( 'data-img-url' );
+				if ( imgUrl && mainImg ) {
+					mainImg.src = imgUrl;
+				} else if ( placeholder ) {
+					placeholder.textContent = '[ تصویر ' + toFa( idx + 1 ) + ' — ۱۲۰۰×۱۲۰۰ ]';
+				}
+			} );
+		} );
+	}
+
+	/* --------------------------------------------------------
+	   انتخاب رنگ و سایز و متغیرهای محصول
+	   -------------------------------------------------------- */
+
+	function initProductVariants( root ) {
+		var colorGroup = root.querySelector( '[data-ard-color-group]' );
+		var sizeGroup = root.querySelector( '[data-ard-size-group]' );
+		var colorTarget = root.querySelector( '[data-ard-color-target]' );
+		var stickyVariant = document.querySelector( '[data-ard-sticky-variant]' );
+
+		var selectedColor = '';
+		var selectedSize = '';
+
+		function updateSticky() {
+			if ( ! stickyVariant ) {
+				stickyVariant = document.querySelector( '[data-ard-sticky-variant]' );
+			}
+			if ( stickyVariant ) {
+				var parts = [];
+				if ( selectedColor ) {
+					parts.push( selectedColor );
+				}
+				if ( selectedSize ) {
+					parts.push( 'سایز ' + selectedSize );
+				}
+				if ( parts.length ) {
+					stickyVariant.textContent = parts.join( ' · ' );
+				}
+			}
+		}
+
+		if ( colorGroup ) {
+			var colors = Array.prototype.slice.call( colorGroup.querySelectorAll( '.ard-prod-color' ) );
+			var activeColor = colorGroup.querySelector( '.ard-prod-color.is-active' );
+			if ( activeColor ) {
+				selectedColor = activeColor.getAttribute( 'data-color-name' ) || '';
+			}
+
+			colors.forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					colors.forEach( function ( c ) {
+						c.classList.remove( 'is-active' );
+					} );
+					btn.classList.add( 'is-active' );
+					var name = btn.getAttribute( 'data-color-name' ) || '';
+					selectedColor = name;
+					if ( colorTarget ) {
+						colorTarget.textContent = name;
+					}
+					updateSticky();
+				} );
+			} );
+		}
+
+		if ( sizeGroup ) {
+			var sizes = Array.prototype.slice.call( sizeGroup.querySelectorAll( '.ard-prod-size:not(.is-disabled)' ) );
+			var activeSize = sizeGroup.querySelector( '.ard-prod-size.is-active' );
+			if ( activeSize ) {
+				selectedSize = activeSize.getAttribute( 'data-size-val' ) || '';
+			}
+
+			sizes.forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					sizes.forEach( function ( s ) {
+						s.classList.remove( 'is-active' );
+					} );
+					btn.classList.add( 'is-active' );
+					selectedSize = btn.getAttribute( 'data-size-val' ) || '';
+					updateSticky();
+				} );
+			} );
+		}
+	}
+
+	/* --------------------------------------------------------
+	   شمارنده تعداد (+ / -) و دکمه خرید
+	   -------------------------------------------------------- */
+
+	function initProductQty( root ) {
+		var qtyVal = 1;
+		var display = root.querySelector( '[data-ard-qty-display]' );
+		var btnInc = root.querySelector( '[data-ard-qty-inc]' );
+		var btnDec = root.querySelector( '[data-ard-qty-dec]' );
+		var btnAdd = root.querySelector( '[data-ard-add-to-cart]' );
+
+		if ( btnInc && display ) {
+			btnInc.addEventListener( 'click', function () {
+				if ( qtyVal < 99 ) {
+					qtyVal++;
+					display.textContent = toFa( qtyVal );
+				}
+			} );
+		}
+
+		if ( btnDec && display ) {
+			btnDec.addEventListener( 'click', function () {
+				if ( qtyVal > 1 ) {
+					qtyVal--;
+					display.textContent = toFa( qtyVal );
+				}
+			} );
+		}
+
+		if ( btnAdd ) {
+			btnAdd.addEventListener( 'click', function () {
+				var textSpan = btnAdd.querySelector( '.ard-prod-buybox__btn-text' );
+				if ( textSpan ) {
+					var originalText = textSpan.textContent;
+					textSpan.textContent = 'به سبد خرید اضافه شد ✓';
+					setTimeout( function () {
+						textSpan.textContent = originalText;
+					}, 1800 );
+				}
+			} );
+		}
+	}
+
+	/* --------------------------------------------------------
+	   تب‌های صفحه محصول
+	   -------------------------------------------------------- */
+
+	function initProductTabs( root ) {
+		var navBtns = Array.prototype.slice.call( root.querySelectorAll( '.ard-ptabs__btn' ) );
+		var panels = Array.prototype.slice.call( root.querySelectorAll( '.ard-ptabs__panel' ) );
+
+		navBtns.forEach( function ( btn ) {
+			btn.addEventListener( 'click', function () {
+				var targetId = btn.getAttribute( 'data-tab-target' );
+
+				navBtns.forEach( function ( b ) {
+					var isSelected = b === btn;
+					b.classList.toggle( 'is-active', isSelected );
+					b.setAttribute( 'aria-selected', isSelected ? 'true' : 'false' );
+				} );
+
+				panels.forEach( function ( panel ) {
+					var isMatch = panel.id === targetId;
+					panel.classList.toggle( 'is-active', isMatch );
+				} );
+			} );
+		} );
+	}
+
+	/* --------------------------------------------------------
+	   نوار چسبان خرید (Sticky Bar)
+	   -------------------------------------------------------- */
+
+	function initProductStickyBar( root ) {
+		if ( ! root.classList.contains( 'ard-prod-sticky-bar--scroll' ) ) {
+			return;
+		}
+
+		var hero = document.querySelector( '[data-ard-product-hero]' );
+
+		function checkScroll() {
+			var threshold = 350;
+			if ( hero ) {
+				var rect = hero.getBoundingClientRect();
+				threshold = rect.top + window.pageYOffset + ( rect.height * 0.6 );
+			}
+
+			if ( window.pageYOffset > threshold ) {
+				root.classList.add( 'is-visible' );
+			} else {
+				root.classList.remove( 'is-visible' );
+			}
+		}
+
+		window.addEventListener( 'scroll', checkScroll, { passive: true } );
+		checkScroll();
+	}
+
+	/* --------------------------------------------------------
 	   راه‌اندازی
 	   -------------------------------------------------------- */
 
@@ -500,6 +740,29 @@
 				initBurger( el );
 			}
 		} );
+
+		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-product-hero]' ), function ( el ) {
+			if ( ! el.ardReady ) {
+				el.ardReady = true;
+				initProductGallery( el );
+				initProductVariants( el );
+				initProductQty( el );
+			}
+		} );
+
+		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-product-tabs]' ), function ( el ) {
+			if ( ! el.ardReady ) {
+				el.ardReady = true;
+				initProductTabs( el );
+			}
+		} );
+
+		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-sticky-bar]' ), function ( el ) {
+			if ( ! el.ardReady ) {
+				el.ardReady = true;
+				initProductStickyBar( el );
+			}
+		} );
 	}
 
 	if ( 'loading' === document.readyState ) {
@@ -521,7 +784,10 @@
 			'ardal-deal',
 			'ardal-sale-festival',
 			'ardal-products',
-			'ardal-header'
+			'ardal-header',
+			'ardal-product-hero',
+			'ardal-product-tabs',
+			'ardal-product-sticky-bar'
 		].forEach( function ( name ) {
 			window.elementorFrontend.hooks.addAction(
 				'frontend/element_ready/' + name + '.default',
@@ -532,3 +798,4 @@
 		} );
 	} );
 }() );
+

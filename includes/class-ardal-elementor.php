@@ -11,7 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Ardal_Elementor {
 
-	const CATEGORY = 'ardal';
+	const CATEGORY         = 'ardal';
+	const CATEGORY_PRODUCT = 'ardal-product';
 
 	/**
 	 * نگاشت اسلاگ فایل به نام کلاس.
@@ -20,24 +21,30 @@ class Ardal_Elementor {
 	 */
 	public static function widgets() {
 		return array(
-			'topbar'        => 'Ardal_Widget_Topbar',
-			'header'        => 'Ardal_Widget_Header',
-			'nav'           => 'Ardal_Widget_Nav',
-			'hero'          => 'Ardal_Widget_Hero',
-			'deal'          => 'Ardal_Widget_Deal',
-			'services'      => 'Ardal_Widget_Services',
-			'categories'    => 'Ardal_Widget_Categories',
-			'products'      => 'Ardal_Widget_Products',
-			'product-card'  => 'Ardal_Widget_Product_Card',
-			'sale-festival' => 'Ardal_Widget_Sale_Festival',
-			'banners'       => 'Ardal_Widget_Banners',
-			'bestsellers'   => 'Ardal_Widget_Bestsellers',
-			'brands'        => 'Ardal_Widget_Brands',
-			'reviews'       => 'Ardal_Widget_Reviews',
-			'posts'         => 'Ardal_Widget_Posts',
-			'newsletter'    => 'Ardal_Widget_Newsletter',
-			'footer'        => 'Ardal_Widget_Footer',
-			'mobile-nav'    => 'Ardal_Widget_Mobile_Nav',
+			'topbar'              => 'Ardal_Widget_Topbar',
+			'header'              => 'Ardal_Widget_Header',
+			'nav'                 => 'Ardal_Widget_Nav',
+			'hero'                => 'Ardal_Widget_Hero',
+			'deal'                => 'Ardal_Widget_Deal',
+			'services'            => 'Ardal_Widget_Services',
+			'categories'          => 'Ardal_Widget_Categories',
+			'products'            => 'Ardal_Widget_Products',
+			'product-card'        => 'Ardal_Widget_Product_Card',
+			'sale-festival'       => 'Ardal_Widget_Sale_Festival',
+			'banners'             => 'Ardal_Widget_Banners',
+			'bestsellers'         => 'Ardal_Widget_Bestsellers',
+			'brands'              => 'Ardal_Widget_Brands',
+			'reviews'             => 'Ardal_Widget_Reviews',
+			'posts'               => 'Ardal_Widget_Posts',
+			'newsletter'          => 'Ardal_Widget_Newsletter',
+			'footer'              => 'Ardal_Widget_Footer',
+			'mobile-nav'          => 'Ardal_Widget_Mobile_Nav',
+			'product-breadcrumb'  => 'Ardal_Widget_Product_Breadcrumb',
+			'product-gallery'     => 'Ardal_Widget_Product_Gallery',
+			'product-info'        => 'Ardal_Widget_Product_Info',
+			'product-buybox'      => 'Ardal_Widget_Product_Buybox',
+			'product-tabs'        => 'Ardal_Widget_Product_Tabs',
+			'product-sticky-bar'  => 'Ardal_Widget_Product_Sticky_Bar',
 		);
 	}
 
@@ -66,6 +73,12 @@ class Ardal_Elementor {
 			'خبرنامه',
 			'فوتر فروشگاه',
 			'نوار پایین موبایل',
+			'مسیر صفحه (Breadcrumb)',
+			'گالری تصاویر محصول',
+			'اطلاعات و مشخصات محصول',
+			'باکس خرید و قیمت',
+			'تب‌های جامع محصول',
+			'نوار چسبان خرید محصول',
 		);
 	}
 
@@ -83,6 +96,14 @@ class Ardal_Elementor {
 			array(
 				'title' => 'اردال — فروشگاه ورزشی',
 				'icon'  => 'eicon-woocommerce',
+			)
+		);
+
+		$manager->add_category(
+			self::CATEGORY_PRODUCT,
+			array(
+				'title' => 'اردال — صفحه محصول',
+				'icon'  => 'eicon-single-product',
 			)
 		);
 	}
@@ -109,3 +130,4 @@ class Ardal_Elementor {
 		}
 	}
 }
+
