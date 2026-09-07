@@ -1,0 +1,980 @@
+/*!
+ * Ardal — مگا منو (دسکتاپ: پنل چندستونی، موبایل: کشوی آف‌کنواس)
+ *
+ * چیدمان با کلاس `is-mobile` عوض می‌شود که جاوااسکریپت بر اساس نقطهٔ شکست
+ * انتخاب‌شده اضافه می‌کند؛ چند قانون مدیاکوئری هم پایین فایل هست تا پیش از
+ * اجرای جاوااسکریپت روی موبایل، منوی دسکتاپ یک لحظه دیده نشود.
+ */
+
+/* کشو و پرده هنگام باز شدن به body منتقل می‌شوند و دیگر داخل رَپر ویجت المنتور
+   نیستند؛ پس متغیرها و ریست‌ها روی خودشان هم تعریف می‌شود، نه فقط روی ریشه. */
+.ard-mm,
+.ard-mm__nav,
+.ard-mm__scrim,
+.ard-mm__wave {
+	--ard-mm-gap: 22px;
+	--ard-mm-panel-pad: 22px;
+	--ard-mm-drawer-w: 320px;
+	--ard-mm-bar-bg: var(--ard-base);
+	--ard-mm-panel-bg: var(--ard-base);
+	--ard-mm-link: var(--ard-text-body);
+	--ard-mm-link-active: var(--ard-primary);
+	--ard-mm-wave-1: var(--ard-primary-dark);
+	--ard-mm-wave-2: var(--ard-primary);
+	--ard-mm-wave-3: var(--ard-base);
+	--ard-mm-burger-size: 48px;
+	--ard-mm-burger-line: 22px;
+}
+
+.ard-mm,
+.ard-mm__nav {
+	direction: rtl;
+	text-align: right;
+	font-family: var(--ard-font);
+	color: var(--ard-text);
+}
+
+.ard-mm {
+	position: relative;
+	/* پنل‌ها باید روی بخش بعدی صفحه بیفتند. */
+	z-index: 40;
+}
+
+/* ریست‌ها داخل :where() هستند تا وزن صفر داشته باشند و کلاس‌های خود کامپوننت
+   همیشه بالاتر بمانند — همان الگوی ardal.css. */
+:where(.ard-mm, .ard-mm__nav) *,
+:where(.ard-mm, .ard-mm__nav) *::before,
+:where(.ard-mm, .ard-mm__nav) *::after {
+	box-sizing: border-box;
+}
+
+:where(.ard-mm, .ard-mm__nav) a {
+	color: inherit;
+	text-decoration: none;
+}
+
+:where(.ard-mm, .ard-mm__nav) ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+:where(.ard-mm, .ard-mm__nav) li {
+	margin: 0;
+	list-style: none;
+}
+
+:where(.ard-mm, .ard-mm__nav) button {
+	margin: 0;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	line-height: inherit;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	cursor: pointer;
+}
+
+:where(.ard-mm, .ard-mm__nav) img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+.ard-mm--bar .ard-mm__bar {
+	background: var(--ard-mm-bar-bg);
+	border-block-end: 1px solid var(--ard-border-soft);
+}
+
+.ard-mm__bar-inner {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	min-block-size: 52px;
+	padding-inline: 16px;
+}
+
+.ard-mm--plain .ard-mm__bar-inner {
+	min-block-size: auto;
+	padding-block: 6px;
+}
+
+/* ------------------------------------------------------------
+   دکمهٔ همبرگری و دکمهٔ «همه دسته‌بندی‌ها»
+   ------------------------------------------------------------ */
+
+.ard-mm__burger {
+	display: none;
+	align-items: center;
+	gap: 8px;
+	flex: none;
+	padding: 9px 14px;
+	border-radius: calc(var(--ard-radius-sm) / 1.25);
+	background: var(--ard-primary);
+	color: var(--ard-base);
+	font-size: 13.5px;
+	font-weight: 700;
+}
+
+.ard-mm.is-mobile .ard-mm__burger {
+	display: inline-flex;
+}
+
+.ard-mm__all {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex: none;
+	padding: 9px 16px;
+	border-radius: calc(var(--ard-radius-sm) / 1.25);
+	background: var(--ard-primary);
+	color: var(--ard-base);
+	font-size: 13.5px;
+	font-weight: 700;
+	transition: background .2s;
+}
+
+.ard-mm__all:hover {
+	background: var(--ard-primary-hover);
+}
+
+.ard-mm.is-mobile .ard-mm__all {
+	display: none;
+}
+
+/* ------------------------------------------------------------
+   دکمهٔ همبرگری متحرک (سه خط که به ضربدر تبدیل می‌شوند)
+   اقتباس از الگوی «موج + همبرگر» با نام‌گذاری و متغیرهای اردال.
+   ------------------------------------------------------------ */
+
+.ard-mm__burger--wave {
+	gap: 10px;
+	padding: 0;
+	border-radius: 0;
+	background: none;
+	color: var(--ard-mm-link);
+}
+
+.ard-mm__burger--wave:hover {
+	background: none;
+}
+
+.ard-mm__burger-text {
+	font-size: 13.5px;
+	font-weight: 700;
+}
+
+.ard-mm__lines {
+	position: relative;
+	display: block;
+	flex: none;
+	inline-size: var(--ard-mm-burger-size);
+	block-size: var(--ard-mm-burger-size);
+	border-radius: 50%;
+	background: var(--ard-mm-burger-bg, var(--ard-base));
+	box-shadow: 0 6px 22px rgba(0, 0, 0, .14);
+	transition: box-shadow .3s;
+}
+
+/* حلقهٔ نبض — فقط روی هاور و فوکوس، تا روی نوار فروشگاه مزاحم نباشد. */
+.ard-mm__lines::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px var(--ard-mm-wave-2);
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ard-mm__burger--wave:hover .ard-mm__lines::after,
+.ard-mm__burger--wave:focus-visible .ard-mm__lines::after {
+	animation: ard-mm-pulse 1.2s infinite;
+}
+
+@keyframes ard-mm-pulse {
+	0%   { opacity: 1; transform: scale(1); }
+	80%  { transform: scale(1.5); }
+	100% { opacity: 0; transform: scale(1.5); }
+}
+
+.ard-mm__line {
+	position: absolute;
+	left: calc((var(--ard-mm-burger-size) - var(--ard-mm-burger-line)) / 2);
+	inline-size: var(--ard-mm-burger-line);
+	block-size: 2px;
+	overflow: hidden;
+	transition-duration: .6s;
+	transition-timing-function: cubic-bezier(.19, 1, .22, 1);
+}
+
+.ard-mm__line-in {
+	position: absolute;
+	top: 0;
+	left: 0;
+	inline-size: calc(var(--ard-mm-burger-line) * 3);
+	block-size: 2px;
+	transition-duration: .6s;
+	transition-timing-function: cubic-bezier(.19, 1, .22, 1);
+}
+
+.ard-mm__line-in::before,
+.ard-mm__line-in::after {
+	content: '';
+	display: block;
+	position: absolute;
+	top: 0;
+	inline-size: var(--ard-mm-burger-line);
+	block-size: 2px;
+	border-radius: 2px;
+	background: var(--ard-mm-burger-ink, var(--ard-text));
+	transition-property: transform;
+	transition-timing-function: cubic-bezier(.19, 1, .22, 1);
+}
+
+.ard-mm__line-in::before {
+	left: calc(var(--ard-mm-burger-line) * -2);
+}
+
+.ard-mm__line-in::after {
+	left: 0;
+}
+
+.ard-mm__line--01 { top: calc(50% - 6px); }
+.ard-mm__line--03 { top: calc(50% + 4px); }
+
+.ard-mm__line--02,
+.ard-mm__line--cross01,
+.ard-mm__line--cross02 {
+	top: calc(50% - 1px);
+}
+
+.ard-mm__line--cross01 { transform: rotate(45deg); }
+.ard-mm__line--cross02 { transform: rotate(-45deg); }
+
+.ard-mm__line-in--cross01,
+.ard-mm__line-in--cross02 {
+	transform: translateX(-33.3%);
+}
+
+.ard-mm__line-in--01 { transition-delay: .2s; }
+.ard-mm__line-in--02 { transition-delay: .25s; }
+.ard-mm__line-in--03 { transition-delay: .3s; }
+.ard-mm__line-in--cross01 { transition-delay: 0s; }
+.ard-mm__line-in--cross02 { transition-delay: .05s; }
+
+.ard-mm__line-in--02::before,
+.ard-mm__line-in--02::after { transition-delay: .05s; }
+
+.ard-mm__line-in--03::before,
+.ard-mm__line-in--03::after { transition-delay: .1s; }
+
+.ard-mm__line-in--cross02::before,
+.ard-mm__line-in--cross02::after { transition-delay: .1s; }
+
+/* حالت باز: سه خط بیرون می‌روند و دو خط ضربدر جای‌شان می‌نشینند. */
+.is-opened-navi .ard-mm__line-in--01,
+.is-opened-navi .ard-mm__line-in--02,
+.is-opened-navi .ard-mm__line-in--03 {
+	transform: translateX(33.3%);
+}
+
+.is-opened-navi .ard-mm__line-in--cross01,
+.is-opened-navi .ard-mm__line-in--cross02 {
+	transform: translateX(0);
+}
+
+.is-opened-navi .ard-mm__line-in--01 { transition-delay: 0s; }
+.is-opened-navi .ard-mm__line-in--02 { transition-delay: .05s; }
+.is-opened-navi .ard-mm__line-in--03 { transition-delay: .1s; }
+.is-opened-navi .ard-mm__line-in--cross01 { transition-delay: .25s; }
+.is-opened-navi .ard-mm__line-in--cross02 { transition-delay: .3s; }
+
+/* جاروی خط‌ها روی هاور */
+.ard-mm__burger--wave:hover .ard-mm__line-in::before,
+.ard-mm__burger--wave:hover .ard-mm__line-in::after,
+.ard-mm__close--wave:hover .ard-mm__line-in::before,
+.ard-mm__close--wave:hover .ard-mm__line-in::after {
+	transform: translateX(200%);
+}
+
+.ard-mm__burger--wave:hover .ard-mm__line-in--01::before,
+.ard-mm__burger--wave:hover .ard-mm__line-in--01::after,
+.ard-mm__burger--wave:hover .ard-mm__line-in--02::before,
+.ard-mm__burger--wave:hover .ard-mm__line-in--02::after,
+.ard-mm__burger--wave:hover .ard-mm__line-in--03::before,
+.ard-mm__burger--wave:hover .ard-mm__line-in--03::after {
+	transition-duration: 1s;
+}
+
+.ard-mm__burger--wave:hover .ard-mm__line-in--cross01::before,
+.ard-mm__burger--wave:hover .ard-mm__line-in--cross01::after,
+.ard-mm__burger--wave:hover .ard-mm__line-in--cross02::before,
+.ard-mm__burger--wave:hover .ard-mm__line-in--cross02::after {
+	transition-duration: 0s;
+}
+
+/* دکمهٔ بستن داخل پرده همان دکمهٔ همبرگری است، فقط بدون قاب دکمه. */
+.ard-mm__close--wave {
+	inline-size: auto;
+	block-size: auto;
+	padding: 0;
+	border-radius: 0;
+	background: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-mm__line,
+	.ard-mm__line-in,
+	.ard-mm__line-in::before,
+	.ard-mm__line-in::after {
+		transition-duration: 0s;
+		transition-delay: 0s;
+	}
+
+	.ard-mm__burger--wave:hover .ard-mm__lines::after,
+	.ard-mm__burger--wave:focus-visible .ard-mm__lines::after {
+		animation: none;
+	}
+}
+
+/* ------------------------------------------------------------
+   نوار منو — حالت دسکتاپ
+   ------------------------------------------------------------ */
+
+.ard-mm__nav {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-mm__drawer-head {
+	display: none;
+}
+
+.ard-mm__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--ard-mm-gap);
+	justify-content: var(--ard-mm-justify, flex-start);
+}
+
+.ard-mm__item {
+	position: relative;
+}
+
+/* پنل مگا باید هم‌عرض کل نوار باشد، پس نباید نسبت به آیتم بچسبد. */
+.ard-mm__nav:not(.is-mobile) .ard-mm__item--mega {
+	position: static;
+}
+
+.ard-mm__row {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.ard-mm__link,
+.ard-mm__col-title,
+.ard-mm__sublink {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--ard-mm-link);
+	font-size: 13.5px;
+	font-weight: 600;
+	transition: color .2s;
+}
+
+.ard-mm__nav:not(.is-mobile) .ard-mm__link {
+	padding-block: 15px;
+}
+
+.ard-mm__icon {
+	display: inline-flex;
+	flex: none;
+	color: var(--ard-primary);
+}
+
+.ard-mm__text {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 2px;
+	min-inline-size: 0;
+}
+
+.ard-mm__desc {
+	font-size: 11.5px;
+	font-weight: 400;
+	line-height: 1.6;
+	color: var(--ard-muted);
+}
+
+/* توضیح کوتاه فقط داخل پنل و کشو معنا دارد، نه روی نوار دسکتاپ. */
+.ard-mm__nav:not(.is-mobile) .ard-mm__link .ard-mm__desc {
+	display: none;
+}
+
+.ard-mm__badge {
+	flex: none;
+	padding: 1px 7px;
+	border-radius: 11px;
+	font-size: 10.5px;
+	font-weight: 800;
+	line-height: 1.7;
+	color: var(--ard-base);
+}
+
+.ard-mm__badge--accent {
+	background: var(--ard-accent);
+	color: var(--ard-accent-ink);
+}
+
+.ard-mm__badge--sale {
+	background: var(--ard-sale);
+}
+
+.ard-mm__badge--primary {
+	background: var(--ard-primary);
+}
+
+.ard-mm__item:hover > .ard-mm__row > .ard-mm__link,
+.ard-mm__row:focus-within > .ard-mm__link,
+.current-menu-item > .ard-mm__row > .ard-mm__link,
+.current-menu-ancestor > .ard-mm__row > .ard-mm__link {
+	color: var(--ard-mm-link-active);
+}
+
+.current-menu-item > .ard-mm__row > .ard-mm__link {
+	font-weight: 700;
+}
+
+.is-highlight > .ard-mm__row > .ard-mm__link,
+.is-highlight > .ard-mm__row > .ard-mm__sublink,
+.is-highlight > .ard-mm__col-title {
+	color: var(--ard-sale);
+	font-weight: 700;
+}
+
+.ard-mm__toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	padding: 4px;
+	color: inherit;
+	line-height: 0;
+}
+
+.ard-mm__toggle .ard-i {
+	transform: rotate(-90deg);
+	transition: transform .22s;
+}
+
+.ard-mm__item.is-open > .ard-mm__row > .ard-mm__toggle .ard-i,
+.ard-mm__dropitem.is-open > .ard-mm__row > .ard-mm__toggle .ard-i {
+	transform: rotate(90deg);
+}
+
+/* ------------------------------------------------------------
+   پنل‌ها — حالت دسکتاپ
+   ------------------------------------------------------------ */
+
+.ard-mm__nav:not(.is-mobile) .ard-mm__panel {
+	position: absolute;
+	inset-block-start: 100%;
+	z-index: 60;
+	padding-block-start: 8px;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(6px);
+	pointer-events: none;
+	transition: opacity .18s ease, transform .18s ease, visibility .18s;
+}
+
+.ard-mm__nav:not(.is-mobile) .ard-mm__item--mega > .ard-mm__panel {
+	inset-inline: 0;
+}
+
+.ard-mm__nav:not(.is-mobile) .ard-mm__item--drop > .ard-mm__panel {
+	inset-inline-start: 0;
+	min-inline-size: 230px;
+	max-inline-size: 92vw;
+}
+
+.ard-mm__dropitem {
+	position: relative;
+}
+
+/* زیرمنوی تودرتوی حالت کشویی، کنار آیتم باز می‌شود. */
+.ard-mm__nav:not(.is-mobile) .ard-mm__dropitem > .ard-mm__panel {
+	inset-block-start: -10px;
+	inset-inline-start: 100%;
+	padding-block-start: 0;
+	padding-inline-start: 8px;
+}
+
+.ard-mm__nav:not(.is-mobile) .ard-mm__panel-inner {
+	display: flex;
+	gap: 22px;
+	padding: var(--ard-mm-panel-pad);
+	border: 1px solid var(--ard-border-soft);
+	border-radius: var(--ard-radius);
+	background: var(--ard-mm-panel-bg);
+	box-shadow: 0 18px 44px rgba(0, 0, 0, .13);
+	max-block-size: min(72vh, 560px);
+	overflow-y: auto;
+}
+
+.ard-mm__nav:not(.is-mobile) .ard-mm__item--parent:hover > .ard-mm__panel,
+.ard-mm__nav:not(.is-mobile) .ard-mm__item--parent:focus-within > .ard-mm__panel,
+.ard-mm__nav:not(.is-mobile) .ard-mm__dropitem:hover > .ard-mm__panel,
+.ard-mm__nav:not(.is-mobile) .ard-mm__dropitem:focus-within > .ard-mm__panel,
+.ard-mm__nav:not(.is-mobile) .is-open > .ard-mm__panel {
+	opacity: 1;
+	visibility: visible;
+	transform: none;
+	pointer-events: auto;
+}
+
+.ard-mm__cols {
+	display: grid;
+	gap: 18px 26px;
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-mm__cols--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ard-mm__cols--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ard-mm__cols--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ard-mm__cols--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+.ard-mm__col-title {
+	display: flex;
+	margin-block-end: 8px;
+	padding-block-end: 8px;
+	border-block-end: 1px solid var(--ard-border-soft);
+	color: var(--ard-text);
+	font-size: 13.5px;
+	font-weight: 800;
+}
+
+.ard-mm__col-title:hover {
+	color: var(--ard-mm-link-active);
+}
+
+.ard-mm__sub {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.ard-mm__sublink {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--ard-text-soft);
+}
+
+.ard-mm__subitem:hover > .ard-mm__row > .ard-mm__sublink,
+.ard-mm__dropitem:hover > .ard-mm__row > .ard-mm__sublink {
+	color: var(--ard-mm-link-active);
+}
+
+.ard-mm__drop {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1;
+}
+
+.ard-mm__nav:not(.is-mobile) .ard-mm__drop .ard-mm__row {
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.ard-mm__promo {
+	display: block;
+	flex: none;
+	inline-size: 230px;
+	border-radius: var(--ard-radius-sm);
+	overflow: hidden;
+}
+
+.ard-mm__promo-img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+/* ------------------------------------------------------------
+   کشوی موبایل (آف‌کنواس)
+   ------------------------------------------------------------ */
+
+.ard-mm__scrim {
+	display: none;
+}
+
+.ard-mm__scrim.is-mobile {
+	display: block;
+	position: fixed;
+	inset: 0;
+	z-index: 99998;
+	background: rgba(0, 0, 0, .48);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity .25s ease, visibility .25s;
+}
+
+.ard-mm__scrim.is-mobile.is-open {
+	opacity: 1;
+	visibility: visible;
+}
+
+.ard-mm__nav.is-mobile {
+	position: fixed;
+	z-index: 99999;
+	display: flex;
+	flex-direction: column;
+	max-inline-size: 100%;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	visibility: hidden;
+	direction: rtl;
+	text-align: right;
+	font-family: var(--ard-font);
+	color: var(--ard-text);
+}
+
+/* --- کشوی کناری --- */
+
+.ard-mm__nav--drawer.is-mobile {
+	inset-block: 0;
+	inline-size: min(var(--ard-mm-drawer-w, 320px), 92vw);
+	background: var(--ard-mm-panel-bg);
+	box-shadow: 0 0 40px rgba(0, 0, 0, .22);
+	transition: transform .28s ease, visibility .28s;
+}
+
+.ard-mm__nav--start.is-mobile {
+	right: 0;
+	transform: translateX(105%);
+}
+
+.ard-mm__nav--end.is-mobile {
+	left: 0;
+	transform: translateX(-105%);
+}
+
+.ard-mm__nav--drawer.is-mobile.is-open {
+	visibility: visible;
+	transform: none;
+}
+
+/* --- خود پرده --- */
+
+.ard-mm__wave {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 99997;
+	inline-size: 100%;
+	block-size: 100%;
+	pointer-events: none;
+}
+
+.ard-mm__wave.is-mobile {
+	display: block;
+}
+
+.ard-mm__wave.is-opened {
+	pointer-events: auto;
+}
+
+.ard-mm__wave-path:nth-of-type(1) { fill: var(--ard-mm-wave-1); }
+.ard-mm__wave-path:nth-of-type(2) { fill: var(--ard-mm-wave-2); }
+.ard-mm__wave-path:nth-of-type(3) { fill: var(--ard-mm-wave-3); }
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-mm__nav.is-mobile,
+	.ard-mm__scrim.is-mobile,
+	.ard-mm__nav.is-mobile .ard-mm__panel {
+		transition: none;
+	}
+}
+
+.ard-mm__nav.is-mobile .ard-mm__drawer-head {
+	position: sticky;
+	inset-block-start: 0;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 14px 18px;
+	border-block-end: 1px solid var(--ard-border-soft);
+	background: var(--ard-mm-panel-bg);
+}
+
+.ard-mm__drawer-title {
+	font-size: 15px;
+	font-weight: 800;
+	color: var(--ard-text);
+}
+
+.ard-mm__close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 32px;
+	block-size: 32px;
+	border-radius: 50%;
+	background: var(--ard-surface);
+	color: var(--ard-text-body);
+	font-size: 22px;
+	line-height: 1;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__list {
+	display: block;
+	padding-block-end: 24px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__row {
+	justify-content: space-between;
+	gap: 0;
+	border-block-end: 1px solid var(--ard-border-soft);
+}
+
+.ard-mm__nav.is-mobile .ard-mm__link {
+	flex: 1;
+	padding: 13px 18px;
+	font-size: 14px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__toggle {
+	padding: 13px 16px;
+	border-inline-start: 1px solid var(--ard-border-soft);
+	color: var(--ard-muted);
+}
+
+.ard-mm__nav.is-mobile .ard-mm__panel {
+	height: 0;
+	overflow: hidden;
+	background: var(--ard-surface);
+	transition: height .26s ease;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__panel-inner,
+.ard-mm__nav.is-mobile .ard-mm__cols,
+.ard-mm__nav.is-mobile .ard-mm__sub,
+.ard-mm__nav.is-mobile .ard-mm__drop {
+	display: block;
+	padding: 0;
+	border: 0;
+	box-shadow: none;
+	background: none;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__panel-inner {
+	padding-block: 4px 8px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__col {
+	padding-block-end: 4px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__col-title {
+	margin: 0;
+	padding: 11px 28px;
+	border-block-end: 0;
+	font-size: 13.5px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__sublink {
+	display: flex;
+	flex: 1;
+	padding: 9px 38px;
+	font-size: 13px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__drop .ard-mm__sublink {
+	padding-inline-start: 28px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__sub .ard-mm__row,
+.ard-mm__nav.is-mobile .ard-mm__drop .ard-mm__row {
+	border-block-end: 0;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__promo {
+	inline-size: auto;
+	margin: 10px 18px;
+}
+
+/* --- پردهٔ موجی تمام‌صفحه ---
+   پس‌زمینه‌اش لایهٔ سوم خود پرده است، پس خودش شفاف می‌ماند. باز و بسته شدنش
+   بدون ترنزیشن است: انیمیشن را مسیرهای SVG می‌سازند و محتوا با تأخیر می‌آید. */
+
+.ard-mm__nav--wave.is-mobile {
+	inset: 0;
+	inline-size: 100%;
+	background: none;
+	transform: scale(0);
+}
+
+.ard-mm__nav--wave.is-mobile.is-open {
+	visibility: visible;
+	transform: none;
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__nav-inner {
+	flex: 1;
+	inline-size: min(560px, 92%);
+	margin-inline: auto;
+	padding-block: 18px 40px;
+	opacity: 0;
+	transform: translateY(-26px);
+	transition: opacity .45s ease, transform .45s ease;
+}
+
+.ard-mm__nav--wave.is-mobile.is-open .ard-mm__nav-inner {
+	opacity: 1;
+	transform: none;
+	transition-delay: .72s;
+}
+
+/* آیتم‌های سطح اول پلکانی می‌آیند؛ شمارهٔ هرکدام را واکر چاپ می‌کند. */
+.ard-mm__nav--wave.is-mobile .ard-mm__list > .ard-mm__item {
+	opacity: 0;
+	transform: translateY(14px);
+	transition: opacity .4s ease, transform .4s ease;
+}
+
+.ard-mm__nav--wave.is-mobile.is-open .ard-mm__list > .ard-mm__item {
+	opacity: 1;
+	transform: none;
+	transition-delay: calc(.78s + var(--ard-mm-i, 0) * 50ms);
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__drawer-head {
+	position: static;
+	margin-block-end: 6px;
+	padding: 4px 6px 14px;
+	background: none;
+	border-block-end: 1px solid var(--ard-border-soft);
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__drawer-title {
+	font-size: 16px;
+}
+
+/* ردیف‌ها روی پرده بزرگ‌ترند و خط جداکننده‌شان کم‌رنگ‌تر. */
+.ard-mm__nav--wave.is-mobile .ard-mm__row {
+	min-block-size: 52px;
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__link {
+	padding: 14px 6px;
+	font-size: 15.5px;
+	font-weight: 700;
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__link .ard-mm__desc {
+	font-weight: 400;
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__toggle {
+	inline-size: 40px;
+	block-size: 40px;
+	padding: 0;
+	border-inline-start: 0;
+	border-radius: 50%;
+	background: var(--ard-surface);
+	color: var(--ard-text-body);
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__panel {
+	background: none;
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__panel-inner {
+	padding-block: 2px 12px;
+}
+
+/* عنوان ستون: برچسب بخش، نه یک آیتم هم‌وزن بقیه. */
+.ard-mm__nav--wave.is-mobile .ard-mm__col-title {
+	padding: 12px 6px 6px;
+	font-size: 12px;
+	font-weight: 800;
+	color: var(--ard-muted);
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__sublink {
+	padding: 10px 18px;
+	font-size: 14px;
+	color: var(--ard-text-body);
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__sub .ard-mm__row,
+.ard-mm__nav--wave.is-mobile .ard-mm__drop .ard-mm__row {
+	min-block-size: 0;
+}
+
+.ard-mm__nav--wave.is-mobile .ard-mm__promo {
+	margin: 12px 6px 4px;
+	border-radius: var(--ard-radius-sm);
+}
+
+/* با کاهش انیمیشن، محتوا بدون تأخیر و بدون حرکت سر جایش است. این بلوک بعد از
+   قواعد بالا می‌آید چون مدیاکوئری به وزن سلکتور چیزی اضافه نمی‌کند. */
+@media (prefers-reduced-motion: reduce) {
+	.ard-mm__nav--wave.is-mobile .ard-mm__nav-inner,
+	.ard-mm__nav--wave.is-mobile .ard-mm__list > .ard-mm__item {
+		opacity: 1;
+		transform: none;
+		transition: none;
+		transition-delay: 0s;
+	}
+}
+
+/* قفل اسکرول صفحه وقتی کشو باز است */
+html.ard-mm-lock,
+html.ard-mm-lock body {
+	overflow: hidden;
+}
+
+/* ------------------------------------------------------------
+   پیش از اجرای جاوااسکریپت: روی عرض‌های موبایل، نوار دسکتاپ پنهان بماند
+   ------------------------------------------------------------ */
+
+@media (max-width: 767.98px) {
+	.ard-mm__nav--bp-md:not(.is-mobile) {
+		display: none;
+	}
+
+	.ard-mm--bp-md:not(.is-mobile) .ard-mm__burger {
+		display: inline-flex;
+	}
+}
+
+@media (max-width: 1023.98px) {
+	.ard-mm__nav--bp-lg:not(.is-mobile) {
+		display: none;
+	}
+
+	.ard-mm--bp-lg:not(.is-mobile) .ard-mm__burger {
+		display: inline-flex;
+	}
+}
+
+@media (max-width: 1199.98px) {
+	.ard-mm__nav--bp-xl:not(.is-mobile) {
+		display: none;
+	}
+
+	.ard-mm--bp-xl:not(.is-mobile) .ard-mm__burger {
+		display: inline-flex;
+	}
+}

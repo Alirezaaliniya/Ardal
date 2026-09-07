@@ -19,9 +19,59 @@ class Ardal_Assets {
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register' ), 5 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'maybe_enqueue_for_woo' ), 20 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'disable_selected_woocommerce_assets' ), 999 );
+		add_action( 'wp_print_styles', array( $this, 'disable_selected_woocommerce_assets' ), 1 );
+		add_action( 'wp_print_scripts', array( $this, 'disable_selected_woocommerce_assets' ), 1 );
 		add_action( 'elementor/frontend/after_enqueue_styles', array( $this, 'enqueue' ) );
 		add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'enqueue' ) );
 		add_action( 'elementor/preview/enqueue_styles', array( $this, 'enqueue' ) );
+	}
+
+	/**
+	 * Remove only the WooCommerce front-end assets explicitly disabled in settings.
+	 * This runs again immediately before output because Elementor can enqueue assets
+	 * while rendering a widget, after the usual wp_enqueue_scripts hook.
+	 */
+	public function disable_selected_woocommerce_assets() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$assets = array(
+			'disable_wc_general_css'      => array( 'style', 'woocommerce-general' ),
+			'disable_wc_layout_css'       => array( 'style', 'woocommerce-layout' ),
+			'disable_wc_smallscreen_css'  => array( 'style', 'woocommerce-smallscreen' ),
+			'disable_wc_add_to_cart_js'   => array( 'script', 'wc-add-to-cart' ),
+			'disable_wc_cart_fragments_js'=> array( 'script', 'wc-cart-fragments' ),
+			'disable_wc_single_product_js'=> array( 'script', 'wc-single-product' ),
+			'disable_wc_variation_js'     => array( 'script', 'wc-add-to-cart-variation' ),
+		);
+
+		foreach ( $assets as $setting => $asset ) {
+			if ( '1' !== Ardal_Palette::get( $setting ) ) {
+				continue;
+			}
+
+			if ( 'style' === $asset[0] ) {
+				wp_dequeue_style( $asset[1] );
+			} else {
+				wp_dequeue_script( $asset[1] );
+			}
+		}
+	}
+
+	/**
+	 * @param string $setting Palette setting key.
+	 * @return bool
+	 */
+	public static function is_woocommerce_asset_disabled( $setting ) {
+		return '1' === Ardal_Palette::get( $setting );
+	}
+
+	/** Enqueue the self-contained animated review-rating component. */
+	public static function enqueue_monster_rating() {
+		wp_enqueue_style( 'ardal-monster-rating' );
+		wp_enqueue_script( 'ardal-monster-rating' );
 	}
 
 	/**
@@ -34,19 +84,14 @@ class Ardal_Assets {
 
 		$this->registered = true;
 
-		$palette = Ardal_Palette::get_all();
-
-		if ( '1' === $palette['load_google_font'] && 'Vazirmatn' === trim( $palette['font_family'] ) ) {
-			wp_register_style(
-				'ardal-font',
-				'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;800;900&display=swap',
-				array(),
-				null // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- نسخه‌گذاری روی URL گوگل معنا ندارد.
-			);
-		}
-
 		wp_register_style( 'ardal', ARDAL_URL . 'assets/css/ardal.css', array(), ARDAL_VERSION );
 		wp_register_script( 'ardal', ARDAL_URL . 'assets/js/ardal.js', array(), ARDAL_VERSION, true );
+		wp_register_style( 'ardal-monster-rating', ARDAL_URL . 'assets/css/ardal-monster-rating.css', array(), ARDAL_VERSION );
+		wp_register_style( 'ardal-mega-menu', ARDAL_URL . 'assets/css/ardal-mega-menu.css', array( 'ardal' ), ARDAL_VERSION );
+		wp_register_script( 'ardal-mega-menu', ARDAL_URL . 'assets/js/ardal-mega-menu.js', array(), ARDAL_VERSION, true );
+		wp_register_script( 'ardal-gsap', ARDAL_URL . 'assets/vendor/gsap/gsap.min.js', array(), ARDAL_VERSION, true );
+		wp_register_script( 'ardal-morphsvg', ARDAL_URL . 'assets/vendor/gsap/morphsvg.min.js', array( 'ardal-gsap' ), ARDAL_VERSION, true );
+		wp_register_script( 'ardal-monster-rating', ARDAL_URL . 'assets/js/ardal-monster-rating.js', array( 'ardal-morphsvg' ), ARDAL_VERSION, true );
 
 		wp_add_inline_style( 'ardal', Ardal_Palette::css_vars() );
 	}
@@ -66,10 +111,6 @@ class Ardal_Assets {
 
 	public function enqueue() {
 		$this->register();
-
-		if ( wp_style_is( 'ardal-font', 'registered' ) ) {
-			wp_enqueue_style( 'ardal-font' );
-		}
 
 		wp_enqueue_style( 'ardal' );
 		wp_enqueue_script( 'ardal' );

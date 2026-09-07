@@ -252,11 +252,16 @@ class Ardal_Settings {
 							</div>
 						<?php endforeach; ?>
 
+						<?php foreach ( Ardal_Palette::extras_groups() as $ex_group => $ex_title ) : ?>
 						<div class="ardal-card">
-							<h2>تایپوگرافی و ابعاد</h2>
+							<h2><?php echo esc_html( $ex_title ); ?></h2>
 							<div class="ardal-fields ardal-fields--stack">
 								<?php
 								foreach ( $extras as $key => $field ) :
+									if ( $ex_group !== ( isset( $field['group'] ) ? $field['group'] : 'type' ) ) {
+										continue;
+									}
+
 									$id   = 'ardal-field-' . $key;
 									$name = $opt . '[' . $key . ']';
 									?>
@@ -293,6 +298,7 @@ class Ardal_Settings {
 								<?php endforeach; ?>
 							</div>
 						</div>
+						<?php endforeach; ?>
 
 						<p class="ardal-actions">
 							<?php submit_button( 'ذخیره تغییرات', 'primary', 'submit', false ); ?>

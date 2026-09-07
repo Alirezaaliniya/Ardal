@@ -25,6 +25,13 @@ define( 'ARDAL_MIN_PHP', '7.4' );
 require_once ARDAL_PATH . 'includes/class-ardal-palette.php';
 require_once ARDAL_PATH . 'includes/class-ardal-currency.php';
 require_once ARDAL_PATH . 'includes/class-ardal-settings.php';
+// هلپرها و لایهٔ دادهٔ محصول در پیشخوان هم لازم‌اند (فیلد عنوان انگلیسی)،
+// نه فقط موقع ثبت ویجت‌های المنتور.
+require_once ARDAL_PATH . 'includes/class-ardal-helpers.php';
+require_once ARDAL_PATH . 'includes/class-ardal-jalali.php';
+require_once ARDAL_PATH . 'includes/class-ardal-product.php';
+require_once ARDAL_PATH . 'includes/class-ardal-product-fields.php';
+require_once ARDAL_PATH . 'includes/class-ardal-mega-menu.php';
 require_once ARDAL_PATH . 'includes/class-ardal-assets.php';
 require_once ARDAL_PATH . 'includes/class-ardal.php';
 

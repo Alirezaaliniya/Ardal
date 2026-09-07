@@ -30,10 +30,38 @@ final class Ardal {
 	private function __construct() {
 		new Ardal_Settings();
 		new Ardal_Assets();
+		add_filter( 'preprocess_comment', array( $this, 'allow_ardal_unrated_reviews' ), -1 );
 
 		Ardal_Currency::init();
+		Ardal_Product_Fields::init();
+		Ardal_Mega_Menu::init();
 
 		add_action( 'plugins_loaded', array( $this, 'boot_elementor' ) );
+	}
+
+	/**
+	 * The animated rating input intentionally offers an empty rating. WooCommerce
+	 * rejects an empty `rating` only when that POST key is present, so remove it
+	 * for this explicitly marked Ardal form before WooCommerce validates reviews.
+	 *
+	 * @param array $comment_data Pending comment data.
+	 * @return array
+	 */
+	public function allow_ardal_unrated_reviews( $comment_data ) {
+		if (
+			is_admin()
+			|| empty( $_POST['ardal_allow_empty_rating'] )
+			|| empty( $_POST['comment_post_ID'] )
+			|| 'product' !== get_post_type( absint( $_POST['comment_post_ID'] ) )
+			|| ! isset( $_POST['rating'] )
+			|| '' !== trim( (string) wp_unslash( $_POST['rating'] ) )
+		) {
+			return $comment_data;
+		}
+
+		unset( $_POST['rating'] );
+
+		return $comment_data;
 	}
 
 	/**
@@ -54,7 +82,6 @@ final class Ardal {
 
 		// کلاس پایه ویجت اینجا لود نمی‌شود: المنتور Widget_Base را فقط هنگام
 		// راه‌اندازی ویجت‌ها require می‌کند، پس بارگذاری‌اش به زمان ثبت موکول شده است.
-		require_once ARDAL_PATH . 'includes/class-ardal-helpers.php';
 		require_once ARDAL_PATH . 'includes/class-ardal-elementor.php';
 
 		new Ardal_Elementor();

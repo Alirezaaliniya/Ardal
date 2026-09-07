@@ -429,9 +429,22 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		$classes = array( $class );
 
 		if ( $to_cart && ! empty( $item['product_id'] ) ) {
+			$product = wc_get_product( (int) $item['product_id'] );
+
+			if ( $product ) {
+				echo Ardal_Helpers::woocommerce_add_to_cart_link(
+					$product,
+					$classes,
+					wp_strip_all_tags( $inner ),
+					array( 'data-ard-add-to-cart' => '' !== $label ? $label : 'true' )
+				); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce API output.
+
+				return;
+			}
+
 			$classes[] = 'add_to_cart_button';
 
-			if ( ! empty( $item['ajax_add'] ) ) {
+			if ( ! empty( $item['ajax_add'] ) && ! Ardal_Assets::is_woocommerce_asset_disabled( 'disable_wc_add_to_cart_js' ) ) {
 				$classes[] = 'ajax_add_to_cart';
 
 				// اسکریپت ووکامرس در فوتر ثبت شده؛ همین‌جا صدا زدنش کافی است.

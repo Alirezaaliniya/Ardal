@@ -176,59 +176,144 @@ class Ardal_Palette {
 	}
 
 	/**
+	 * عنوان کارت‌های تنظیمات غیررنگی.
+	 *
+	 * @return array
+	 */
+	public static function extras_groups() {
+		return array(
+			'type'    => 'تایپوگرافی و ابعاد',
+			'money'   => 'واحد پول و اعداد',
+			'product' => 'صفحه محصول',
+			'woocommerce_assets' => 'فایل‌های ووکامرس',
+		);
+	}
+
+	/**
 	 * تنظیمات غیررنگی.
 	 *
 	 * @return array
 	 */
 	public static function extras_schema() {
 		return array(
-			'font_family'      => array(
-				'label'   => 'فونت اصلی',
-				'default' => 'Vazirmatn',
-				'type'    => 'text',
-				'desc'    => 'نام خانواده فونت. برای استفاده از فونت قالب، این فیلد را خالی بگذارید.',
-			),
-			'load_google_font' => array(
-				'label'   => 'بارگذاری وزیرمتن از Google Fonts',
-				'default' => '1',
-				'type'    => 'checkbox',
-				'desc'    => 'اگر فونت را خودتان در قالب لود می‌کنید، این گزینه را خاموش کنید.',
-			),
 			'radius'           => array(
 				'label'   => 'گردی گوشه‌ها',
 				'default' => '16',
 				'type'    => 'number',
 				'desc'    => 'مبنای گردی کارت‌ها بر حسب پیکسل؛ بقیه اندازه‌ها نسبت به آن محاسبه می‌شوند.',
+				'group'   => 'type',
 			),
 			'container'        => array(
 				'label'   => 'حداکثر عرض محتوا',
 				'default' => '1440',
 				'type'    => 'number',
 				'desc'    => 'عرض کانتینر بخش‌ها بر حسب پیکسل. دیزاین برای ۱۴۴۰ پیکسل طراحی شده است.',
+				'group'   => 'type',
 			),
 			'toman_symbol'     => array(
 				'label'   => 'تغییر ساختار تومان',
 				'default' => '0',
 				'type'    => 'checkbox',
 				'desc'    => 'به‌جای نوشتن «تومان» کنار قیمت‌ها، نماد رسمی تومان نمایش داده می‌شود.',
+				'group'   => 'money',
 			),
 			'toman_woo'        => array(
 				'label'   => 'اعمال روی قیمت‌های خود ووکامرس',
 				'default' => '0',
 				'type'    => 'checkbox',
 				'desc'    => 'علاوه بر ویجت‌های اردال، روی قیمت محصول در فروشگاه، آرشیو، صفحه محصول، سبد خرید و تسویه هم اعمال می‌شود. ایمیل‌ها و پیشخوان دست‌نخورده می‌مانند.',
+				'group'   => 'money',
 			),
 			'toman_size'       => array(
 				'label'   => 'اندازه نماد تومان',
 				'default' => '170',
 				'type'    => 'number',
 				'desc'    => 'درصدِ اندازهٔ قلمِ قیمت. نماد تومان دوطبقه است، برای همین از خودِ رقم‌ها بلندتر تنظیم می‌شود.',
+				'group'   => 'money',
 			),
 			'persian_digits'   => array(
 				'label'   => 'تبدیل خودکار اعداد به فارسی',
 				'default' => '1',
 				'type'    => 'checkbox',
 				'desc'    => 'قیمت‌ها، شمارنده‌ها و تعدادها با ارقام فارسی نمایش داده می‌شوند.',
+				'group'   => 'money',
+			),
+			'product_subtitle' => array(
+				'label'   => 'نمایش عنوان انگلیسی محصول',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'زیرعنوان لاتین زیر نام محصول. متن آن از فیلد سفارشی محصول یا از تنظیم خود ویجت خوانده می‌شود.',
+				'group'   => 'product',
+			),
+			'product_subtitle_key' => array(
+				'label'   => 'کلید فیلد سفارشی عنوان انگلیسی',
+				'default' => '_ardal_subtitle',
+				'type'    => 'text',
+				'desc'    => 'نام متای محصول که عنوان انگلیسی از آن خوانده می‌شود. اگر خالی یا موجود نبود، از متن ویجت استفاده می‌شود.',
+				'group'   => 'product',
+			),
+			'product_wishlist' => array(
+				'label'   => 'فعال‌سازی علاقه‌مندی',
+				'default' => '1',
+				'type'    => 'checkbox',
+				'desc'    => 'دکمهٔ علاقه‌مندی در گالری، کارت محصول و باکس خرید. با خاموش‌کردن، همه‌جا حذف می‌شود.',
+				'group'   => 'product',
+			),
+			'product_compare'  => array(
+				'label'   => 'فعال‌سازی مقایسه',
+				'default' => '1',
+				'type'    => 'checkbox',
+				'desc'    => 'دکمهٔ مقایسه در گالری و کارت محصول. با خاموش‌کردن، همه‌جا حذف می‌شود.',
+				'group'   => 'product',
+			),
+			'disable_wc_general_css' => array(
+				'label'   => 'غیرفعال‌سازی CSS اصلی ووکامرس (woocommerce-general)',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'استایل‌های عمومی دکمه‌ها، پیام‌ها و جدول‌های ووکامرس. فعال‌سازی این گزینه ممکن است ظاهر فروشگاه، سبد و تسویه‌حساب را تغییر دهد.',
+				'group'   => 'woocommerce_assets',
+			),
+			'disable_wc_layout_css' => array(
+				'label'   => 'غیرفعال‌سازی CSS چیدمان ووکامرس (woocommerce-layout)',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'چیدمان پیش‌فرض فروشگاه و صفحه محصول، شامل ستون‌ها و ساختار محتوا. فقط وقتی قالب/Elementor جایگزین کامل چیدمان است فعال کنید.',
+				'group'   => 'woocommerce_assets',
+			),
+			'disable_wc_smallscreen_css' => array(
+				'label'   => 'غیرفعال‌سازی CSS واکنش‌گرا ووکامرس (woocommerce-smallscreen)',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'قواعد واکنش‌گرا برای نمایش ووکامرس در موبایل و صفحه‌های کوچک. ممکن است ظاهر فروشگاه در موبایل را تحت تأثیر قرار دهد.',
+				'group'   => 'woocommerce_assets',
+			),
+			'disable_wc_add_to_cart_js' => array(
+				'label'   => 'غیرفعال‌سازی JavaScript افزودن ایجکس به سبد (wc-add-to-cart)',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'افزودن محصول از لیست/کارت بدون رفرش صفحه را خاموش می‌کند؛ دکمه‌ها با رفتن به لینک محصول یا سبد کار می‌کنند.',
+				'group'   => 'woocommerce_assets',
+			),
+			'disable_wc_cart_fragments_js' => array(
+				'label'   => 'غیرفعال‌سازی JavaScript به‌روزرسانی مینی‌سبد (wc-cart-fragments)',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'شمارنده و محتوای مینی‌سبد پس از افزودن کالا خودکار به‌روزرسانی نمی‌شود؛ برای کاهش درخواست‌های Ajax مناسب است.',
+				'group'   => 'woocommerce_assets',
+			),
+			'disable_wc_single_product_js' => array(
+				'label'   => 'غیرفعال‌سازی JavaScript صفحه محصول (wc-single-product)',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'رفتار گالری استاندارد ووکامرس و وابستگی‌های آن را خاموش می‌کند. اگر از گالری سفارشی اردال استفاده می‌کنید می‌تواند مفید باشد.',
+				'group'   => 'woocommerce_assets',
+			),
+			'disable_wc_variation_js' => array(
+				'label'   => 'غیرفعال‌سازی JavaScript محصول متغیر (wc-add-to-cart-variation)',
+				'default' => '0',
+				'type'    => 'checkbox',
+				'desc'    => 'انتخاب ویژگی‌ها، قیمت و موجودی محصول متغیر در فرم استاندارد ووکامرس را غیرفعال می‌کند. برای محصولات متغیر معمولاً خاموش بماند.',
+				'group'   => 'woocommerce_assets',
 			),
 		);
 	}
@@ -246,7 +331,7 @@ class Ardal_Palette {
 		$merged = array_merge( $defaults, array_intersect_key( $saved, $defaults ) );
 
 		foreach ( $merged as $key => $value ) {
-			if ( '' === $value && isset( $defaults[ $key ] ) && 'font_family' !== $key ) {
+			if ( '' === $value && isset( $defaults[ $key ] ) ) {
 				$merged[ $key ] = $defaults[ $key ];
 			}
 		}
@@ -373,13 +458,8 @@ class Ardal_Palette {
 
 		$lines[] = sprintf( '--ard-toman-size:%.2fem;', $toman / 100 );
 
-		$font = trim( (string) $p['font_family'] );
-
-		if ( '' !== $font ) {
-			$lines[] = sprintf( '--ard-font:%s,system-ui,-apple-system,sans-serif;', $font );
-		} else {
-			$lines[] = '--ard-font:inherit;';
-		}
+		// Typography is inherited from the active theme / Elementor Site Settings.
+		$lines[] = '--ard-font:inherit;';
 
 		return ':root{' . implode( '', $lines ) . '}';
 	}

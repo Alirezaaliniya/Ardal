@@ -1,0 +1,81 @@
+/*!
+ * Ardal — فیلدهای مگا منو در صفحه «نمایش ← فهرست‌ها».
+ */
+
+.ardal-mm-fields {
+	clear: both;
+	margin-top: 12px;
+	padding: 12px 14px 14px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	background: #f6f7f7;
+}
+
+.ardal-mm-head {
+	margin: 0 0 10px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.ardal-mm-row {
+	margin: 0 0 10px;
+}
+
+.ardal-mm-row label {
+	display: block;
+	margin-bottom: 4px;
+	font-size: 12px;
+	color: #50575e;
+}
+
+.ardal-mm-row input[type="text"],
+.ardal-mm-row select {
+	width: 100%;
+	max-width: 100%;
+}
+
+.ardal-mm-row--check label {
+	display: inline-block;
+	margin-bottom: 0;
+	font-size: 13px;
+	color: #1d2327;
+}
+
+.ardal-mm-row--split {
+	display: flex;
+	gap: 10px;
+}
+
+.ardal-mm-row--split > span {
+	flex: 1;
+	min-width: 0;
+}
+
+/* گزینه‌های مخصوص پنل مگا تا وقتی تیک نخورده پنهان می‌مانند. */
+.ardal-mm-fields:not(.is-mega) .ardal-mm-row--mega {
+	display: none;
+}
+
+.ardal-mm-media__preview {
+	display: block;
+	margin-bottom: 6px;
+}
+
+.ardal-mm-media__preview img {
+	max-width: 130px;
+	height: auto;
+	border-radius: 4px;
+	border: 1px solid #dcdcde;
+}
+
+.ardal-mm-media__actions {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 8px;
+}
+
+.ardal-mm-media__url {
+	display: block;
+	width: 100%;
+}

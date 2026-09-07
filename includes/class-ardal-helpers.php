@@ -148,7 +148,9 @@ class Ardal_Helpers {
 
 		return '<span class="ard-stars" role="img" aria-label="' . esc_attr( self::fa_digits( $rating ) . ' از ۵' ) . '">'
 			. str_repeat( '★', $full )
-			. ( $half ? '★' : '' )
+			// ستارهٔ نیمه کلاس خودش را می‌گیرد تا CSS نیمی از آن را پر کند؛
+			// قبلاً به‌شکل ستارهٔ کامل درمی‌آمد و مثلاً ۴٫۶ پنج ستارهٔ پر می‌شد.
+			. ( $half ? '<span class="ard-stars__half">★</span>' : '' )
 			. str_repeat( '☆', max( 0, $empty ) )
 			. '</span>';
 	}
@@ -272,6 +274,66 @@ class Ardal_Helpers {
 	}
 
 	/**
+	 * Render a WooCommerce loop add-to-cart link through WooCommerce's public API.
+	 *
+	 * @param WC_Product $product Product instance.
+	 * @param array      $classes Widget-specific classes.
+	 * @param string     $text Link text.
+	 * @param array      $attributes Widget-specific attributes.
+	 * @return string
+	 */
+	public static function woocommerce_add_to_cart_link( $product, $classes = array(), $text = '', $attributes = array() ) {
+		if ( ! $product || ! is_a( $product, 'WC_Product' ) ) {
+			return '';
+		}
+
+		$button_classes = array_merge( (array) $classes, array( 'button', 'product_type_' . $product->get_type() ) );
+
+		if ( $product->is_purchasable() && $product->is_in_stock() ) {
+			$button_classes[] = 'add_to_cart_button';
+		}
+
+		if ( $product->supports( 'ajax_add_to_cart' ) && $product->is_purchasable() && $product->is_in_stock() && ! Ardal_Assets::is_woocommerce_asset_disabled( 'disable_wc_add_to_cart_js' ) ) {
+			$button_classes[] = 'ajax_add_to_cart';
+			wp_enqueue_script( 'wc-add-to-cart' );
+		}
+
+		$args = apply_filters(
+			'woocommerce_loop_add_to_cart_args',
+			array(
+				'quantity'   => 1,
+				'class'      => implode( ' ', array_unique( array_filter( $button_classes ) ) ),
+				'attributes' => array_merge(
+					array(
+						'data-product_id'  => $product->get_id(),
+						'data-product_sku' => $product->get_sku(),
+						'data-quantity'    => 1,
+						'aria-label'       => $product->add_to_cart_description(),
+						'rel'              => 'nofollow',
+					),
+					(array) $attributes
+				),
+			),
+			$product
+		);
+
+		// WooCommerce and extensions use the filtered quantity as the source of truth.
+		if ( ! isset( $args['attributes']['data-quantity'] ) ) {
+			$args['attributes']['data-quantity'] = isset( $args['quantity'] ) ? $args['quantity'] : 1;
+		}
+
+		$link = sprintf(
+			'<a href="%1$s" %2$s class="%3$s">%4$s</a>',
+			esc_url( $product->add_to_cart_url() ),
+			wc_implode_html_attributes( isset( $args['attributes'] ) ? $args['attributes'] : array() ),
+			esc_attr( isset( $args['class'] ) ? $args['class'] : '' ),
+			esc_html( '' !== $text ? $text : $product->add_to_cart_text() )
+		);
+
+		return apply_filters( 'woocommerce_loop_add_to_cart_link', $link, $product, $args );
+	}
+
+	/**
 	 * واکشی محصولات ووکامرس و تبدیل به ساختار مشترک کارت محصول.
 	 *
 	 * @param array $args
@@ -361,7 +423,8 @@ class Ardal_Helpers {
 			'old_price' => ( $product->is_on_sale() && $regular ) ? self::price( $regular ) : '',
 			'off'       => $off,
 			'rating'    => (float) $product->get_average_rating(),
-			'count'     => (int) $product->get_rating_count(),
+			// برچسب «نظر» همهٔ دیدگاه‌ها را می‌شمارد، نه فقط دیدگاه‌های امتیازدار.
+			'count'     => (int) $product->get_review_count(),
 			'link'      => array( 'url' => get_permalink( $product->get_id() ) ),
 			'image'     => array( 'url' => $image ? $image[0] : '' ),
 			'badge'     => '',
@@ -404,5 +467,47 @@ class Ardal_Helpers {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * حدس کد رنگ از نام رنگ فارسی، برای نمونه‌رنگ کنار گزینه.
+	 *
+	 * ویژگی‌های ووکامرس کد رنگ ندارند، پس نام‌های رایج نگاشت می‌شوند و بقیه
+	 * یک خاکستری خنثی می‌گیرند.
+	 *
+	 * @param string $label
+	 * @return string
+	 */
+	public static function guess_color( $label ) {
+		$map = array(
+			'مشکی'   => '#20303F',
+			'سیاه'   => '#20303F',
+			'سفید'   => '#F2F5F8',
+			'قرمز'   => '#C0392B',
+			'آبی'    => '#0B62CE',
+			'سرمه'   => '#0B3C8C',
+			'نیلی'   => '#0B3C8C',
+			'سبز'    => '#5FA315',
+			'زرد'    => '#F0C300',
+			'نارنجی' => '#E8590C',
+			'صورتی'  => '#E5679B',
+			'بنفش'   => '#7048E8',
+			'قهوه'   => '#8B5E34',
+			'خاکستری' => '#8C98A4',
+			'طوسی'   => '#8C98A4',
+			'نقره'   => '#C7CED6',
+			'طلایی'  => '#C9A227',
+			'کرم'    => '#EFE3CC',
+			'بژ'     => '#E3D5BE',
+			'فیروزه' => '#2BB3C0',
+		);
+
+		foreach ( $map as $needle => $hex ) {
+			if ( false !== mb_stripos( $label, $needle ) ) {
+				return $hex;
+			}
+		}
+
+		return '#C7CED6';
 	}
 }

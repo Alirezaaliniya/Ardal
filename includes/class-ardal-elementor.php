@@ -24,6 +24,7 @@ class Ardal_Elementor {
 			'topbar'              => 'Ardal_Widget_Topbar',
 			'header'              => 'Ardal_Widget_Header',
 			'nav'                 => 'Ardal_Widget_Nav',
+			'mega-menu'           => 'Ardal_Widget_Mega_Menu',
 			'hero'                => 'Ardal_Widget_Hero',
 			'deal'                => 'Ardal_Widget_Deal',
 			'services'            => 'Ardal_Widget_Services',
@@ -41,9 +42,18 @@ class Ardal_Elementor {
 			'mobile-nav'          => 'Ardal_Widget_Mobile_Nav',
 			'product-breadcrumb'  => 'Ardal_Widget_Product_Breadcrumb',
 			'product-gallery'     => 'Ardal_Widget_Product_Gallery',
-			'product-info'        => 'Ardal_Widget_Product_Info',
+			// ناحیهٔ اطلاعات محصول به ازای هر بخش یک ویجت مستقل دارد تا جایگاه
+			// هرکدام جداگانه در المنتور تعیین شود.
+			'product-title'       => 'Ardal_Widget_Product_Title',
+			'product-brand'       => 'Ardal_Widget_Product_Brand',
+			'product-meta'        => 'Ardal_Widget_Product_Meta',
+			'product-color'       => 'Ardal_Widget_Product_Color',
+			'product-size'        => 'Ardal_Widget_Product_Size',
+			'product-specs'       => 'Ardal_Widget_Product_Specs',
+			'product-price-date'  => 'Ardal_Widget_Product_Price_Date',
 			'product-buybox'      => 'Ardal_Widget_Product_Buybox',
 			'product-tabs'        => 'Ardal_Widget_Product_Tabs',
+			'product-related'     => 'Ardal_Widget_Product_Related',
 			'product-sticky-bar'  => 'Ardal_Widget_Product_Sticky_Bar',
 		);
 	}
@@ -58,6 +68,7 @@ class Ardal_Elementor {
 			'نوار اعلان بالای صفحه',
 			'هدر فروشگاه (لوگو، جستجو، سبد خرید)',
 			'منوی دسته‌بندی‌ها',
+			'مگا منو (از فهرست‌های وردپرس)',
 			'اسلایدر هیرو',
 			'پیشنهاد ویژه با شمارش معکوس',
 			'خدمات و مزیت‌ها',
@@ -78,6 +89,7 @@ class Ardal_Elementor {
 			'اطلاعات و مشخصات محصول',
 			'باکس خرید و قیمت',
 			'تب‌های جامع محصول',
+			'محصولات مرتبط',
 			'نوار چسبان خرید محصول',
 		);
 	}

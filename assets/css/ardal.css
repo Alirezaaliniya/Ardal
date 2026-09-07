@@ -10,6 +10,7 @@
 .elementor-widget-ardal-topbar,
 .elementor-widget-ardal-header,
 .elementor-widget-ardal-nav,
+.elementor-widget-ardal-mega-menu,
 .elementor-widget-ardal-hero,
 .elementor-widget-ardal-deal,
 .elementor-widget-ardal-services,
@@ -179,8 +180,18 @@ del .ard-toman {
 .ard-stars {
 	color: var(--ard-star);
 	font-size: 11.5px;
-	letter-spacing: 1px;
+	letter-spacing: 1.5px;
 	white-space: nowrap;
+}
+
+/* ستارهٔ نیمه: در RTL شروعِ بصری سمت راست است، پس پُرشدن از راست است.
+   رنگ باید صریح باشد نه currentColor، چون color اینجا transparent است و
+   گرادیان هم همان را می‌گرفت و نیمهٔ پر نامرئی می‌شد. */
+.ard-stars__half {
+	background: linear-gradient(to left, var(--ard-star) 50%, var(--ard-border) 50%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
 }
 
 .ard-badge {
@@ -3036,19 +3047,19 @@ a.ard-brand:hover img {
 	align-items: center;
 	gap: 6px;
 	font-size: 13px;
-	color: #7a8a9c;
+	color: var(--ard-text-soft);
 	padding: 12px 0;
 	margin: 0;
 }
 
 .ard-breadcrumb__sep {
 	font-size: 12px;
-	color: #b0bbc8;
+	color: var(--ard-muted);
 	user-select: none;
 }
 
 .ard-breadcrumb__item {
-	color: #7a8a9c;
+	color: var(--ard-text-soft);
 	text-decoration: none;
 	transition: color 0.2s;
 }
@@ -3102,9 +3113,13 @@ a.ard-breadcrumb__item:hover {
 
 .ard-prod-gallery__main {
 	position: relative;
-	border: 1px solid #e9eef4;
+	border: 1px solid var(--ard-border);
 	border-radius: 18px;
-	background: repeating-linear-gradient(45deg, #f2f6fa 0 10px, #fafcfe 10px 20px);
+	/* از متغیر می‌خواند تا کنترل ویجت بتواند راه‌راه، رنگ ساده یا هیچ بگذارد.
+	   متغیر روی ریشهٔ ویجت نوشته می‌شود تا بندانگشتی‌ها هم به آن برسند. */
+	background: var(--ard-frame-bg, repeating-linear-gradient(45deg,
+		var(--ard-frame-line, var(--ard-surface)) 0 var(--ard-frame-size, 10px),
+		var(--ard-frame-base, var(--ard-base)) var(--ard-frame-size, 10px) calc(var(--ard-frame-size, 10px) * 2)));
 	aspect-ratio: 1 / 1;
 	display: flex;
 	align-items: center;
@@ -3112,24 +3127,132 @@ a.ard-breadcrumb__item:hover {
 	overflow: hidden;
 }
 
-.ard-prod-gallery__main-wrap {
-	width: 100%;
-	height: 100%;
+/* ترک اسلایدر: اسکرول افقی با snap، پس کشیدن انگشت بومی کار می‌کند. */
+.ard-prod-gallery__track {
+	display: flex;
+	inline-size: 100%;
+	block-size: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior-x: contain;
+}
+
+.ard-prod-gallery__track::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-prod-gallery__slide {
+	flex: 0 0 100%;
+	inline-size: 100%;
+	block-size: 100%;
+	min-inline-size: 0;
+	margin: 0;
+	padding: 16px;
+	scroll-snap-align: start;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 16px;
 }
 
+/* تصویر کادر را پر می‌کند تا در ستون‌های عریض ریز نماند؛ contain نسبت
+   تصویر را حفظ می‌کند پس کشیدگی رخ نمی‌دهد. */
 .ard-prod-gallery__active-img {
-	max-width: 100%;
-	max-height: 100%;
+	inline-size: 100%;
+	block-size: 100%;
 	object-fit: contain;
-	transition: transform 0.3s ease;
+}
+
+/* ذره‌بین: عدسی گردی که همان نقطهٔ زیر نشانگر را بزرگ‌شده نشان می‌دهد. */
+.ard-prod-gallery__lens {
+	position: absolute;
+	inline-size: 180px;
+	block-size: 180px;
+	border-radius: 50%;
+	border: 2px solid var(--ard-base);
+	box-shadow: 0 10px 28px rgba(var(--ard-primary-dark-rgb), .28);
+	background-repeat: no-repeat;
+	background-color: var(--ard-base);
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity .15s;
+	/* بالای تصویر ولی زیر دکمه‌ها (۲) و فلش‌ها (۳)، وگرنه عدسی روی آن‌ها
+	   می‌افتاد و عملاً غیرقابل‌استفاده‌شان می‌کرد. */
+	z-index: 1;
+}
+
+.ard-prod-gallery__lens.is-on {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* فلش‌های اسلایدر — در RTL «قبلی» سمت راست است. */
+.ard-prod-gallery__arrow {
+	position: absolute;
+	top: 50%;
+	translate: 0 -50%;
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 36px;
+	block-size: 36px;
+	padding: 0;
+	border: 1px solid var(--ard-border);
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--ard-base) 88%, transparent);
+	color: var(--ard-primary-dark);
+	cursor: pointer;
+	transition: background .2s, border-color .2s;
+	backdrop-filter: blur(4px);
+}
+
+.ard-prod-gallery__arrow:hover {
+	background: var(--ard-base);
+	border-color: var(--ard-tint-blue-border);
+}
+
+.ard-prod-gallery__arrow--prev {
+	right: 12px;
+}
+
+.ard-prod-gallery__arrow--next {
+	left: 12px;
+}
+
+.ard-prod-gallery[data-single="yes"] .ard-prod-gallery__arrow {
+	display: none;
+}
+
+/* نقطه‌های اسلایدر */
+.ard-prod-gallery__dots {
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+	margin-block-start: 10px;
+}
+
+.ard-prod-gallery__dot {
+	inline-size: 7px;
+	block-size: 7px;
+	padding: 0;
+	border: 0;
+	border-radius: 5px;
+	background: color-mix(in srgb, var(--ard-primary-dark) 22%, var(--ard-base));
+	cursor: pointer;
+	transition: inline-size .25s, background .25s;
+}
+
+.ard-prod-gallery__dot.is-active {
+	inline-size: 20px;
+	background: var(--ard-accent);
 }
 
 .ard-prod-gallery__placeholder {
-	color: #9aa7b4;
+	color: var(--ard-muted);
 	font: 600 12px ui-monospace, monospace;
 	text-align: center;
 }
@@ -3146,8 +3269,8 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-gallery__badge--guarantee {
-	background: #7DC61E !important;
-	color: #14340a !important;
+	background: var(--ard-accent) !important;
+	color: var(--ard-accent-ink) !important;
 	font-size: 11.5px !important;
 	font-weight: 800 !important;
 	border-radius: 8px !important;
@@ -3168,12 +3291,12 @@ a.ard-breadcrumb__item:hover {
 	width: 38px;
 	height: 38px;
 	border-radius: 50%;
-	background: #fff;
-	border: 1px solid #e3e9ef;
+	background: var(--ard-base);
+	border: 1px solid color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted));
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #5d6b7a;
+	color: var(--ard-text-soft);
 	font-size: 15px;
 	cursor: pointer;
 	transition: border-color 0.2s, color 0.2s, transform 0.2s;
@@ -3181,22 +3304,52 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-gallery__btn:hover {
-	border-color: var(--ard-primary, #0B62CE);
-	color: var(--ard-primary, #0B62CE);
+	border-color: var(--ard-primary, var(--ard-primary));
+	color: var(--ard-primary, var(--ard-primary));
 	transform: scale(1.08);
 }
 
 .ard-prod-gallery__btn[data-ard-wishlist]:hover {
-	border-color: var(--ard-danger, #C0392B);
-	color: var(--ard-danger, #C0392B);
+	border-color: var(--ard-sale);
+	color: var(--ard-sale);
+}
+
+/* وضعیت «افزوده شده» باید بدون هاور هم دیده شود. */
+.ard-prod-gallery__btn.is-active {
+	border-color: var(--ard-primary);
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary);
+}
+
+.ard-prod-gallery__btn--wishlist.is-active {
+	border-color: var(--ard-sale);
+	background: var(--ard-sale-soft);
+	color: var(--ard-sale);
+}
+
+.ard-prod-gallery__btn--wishlist.is-active .ard-i {
+	fill: currentColor;
+}
+
+.ard-prod-gallery__btn-link {
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--ard-primary);
+	text-align: center;
+	line-height: 1.6;
+}
+
+/* زمینهٔ راهنما هم باید از پالت بیاید، نه رنگ ثابت. */
+.ard-prod-gallery__zoom-hint {
+	background: rgba(var(--ard-primary-dark-rgb), .9);
 }
 
 .ard-prod-gallery__zoom-hint {
 	position: absolute;
 	bottom: 14px;
 	left: 14px;
-	background: rgba(11, 60, 140, 0.9);
-	color: #dbe9ff;
+	background: rgba(var(--ard-primary-dark-rgb), .9);
+	color: var(--ard-on-dark);
 	font-size: 11px;
 	padding: 6px 11px;
 	border-radius: 8px;
@@ -3204,23 +3357,107 @@ a.ard-breadcrumb__item:hover {
 	backdrop-filter: blur(4px);
 }
 
-.ard-prod-gallery__thumbs {
-	display: flex;
-	gap: 10px;
+/* نوار بندانگشتی هم مثل تصویر اصلی اسلایدر است: تِرَک افقیِ scroll-snap با
+   فلش‌های کناری. قبلاً grid بود و با تصاویر زیاد فشرده یا چندردیفه می‌شد. */
+.ard-prod-gallery__thumbs-wrap {
+	position: relative;
 	margin-top: 12px;
+}
+
+.ard-prod-gallery__thumbs {
+	--ard-thumbs: 5;
+	--ard-thumb-gap: 10px;
+
+	display: flex;
+	gap: var(--ard-thumb-gap);
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x proximity;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior-x: contain;
+}
+
+.ard-prod-gallery__thumbs::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-prod-gallery__thumbs > .ard-prod-gallery__thumb {
+	/* هر بندانگشتی دقیقاً یک n اُمِ عرضِ نما، با احتساب فاصله‌ها. */
+	flex: 0 0 calc((100% - (var(--ard-thumbs) - 1) * var(--ard-thumb-gap)) / var(--ard-thumbs));
+	scroll-snap-align: start;
+}
+
+/* سوییچ ویجت: بندانگشتی‌ها همان پس‌زمینهٔ کادر اصلی را بگیرند — همان متغیرِ
+   مشترکی که کنترل «پس‌زمینه» روی ریشهٔ ویجت می‌نویسد. */
+.ard-thumb-bg-yes .ard-prod-gallery__thumb {
+	background: var(--ard-frame-bg, repeating-linear-gradient(45deg,
+		var(--ard-frame-line, var(--ard-surface)) 0 var(--ard-frame-size, 10px),
+		var(--ard-frame-base, var(--ard-base)) var(--ard-frame-size, 10px) calc(var(--ard-frame-size, 10px) * 2)));
+}
+
+.ard-thumb-bg-yes .ard-prod-gallery__thumb img {
+	background: var(--ard-frame-base, var(--ard-base));
+}
+
+/* جای‌گزینِ «تصویر ندارد» پس‌زمینهٔ راه‌راهِ خودش را دارد و روی پس‌زمینهٔ
+   انتخابی کاربر می‌افتاد؛ داخل گالری از همان متغیر مشترک پیروی کند. */
+.ard-prod-gallery .ard-ph {
+	background: var(--ard-frame-bg, repeating-linear-gradient(45deg,
+		var(--ard-frame-line, var(--ard-surface)) 0 var(--ard-frame-size, 10px),
+		var(--ard-frame-base, var(--ard-base)) var(--ard-frame-size, 10px) calc(var(--ard-frame-size, 10px) * 2)));
+}
+
+.ard-prod-gallery__thumb-arrow {
+	position: absolute;
+	top: 50%;
+	translate: 0 -50%;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 30px;
+	block-size: 30px;
+	padding: 0;
+	border: 1px solid var(--ard-border);
+	border-radius: 50%;
+	background: var(--ard-base);
+	color: var(--ard-text-soft);
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(var(--ard-primary-dark-rgb), .12);
+	transition: color .2s, border-color .2s, opacity .2s;
+}
+
+.ard-prod-gallery__thumb-arrow:hover {
+	color: var(--ard-primary);
+	border-color: var(--ard-primary);
+}
+
+/* در RTL «قبلی» سمت راست است. */
+.ard-prod-gallery__thumb-arrow--prev {
+	right: -6px;
+}
+
+.ard-prod-gallery__thumb-arrow--next {
+	left: -6px;
+}
+
+.ard-prod-gallery__thumb-arrow[hidden] {
+	display: none;
 }
 
 .ard-prod-gallery__thumb {
 	box-sizing: border-box;
-	flex: 1;
+	min-inline-size: 0;
 	height: 88px;
 	border-radius: 12px;
-	border: 2px solid #e9eef4;
-	background: repeating-linear-gradient(45deg, #f2f6fa 0 8px, #fafcfe 8px 16px);
+	border: 2px solid var(--ard-border);
+	background: repeating-linear-gradient(45deg, var(--ard-surface) 0 8px, var(--ard-base) 8px 16px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #9aa7b4;
+	color: var(--ard-muted);
 	font: 600 9.5px ui-monospace, monospace;
 	cursor: pointer;
 	padding: 4px;
@@ -3229,12 +3466,12 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-gallery__thumb:hover {
-	border-color: var(--ard-accent, #7DC61E);
+	border-color: var(--ard-accent, var(--ard-accent));
 }
 
 .ard-prod-gallery__thumb.is-active {
-	border-color: var(--ard-accent, #7DC61E);
-	box-shadow: 0 0 0 1px var(--ard-accent, #7DC61E);
+	border-color: var(--ard-accent, var(--ard-accent));
+	box-shadow: 0 0 0 1px var(--ard-accent, var(--ard-accent));
 }
 
 .ard-prod-gallery__thumb img {
@@ -3245,8 +3482,8 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-gallery__thumb--video {
-	background: #eef4fc;
-	color: var(--ard-primary, #0B62CE);
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary, var(--ard-primary));
 	font-weight: 700;
 }
 
@@ -3254,32 +3491,31 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-hero__title {
 	font-size: clamp(19px, 1.8vw, 24px);
 	font-weight: 900;
-	color: #20303f;
+	color: var(--ard-text);
 	line-height: 1.55;
 	margin: 0 0 6px;
 }
 
 .ard-prod-hero__subtitle {
 	font-size: 13px;
-	color: #9aa7b4;
+	color: var(--ard-muted);
 	direction: ltr;
 	text-align: right;
-	margin-bottom: 14px;
+	margin-bottom: 0;
 }
 
 .ard-prod-brand {
 	display: inline-flex;
 	align-items: center;
 	gap: 12px;
-	margin-bottom: 16px;
-	border: 1px solid #e9eef4;
+	border: 1px solid var(--ard-border);
 	border-radius: 14px;
 	padding: 10px 14px;
 	transition: border-color 0.2s;
 }
 
 .ard-prod-brand:hover {
-	border-color: #cfe2f8;
+	border-color: var(--ard-tint-blue-border);
 }
 
 .ard-prod-brand__logo {
@@ -3287,11 +3523,11 @@ a.ard-breadcrumb__item:hover {
 	height: 36px;
 	flex: none;
 	border-radius: 8px;
-	background: repeating-linear-gradient(45deg, #f2f6fa 0 8px, #fafcfe 8px 16px);
+	background: repeating-linear-gradient(45deg, var(--ard-surface) 0 8px, var(--ard-base) 8px 16px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #9aa7b4;
+	color: var(--ard-muted);
 	font: 600 8.5px ui-monospace, monospace;
 	overflow: hidden;
 }
@@ -3305,12 +3541,12 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-brand__name {
 	font-size: 12.5px;
 	font-weight: 800;
-	color: #20303f;
+	color: var(--ard-text);
 }
 
 .ard-prod-brand__link {
 	font-size: 11px;
-	color: var(--ard-primary, #0B62CE) !important;
+	color: var(--ard-primary, var(--ard-primary)) !important;
 	font-weight: 700;
 	margin-top: 3px;
 	display: block;
@@ -3321,11 +3557,17 @@ a.ard-breadcrumb__item:hover {
 	align-items: center;
 	gap: 18px;
 	flex-wrap: wrap;
-	margin: 16px 0;
-	padding-bottom: 16px;
-	border-bottom: 1px solid #eef1f5;
 	font-size: 12.5px;
-	color: #7b8794;
+	/* تُنِ خاکستری دیزاین بین text-soft و muted است؛ به‌جای هاردکدکردن، از
+	   ترکیب همان دو توکن پالت ساخته می‌شود تا با تغییر پالت هم بخواند. */
+	color: color-mix(in srgb, var(--ard-text-soft) 55%, var(--ard-muted));
+}
+
+/* بخش‌ها حالا ویجت مستقل‌اند و فاصله‌شان را المنتور تعیین می‌کند، پس خط
+   جداکننده اختیاری شد و با سوییچ خود ویجت روشن می‌شود. */
+.ard-meta-divider-yes .ard-prod-meta {
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--ard-border-soft);
 }
 
 .ard-prod-meta__rate {
@@ -3335,17 +3577,17 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-meta__stars {
-	color: #F0A500;
+	color: var(--ard-star);
 	letter-spacing: 1.5px;
 }
 
 .ard-prod-meta__score {
 	font-weight: 800;
-	color: #20303f;
+	color: var(--ard-text);
 }
 
 .ard-prod-meta__item--link {
-	color: var(--ard-primary, #0B62CE);
+	color: var(--ard-primary, var(--ard-primary));
 	font-weight: 700;
 	cursor: pointer;
 }
@@ -3354,7 +3596,7 @@ a.ard-breadcrumb__item:hover {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	color: #3f7a0c;
+	color: var(--ard-accent-deep);
 	font-weight: 700;
 }
 
@@ -3362,13 +3604,13 @@ a.ard-breadcrumb__item:hover {
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
-	background: var(--ard-accent, #7DC61E);
+	background: var(--ard-accent, var(--ard-accent));
 	display: inline-block;
 }
 
 /* تغییرات رنگ و سایز */
 .ard-prod-variants {
-	margin-top: 18px;
+	margin-top: 0;
 }
 
 .ard-prod-variants__header {
@@ -3381,18 +3623,18 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-variants__label {
 	font-size: 13.5px;
 	font-weight: 800;
-	color: #20303f;
+	color: var(--ard-text);
 }
 
 .ard-prod-variants__selected {
 	font-size: 13px;
-	color: #5d6b7a;
+	color: var(--ard-text-soft);
 }
 
 .ard-prod-variants__guide {
 	margin-right: auto;
 	font-size: 12.5px;
-	color: var(--ard-primary, #0B62CE) !important;
+	color: var(--ard-primary, var(--ard-primary)) !important;
 	font-weight: 700;
 }
 
@@ -3407,32 +3649,32 @@ a.ard-breadcrumb__item:hover {
 	display: flex;
 	align-items: center;
 	gap: 9px;
-	border: 1.5px solid #e3e9ef;
-	background: #fff;
+	border: 1.5px solid color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted));
+	background: var(--ard-base);
 	border-radius: 11px;
 	padding: 9px 14px;
 	cursor: pointer;
 	font-size: 12.5px;
 	font-weight: 700;
-	color: #20303f;
+	color: var(--ard-text);
 	transition: border-color 0.2s, background 0.2s;
 	font-family: inherit;
 }
 
 .ard-prod-color:hover {
-	border-color: var(--ard-accent, #7DC61E);
+	border-color: var(--ard-accent, var(--ard-accent));
 }
 
 .ard-prod-color.is-active {
-	border-color: var(--ard-accent, #7DC61E);
-	background: #f7fcef;
+	border-color: var(--ard-accent, var(--ard-accent));
+	background: color-mix(in srgb, var(--ard-tint-green) 55%, var(--ard-base));
 }
 
 .ard-prod-color__swatch {
 	width: 18px;
 	height: 18px;
 	border-radius: 50%;
-	background: var(--swatch-color, #20303f);
+	background: var(--swatch-color, var(--ard-text));
 	border: 1px solid rgba(0, 0, 0, 0.12);
 	display: inline-block;
 	flex: none;
@@ -3448,9 +3690,9 @@ a.ard-breadcrumb__item:hover {
 	box-sizing: border-box;
 	min-width: 56px;
 	text-align: center;
-	border: 1.5px solid #e3e9ef;
-	background: #fff;
-	color: #20303f;
+	border: 1.5px solid color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted));
+	background: var(--ard-base);
+	color: var(--ard-text);
 	border-radius: 10px;
 	padding: 10px 0;
 	font-size: 13.5px;
@@ -3461,19 +3703,19 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-size:hover:not(.is-disabled) {
-	border-color: var(--ard-primary, #0B62CE);
+	border-color: var(--ard-primary, var(--ard-primary));
 }
 
 .ard-prod-size.is-active {
-	border-color: var(--ard-primary, #0B62CE);
-	background: var(--ard-primary, #0B62CE);
-	color: #fff;
+	border-color: var(--ard-primary, var(--ard-primary));
+	background: var(--ard-primary, var(--ard-primary));
+	color: var(--ard-base);
 }
 
 .ard-prod-size.is-disabled {
-	border-color: #eef1f5;
-	background: #fafbfc;
-	color: #c3ccd5;
+	border-color: var(--ard-border-soft);
+	background: var(--ard-surface-alt);
+	color: color-mix(in srgb, var(--ard-muted) 55%, var(--ard-base));
 	text-decoration: line-through;
 	cursor: not-allowed;
 }
@@ -3482,9 +3724,11 @@ a.ard-breadcrumb__item:hover {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	gap: 10px 26px;
-	margin-top: 22px;
+}
+
+.ard-specs-divider-yes .ard-prod-quick {
 	padding-top: 18px;
-	border-top: 1px solid #eef1f5;
+	border-top: 1px solid var(--ard-border-soft);
 }
 
 .ard-prod-quick__item {
@@ -3498,25 +3742,25 @@ a.ard-breadcrumb__item:hover {
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
-	background: var(--ard-accent, #7DC61E);
+	background: var(--ard-accent, var(--ard-accent));
 	flex: none;
 }
 
 .ard-prod-quick__key {
-	color: #7b8794;
+	color: var(--ard-text-soft);
 	min-width: 82px;
 }
 
 .ard-prod-quick__val {
-	color: #20303f;
+	color: var(--ard-text);
 	font-weight: 700;
 }
 
 /* ستون باکس خرید */
 .ard-prod-buybox {
-	border: 1.5px solid #dbeec2;
+	border: 1.5px solid var(--ard-tint-green-border);
 	border-radius: 18px;
-	background: linear-gradient(180deg, #f7fcef, #fff);
+	background: linear-gradient(180deg, color-mix(in srgb, var(--ard-tint-green) 55%, var(--ard-base)), var(--ard-base));
 	padding: 18px;
 	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
 }
@@ -3529,8 +3773,8 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-buybox__badge {
-	background: var(--ard-danger, #C0392B);
-	color: #fff;
+	background: var(--ard-danger, var(--ard-sale));
+	color: var(--ard-base);
 	font-size: 12px;
 	font-weight: 800;
 	padding: 4px 9px;
@@ -3539,14 +3783,14 @@ a.ard-breadcrumb__item:hover {
 
 .ard-prod-buybox__old {
 	font-size: 13px;
-	color: #9aa7b4;
+	color: var(--ard-muted);
 	text-decoration: line-through;
 }
 
 .ard-prod-buybox__price-main {
 	font-size: 26px;
 	font-weight: 900;
-	color: var(--ard-primary, #0B3C8C);
+	color: var(--ard-primary, var(--ard-primary-dark));
 	margin-bottom: 14px;
 }
 
@@ -3564,8 +3808,8 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-countdown__box {
 	flex: 1;
 	text-align: center;
-	background: var(--ard-primary, #0B3C8C);
-	color: #fff;
+	background: var(--ard-primary, var(--ard-primary-dark));
+	color: var(--ard-base);
 	border-radius: 10px;
 	padding: 7px 0;
 }
@@ -3579,7 +3823,7 @@ a.ard-breadcrumb__item:hover {
 
 .ard-prod-countdown__lbl {
 	font-size: 9.5px;
-	color: #a9c8f5;
+	color: color-mix(in srgb, var(--ard-on-dark) 85%, var(--ard-primary-light));
 	margin-top: 2px;
 }
 
@@ -3590,21 +3834,21 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-stock__track {
 	height: 6px;
 	border-radius: 4px;
-	background: #e6eef7;
+	background: color-mix(in srgb, var(--ard-primary-dark) 10%, var(--ard-surface));
 	overflow: hidden;
 	margin-bottom: 6px;
 }
 
 .ard-prod-stock__fill {
 	height: 100%;
-	background: var(--ard-accent, #7DC61E);
+	background: var(--ard-accent, var(--ard-accent));
 	border-radius: 4px;
 	transition: width 0.4s ease;
 }
 
 .ard-prod-stock__note {
 	font-size: 10.5px;
-	color: #7b8794;
+	color: var(--ard-text-soft);
 }
 
 .ard-prod-qty {
@@ -3617,15 +3861,15 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-qty__label {
 	font-size: 12.5px;
 	font-weight: 800;
-	color: #20303f;
+	color: var(--ard-text);
 }
 
 .ard-prod-qty__stepper {
 	margin-right: auto;
 	display: flex;
 	align-items: center;
-	background: #fff;
-	border: 1px solid #e3e9ef;
+	background: var(--ard-base);
+	border: 1px solid color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted));
 	border-radius: 10px;
 	overflow: hidden;
 }
@@ -3636,7 +3880,7 @@ a.ard-breadcrumb__item:hover {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #5d6b7a;
+	color: var(--ard-text-soft);
 	font-size: 18px;
 	cursor: pointer;
 	border: 0;
@@ -3646,7 +3890,7 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-qty__btn:hover {
-	background: #f4f7fa;
+	background: var(--ard-surface);
 }
 
 .ard-prod-qty__val {
@@ -3654,13 +3898,13 @@ a.ard-breadcrumb__item:hover {
 	text-align: center;
 	font-size: 15px;
 	font-weight: 900;
-	color: #20303f;
+	color: var(--ard-text);
 }
 
 .ard-prod-buybox__btn {
 	display: block;
-	background: var(--ard-accent, #7DC61E) !important;
-	color: #14340a !important;
+	background: var(--ard-accent, var(--ard-accent)) !important;
+	color: var(--ard-accent-ink) !important;
 	text-align: center;
 	font-size: 15px;
 	font-weight: 900;
@@ -3673,7 +3917,7 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-buybox__btn:hover {
-	background: #8ed928 !important;
+	background: var(--ard-accent-hover) !important;
 	transform: translateY(-2px);
 	box-shadow: 0 8px 20px rgba(95, 163, 21, 0.45);
 }
@@ -3682,7 +3926,7 @@ a.ard-breadcrumb__item:hover {
 	display: block;
 	text-align: center;
 	font-size: 11.5px;
-	color: var(--ard-primary, #0B62CE) !important;
+	color: var(--ard-primary, var(--ard-primary)) !important;
 	font-weight: 700;
 	margin-top: 12px;
 }
@@ -3690,7 +3934,7 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-guards {
 	margin-top: 16px;
 	padding-top: 14px;
-	border-top: 1px solid #eef1f5;
+	border-top: 1px solid var(--ard-border-soft);
 	display: flex;
 	flex-direction: column;
 	gap: 11px;
@@ -3701,7 +3945,7 @@ a.ard-breadcrumb__item:hover {
 	align-items: center;
 	gap: 9px;
 	font-size: 11.5px;
-	color: #3d4a58;
+	color: var(--ard-text-body);
 }
 
 .ard-prod-guard__icon {
@@ -3709,11 +3953,11 @@ a.ard-breadcrumb__item:hover {
 	height: 22px;
 	flex: none;
 	border-radius: 50%;
-	background: #eaf4ff;
+	background: var(--ard-tint-blue);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--ard-primary, #0B62CE);
+	color: var(--ard-primary, var(--ard-primary));
 	font-size: 11px;
 	font-weight: 900;
 }
@@ -3731,14 +3975,56 @@ a.ard-breadcrumb__item:hover {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 6px;
-	border-bottom: 1px solid #eef1f5;
+	border-bottom: 1px solid var(--ard-border-soft);
+}
+
+/* ---- حالت «همه بخش‌ها زیر هم» ---- */
+
+/* در این حالت نوار عنوان‌ها ناوبری است، پس در فضای کم به‌جای شکستن به خط
+   بعد، یک خط با اسکرول افقی می‌ماند تا چسبانی‌اش ارتفاع نگیرد. */
+.ard-ptabs--sections .ard-ptabs__nav {
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	scrollbar-width: none;
+	background: var(--ard-base);
+}
+
+.ard-ptabs--sections .ard-ptabs__nav::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-ptabs--sections .ard-ptabs__btn {
+	flex: 0 0 auto;
+	text-decoration: none;
+}
+
+.ard-ptabs--sticky-nav .ard-ptabs__nav {
+	position: sticky;
+	top: var(--ard-ptabs-offset, 0px);
+	z-index: 5;
+}
+
+.ard-ptabs--sections .ard-ptabs__panel {
+	padding-block: 26px;
+	scroll-margin-top: calc(var(--ard-ptabs-offset, 0px) + 72px);
+}
+
+.ard-ptabs--sections .ard-ptabs__panel + .ard-ptabs__panel {
+	border-top: 1px solid var(--ard-border-soft);
+}
+
+.ard-ptabs__panel-title {
+	margin: 0 0 16px;
+	font-size: 16px;
+	font-weight: 800;
+	color: var(--ard-text);
 }
 
 .ard-ptabs__btn {
 	padding: 13px 22px;
 	font-size: 14px;
 	font-weight: 500;
-	color: #7b8794;
+	color: var(--ard-text-soft);
 	border: 0;
 	background: transparent;
 	border-bottom: 3px solid transparent;
@@ -3749,13 +4035,13 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-ptabs__btn:hover {
-	color: var(--ard-primary, #0B3C8C);
+	color: var(--ard-primary, var(--ard-primary-dark));
 }
 
 .ard-ptabs__btn.is-active {
 	font-weight: 900;
-	color: var(--ard-primary, #0B3C8C);
-	border-bottom-color: var(--ard-accent, #7DC61E);
+	color: var(--ard-primary, var(--ard-primary-dark));
+	border-bottom-color: var(--ard-accent, var(--ard-accent));
 }
 
 .ard-ptabs__panels {
@@ -3790,21 +4076,21 @@ a.ard-breadcrumb__item:hover {
 	padding: 13px 14px;
 	border-radius: 10px;
 	font-size: 13px;
-	background: #fff;
+	background: var(--ard-base);
 }
 
 .ard-ptabs-specs__item--even {
-	background: #fafbfc;
+	background: var(--ard-surface-alt);
 }
 
 .ard-ptabs-specs__key {
 	width: 150px;
 	flex: none;
-	color: #7b8794;
+	color: var(--ard-text-soft);
 }
 
 .ard-ptabs-specs__val {
-	color: #20303f;
+	color: var(--ard-text);
 	font-weight: 700;
 }
 
@@ -3820,13 +4106,13 @@ a.ard-breadcrumb__item:hover {
 	min-width: 290px;
 	font-size: 14px;
 	line-height: 2.1;
-	color: #3d4a58;
+	color: var(--ard-text-body);
 }
 
 .ard-ptabs-desc__title {
 	font-size: 16px;
 	font-weight: 900;
-	color: #20303f;
+	color: var(--ard-text);
 	margin: 0 0 10px;
 }
 
@@ -3845,11 +4131,11 @@ a.ard-breadcrumb__item:hover {
 .ard-ptabs-desc__img-box {
 	height: 220px;
 	border-radius: 14px;
-	background: repeating-linear-gradient(45deg, #f2f6fa 0 10px, #fafcfe 10px 20px);
+	background: repeating-linear-gradient(45deg, var(--ard-surface) 0 10px, var(--ard-base) 10px 20px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #9aa7b4;
+	color: var(--ard-muted);
 	font: 600 11px ui-monospace, monospace;
 	overflow: hidden;
 }
@@ -3874,7 +4160,7 @@ a.ard-breadcrumb__item:hover {
 .ard-ptabs-reviews__summary {
 	flex: 1 1 260px;
 	min-width: 250px;
-	border: 1px solid #e9eef4;
+	border: 1px solid var(--ard-border);
 	border-radius: 16px;
 	padding: 18px;
 }
@@ -3889,18 +4175,28 @@ a.ard-breadcrumb__item:hover {
 .ard-ptabs-reviews__score {
 	font-size: 38px;
 	font-weight: 900;
-	color: var(--ard-primary, #0B3C8C);
+	color: var(--ard-primary, var(--ard-primary-dark));
 	line-height: 1;
 }
 
+/* دو عدد در یک خط با «·» در راست‌چین به هم می‌چسبیدند و «از ۵ · ۲ نظر» شبیه
+   «از ۲۰۵ نظر» خوانده می‌شد؛ حالا هر کدام خط خودش را دارد. */
 .ard-ptabs-reviews__note {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
 	font-size: 12px;
-	color: #7b8794;
+	color: var(--ard-text-soft);
 	padding-bottom: 6px;
 }
 
+.ard-ptabs-reviews__reviews {
+	font-size: 11.5px;
+	color: var(--ard-muted);
+}
+
 .ard-ptabs-reviews__stars {
-	color: #F0A500;
+	color: var(--ard-star);
 	letter-spacing: 2px;
 	font-size: 15px;
 	margin-bottom: 16px;
@@ -3917,7 +4213,7 @@ a.ard-breadcrumb__item:hover {
 	align-items: center;
 	gap: 9px;
 	font-size: 11.5px;
-	color: #7b8794;
+	color: var(--ard-text-soft);
 }
 
 .ard-ptabs-reviews__bar-label {
@@ -3928,7 +4224,7 @@ a.ard-breadcrumb__item:hover {
 	flex: 1;
 	height: 7px;
 	border-radius: 4px;
-	background: #eef1f5;
+	background: var(--ard-border-soft);
 	overflow: hidden;
 	display: block;
 }
@@ -3936,7 +4232,7 @@ a.ard-breadcrumb__item:hover {
 .ard-ptabs-reviews__bar-fill {
 	display: block;
 	height: 100%;
-	background: var(--ard-accent, #7DC61E);
+	background: var(--ard-accent, var(--ard-accent));
 	border-radius: 4px;
 }
 
@@ -3949,8 +4245,8 @@ a.ard-breadcrumb__item:hover {
 	display: block;
 	width: 100%;
 	margin-top: 18px;
-	background: var(--ard-primary, #0B62CE);
-	color: #fff;
+	background: var(--ard-primary, var(--ard-primary));
+	color: var(--ard-base);
 	text-align: center;
 	font-size: 13px;
 	font-weight: 800;
@@ -3975,7 +4271,7 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-review-card {
-	border: 1px solid #e9eef4;
+	border: 1px solid var(--ard-border);
 	border-radius: 16px;
 	padding: 16px 18px;
 }
@@ -3991,24 +4287,24 @@ a.ard-breadcrumb__item:hover {
 	width: 34px;
 	height: 34px;
 	border-radius: 50%;
-	background: #eaf4ff;
-	border: 1px solid #cfe2f8;
+	background: var(--ard-tint-blue);
+	border: 1px solid var(--ard-tint-blue-border);
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: 13px;
 	font-weight: 900;
-	color: var(--ard-primary, #0B62CE);
+	color: var(--ard-primary, var(--ard-primary));
 }
 
 .ard-review-card__author {
 	font-size: 13px;
 	font-weight: 800;
-	color: #20303f;
+	color: var(--ard-text);
 }
 
 .ard-review-card__stars {
-	color: #F0A500;
+	color: var(--ard-star);
 	letter-spacing: 1.5px;
 	font-size: 12px;
 }
@@ -4016,13 +4312,13 @@ a.ard-breadcrumb__item:hover {
 .ard-review-card__date {
 	margin-right: auto;
 	font-size: 11px;
-	color: #9aa7b4;
+	color: var(--ard-muted);
 }
 
 .ard-review-card__body {
 	font-size: 13.5px;
 	line-height: 2;
-	color: #3d4a58;
+	color: var(--ard-text-body);
 }
 
 .ard-review-card__footer {
@@ -4030,7 +4326,7 @@ a.ard-breadcrumb__item:hover {
 	gap: 16px;
 	margin-top: 12px;
 	font-size: 11.5px;
-	color: #7b8794;
+	color: var(--ard-text-soft);
 }
 
 .ard-review-card__vote {
@@ -4044,10 +4340,94 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-review-card__vote:hover {
-	color: var(--ard-primary, #0B62CE);
+	color: var(--ard-primary, var(--ard-primary));
 }
 
 /* تب پرسش و پاسخ */
+/* WooCommerce review form inside the product-tabs widget. */
+.ard-ptabs-review-form {
+	margin-top: 8px;
+	padding: 20px;
+	border: 1px solid var(--ard-border);
+	border-radius: 16px;
+	background: var(--ard-surface-alt);
+}
+
+.ard-ptabs-review-form .comment-reply-title {
+	display: block;
+	margin-bottom: 16px;
+	font-size: 16px;
+	font-weight: 900;
+	color: var(--ard-text);
+}
+
+.ard-ptabs-review-form .comment-form-author,
+.ard-ptabs-review-form .comment-form-email,
+.ard-ptabs-review-form .comment-form-rating,
+.ard-ptabs-review-form .comment-form-comment {
+	margin: 0 0 13px;
+}
+
+.ard-ptabs-review-form label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--ard-text-body);
+}
+
+.ard-ptabs-review-form input,
+.ard-ptabs-review-form select,
+.ard-ptabs-review-form textarea {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: none;
+	border: 1px solid var(--ard-border);
+	border-radius: 9px;
+	padding: 10px 12px;
+	background: var(--ard-base);
+	color: var(--ard-text);
+	font: inherit;
+}
+
+.ard-ptabs-review-form textarea {
+	resize: vertical;
+	min-height: 120px;
+}
+
+.ard-ptabs-review-form input:focus,
+.ard-ptabs-review-form select:focus,
+.ard-ptabs-review-form textarea:focus {
+	border-color: var(--ard-primary);
+	outline: 2px solid color-mix(in srgb, var(--ard-primary) 18%, transparent);
+	outline-offset: 1px;
+}
+
+.ard-ptabs-review-form .form-submit {
+	margin: 18px 0 0;
+}
+
+.ard-ptabs-review-form .submit {
+	border: 0;
+	border-radius: 10px;
+	padding: 11px 22px;
+	background: var(--ard-primary);
+	color: var(--ard-base);
+	cursor: pointer;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.ard-ptabs-reviews__verification {
+	margin: 8px 0 0;
+	padding: 13px;
+	border-radius: 10px;
+	background: var(--ard-tint-blue);
+	color: var(--ard-text-body);
+	font-size: 12px;
+}
+
 .ard-ptabs-qna {
 	max-width: 860px;
 }
@@ -4059,7 +4439,7 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-qna-card {
-	border: 1px solid #e9eef4;
+	border: 1px solid var(--ard-border);
 	border-radius: 16px;
 	padding: 16px 18px;
 }
@@ -4070,7 +4450,7 @@ a.ard-breadcrumb__item:hover {
 	gap: 10px;
 	font-size: 13.5px;
 	font-weight: 800;
-	color: #20303f;
+	color: var(--ard-text);
 }
 
 .ard-qna-card__badge {
@@ -4086,13 +4466,13 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-qna-card__badge--q {
-	background: #f1f8e6;
-	color: #3f7a0c;
+	background: var(--ard-tint-green);
+	color: var(--ard-accent-deep);
 }
 
 .ard-qna-card__badge--a {
-	background: #eaf4ff;
-	color: var(--ard-primary, #0B62CE);
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary, var(--ard-primary));
 }
 
 .ard-qna-card__answer {
@@ -4101,25 +4481,28 @@ a.ard-breadcrumb__item:hover {
 	gap: 10px;
 	margin-top: 12px;
 	padding-top: 12px;
-	border-top: 1px dashed #e9eef4;
+	border-top: 1px dashed var(--ard-border);
 	font-size: 13px;
 	line-height: 2;
-	color: #3d4a58;
+	color: var(--ard-text-body);
 }
 
 /* ============================================================
    ویجت نوار چسبان خرید پایین صفحه (Sticky Bar)
    ============================================================ */
 
+/* `sticky` اینجا کار نمی‌کرد: عنصر فقط نسبت به بلوک دربرگیرنده‌اش می‌چسبد و
+   کانتینر ویجت المنتور کوتاه است، پس نوار عملاً همان‌جا می‌ماند. `fixed` نسبت
+   به viewport است. جاوااسکریپت هم رَپِر ویجت را به body منتقل می‌کند تا
+   ترنسفورمِ هر جد (انیمیشن‌های المنتور) بلوک دربرگیرنده نسازد. */
 .ard-prod-sticky-bar {
-	position: sticky;
+	position: fixed;
 	bottom: 0;
-	left: 0;
-	right: 0;
+	inset-inline: 0;
 	z-index: 99;
-	background: #fff;
-	border-top: 1px solid #e3e9ef;
-	box-shadow: 0 -8px 24px rgba(11, 60, 140, 0.08);
+	background: var(--ard-base);
+	border-top: 1px solid color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted));
+	box-shadow: 0 -8px 24px rgba(var(--ard-primary-dark-rgb), .08);
 	padding: 14px clamp(14px, 2.5vw, 40px);
 	transition: transform 0.3s ease, opacity 0.3s ease;
 }
@@ -4150,7 +4533,7 @@ a.ard-breadcrumb__item:hover {
 	height: 56px;
 	flex: none;
 	border-radius: 12px;
-	background: repeating-linear-gradient(45deg, #f2f6fa 0 8px, #fafcfe 8px 16px);
+	background: repeating-linear-gradient(45deg, var(--ard-surface) 0 8px, var(--ard-base) 8px 16px);
 	overflow: hidden;
 	display: flex;
 	align-items: center;
@@ -4176,7 +4559,7 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-sticky-bar__title {
 	font-size: 13.5px;
 	font-weight: 800;
-	color: #20303f;
+	color: var(--ard-text);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -4184,7 +4567,7 @@ a.ard-breadcrumb__item:hover {
 
 .ard-prod-sticky-bar__variant {
 	font-size: 11.5px;
-	color: #7b8794;
+	color: var(--ard-text-soft);
 	margin-top: 3px;
 }
 
@@ -4201,7 +4584,7 @@ a.ard-breadcrumb__item:hover {
 
 .ard-prod-sticky-bar__old {
 	font-size: 11.5px;
-	color: #9aa7b4;
+	color: var(--ard-muted);
 	text-decoration: line-through;
 	display: block;
 }
@@ -4209,7 +4592,7 @@ a.ard-breadcrumb__item:hover {
 .ard-prod-sticky-bar__price {
 	font-size: 19px;
 	font-weight: 900;
-	color: var(--ard-primary, #0B3C8C);
+	color: var(--ard-primary, var(--ard-primary-dark));
 	white-space: nowrap;
 }
 
@@ -4219,8 +4602,8 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-sticky-bar__btn {
-	background: var(--ard-accent, #7DC61E) !important;
-	color: #14340a !important;
+	background: var(--ard-accent, var(--ard-accent)) !important;
+	color: var(--ard-accent-ink) !important;
 	font-size: 14.5px;
 	font-weight: 900;
 	padding: 14px 34px;
@@ -4233,6 +4616,332 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-sticky-bar__btn:hover {
-	background: #8ed928 !important;
+	background: var(--ard-accent-hover) !important;
 }
 
+
+/* ============================================================
+   ریسپانسیو صفحه محصول
+   نقطه‌شکست‌ها همان‌هایی است که بقیه افزونه استفاده می‌کند.
+   کنترل‌های ریسپانسیو المنتور با ویژگی اختصاصی‌تر این‌ها را
+   بازنویسی می‌کنند؛ این‌ها فقط تور ایمنی چیدمان‌اند.
+   ============================================================ */
+
+@media (max-width: 1200px) {
+	/* باکس خرید به زیر می‌رود و گالری و اطلاعات کنار هم می‌مانند. */
+	.ard-prod-hero__col--buybox {
+		flex-basis: 100%;
+		max-inline-size: none;
+	}
+}
+
+@media (max-width: 1024px) {
+	.ard-prod-hero__layout {
+		gap: 20px;
+	}
+
+	.ard-prod-hero__col--gallery {
+		max-inline-size: 380px;
+	}
+
+	.ard-ptabs-desc,
+	.ard-ptabs-reviews {
+		gap: 22px;
+	}
+}
+
+@media (max-width: 860px) {
+	/* تک‌ستونی: هیچ min-width سختی نباید باعث سرریز افقی شود. */
+	.ard-prod-hero__layout {
+		gap: 18px;
+	}
+
+	.ard-prod-hero__col--gallery,
+	.ard-prod-hero__col--info,
+	.ard-prod-hero__col--buybox {
+		flex: 1 1 100%;
+		min-inline-size: 0;
+		max-inline-size: none;
+	}
+
+	.ard-prod-quick,
+	.ard-ptabs-specs {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ard-ptabs-desc__text,
+	.ard-ptabs-desc__media,
+	.ard-ptabs-reviews__summary,
+	.ard-ptabs-reviews__list {
+		flex: 1 1 100%;
+		min-inline-size: 0;
+	}
+
+	/* نوار تب‌ها در یک خط با اسکرول، تا عنوان‌ها شکسته نشوند. */
+	.ard-ptabs__nav {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.ard-ptabs__nav::-webkit-scrollbar {
+		display: none;
+	}
+
+	.ard-ptabs__btn {
+		white-space: nowrap;
+	}
+
+	.ard-prod-meta {
+		gap: 8px 12px;
+		font-size: 12px;
+	}
+
+	.ard-prod-hero__title {
+		font-size: 19px;
+	}
+
+	.ard-prod-buybox__price-main {
+		font-size: 22px;
+	}
+
+	/* نوار چسبان: در موبایل فقط قیمت و دکمه لازم است. */
+	.ard-prod-sticky-bar__inner {
+		gap: 10px 12px;
+	}
+
+	.ard-prod-sticky-bar__media {
+		display: none;
+	}
+
+	.ard-prod-sticky-bar__info {
+		flex: 1 1 100%;
+		min-inline-size: 0;
+	}
+
+	.ard-prod-sticky-bar__title {
+		display: -webkit-box;
+		-webkit-line-clamp: 1;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.ard-prod-sticky-bar__action-group {
+		inline-size: 100%;
+		justify-content: space-between;
+	}
+
+	.ard-prod-sticky-bar__btn {
+		flex: 1;
+		text-align: center;
+	}
+}
+
+@media (max-width: 600px) {
+	/* فقط فاصله؛ تعداد بندانگشتی‌ها کنترل ریسپانسیو خودِ ویجت است و اینجا
+	   بازنویسی‌اش نمی‌کنیم. */
+	.ard-prod-gallery__thumbs {
+		--ard-thumb-gap: 8px;
+	}
+
+	.ard-prod-gallery__thumb {
+		height: 62px;
+	}
+
+	.ard-prod-gallery__zoom-hint {
+		display: none;
+	}
+
+	.ard-prod-sizes {
+		gap: 7px;
+	}
+
+	.ard-prod-colors {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.ard-ptabs-reviews__summary {
+		padding: 14px;
+	}
+
+	.ard-review-card__header {
+		flex-wrap: wrap;
+		gap: 6px 10px;
+	}
+
+	.ard-review-card__date {
+		margin-inline-start: 0;
+	}
+
+	.ard-prod-guards {
+		gap: 9px;
+	}
+}
+
+/* هیچ بخشی از صفحه محصول نباید صفحه را پهن‌تر از دستگاه کند. */
+[class*="elementor-widget-ardal-product-"] {
+	max-inline-size: 100%;
+	overflow-wrap: break-word;
+}
+
+/* ============================================================
+   لایت‌باکس تصویر محصول
+   ============================================================ */
+
+.ard-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: clamp(12px, 4vw, 48px);
+	background: rgba(var(--ard-primary-dark-rgb), .92);
+	backdrop-filter: blur(6px);
+	direction: rtl;
+}
+
+.ard-lightbox.is-open {
+	display: flex;
+}
+
+.ard-lightbox__stage {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 100%;
+	block-size: 100%;
+}
+
+.ard-lightbox__img {
+	max-inline-size: 100%;
+	max-block-size: 100%;
+	border-radius: var(--ard-radius);
+	background: var(--ard-base);
+	object-fit: contain;
+	/* کشیدن انگشت افقی برای تعویض تصویر آزاد بماند. */
+	touch-action: pan-y;
+}
+
+.ard-lightbox__close,
+.ard-lightbox__nav {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 44px;
+	block-size: 44px;
+	padding: 0;
+	border: 1px solid rgba(255, 255, 255, .45);
+	border-radius: 50%;
+	/* پس‌زمینهٔ تیره تا دکمه روی تصویرهای روشن هم خوانا بماند. */
+	background: rgba(var(--ard-primary-dark-rgb), .55);
+	color: var(--ard-base);
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+	transition: background .2s;
+}
+
+.ard-lightbox__close:hover,
+.ard-lightbox__nav:hover {
+	background: rgba(var(--ard-primary-dark-rgb), .8);
+}
+
+.ard-lightbox__close {
+	top: 16px;
+	left: 16px;
+}
+
+.ard-lightbox__nav {
+	top: 50%;
+	translate: 0 -50%;
+}
+
+/* در RTL «قبلی» سمت راست می‌نشیند. */
+.ard-lightbox__nav--prev {
+	right: 16px;
+}
+
+.ard-lightbox__nav--next {
+	left: 16px;
+}
+
+/* شِوران با ضلع‌های فیزیکی ساخته می‌شود؛ داخل کانتینر RTL نگاشتِ منطقی
+   جهت را برعکس می‌کرد و پیکان به بالا می‌افتاد. */
+.ard-lightbox__nav::before {
+	content: "";
+	inline-size: 12px;
+	block-size: 12px;
+	border-left: 2px solid currentColor;
+	border-top: 2px solid currentColor;
+}
+
+/* «قبلی» سمت راست است و باید به راست اشاره کند. */
+.ard-lightbox__nav--prev::before {
+	rotate: 135deg;
+	margin-left: 5px;
+}
+
+.ard-lightbox__nav--next::before {
+	rotate: -45deg;
+	margin-right: 5px;
+}
+
+.ard-prod-gallery[data-single="yes"] ~ .ard-lightbox .ard-lightbox__nav {
+	display: none;
+}
+
+@media (max-width: 600px) {
+	.ard-lightbox__close,
+	.ard-lightbox__nav {
+		inline-size: 38px;
+		block-size: 38px;
+	}
+
+	.ard-lightbox__nav--prev {
+		right: 8px;
+	}
+
+	.ard-lightbox__nav--next {
+		left: 8px;
+	}
+}
+
+/* روی دستگاه لمسی، تصویر با کلیک باز می‌شود پس نشانگر باید گویا باشد. */
+.ard-prod-gallery[data-lightbox="yes"] .ard-prod-gallery__slide {
+	cursor: zoom-in;
+}
+
+/* ============================================================
+   تاریخ به‌روزرسانی قیمت
+   ============================================================ */
+
+.ard-price-date {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	font-size: 12.5px;
+	color: color-mix(in srgb, var(--ard-text-soft) 55%, var(--ard-muted));
+	line-height: 1.7;
+}
+
+.ard-price-date--boxed {
+	padding: 9px 14px;
+	border: 1px solid var(--ard-border-soft);
+	border-radius: calc(var(--ard-radius) * 0.75);
+	background: var(--ard-surface);
+}
+
+.ard-price-date__icon {
+	display: inline-flex;
+	flex: none;
+	color: var(--ard-primary);
+}
+
+.ard-price-date__value {
+	font-weight: 800;
+	color: var(--ard-text);
+}
