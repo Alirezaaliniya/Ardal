@@ -154,6 +154,34 @@ class Ardal_Jalali {
 	}
 
 	/**
+	 * نام ماه شمسی از روی شمارهٔ آن — برای برچسب نمودارها.
+	 *
+	 * @param int $month شمارهٔ ماه ۱ تا ۱۲.
+	 * @return string
+	 */
+	public static function month_label( $month ) {
+		$month = (int) $month;
+
+		return isset( self::$months[ $month ] ) ? self::$months[ $month ] : '';
+	}
+
+	/**
+	 * کلید یکتای «سال-ماه» شمسی، برای گروه‌بندی داده‌ها بر حسب ماه.
+	 *
+	 * @param int $timestamp
+	 * @return string
+	 */
+	public static function month_key( $timestamp ) {
+		list( $jy, $jm, ) = self::to_jalali(
+			(int) gmdate( 'Y', $timestamp ),
+			(int) gmdate( 'n', $timestamp ),
+			(int) gmdate( 'j', $timestamp )
+		);
+
+		return sprintf( '%04d-%02d', $jy, $jm );
+	}
+
+	/**
 	 * زمان محلی سایت. `current_time` منطقهٔ زمانی وردپرس را اعمال می‌کند، پس
 	 * بقیهٔ محاسبات با gmdate انجام می‌شود تا آفست دوباره اضافه نشود.
 	 *

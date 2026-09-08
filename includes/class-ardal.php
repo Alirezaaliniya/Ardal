@@ -35,6 +35,7 @@ final class Ardal {
 		Ardal_Currency::init();
 		Ardal_Product_Fields::init();
 		Ardal_Mega_Menu::init();
+		Ardal_Account::init();
 
 		add_action( 'plugins_loaded', array( $this, 'boot_elementor' ) );
 	}

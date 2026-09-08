@@ -1,0 +1,2818 @@
+/*!
+ * Ardal — پنل کاربری ووکامرس
+ *
+ * رنگ‌های برند از پالت افزونه می‌آیند و رنگ‌های خنثای خود پنل (سطوح، حاشیه‌ها
+ * و چیپ‌های وضعیت) همان مقادیر دیزاین‌اند؛ همه از بالا قابل تغییرند.
+ */
+
+.ard-ac {
+	/* برند — از پالت سراسری */
+	--ac-navy: var(--ard-primary-dark);
+	--ac-navy-hover: #0a3477;
+	--ac-green: var(--ard-accent);
+	--ac-green-hover: #8ede23;
+	--ac-green-ink: #12290a;
+	--ac-green-deep: #4d8410;
+
+	/* سطوح و متن */
+	--ac-bg: #EEF3F8;
+	--ac-card: #ffffff;
+	--ac-border: #E6EEF6;
+	--ac-border-2: #E1EAF3;
+	--ac-divider: #F0F4F9;
+	--ac-ink: #12212F;
+	--ac-body: #42526b;
+	--ac-soft: #5B6A7A;
+	--ac-soft-2: #5F6D7C;
+	--ac-mute: #6B7885;
+	--ac-tint: #F2F7FC;
+	--ac-tint-2: #F4F8FB;
+	--ac-tint-3: #FAFCFE;
+	--ac-green-tint: #F1F8E6;
+
+	/* وضعیت‌ها */
+	--ac-amber: #F6A609;
+	--ac-amber-bg: #FFF8EC;
+	--ac-amber-border: #f2dfba;
+	--ac-amber-ink: #6E5D33;
+	--ac-amber-chip: #FFF1D9;
+	--ac-amber-chip-ink: #8a6c1d;
+	--ac-red: #c14040;
+	--ac-red-bg: #FDF1F1;
+	--ac-red-chip: #FDECEC;
+	--ac-red-border: #F5DADA;
+
+	--ac-r: 20px;
+	--ac-r-sm: 12px;
+	--ac-r-xs: 10px;
+
+	direction: rtl;
+	text-align: right;
+	background: var(--ac-bg);
+	color: var(--ac-ink);
+	font-family: var(--ard-font);
+	font-size: 13px;
+	line-height: 1.9;
+}
+
+/* ریست‌ها با وزن صفر تا کلاس‌های پنل همیشه بالاتر بمانند. */
+:where(.ard-ac, .ard-ac__drawer) *,
+:where(.ard-ac, .ard-ac__drawer) *::before,
+:where(.ard-ac, .ard-ac__drawer) *::after {
+	box-sizing: border-box;
+}
+
+:where(.ard-ac, .ard-ac__drawer) a {
+	color: inherit;
+	text-decoration: none;
+}
+
+:where(.ard-ac, .ard-ac__drawer) ul,
+:where(.ard-ac, .ard-ac__drawer) ol,
+:where(.ard-ac, .ard-ac__drawer) li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+:where(.ard-ac, .ard-ac__drawer) h2,
+:where(.ard-ac, .ard-ac__drawer) h3,
+:where(.ard-ac, .ard-ac__drawer) p {
+	margin: 0;
+}
+
+:where(.ard-ac, .ard-ac__drawer) address {
+	font-style: normal;
+	margin: 0;
+}
+
+:where(.ard-ac, .ard-ac__drawer) img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+:where(.ard-ac, .ard-ac__drawer) button {
+	margin: 0;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	cursor: pointer;
+}
+
+.ard-ac__i {
+	flex: none;
+}
+
+/* ============================================================
+   نوار بالا (دسکتاپ)
+   ============================================================ */
+
+.ard-ac__topbar {
+	background: var(--ac-card);
+	border-block-end: 1px solid var(--ac-border);
+}
+
+.ard-ac__topbar-inner {
+	display: flex;
+	align-items: center;
+	gap: 22px;
+	max-inline-size: 1400px;
+	margin-inline: auto;
+	padding: 14px 28px;
+}
+
+.ard-ac__brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: none;
+}
+
+.ard-ac__brand-mark {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 38px;
+	block-size: 38px;
+	border-radius: var(--ac-r-sm);
+	background: var(--ac-navy);
+	color: var(--ac-green);
+}
+
+.ard-ac__brand-logo img {
+	max-block-size: 38px;
+	inline-size: auto;
+}
+
+.ard-ac__brand-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.ard-ac__brand-name {
+	font-size: 17px;
+	font-weight: 900;
+	letter-spacing: -.2px;
+	line-height: 1.3;
+}
+
+.ard-ac__brand-sub {
+	font-size: 10.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+	line-height: 1.4;
+}
+
+.ard-ac__topbar-side {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-inline-start: auto;
+}
+
+.ard-ac__bell {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 38px;
+	block-size: 38px;
+	border: 1px solid var(--ac-border-2);
+	border-radius: var(--ac-r-sm);
+	color: var(--ac-body);
+	transition: border-color .2s;
+}
+
+.ard-ac__bell:hover {
+	border-color: var(--ac-navy);
+}
+
+.ard-ac__bell-badge {
+	position: absolute;
+	inset-block-start: -3px;
+	inset-inline-end: -3px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: 17px;
+	block-size: 17px;
+	padding-inline: 4px;
+	border-radius: 9px;
+	background: #E03131;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 800;
+	line-height: 1;
+}
+
+.ard-ac__chip {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 4px 6px 4px 10px;
+	border: 1px solid var(--ac-border-2);
+	border-radius: var(--ac-r-sm);
+	transition: border-color .2s;
+}
+
+.ard-ac__chip:hover {
+	border-color: var(--ac-navy);
+}
+
+.ard-ac__chip-avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 30px;
+	block-size: 30px;
+	border-radius: 9px;
+	background: var(--ac-navy);
+	color: #fff;
+	font-size: 12px;
+	font-weight: 800;
+}
+
+.ard-ac__chip-text {
+	display: flex;
+	flex-direction: column;
+	min-inline-size: 0;
+}
+
+.ard-ac__chip-name {
+	font-size: 12.5px;
+	font-weight: 800;
+	line-height: 1.4;
+}
+
+.ard-ac__chip-phone {
+	font-size: 10px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+	line-height: 1.4;
+}
+
+/* ============================================================
+   هدر موبایل
+   ============================================================ */
+
+.ard-ac__mhead {
+	display: none;
+	position: relative;
+	overflow: hidden;
+	background: var(--ac-navy);
+	padding: 16px 18px 22px;
+}
+
+.ard-ac__mhead::before {
+	content: '';
+	position: absolute;
+	inset-inline-end: -40px;
+	inset-block-start: -40px;
+	inline-size: 140px;
+	block-size: 140px;
+	border-radius: 80px;
+	background: rgba(125, 198, 30, .16);
+}
+
+.ard-ac__mhead-inner {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.ard-ac__burger {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	flex: none;
+	inline-size: 44px;
+	block-size: 44px;
+	border-radius: 14px;
+	background: rgba(255, 255, 255, .14);
+}
+
+.ard-ac__burger span[aria-hidden] {
+	display: block;
+	inline-size: 18px;
+	block-size: 2px;
+	border-radius: 2px;
+	background: #fff;
+}
+
+.ard-ac__burger span[aria-hidden]:nth-child(2) {
+	background: var(--ac-green);
+}
+
+.ard-ac__burger span[aria-hidden]:nth-child(3) {
+	inline-size: 12px;
+}
+
+.ard-ac__mhead-avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 44px;
+	block-size: 44px;
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, .2);
+	background: rgba(255, 255, 255, .16);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 900;
+}
+
+.ard-ac__mhead-text {
+	display: flex;
+	flex-direction: column;
+	min-inline-size: 0;
+	flex: 1;
+}
+
+.ard-ac__mhead-name {
+	font-size: 14.5px;
+	font-weight: 800;
+	color: #fff;
+	line-height: 1.5;
+}
+
+.ard-ac__mhead-phone {
+	font-size: 11px;
+	font-weight: 600;
+	color: #a9c6ee;
+	line-height: 1.6;
+}
+
+.ard-ac__mbell {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 38px;
+	block-size: 38px;
+	border-radius: var(--ac-r-sm);
+	background: rgba(255, 255, 255, .14);
+	color: #fff;
+}
+
+.ard-ac__mbell-badge {
+	position: absolute;
+	inset-block-start: -2px;
+	inset-inline-end: -2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: 16px;
+	block-size: 16px;
+	padding-inline: 4px;
+	border-radius: 8px;
+	background: var(--ac-green);
+	color: var(--ac-green-ink);
+	font-size: 9.5px;
+	font-weight: 800;
+	line-height: 1;
+}
+
+/* ============================================================
+   چیدمان
+   ============================================================ */
+
+.ard-ac__body {
+	display: grid;
+	grid-template-columns: 250px minmax(0, 1fr);
+	gap: 22px;
+	align-items: start;
+	max-inline-size: 1440px;
+	margin-inline: auto;
+	padding: 24px 28px;
+}
+
+.ard-ac__side {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.ard-ac__content {
+	min-inline-size: 0;
+}
+
+.ard-ac__stack {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	min-inline-size: 0;
+}
+
+.ard-ac__cols {
+	display: grid;
+	grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+	gap: 18px;
+	align-items: start;
+}
+
+.ard-ac__cols--detail {
+	grid-template-columns: minmax(0, 1fr) 340px;
+}
+
+.ard-ac__grid {
+	display: grid;
+	gap: 16px;
+}
+
+.ard-ac__grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ard-ac__grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+
+.ard-ac__card {
+	background: var(--ac-card);
+	border: 1px solid var(--ac-border);
+	border-radius: var(--ac-r);
+	padding: 20px 22px;
+}
+
+.ard-ac__ptitle {
+	font-size: 17px;
+	font-weight: 900;
+	line-height: 1.6;
+}
+
+.ard-ac__ctitle {
+	font-size: 15px;
+	font-weight: 900;
+	line-height: 1.6;
+}
+
+.ard-ac__ctitle--mb {
+	margin-block-end: 16px;
+}
+
+.ard-ac__csub {
+	margin-block-start: 5px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+	line-height: 1.9;
+}
+
+.ard-ac__csub--mb {
+	margin-block-end: 18px;
+}
+
+.ard-ac__chead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-block-end: 18px;
+}
+
+.ard-ac__chead--card {
+	margin-block-end: 0;
+}
+
+.ard-ac__chead-note {
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--ac-soft-2);
+	flex: none;
+}
+
+.ard-ac__link {
+	font-size: 12px;
+	font-weight: 800;
+	color: var(--ac-navy);
+}
+
+.ard-ac__link:hover {
+	color: var(--ac-green-deep);
+}
+
+.ard-ac__unit {
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--ac-soft-2);
+	margin-inline-start: 3px;
+}
+
+/* ============================================================
+   دکمه‌ها و چیپ‌ها
+   ============================================================ */
+
+.ard-ac__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	flex: none;
+	block-size: 42px;
+	padding-inline: 18px;
+	border-radius: var(--ac-r-sm);
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1;
+	white-space: nowrap;
+	transition: background .2s, border-color .2s, color .2s;
+}
+
+.ard-ac__btn--sm {
+	block-size: 34px;
+	padding-inline: 14px;
+	font-size: 11.5px;
+	border-radius: var(--ac-r-xs);
+}
+
+.ard-ac__btn--block {
+	display: flex;
+	inline-size: 100%;
+}
+
+.ard-ac__btn--primary {
+	background: var(--ac-navy);
+	color: #fff;
+}
+
+.ard-ac__btn--primary:hover {
+	background: var(--ac-navy-hover);
+	color: #fff;
+}
+
+.ard-ac__btn--accent,
+.ard-ac__btn--green {
+	background: var(--ac-green);
+	color: var(--ac-green-ink);
+}
+
+.ard-ac__btn--accent:hover,
+.ard-ac__btn--green:hover {
+	background: var(--ac-green-hover);
+	color: var(--ac-green-ink);
+}
+
+.ard-ac__btn--amber {
+	background: var(--ac-amber);
+	color: #3d2a00;
+}
+
+.ard-ac__btn--amber:hover {
+	background: #ffb724;
+	color: #3d2a00;
+}
+
+.ard-ac__btn--ghost {
+	border: 1px solid var(--ac-border-2);
+	background: var(--ac-card);
+	color: var(--ac-body);
+}
+
+.ard-ac__btn--ghost:hover {
+	border-color: var(--ac-navy);
+	color: var(--ac-navy);
+}
+
+.ard-ac__btn--soft {
+	background: var(--ac-tint);
+	color: var(--ac-navy);
+}
+
+.ard-ac__btn--soft:hover {
+	background: #e4eef9;
+	color: var(--ac-navy);
+}
+
+.ard-ac__badge {
+	display: inline-flex;
+	align-items: center;
+	flex: none;
+	padding: 5px 10px;
+	border-radius: 8px;
+	font-size: 11px;
+	font-weight: 800;
+	line-height: 1.3;
+}
+
+.ard-ac__badge--green { background: #E9F6D6; color: var(--ac-green-deep); }
+.ard-ac__badge--amber { background: var(--ac-amber-chip); color: var(--ac-amber-chip-ink); }
+.ard-ac__badge--red   { background: var(--ac-red-chip); color: #b53c3c; }
+.ard-ac__badge--grey  { background: #EAF0F6; color: var(--ac-soft); }
+
+/* ============================================================
+   ستون کناری
+   ============================================================ */
+
+.ard-ac__nav-card {
+	padding: 18px 14px 10px;
+}
+
+.ard-ac__user {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 0 4px 16px;
+	border-block-end: 1px solid var(--ac-divider);
+	margin-block-end: 10px;
+}
+
+.ard-ac__user-avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 46px;
+	block-size: 46px;
+	border-radius: 15px;
+	background: linear-gradient(135deg, var(--ac-navy), #2168CC);
+	color: #fff;
+	font-size: 14px;
+	font-weight: 900;
+}
+
+.ard-ac__user-text {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	min-inline-size: 0;
+}
+
+.ard-ac__user-name {
+	font-size: 14px;
+	font-weight: 800;
+	line-height: 1.4;
+}
+
+.ard-ac__user-phone {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+	line-height: 1.4;
+}
+
+.ard-ac__nav {
+	display: flex;
+	flex-direction: column;
+}
+
+.ard-ac__nav-item {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	margin: 0 4px 3px;
+	padding: 10px;
+	border-radius: var(--ac-r-sm);
+	color: var(--ac-body);
+	transition: background .15s, color .15s;
+}
+
+.ard-ac__nav-item:hover {
+	background: var(--ac-tint);
+	color: var(--ac-navy);
+}
+
+.ard-ac__nav-item.is-active {
+	background: var(--ac-navy);
+	color: #fff;
+}
+
+.ard-ac__nav-label {
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.ard-ac__nav-badge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-inline-start: auto;
+	min-inline-size: 20px;
+	block-size: 20px;
+	padding-inline: 5px;
+	border-radius: 7px;
+	background: var(--ac-green-tint);
+	color: var(--ac-green-deep);
+	font-size: 10.5px;
+	font-weight: 800;
+}
+
+.ard-ac__nav-item.is-active .ard-ac__nav-badge {
+	background: rgba(255, 255, 255, .22);
+	color: #fff;
+}
+
+.ard-ac__logout-wrap {
+	margin-block-start: 8px;
+	padding: 10px 4px 4px;
+	border-block-start: 1px solid var(--ac-divider);
+}
+
+.ard-ac__logout {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	padding: 9px 10px;
+	border-radius: var(--ac-r-sm);
+	color: var(--ac-red);
+	font-size: 13px;
+	font-weight: 700;
+	transition: background .15s;
+}
+
+.ard-ac__logout:hover {
+	background: var(--ac-red-bg);
+	color: var(--ac-red);
+}
+
+.ard-ac__support {
+	position: relative;
+	overflow: hidden;
+	padding: 18px;
+	border-radius: var(--ac-r);
+	background: var(--ac-navy);
+}
+
+.ard-ac__support-blob {
+	position: absolute;
+	inset-inline-end: -34px;
+	inset-block-end: -34px;
+	inline-size: 112px;
+	block-size: 112px;
+	border-radius: 60px;
+	background: rgba(125, 198, 30, .2);
+}
+
+.ard-ac__support-body {
+	position: relative;
+}
+
+.ard-ac__support-title {
+	font-size: 13.5px;
+	font-weight: 800;
+	color: #fff;
+	line-height: 1.7;
+}
+
+.ard-ac__support-note {
+	margin-block-start: 6px;
+	font-size: 11.5px;
+	color: #a9c6ee;
+	line-height: 1.9;
+}
+
+.ard-ac__support-phone {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-block-start: 14px;
+	block-size: 38px;
+	border-radius: 11px;
+	background: var(--ac-green);
+	color: var(--ac-green-ink);
+	font-size: 12.5px;
+	font-weight: 800;
+	direction: ltr;
+	transition: background .2s;
+}
+
+.ard-ac__support-phone:hover {
+	background: var(--ac-green-hover);
+	color: var(--ac-green-ink);
+}
+
+/* ============================================================
+   داشبورد
+   ============================================================ */
+
+.ard-ac__welcome {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	padding: 22px 24px;
+}
+
+.ard-ac__welcome-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__welcome-title {
+	font-size: 20px;
+	font-weight: 900;
+	line-height: 1.6;
+}
+
+.ard-ac__welcome-sub {
+	margin-block-start: 9px;
+	font-size: 13px;
+	color: var(--ac-soft);
+	line-height: 1.95;
+}
+
+.ard-ac__welcome-actions {
+	display: flex;
+	gap: 10px;
+	flex: none;
+}
+
+.ard-ac__stats {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 14px;
+}
+
+.ard-ac__stat {
+	padding: 17px 18px;
+	border-radius: 18px;
+}
+
+.ard-ac__stat-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.ard-ac__stat-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 36px;
+	block-size: 36px;
+	border-radius: 11px;
+	background: var(--ac-tint);
+	color: var(--ac-navy);
+}
+
+.ard-ac__stat-delta {
+	padding: 4px 8px;
+	border-radius: 7px;
+	background: var(--ac-green-tint);
+	color: var(--ac-green-deep);
+	font-size: 10.5px;
+	font-weight: 800;
+}
+
+.ard-ac__stat-value {
+	margin-block-start: 14px;
+	font-size: 23px;
+	font-weight: 900;
+	letter-spacing: -.5px;
+	line-height: 1.4;
+}
+
+.ard-ac__stat-unit {
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ac-soft-2);
+	margin-inline-start: 4px;
+}
+
+.ard-ac__stat-label {
+	margin-block-start: 5px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ac-soft);
+}
+
+.ard-ac__alert {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 16px 20px;
+	border: 1px solid var(--ac-amber-border);
+	border-radius: 18px;
+	background: var(--ac-amber-bg);
+}
+
+.ard-ac__alert-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 38px;
+	block-size: 38px;
+	border-radius: var(--ac-r-sm);
+	background: var(--ac-amber);
+	color: #fff;
+}
+
+.ard-ac__alert-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__alert-title {
+	font-size: 13.5px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ard-ac__alert-note {
+	margin-block-start: 5px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-amber-ink);
+}
+
+.ard-ac__alert .ard-ac__btn {
+	block-size: 38px;
+	font-size: 12.5px;
+	border-radius: 11px;
+}
+
+/* رهگیری */
+
+.ard-ac__steps {
+	display: flex;
+	align-items: flex-start;
+	margin-block-end: 20px;
+}
+
+.ard-ac__step {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	min-inline-size: 0;
+}
+
+.ard-ac__step-bar {
+	inline-size: 100%;
+	block-size: 4px;
+	margin-block-end: 13px;
+	border-radius: 3px;
+	background: #EDF1F6;
+	overflow: hidden;
+}
+
+.ard-ac__step-bar span {
+	display: block;
+	inline-size: 0;
+	block-size: 100%;
+	border-radius: 3px;
+	background: var(--ac-green);
+	transition: width .4s ease;
+}
+
+.ard-ac__step.is-done .ard-ac__step-bar span {
+	inline-size: 100%;
+}
+
+.ard-ac__step-dot {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 26px;
+	block-size: 26px;
+	margin-block-end: 10px;
+	border: 2px solid #E1E8F0;
+	border-radius: 14px;
+	background: #EDF1F6;
+	color: #EDF1F6;
+}
+
+.ard-ac__step.is-done .ard-ac__step-dot {
+	border-color: var(--ac-green);
+	background: var(--ac-green);
+	color: #fff;
+}
+
+.ard-ac__step-label {
+	font-size: 11.5px;
+	font-weight: 800;
+	color: var(--ac-mute);
+}
+
+.ard-ac__step.is-done .ard-ac__step-label {
+	color: var(--ac-ink);
+}
+
+.ard-ac__step-time {
+	margin-block-start: 3px;
+	font-size: 10.5px;
+	font-weight: 600;
+	color: var(--ac-mute);
+}
+
+.ard-ac__track-items {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	padding-block-start: 18px;
+	border-block-start: 1px solid var(--ac-divider);
+}
+
+.ard-ac__line {
+	display: flex;
+	align-items: center;
+	gap: 13px;
+}
+
+.ard-ac__line-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__line-name {
+	display: block;
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.6;
+}
+
+.ard-ac__line-meta {
+	display: block;
+	margin-block-start: 4px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__line-price {
+	flex: none;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+/* تصاویر */
+
+.ard-ac__thumb {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 58px;
+	block-size: 58px;
+	border: 1px solid #EAF0F6;
+	border-radius: 14px;
+	background: var(--ac-tint-2);
+	overflow: hidden;
+}
+
+.ard-ac__thumb img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.ard-ac__thumb--sm { inline-size: 54px; block-size: 54px; }
+.ard-ac__thumb--md { inline-size: 64px; block-size: 64px; border-radius: 15px; }
+
+.ard-ac__thumb--more {
+	font-size: 11px;
+	font-weight: 800;
+	color: var(--ac-mute);
+}
+
+.ard-ac__thumb-empty {
+	font-size: 9.5px;
+	font-weight: 700;
+	color: var(--ac-mute);
+}
+
+/* نمودار */
+
+.ard-ac__chart {
+	display: flex;
+	align-items: flex-end;
+	gap: 9px;
+	block-size: 140px;
+}
+
+.ard-ac__bar-wrap {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	block-size: 100%;
+	min-inline-size: 0;
+}
+
+.ard-ac__bar-value {
+	font-size: 10.5px;
+	font-weight: 800;
+	color: var(--ac-body);
+}
+
+.ard-ac__bar {
+	inline-size: 100%;
+	border-radius: 8px 8px 4px 4px;
+	background: #DCE8F6;
+}
+
+.ard-ac__bar.is-current {
+	background: var(--ac-navy);
+}
+
+.ard-ac__bar-month {
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--ac-soft-2);
+}
+
+/* کد تخفیف */
+
+.ard-ac__coupon {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 14px 16px;
+	border: 1.5px dashed #b7d97a;
+	border-radius: 14px;
+	background: #F7FCEF;
+}
+
+.ard-ac__coupon-code {
+	font-size: 16px;
+	font-weight: 900;
+	letter-spacing: 1.5px;
+	color: var(--ac-green-deep);
+	direction: ltr;
+	text-align: right;
+}
+
+.ard-ac__coupon-desc {
+	margin-block-start: 5px;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ac-soft);
+	line-height: 1.7;
+}
+
+.ard-ac__coupon .ard-ac__btn {
+	block-size: 34px;
+	padding-inline: 14px;
+	font-size: 12px;
+	border-radius: var(--ac-r-xs);
+}
+
+.ard-ac__coupon-expiry {
+	margin-block-start: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ac-mute);
+}
+
+/* پیشنهادها */
+
+.ard-ac__mini {
+	display: block;
+	padding: 12px;
+	border: 1px solid #EAF0F6;
+	border-radius: 16px;
+	transition: border-color .2s, box-shadow .2s;
+}
+
+.ard-ac__mini:hover {
+	border-color: #c9dcf3;
+	box-shadow: 0 10px 24px rgba(11, 60, 140, .08);
+}
+
+.ard-ac__mini-media {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	block-size: 108px;
+	margin-block-end: 11px;
+	border-radius: var(--ac-r-sm);
+	background: var(--ac-tint-2);
+	overflow: hidden;
+}
+
+.ard-ac__mini-media img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.ard-ac__mini-name {
+	display: block;
+	block-size: 43px;
+	overflow: hidden;
+	font-size: 12.5px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ard-ac__mini-foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-block-start: 9px;
+}
+
+.ard-ac__mini-price {
+	font-size: 13px;
+	font-weight: 900;
+}
+
+.ard-ac__mini-price del {
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--ac-mute);
+	margin-inline-end: 4px;
+}
+
+.ard-ac__mini-price ins {
+	text-decoration: none;
+}
+
+.ard-ac__mini-plus {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 30px;
+	block-size: 30px;
+	border-radius: 9px;
+	background: var(--ac-green-tint);
+	color: #5d9c14;
+}
+
+/* ============================================================
+   سفارش‌ها
+   ============================================================ */
+
+.ard-ac__tabs {
+	display: flex;
+	gap: 6px;
+	padding: 4px;
+	border-radius: 13px;
+	background: var(--ac-tint-2);
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.ard-ac__tabs::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-ac__tabs-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	flex: 1;
+	block-size: 38px;
+	padding-inline: 12px;
+	border-radius: var(--ac-r-xs);
+	color: var(--ac-soft);
+	font-size: 12.5px;
+	font-weight: 800;
+	white-space: nowrap;
+}
+
+.ard-ac__tabs-item.is-active {
+	background: var(--ac-card);
+	color: var(--ac-navy);
+	box-shadow: 0 2px 8px rgba(11, 60, 140, .09);
+}
+
+.ard-ac__tabs-count {
+	padding: 2px 6px;
+	border-radius: 6px;
+	background: #E8EEF5;
+	color: var(--ac-soft-2);
+	font-size: 10.5px;
+	font-weight: 800;
+}
+
+.ard-ac__tabs-item.is-active .ard-ac__tabs-count {
+	background: var(--ac-tint);
+	color: var(--ac-navy);
+}
+
+.ard-ac__order {
+	padding: 0;
+	overflow: hidden;
+}
+
+.ard-ac__order-head {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding: 15px 22px;
+	border-block-end: 1px solid #EFF4F9;
+	background: var(--ac-tint-3);
+	flex-wrap: wrap;
+}
+
+.ard-ac__order-code {
+	font-size: 12.5px;
+	font-weight: 800;
+	color: var(--ac-body);
+}
+
+.ard-ac__order-meta {
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__order-side {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-inline-start: auto;
+}
+
+.ard-ac__order-total {
+	font-size: 14px;
+	font-weight: 900;
+}
+
+.ard-ac__order-body {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding: 18px 22px;
+}
+
+.ard-ac__order-thumbs {
+	display: flex;
+	gap: 9px;
+	flex: none;
+}
+
+.ard-ac__order-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__order-title {
+	display: block;
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ard-ac__order-items {
+	display: block;
+	margin-block-start: 5px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__order-actions {
+	display: flex;
+	gap: 8px;
+	flex: none;
+}
+
+.ard-ac__order-actions .ard-ac__btn {
+	block-size: 36px;
+	font-size: 12px;
+	border-radius: 11px;
+}
+
+.ard-ac__pager {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	padding-block: 6px;
+	flex-wrap: wrap;
+}
+
+.ard-ac__pager-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: 36px;
+	block-size: 36px;
+	padding-inline: 13px;
+	border: 1px solid var(--ac-border);
+	border-radius: 11px;
+	background: var(--ac-card);
+	color: var(--ac-body);
+	font-size: 12.5px;
+	font-weight: 800;
+}
+
+.ard-ac__pager-item.is-active {
+	border-color: var(--ac-navy);
+	background: var(--ac-navy);
+	color: #fff;
+}
+
+/* ============================================================
+   جزئیات سفارش
+   ============================================================ */
+
+.ard-ac__detail-head {
+	display: flex;
+	align-items: flex-start;
+	gap: 20px;
+	padding: 22px 24px;
+}
+
+.ard-ac__back {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 36px;
+	block-size: 36px;
+	border: 1px solid var(--ac-border-2);
+	border-radius: 11px;
+	color: var(--ac-body);
+	transition: border-color .2s, color .2s;
+}
+
+.ard-ac__back:hover {
+	border-color: var(--ac-navy);
+	color: var(--ac-navy);
+}
+
+.ard-ac__detail-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__detail-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.ard-ac__detail-title .ard-ac__ptitle {
+	font-size: 18px;
+}
+
+.ard-ac__detail-actions {
+	display: flex;
+	gap: 8px;
+	flex: none;
+}
+
+.ard-ac__detail-actions .ard-ac__btn {
+	block-size: 38px;
+	font-size: 12.5px;
+	border-radius: 11px;
+}
+
+.ard-ac__tracking {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 7px 12px;
+	border-radius: var(--ac-r-xs);
+	background: var(--ac-tint-2);
+}
+
+.ard-ac__tracking-label {
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ac-soft);
+}
+
+.ard-ac__tracking-code {
+	font-size: 12.5px;
+	font-weight: 900;
+	letter-spacing: .5px;
+}
+
+.ard-ac__timeline {
+	display: flex;
+	flex-direction: column;
+}
+
+.ard-ac__event {
+	display: flex;
+	gap: 16px;
+}
+
+.ard-ac__event-rail {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex: none;
+	inline-size: 32px;
+}
+
+.ard-ac__event-dot {
+	inline-size: 14px;
+	block-size: 14px;
+	flex: none;
+	border-radius: 8px;
+	background: #BFD4EF;
+}
+
+.ard-ac__event.is-latest .ard-ac__event-dot {
+	background: var(--ac-green);
+	box-shadow: 0 0 0 4px #E9F6D6;
+}
+
+.ard-ac__event-line {
+	inline-size: 2px;
+	flex: 1;
+	margin-block: 4px;
+	background: var(--ac-border);
+}
+
+.ard-ac__event:last-child .ard-ac__event-line {
+	display: none;
+}
+
+.ard-ac__event-body {
+	min-inline-size: 0;
+	padding-block-end: 20px;
+}
+
+.ard-ac__event-title {
+	display: block;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.ard-ac__event.is-latest .ard-ac__event-title {
+	color: var(--ac-navy);
+}
+
+.ard-ac__event-desc {
+	display: block;
+	margin-block-start: 5px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+	line-height: 1.8;
+}
+
+.ard-ac__event-time {
+	margin-inline-start: auto;
+	flex: none;
+	padding-block-start: 2px;
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--ac-mute);
+}
+
+.ard-ac__items {
+	display: flex;
+	flex-direction: column;
+}
+
+.ard-ac__item {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding-block: 16px;
+	border-block-end: 1px solid var(--ac-divider);
+}
+
+.ard-ac__item:last-child {
+	border-block-end: 0;
+	padding-block-end: 0;
+}
+
+.ard-ac__item:first-child {
+	padding-block-start: 0;
+}
+
+.ard-ac__item-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__item-name {
+	display: block;
+	font-size: 13.5px;
+	font-weight: 800;
+	line-height: 1.6;
+}
+
+.ard-ac__item-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	margin-block-start: 7px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__item-price {
+	flex: none;
+	text-align: left;
+}
+
+.ard-ac__item-now {
+	display: block;
+	font-size: 13.5px;
+	font-weight: 900;
+}
+
+.ard-ac__item-old {
+	display: block;
+	margin-block-start: 5px;
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--ac-red);
+}
+
+.ard-ac__summary {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.ard-ac__summary-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--ac-soft);
+}
+
+.ard-ac__summary-val {
+	font-weight: 800;
+	color: var(--ac-ink);
+}
+
+.ard-ac__summary-val--off {
+	color: var(--ac-green-deep);
+}
+
+.ard-ac__summary-total {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-block-start: 16px;
+	padding-block-start: 16px;
+	border-block-start: 1px solid var(--ac-divider);
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.ard-ac__summary-total strong {
+	font-size: 17px;
+	font-weight: 900;
+	color: var(--ac-navy);
+}
+
+.ard-ac__addr-name {
+	font-size: 12.5px;
+	font-weight: 800;
+	line-height: 1.9;
+}
+
+.ard-ac__addr-line {
+	margin-block-start: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ac-soft);
+	line-height: 2.1;
+}
+
+.ard-ac__addr-meta {
+	margin-block-start: 6px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__ship {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	margin-block-start: 16px;
+	padding-block-start: 16px;
+	border-block-start: 1px solid var(--ac-divider);
+}
+
+.ard-ac__ship-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 34px;
+	block-size: 34px;
+	border-radius: var(--ac-r-xs);
+	background: var(--ac-tint);
+	color: var(--ac-navy);
+}
+
+.ard-ac__ship-name {
+	display: block;
+	font-size: 12.5px;
+	font-weight: 800;
+}
+
+.ard-ac__ship-note {
+	display: block;
+	margin-block-start: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+/* ============================================================
+   علاقه‌مندی‌ها
+   ============================================================ */
+
+.ard-ac__fav {
+	position: relative;
+	padding: 14px;
+	transition: box-shadow .2s;
+}
+
+.ard-ac__fav:hover {
+	box-shadow: 0 14px 30px rgba(11, 60, 140, .09);
+}
+
+.ard-ac__fav-remove {
+	position: absolute;
+	inset-block-start: 20px;
+	inset-inline-start: 20px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 32px;
+	block-size: 32px;
+	border-radius: var(--ac-r-xs);
+	background: var(--ac-card);
+	color: #E03131;
+	box-shadow: 0 3px 10px rgba(0, 0, 0, .09);
+	transition: transform .2s;
+}
+
+.ard-ac__fav-remove:hover {
+	transform: scale(1.08);
+}
+
+.ard-ac__fav-tag {
+	position: absolute;
+	inset-block-start: 20px;
+	inset-inline-end: 20px;
+	z-index: 2;
+	padding: 5px 9px;
+	border-radius: 8px;
+	font-size: 10px;
+	font-weight: 800;
+}
+
+.ard-ac__fav-media {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	block-size: 150px;
+	margin-block-end: 13px;
+	border-radius: 15px;
+	background: var(--ac-tint-2);
+	overflow: hidden;
+}
+
+.ard-ac__fav-media img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.ard-ac__fav-brand {
+	display: block;
+	font-size: 9.5px;
+	font-weight: 800;
+	letter-spacing: .4px;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__fav-name {
+	display: block;
+	block-size: 44px;
+	margin-block-start: 6px;
+	overflow: hidden;
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ard-ac__fav-rate {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-block-start: 8px;
+	color: var(--ard-star);
+}
+
+.ard-ac__fav-rate-value {
+	font-size: 11.5px;
+	font-weight: 800;
+	color: var(--ac-ink);
+}
+
+.ard-ac__fav-rate-count {
+	font-size: 10.5px;
+	font-weight: 600;
+	color: var(--ac-mute);
+}
+
+.ard-ac__fav-foot {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 10px;
+	margin-block-start: 12px;
+}
+
+.ard-ac__fav-price {
+	font-size: 15px;
+	font-weight: 900;
+}
+
+.ard-ac__fav-price del {
+	display: block;
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--ac-mute);
+}
+
+.ard-ac__fav-price ins {
+	text-decoration: none;
+}
+
+.ard-ac__fav.is-removing {
+	opacity: .45;
+	pointer-events: none;
+}
+
+/* ============================================================
+   آدرس‌ها
+   ============================================================ */
+
+.ard-ac__addr {
+	border-width: 1.5px;
+}
+
+.ard-ac__addr.is-set {
+	border-color: #b7d97a;
+}
+
+.ard-ac__addr-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-block-end: 14px;
+}
+
+.ard-ac__addr-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 34px;
+	block-size: 34px;
+	border-radius: 11px;
+	background: var(--ac-tint);
+	color: var(--ac-navy);
+}
+
+.ard-ac__addr.is-set .ard-ac__addr-icon {
+	background: var(--ac-green-tint);
+	color: #5d9c14;
+}
+
+.ard-ac__addr-title {
+	font-size: 14px;
+	font-weight: 900;
+}
+
+.ard-ac__addr-facts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	margin-block-start: 14px;
+	padding-block-start: 14px;
+	border-block-start: 1px solid var(--ac-divider);
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__addr-facts strong {
+	color: var(--ac-ink);
+	font-weight: 800;
+}
+
+.ard-ac__addr-empty {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+	line-height: 2;
+}
+
+.ard-ac__addr-actions {
+	display: flex;
+	gap: 8px;
+	margin-block-start: 16px;
+}
+
+/* ============================================================
+   اطلاعات حساب و فرم‌ها
+   ============================================================ */
+
+.ard-ac__profile {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	padding: 24px;
+}
+
+.ard-ac__profile-avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 76px;
+	block-size: 76px;
+	border-radius: 24px;
+	background: linear-gradient(135deg, var(--ac-navy), #2168CC);
+	color: #fff;
+	font-size: 22px;
+	font-weight: 900;
+}
+
+.ard-ac__profile-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__profile-text .ard-ac__ptitle {
+	font-size: 19px;
+	font-weight: 900;
+}
+
+.ard-ac__form {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.woocommerce-EditAccountForm {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.ard-ac__fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.ard-ac__field {
+	display: flex;
+	flex-direction: column;
+	min-inline-size: 0;
+}
+
+.ard-ac__field--wide {
+	grid-column: span 2;
+}
+
+.ard-ac__field label {
+	margin-block-end: 8px;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ac-soft);
+}
+
+.ard-ac__input,
+.ard-ac__fields--woo input.input-text,
+.ard-ac__fields--woo select,
+.ard-ac__fields--woo textarea,
+.ard-ac__fields--woo .select2-container .select2-selection--single {
+	inline-size: 100%;
+	block-size: 46px;
+	padding: 0 14px;
+	border: 1px solid var(--ac-border-2);
+	border-radius: var(--ac-r-sm);
+	background: #F8FBFD;
+	color: var(--ac-ink);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 700;
+	transition: border-color .2s, background .2s;
+}
+
+.ard-ac__input:focus,
+.ard-ac__fields--woo input.input-text:focus,
+.ard-ac__fields--woo select:focus,
+.ard-ac__fields--woo textarea:focus {
+	outline: none;
+	border-color: var(--ac-navy);
+	background: var(--ac-card);
+}
+
+.ard-ac__fields--woo textarea {
+	block-size: 92px;
+	padding-block: 12px;
+	line-height: 1.9;
+}
+
+/* فیلدهای خود ووکامرس داخل شبکهٔ فرم */
+.ard-ac__fields--woo .form-row {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+	min-inline-size: 0;
+}
+
+.ard-ac__fields--woo .form-row-wide,
+.ard-ac__fields--woo #billing_address_1_field,
+.ard-ac__fields--woo #shipping_address_1_field,
+.ard-ac__fields--woo #billing_address_2_field,
+.ard-ac__fields--woo #shipping_address_2_field {
+	grid-column: span 2;
+}
+
+.ard-ac__fields--woo label {
+	margin-block-end: 8px;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ac-soft);
+}
+
+.ard-ac__fields--woo .required {
+	color: var(--ac-red);
+	text-decoration: none;
+}
+
+.ard-ac__fields--woo .select2-container .select2-selection--single {
+	display: flex;
+	align-items: center;
+}
+
+.ard-ac__fields--woo .select2-container .select2-selection__rendered {
+	padding: 0;
+	line-height: inherit;
+	color: inherit;
+}
+
+.ard-ac__fields--woo .select2-container .select2-selection__arrow {
+	inset-block-start: 11px;
+}
+
+.ard-ac__form-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-block-start: 24px;
+	padding-block-start: 20px;
+	border-block-start: 1px solid var(--ac-divider);
+}
+
+/* ============================================================
+   نظرات
+   ============================================================ */
+
+.ard-ac__reviews-head {
+	display: flex;
+	align-items: center;
+	gap: 26px;
+	flex-wrap: wrap;
+}
+
+.ard-ac__reviews-intro {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__reviews-stats {
+	display: flex;
+	align-items: center;
+	gap: 22px;
+	flex: none;
+}
+
+.ard-ac__rstat {
+	text-align: center;
+}
+
+.ard-ac__rstat-value {
+	display: block;
+	font-size: 20px;
+	font-weight: 900;
+}
+
+.ard-ac__rstat-value--amber { color: var(--ac-amber); }
+.ard-ac__rstat-value--green { color: var(--ac-green-deep); }
+
+.ard-ac__rstat-label {
+	display: block;
+	margin-block-start: 4px;
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__rstat-sep {
+	inline-size: 1px;
+	align-self: stretch;
+	background: #EFF4F9;
+}
+
+.ard-ac__prompt {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 18px 22px;
+	border: 1px dashed #cfdcea;
+	border-radius: var(--ac-r);
+	background: #F7FAFD;
+}
+
+.ard-ac__prompt-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__prompt-title {
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ard-ac__prompt-note {
+	margin-block-start: 5px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__prompt .ard-ac__btn {
+	block-size: 38px;
+	font-size: 12.5px;
+	border-radius: 11px;
+}
+
+.ard-ac__review {
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+}
+
+.ard-ac__review-body {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__review-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.ard-ac__review-product {
+	font-size: 13.5px;
+	font-weight: 800;
+}
+
+.ard-ac__review-meta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-block-start: 9px;
+}
+
+.ard-ac__stars {
+	display: flex;
+	gap: 2px;
+	color: #E1E8F0;
+}
+
+.ard-ac__stars .is-on {
+	color: var(--ard-star);
+}
+
+.ard-ac__review-date {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ac-mute);
+}
+
+.ard-ac__review-text {
+	margin-block-start: 12px;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--ac-body);
+	line-height: 2.1;
+	text-wrap: pretty;
+}
+
+.ard-ac__review-actions {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	margin-block-start: 14px;
+}
+
+/* ============================================================
+   حالت خالی
+   ============================================================ */
+
+.ard-ac__empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 40px 24px;
+	text-align: center;
+}
+
+.ard-ac__empty-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 54px;
+	block-size: 54px;
+	border-radius: 18px;
+	background: var(--ac-tint);
+	color: var(--ac-navy);
+}
+
+.ard-ac__empty .ard-ac__csub {
+	max-inline-size: 40ch;
+}
+
+.ard-ac__empty .ard-ac__btn {
+	margin-block-start: 6px;
+}
+
+/* ============================================================
+   کشوی موبایل
+   ============================================================ */
+
+.ard-ac__scrim {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 99998;
+	background: rgba(9, 25, 48, .45);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity .25s, visibility .25s;
+}
+
+.ard-ac__scrim.is-mobile {
+	display: block;
+}
+
+.ard-ac__scrim.is-open {
+	opacity: 1;
+	visibility: visible;
+}
+
+.ard-ac__drawer {
+	display: none;
+	position: fixed;
+	inset-block: 0;
+	inset-inline-end: 0;
+	z-index: 99999;
+	inline-size: min(308px, 88vw);
+	flex-direction: column;
+	background: var(--ac-card);
+	box-shadow: -14px 0 40px rgba(11, 33, 60, .22);
+	direction: rtl;
+	text-align: right;
+	font-family: var(--ard-font);
+	color: var(--ac-ink);
+	visibility: hidden;
+	transform: translateX(-100%);
+	transition: transform .28s cubic-bezier(.3, .8, .3, 1), visibility .28s;
+}
+
+.ard-ac__drawer.is-mobile {
+	display: flex;
+}
+
+.ard-ac__drawer.is-open {
+	visibility: visible;
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-ac__drawer,
+	.ard-ac__scrim {
+		transition: none;
+	}
+}
+
+.ard-ac__drawer-head {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	flex: none;
+	padding: 18px;
+	background: var(--ac-navy);
+}
+
+.ard-ac__drawer-head::before {
+	content: '';
+	position: absolute;
+	inset-inline-end: -40px;
+	inset-block-start: -46px;
+	inline-size: 130px;
+	block-size: 130px;
+	border-radius: 70px;
+	background: rgba(125, 198, 30, .16);
+}
+
+.ard-ac__drawer-avatar {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 48px;
+	block-size: 48px;
+	border: 1px solid rgba(255, 255, 255, .2);
+	border-radius: 15px;
+	background: rgba(255, 255, 255, .16);
+	color: #fff;
+	font-size: 14px;
+	font-weight: 900;
+}
+
+.ard-ac__drawer-text {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__drawer-name {
+	font-size: 14.5px;
+	font-weight: 800;
+	color: #fff;
+	line-height: 1.6;
+}
+
+.ard-ac__drawer-phone {
+	font-size: 11px;
+	font-weight: 600;
+	color: #a9c6ee;
+}
+
+.ard-ac__drawer-close {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 34px;
+	block-size: 34px;
+	border-radius: 11px;
+	background: rgba(255, 255, 255, .14);
+	color: #fff;
+}
+
+.ard-ac__drawer-body {
+	flex: 1;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: 12px 12px 0;
+}
+
+.ard-ac__drawer-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-block-size: 56px;
+	margin-block-end: 4px;
+	padding: 11px 12px;
+	border-radius: 14px;
+}
+
+.ard-ac__drawer-item.is-active {
+	background: var(--ac-tint);
+}
+
+.ard-ac__drawer-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 36px;
+	block-size: 36px;
+	border-radius: var(--ac-r-sm);
+	background: var(--ac-tint-2);
+	color: var(--ac-navy);
+}
+
+.ard-ac__drawer-item.is-active .ard-ac__drawer-icon {
+	background: var(--ac-navy);
+	color: #fff;
+}
+
+.ard-ac__drawer-item-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__drawer-item-label {
+	display: block;
+	font-size: 13.5px;
+	font-weight: 800;
+}
+
+.ard-ac__drawer-item-note {
+	display: block;
+	margin-block-start: 4px;
+	font-size: 10.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+.ard-ac__drawer-badge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	min-inline-size: 20px;
+	block-size: 20px;
+	padding-inline: 5px;
+	border-radius: 7px;
+	background: var(--ac-green-tint);
+	color: var(--ac-green-deep);
+	font-size: 10.5px;
+	font-weight: 800;
+}
+
+.ard-ac__drawer-arrow {
+	color: #B3C1D0;
+}
+
+.ard-ac__drawer-foot {
+	flex: none;
+	padding: 14px 16px 18px;
+	border-block-start: 1px solid #EFF4F9;
+}
+
+.ard-ac__drawer-support {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	min-block-size: 46px;
+	padding: 11px 12px;
+	border-radius: var(--ac-r-sm);
+	background: #F7FAFD;
+	color: var(--ac-navy);
+}
+
+.ard-ac__drawer-logout {
+	display: flex;
+	align-items: center;
+	gap: 11px;
+	min-block-size: 46px;
+	margin-block-start: 6px;
+	padding: 11px 12px;
+	border-radius: var(--ac-r-sm);
+	color: var(--ac-red);
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.ard-ac__drawer-logout:hover {
+	background: var(--ac-red-bg);
+	color: var(--ac-red);
+}
+
+html.ard-ac-lock,
+html.ard-ac-lock body {
+	overflow: hidden;
+}
+
+/* ============================================================
+   نوار پایین موبایل
+   ============================================================ */
+
+.ard-ac__tabbar {
+	display: none;
+	position: sticky;
+	inset-block-end: 0;
+	z-index: 40;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 14px 16px;
+	border-block-start: 1px solid var(--ac-border);
+	background: var(--ac-card);
+}
+
+.ard-ac__tab {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	flex: 1;
+	min-block-size: 52px;
+	color: #67788A;
+}
+
+.ard-ac__tab span {
+	font-size: 10px;
+	font-weight: 800;
+}
+
+.ard-ac__tab.is-active {
+	color: var(--ac-navy);
+}
+
+/* اگر ویجت «نوار پایین موبایل» اردال در همین صفحه باشد، این یکی کنار می‌رود. */
+body:has(.ard-mnav) .ard-ac__tabbar {
+	display: none !important;
+}
+
+/* ============================================================
+   محتوای پیش‌فرض ووکامرس داخل پنل (دانلودها، روش‌های پرداخت، پیام‌ها)
+   ============================================================ */
+
+.ard-ac__content .woocommerce-message,
+.ard-ac__content .woocommerce-info,
+.ard-ac__content .woocommerce-error,
+.ard-ac__content .woocommerce-notice {
+	margin: 0 0 18px;
+	padding: 15px 18px;
+	border: 1px solid var(--ac-border);
+	border-radius: var(--ac-r-sm);
+	background: var(--ac-card);
+	color: var(--ac-body);
+	font-size: 12.5px;
+	font-weight: 700;
+	list-style: none;
+}
+
+.ard-ac__content .woocommerce-message {
+	border-color: #dcecc4;
+	background: #F7FCEF;
+	color: var(--ac-green-deep);
+}
+
+.ard-ac__content .woocommerce-error {
+	border-color: var(--ac-red-border);
+	background: var(--ac-red-bg);
+	color: var(--ac-red);
+}
+
+.ard-ac__content .woocommerce-info {
+	border-color: var(--ac-amber-border);
+	background: var(--ac-amber-bg);
+	color: var(--ac-amber-ink);
+}
+
+.ard-ac__content table.shop_table,
+.ard-ac__content table.woocommerce-table {
+	inline-size: 100%;
+	border-collapse: collapse;
+	border: 1px solid var(--ac-border);
+	border-radius: var(--ac-r);
+	background: var(--ac-card);
+	overflow: hidden;
+	font-size: 12.5px;
+}
+
+.ard-ac__content table.shop_table th,
+.ard-ac__content table.woocommerce-table th {
+	padding: 14px 18px;
+	background: var(--ac-tint-3);
+	border-block-end: 1px solid #EFF4F9;
+	font-size: 12px;
+	font-weight: 800;
+	text-align: right;
+	color: var(--ac-soft);
+}
+
+.ard-ac__content table.shop_table td,
+.ard-ac__content table.woocommerce-table td {
+	padding: 14px 18px;
+	border-block-end: 1px solid var(--ac-divider);
+	font-weight: 700;
+}
+
+.ard-ac__content .woocommerce-Button,
+.ard-ac__content .button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	block-size: 40px;
+	padding-inline: 18px;
+	border: 0;
+	border-radius: var(--ac-r-sm);
+	background: var(--ac-navy);
+	color: #fff;
+	font-family: inherit;
+	font-size: 12.5px;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.ard-ac__content .woocommerce-Button:hover,
+.ard-ac__content .button:hover {
+	background: var(--ac-navy-hover);
+	color: #fff;
+}
+
+/* ============================================================
+   واکنش‌گرایی
+   ============================================================ */
+
+@media (max-width: 1180px) {
+	.ard-ac__cols,
+	.ard-ac__cols--detail {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ard-ac__grid--4 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 1023.98px) {
+	.ard-ac__topbar {
+		display: none;
+	}
+
+	.ard-ac__mhead {
+		display: block;
+	}
+
+	.ard-ac__body {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 14px;
+		padding: 16px 16px 20px;
+	}
+
+	.ard-ac__side {
+		display: none;
+	}
+
+	.ard-ac__stack {
+		gap: 14px;
+	}
+
+	.ard-ac__card {
+		padding: 16px;
+		border-radius: 18px;
+	}
+
+	.ard-ac__stats {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 11px;
+	}
+
+	.ard-ac__stat-value {
+		font-size: 19px;
+		margin-block-start: 11px;
+	}
+
+	.ard-ac__welcome {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 16px;
+	}
+
+	.ard-ac__welcome-title {
+		font-size: 17px;
+	}
+
+	.ard-ac__welcome-actions .ard-ac__btn {
+		flex: 1;
+	}
+
+	.ard-ac__chart {
+		block-size: 100px;
+		gap: 7px;
+	}
+
+	.ard-ac__bar-value {
+		display: none;
+	}
+
+	.ard-ac__step-dot {
+		inline-size: 20px;
+		block-size: 20px;
+		margin-block-end: 7px;
+	}
+
+	.ard-ac__step-label {
+		font-size: 9.5px;
+	}
+
+	.ard-ac__step-time {
+		display: none;
+	}
+
+	.ard-ac__order-head,
+	.ard-ac__order-body {
+		padding: 14px 16px;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.ard-ac__order-side {
+		inline-size: 100%;
+		margin-inline-start: 0;
+		justify-content: space-between;
+	}
+
+	.ard-ac__order-actions {
+		inline-size: 100%;
+	}
+
+	.ard-ac__order-actions .ard-ac__btn {
+		flex: 1;
+	}
+
+	.ard-ac__detail-head {
+		flex-wrap: wrap;
+		padding: 16px;
+	}
+
+	.ard-ac__detail-actions {
+		inline-size: 100%;
+	}
+
+	.ard-ac__detail-actions .ard-ac__btn {
+		flex: 1;
+	}
+
+	.ard-ac__reviews-stats {
+		inline-size: 100%;
+		justify-content: space-between;
+	}
+
+	.ard-ac__prompt {
+		flex-wrap: wrap;
+	}
+
+	.ard-ac__tabbar {
+		display: flex;
+	}
+}
+
+@media (max-width: 600px) {
+	.ard-ac__grid--2,
+	.ard-ac__grid--4 {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ard-ac__fields {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ard-ac__field--wide,
+	.ard-ac__fields--woo .form-row-wide,
+	.ard-ac__fields--woo #billing_address_1_field,
+	.ard-ac__fields--woo #shipping_address_1_field,
+	.ard-ac__fields--woo #billing_address_2_field,
+	.ard-ac__fields--woo #shipping_address_2_field {
+		grid-column: span 1;
+	}
+
+	.ard-ac__profile {
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.ard-ac__profile-avatar {
+		inline-size: 60px;
+		block-size: 60px;
+		border-radius: 18px;
+		font-size: 18px;
+	}
+
+	.ard-ac__item,
+	.ard-ac__review {
+		align-items: flex-start;
+	}
+
+	.ard-ac__alert {
+		flex-wrap: wrap;
+	}
+
+	.ard-ac__alert .ard-ac__btn {
+		inline-size: 100%;
+	}
+}

@@ -32,6 +32,7 @@ require_once ARDAL_PATH . 'includes/class-ardal-jalali.php';
 require_once ARDAL_PATH . 'includes/class-ardal-product.php';
 require_once ARDAL_PATH . 'includes/class-ardal-product-fields.php';
 require_once ARDAL_PATH . 'includes/class-ardal-mega-menu.php';
+require_once ARDAL_PATH . 'includes/class-ardal-account.php';
 require_once ARDAL_PATH . 'includes/class-ardal-assets.php';
 require_once ARDAL_PATH . 'includes/class-ardal.php';
 
