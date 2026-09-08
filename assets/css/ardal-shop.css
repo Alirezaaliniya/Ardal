@@ -263,13 +263,25 @@
 	gap: 14px;
 }
 
-.ard-cart__items {
-	display: flex;
-	flex-direction: column;
-	gap: 14px;
+/* اسکلت جدول در مارک‌آپ می‌ماند (برای پارس شدن <tr> افزونه‌ها) و اینجا به
+   کارت تبدیل می‌شود. */
+.ard-shop table.ard-cart__items,
+.ard-shop table.ard-cart__items > tbody {
+	display: block;
+	inline-size: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-collapse: separate;
+	border-spacing: 0;
+	background: none;
 }
 
-.ard-cart__item {
+.ard-shop table.ard-cart__items > tbody > tr + tr {
+	margin-block-start: 14px;
+}
+
+.ard-shop .ard-cart__item {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 16px;
@@ -277,6 +289,43 @@
 	border: 1px solid var(--sh-line);
 	border-radius: var(--sh-r);
 	background: var(--sh-card);
+}
+
+.ard-shop .ard-cart__item > td,
+.ard-shop .ard-cart__actions-row > td {
+	display: block;
+	padding: 0;
+	border: 0;
+	background: none;
+	vertical-align: top;
+}
+
+.ard-shop .ard-cart__actions-row {
+	display: block;
+	margin-block-start: 14px;
+}
+
+.ard-shop .ard-cart__actions-row > td {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+/* ردیفی که از جای دیگری (افزونه‌ای) چاپ شده باشد دست‌کم خوانا بماند. */
+.ard-shop table.ard-cart__items > tbody > tr:not(.ard-cart__item):not(.ard-cart__actions-row) {
+	display: block;
+	padding: 12px 14px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r);
+	background: var(--sh-card);
+}
+
+.ard-shop table.ard-cart__items > tbody > tr:not(.ard-cart__item):not(.ard-cart__actions-row) > td,
+.ard-shop table.ard-cart__items > tbody > tr:not(.ard-cart__item):not(.ard-cart__actions-row) > th {
+	display: block;
+	padding: 0;
+	border: 0;
+	text-align: inherit;
 }
 
 .ard-cart__media {
@@ -572,25 +621,51 @@
 	font-weight: 900;
 }
 
-.ard-shop__rows {
-	display: flex;
-	flex-direction: column;
-	gap: 11px;
+/* همان داستان جدول: ردیف‌ها <tr> می‌مانند و اینجا بازچینی می‌شوند. */
+.ard-shop table.ard-shop__rows,
+.ard-shop .ard-shop__rows,
+.ard-shop table.ard-shop__rows > tbody,
+.ard-shop table.ard-ck__table > tfoot {
+	display: block;
+	inline-size: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-collapse: separate;
+	border-spacing: 0;
+	background: none;
 	font-size: 13px;
 }
 
-.ard-shop__row {
+.ard-shop .ard-shop__rows tr,
+.ard-shop .ard-shop__row {
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: 12px;
 }
 
-.ard-shop__row-key {
-	color: var(--sh-mute);
+.ard-shop .ard-shop__rows tr + tr {
+	margin-block-start: 11px;
 }
 
-.ard-shop__row-val {
+.ard-shop .ard-shop__rows th,
+.ard-shop .ard-shop__row-key {
+	display: block;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--sh-mute);
+	font-weight: 400;
+	text-align: right;
+}
+
+.ard-shop .ard-shop__rows td,
+.ard-shop .ard-shop__row-val {
+	display: block;
+	padding: 0;
+	border: 0;
+	background: none;
 	font-weight: 700;
 	text-align: left;
 }
@@ -612,11 +687,37 @@
 	line-height: 1.9;
 }
 
+.ard-shop .ard-shop__row--ship td {
+	text-align: right;
+}
+
 .ard-shop__ship-list {
 	display: flex;
 	flex-direction: column;
 	gap: 7px;
 	text-align: right;
+}
+
+.ard-shop__calc {
+	display: block;
+	margin-block-start: 8px;
+	font-size: 11.5px;
+}
+
+.ard-shop__calc .shipping-calculator-button {
+	color: var(--ard-primary);
+	font-weight: 700;
+}
+
+.ard-shop__calc .shipping-calculator-form {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-block-start: 10px;
+}
+
+.ard-shop__calc .shipping-calculator-form .form-row {
+	margin: 0;
 }
 
 .ard-shop__ship-list li {
@@ -631,19 +732,26 @@
 	accent-color: var(--ard-primary);
 }
 
-.ard-shop__total {
+.ard-shop .ard-shop__total,
+.ard-shop .ard-shop__rows tr.order-total {
 	display: flex;
 	align-items: flex-end;
 	justify-content: space-between;
 	gap: 12px;
-	margin-block: 14px;
+	margin-block: 14px 0;
 	padding-block-start: 14px;
 	border-block-start: 1px solid var(--ard-tint-green-border);
 	font-size: 13.5px;
 	font-weight: 800;
 }
 
-.ard-shop__total-val {
+.ard-shop .ard-shop__rows tr.order-total th {
+	color: var(--sh-ink);
+	font-weight: 800;
+}
+
+.ard-shop .ard-shop__total-val,
+.ard-shop .ard-shop__rows tr.order-total td {
 	font-size: 21px;
 	font-weight: 900;
 	color: var(--ard-primary-dark);
@@ -1298,18 +1406,41 @@
 	color: var(--ard-primary);
 }
 
-.ard-ck__lines {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
+.ard-shop table.ard-ck__table {
+	display: block;
+	inline-size: 100%;
+	margin: 0;
+	border: 0;
+	border-collapse: separate;
+	border-spacing: 0;
+	background: none;
+}
+
+.ard-shop .ard-ck__lines {
+	display: block;
 	padding-block-end: 14px;
 	border-block-end: 1px dashed var(--ard-tint-green-border);
 }
 
-.ard-ck__line {
+.ard-shop .ard-ck__line {
 	display: flex;
 	align-items: center;
 	gap: 10px;
+}
+
+.ard-shop .ard-ck__lines tr + tr {
+	margin-block-start: 12px;
+}
+
+.ard-shop .ard-ck__line > td {
+	display: block;
+	padding: 0;
+	border: 0;
+	background: none;
+}
+
+.ard-shop .ard-ck__table tfoot {
+	padding-block: 14px;
 }
 
 .ard-ck__line-media {
@@ -1356,6 +1487,13 @@
 
 .ard-ck__summary .ard-shop__rows {
 	padding-block: 14px;
+}
+
+/* جدول سفارش نباید عرض ستون‌ها را از مرورگر بگیرد. */
+.ard-shop table.ard-ck__table col,
+.ard-shop table.ard-cart__items col,
+.ard-shop table.ard-shop__rows col {
+	inline-size: auto;
 }
 
 .ard-ck__place {

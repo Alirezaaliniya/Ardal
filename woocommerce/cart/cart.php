@@ -52,7 +52,13 @@ $ard_free = Ardal_Shop::free_shipping();
 					</div>
 				<?php endif; ?>
 
-				<div class="ard-cart__items">
+				<?php
+				// اسکلت جدول عمداً نگه داشته شده: قلاب‌های ووکامرس (و افزونه‌های
+				// وصل به آن‌ها) <tr> چاپ می‌کنند و مرورگر <tr> بیرون از جدول را
+				// موقع پارس دور می‌ریزد. ظاهر کارتی را CSS می‌سازد، نه مارک‌آپ.
+				?>
+				<table class="ard-cart__items shop_table cart woocommerce-cart-form__contents">
+					<tbody>
 					<?php do_action( 'woocommerce_before_cart_contents' ); ?>
 
 					<?php
@@ -69,9 +75,9 @@ $ard_free = Ardal_Shop::free_shipping();
 						$ard_now           = (float) $_product->get_price() * $cart_item['quantity'];
 						$ard_off           = $ard_regular > $ard_now ? (int) round( ( $ard_regular - $ard_now ) / $ard_regular * 100 ) : 0;
 						?>
-						<div class="ard-cart__item <?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key ) ); ?>">
+						<tr class="ard-cart__item woocommerce-cart-form__cart-item <?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key ) ); ?>">
 
-							<div class="ard-cart__media">
+							<td class="ard-cart__media">
 								<?php
 								$ard_thumb = apply_filters( 'woocommerce_cart_item_thumbnail', $_product->get_image(), $cart_item, $cart_item_key );
 
@@ -81,9 +87,9 @@ $ard_free = Ardal_Shop::free_shipping();
 									echo $ard_thumb; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 								}
 								?>
-							</div>
+							</td>
 
-							<div class="ard-cart__info">
+							<td class="ard-cart__info">
 								<div class="ard-cart__name">
 									<?php
 									if ( $product_permalink ) {
@@ -144,9 +150,9 @@ $ard_free = Ardal_Shop::free_shipping();
 										>انتقال به علاقه‌مندی‌ها</button>
 									<?php endif; ?>
 								</div>
-							</div>
+							</td>
 
-							<div class="ard-cart__side">
+							<td class="ard-cart__side">
 								<div class="ard-cart__prices">
 									<?php if ( $ard_off > 0 ) : ?>
 										<div class="ard-cart__off-row">
@@ -188,43 +194,49 @@ $ard_free = Ardal_Shop::free_shipping();
 									<?php
 								}
 								?>
-							</div>
-						</div>
+							</td>
+						</tr>
 						<?php
 					}
 					?>
 
 					<?php do_action( 'woocommerce_cart_contents' ); ?>
-				</div>
 
-				<?php if ( wc_coupons_enabled() ) : ?>
-					<div class="ard-cart__coupon">
-						<span class="ard-cart__coupon-title">کد تخفیف دارید؟</span>
-						<label for="coupon_code" class="ard-sr">کد تخفیف</label>
-						<input type="text" name="coupon_code" class="ard-cart__coupon-input input-text" id="coupon_code" value="" placeholder="کد تخفیف را وارد کنید">
-						<button type="submit" class="ard-shop__btn ard-shop__btn--primary" name="apply_coupon" value="اعمال کد">اعمال کد</button>
-						<?php do_action( 'woocommerce_cart_coupon' ); ?>
+					<tr class="ard-cart__actions-row">
+						<td colspan="3">
+							<?php if ( wc_coupons_enabled() ) : ?>
+								<div class="ard-cart__coupon">
+									<span class="ard-cart__coupon-title">کد تخفیف دارید؟</span>
+									<label for="coupon_code" class="ard-sr">کد تخفیف</label>
+									<input type="text" name="coupon_code" class="ard-cart__coupon-input input-text" id="coupon_code" value="" placeholder="کد تخفیف را وارد کنید">
+									<button type="submit" class="ard-shop__btn ard-shop__btn--primary" name="apply_coupon" value="اعمال کد">اعمال کد</button>
+									<?php do_action( 'woocommerce_cart_coupon' ); ?>
 
-						<?php if ( WC()->cart->get_applied_coupons() ) : ?>
-							<div class="ard-cart__coupon-on">
-								<?php foreach ( WC()->cart->get_applied_coupons() as $ard_code ) : ?>
-									<span class="ard-cart__coupon-chip">
-										<?php echo esc_html( wc_cart_totals_coupon_label( $ard_code, false ) ); ?>
-										<a href="<?php echo esc_url( add_query_arg( 'remove_coupon', rawurlencode( $ard_code ), wc_get_cart_url() ) ); ?>" aria-label="حذف کد تخفیف">×</a>
-									</span>
-								<?php endforeach; ?>
+									<?php if ( WC()->cart->get_applied_coupons() ) : ?>
+										<div class="ard-cart__coupon-on">
+											<?php foreach ( WC()->cart->get_applied_coupons() as $ard_code ) : ?>
+												<span class="ard-cart__coupon-chip">
+													<?php echo esc_html( wc_cart_totals_coupon_label( $ard_code, false ) ); ?>
+													<a href="<?php echo esc_url( add_query_arg( 'remove_coupon', rawurlencode( $ard_code ), wc_get_cart_url() ) ); ?>" aria-label="حذف کد تخفیف">×</a>
+												</span>
+											<?php endforeach; ?>
+										</div>
+									<?php endif; ?>
+								</div>
+							<?php endif; ?>
+
+							<div class="ard-cart__update">
+								<button type="submit" class="ard-shop__btn ard-shop__btn--ghost" name="update_cart" value="به‌روزرسانی سبد">به‌روزرسانی سبد</button>
+								<?php do_action( 'woocommerce_cart_actions' ); ?>
+								<?php wp_nonce_field( 'woocommerce-cart', 'woocommerce-cart-nonce' ); ?>
 							</div>
-						<?php endif; ?>
-					</div>
-				<?php endif; ?>
+						</td>
+					</tr>
 
-				<div class="ard-cart__update">
-					<button type="submit" class="ard-shop__btn ard-shop__btn--ghost" name="update_cart" value="به‌روزرسانی سبد">به‌روزرسانی سبد</button>
-					<?php do_action( 'woocommerce_cart_actions' ); ?>
-					<?php wp_nonce_field( 'woocommerce-cart', 'woocommerce-cart-nonce' ); ?>
-				</div>
+					<?php do_action( 'woocommerce_after_cart_contents' ); ?>
+					</tbody>
+				</table>
 
-				<?php do_action( 'woocommerce_after_cart_contents' ); ?>
 				<?php do_action( 'woocommerce_after_cart_table' ); ?>
 			</form>
 		</div>
