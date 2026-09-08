@@ -1,0 +1,1595 @@
+/*!
+ * Ardal — سبد خرید و تسویه حساب
+ *
+ * دیزاین این دو صفحه با همان پالت اصلی افزونه ساخته شده، پس همه‌جا از
+ * متغیرهای --ard-* استفاده می‌شود و تنظیمات رنگ سایت مستقیم اثر می‌گذارد.
+ */
+
+.ard-shop {
+	--sh-ink: var(--ard-text);
+	--sh-body: var(--ard-text-body);
+	--sh-soft: var(--ard-text-soft);
+	--sh-mute: #7b8794;
+	--sh-line: var(--ard-border);
+	--sh-line-soft: var(--ard-border-soft);
+	--sh-card: var(--ard-base);
+	--sh-r: 16px;
+	--sh-r-lg: 18px;
+	--sh-r-sm: 12px;
+	--sh-green-ink: #14340a;
+
+	direction: rtl;
+	text-align: right;
+	font-family: var(--ard-font);
+	color: var(--sh-ink);
+	font-size: 13px;
+	line-height: 1.9;
+	max-inline-size: var(--ard-container);
+	margin-inline: auto;
+	padding-inline: 16px;
+}
+
+/* ریست‌های وزن‌صفر تا کلاس‌های خود کامپوننت همیشه بالاتر بمانند. */
+:where(.ard-shop) *,
+:where(.ard-shop) *::before,
+:where(.ard-shop) *::after {
+	box-sizing: border-box;
+}
+
+:where(.ard-shop) a {
+	color: inherit;
+	text-decoration: none;
+}
+
+:where(.ard-shop) ul,
+:where(.ard-shop) ol,
+:where(.ard-shop) li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+:where(.ard-shop) h1,
+:where(.ard-shop) h2,
+:where(.ard-shop) h3,
+:where(.ard-shop) p {
+	margin: 0;
+}
+
+:where(.ard-shop) img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+:where(.ard-shop) button {
+	margin: 0;
+	font: inherit;
+	color: inherit;
+	border: 0;
+	background: none;
+	cursor: pointer;
+}
+
+/* ============================================================
+   چیدمان
+   ============================================================ */
+
+.ard-shop__head {
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-block-end: 18px;
+}
+
+.ard-shop__title {
+	font-size: 22px;
+	font-weight: 900;
+	line-height: 1.6;
+}
+
+.ard-shop__count {
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--sh-mute);
+}
+
+.ard-shop__cols {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+.ard-shop__main {
+	flex: 2 1 520px;
+	min-inline-size: 290px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.ard-shop__side {
+	flex: 1 1 300px;
+	min-inline-size: 280px;
+	align-self: flex-start;
+	position: sticky;
+	inset-block-start: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.ard-shop__section-title {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-block-end: 16px;
+	font-size: 15.5px;
+	font-weight: 900;
+}
+
+.ard-shop__section-rule {
+	inline-size: 5px;
+	block-size: 20px;
+	flex: none;
+	border-radius: 3px;
+	background: var(--ard-accent);
+}
+
+/* ============================================================
+   دکمه‌ها
+   ============================================================ */
+
+.ard-shop__btn,
+.ard-shop .checkout-button,
+.ard-shop .button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	block-size: 44px;
+	padding-inline: 22px;
+	border: 0;
+	border-radius: var(--sh-r-sm);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1;
+	cursor: pointer;
+	transition: background .2s, color .2s, border-color .2s, transform .2s;
+}
+
+.ard-shop__btn--primary,
+.ard-shop .button {
+	background: var(--ard-primary);
+	color: var(--ard-base);
+}
+
+.ard-shop__btn--primary:hover,
+.ard-shop .button:hover {
+	background: var(--ard-primary-hover);
+	color: var(--ard-base);
+}
+
+.ard-shop__btn--accent,
+.ard-shop .checkout-button {
+	background: var(--ard-accent);
+	color: var(--sh-green-ink);
+}
+
+.ard-shop__btn--accent:hover,
+.ard-shop .checkout-button:hover {
+	background: var(--ard-accent-hover);
+	color: var(--sh-green-ink);
+	transform: translateY(-1px);
+}
+
+.ard-shop__btn--ghost {
+	border: 1px solid var(--sh-line);
+	background: var(--sh-card);
+	color: var(--sh-body);
+}
+
+.ard-shop__btn--ghost:hover {
+	border-color: var(--ard-primary);
+	color: var(--ard-primary);
+}
+
+.ard-shop__btn--block {
+	display: flex;
+	inline-size: 100%;
+}
+
+/* ============================================================
+   سبد خرید — نوار ارسال رایگان
+   ============================================================ */
+
+.ard-cart__free {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 12px 14px;
+	border: 1px solid var(--ard-tint-green-border);
+	border-radius: var(--sh-r-sm);
+	background: #f7fcef;
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--ard-accent-deep);
+}
+
+.ard-cart__free-tick {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 20px;
+	block-size: 20px;
+	border-radius: 50%;
+	background: var(--ard-accent);
+	color: var(--sh-green-ink);
+}
+
+.ard-cart__free:not(.is-reached) .ard-cart__free-tick {
+	background: var(--ard-tint-green-border);
+	color: var(--ard-accent-deep);
+}
+
+.ard-cart__free-bar {
+	flex: 1 1 100%;
+	block-size: 5px;
+	border-radius: 3px;
+	background: #e6f2d3;
+	overflow: hidden;
+}
+
+.ard-cart__free-bar span {
+	display: block;
+	block-size: 100%;
+	border-radius: 3px;
+	background: var(--ard-accent);
+	transition: width .4s ease;
+}
+
+/* ============================================================
+   سبد خرید — اقلام
+   ============================================================ */
+
+.ard-cart__form {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.ard-cart__items {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.ard-cart__item {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	padding: 14px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r);
+	background: var(--sh-card);
+}
+
+.ard-cart__media {
+	inline-size: 118px;
+	block-size: 118px;
+	flex: none;
+	border-radius: var(--sh-r-sm);
+	background: var(--ard-surface);
+	overflow: hidden;
+}
+
+.ard-cart__media img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.ard-cart__info {
+	flex: 1 1 220px;
+	min-inline-size: 0;
+}
+
+.ard-cart__name {
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.75;
+}
+
+.ard-cart__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 14px;
+	margin-block-start: 8px;
+	font-size: 11.5px;
+	color: var(--sh-mute);
+}
+
+.ard-cart__meta dl,
+.ard-cart__meta dt,
+.ard-cart__meta dd,
+.ard-cart__meta p {
+	display: inline;
+	margin: 0;
+}
+
+.ard-cart__meta dt {
+	font-weight: 700;
+}
+
+.ard-cart__stock {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-block-start: 10px;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ard-accent-deep);
+}
+
+.ard-cart__dot {
+	inline-size: 7px;
+	block-size: 7px;
+	flex: none;
+	border-radius: 50%;
+	background: var(--ard-accent);
+}
+
+.ard-cart__stock.is-out {
+	color: var(--ard-sale);
+}
+
+.ard-cart__stock.is-out .ard-cart__dot {
+	background: var(--ard-sale);
+}
+
+.ard-cart__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-block-start: 12px;
+	font-size: 11.5px;
+	color: var(--sh-mute);
+}
+
+.ard-cart__remove {
+	font-weight: 700;
+	color: var(--ard-sale);
+}
+
+.ard-cart__save {
+	padding: 0;
+	font-size: 11.5px;
+	color: var(--sh-mute);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.ard-cart__save:hover {
+	color: var(--ard-primary);
+}
+
+.ard-cart__side {
+	flex: 1 1 170px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.ard-cart__prices {
+	text-align: left;
+}
+
+.ard-cart__off-row {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.ard-cart__off {
+	padding: 3px 8px;
+	border-radius: 6px;
+	background: var(--ard-sale);
+	color: var(--ard-base);
+	font-size: 11px;
+	font-weight: 800;
+}
+
+.ard-cart__old {
+	font-size: 11.5px;
+	color: var(--ard-muted);
+}
+
+.ard-cart__price {
+	margin-block-start: 6px;
+	font-size: 17px;
+	font-weight: 900;
+	color: var(--ard-primary-dark);
+}
+
+.ard-cart__price .woocommerce-Price-currencySymbol,
+.ard-cart__price small {
+	font-size: 10.5px;
+	font-weight: 500;
+}
+
+/* شمارنده */
+
+.ard-cart__qty {
+	display: flex;
+	align-items: center;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r-sm);
+	background: var(--sh-card);
+	overflow: hidden;
+}
+
+.ard-cart__qty-btn {
+	inline-size: 34px;
+	block-size: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--sh-soft);
+	font-size: 18px;
+	line-height: 1;
+	transition: background .2s;
+}
+
+.ard-cart__qty-btn:hover {
+	background: var(--ard-surface);
+}
+
+.ard-cart__qty .quantity,
+.ard-cart__qty .qty {
+	margin: 0;
+}
+
+.ard-cart__qty input.qty,
+.ard-cart__qty .ard-cart__qty-input {
+	inline-size: 46px;
+	block-size: 36px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--sh-ink);
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 900;
+	text-align: center;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+.ard-cart__qty input::-webkit-outer-spin-button,
+.ard-cart__qty input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.ard-cart__qty input:focus {
+	outline: none;
+}
+
+/* کد تخفیف */
+
+.ard-cart__coupon {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	padding: 14px;
+	border: 1px dashed var(--ard-tint-blue-border);
+	border-radius: 14px;
+	background: #fafcff;
+}
+
+.ard-cart__coupon-title {
+	flex: none;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.ard-cart__coupon-input {
+	flex: 1 1 200px;
+	min-inline-size: 0;
+	block-size: 42px;
+	padding-inline: 12px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r-sm);
+	background: var(--sh-card);
+	font-family: inherit;
+	font-size: 13px;
+	color: var(--sh-ink);
+}
+
+.ard-cart__coupon-input:focus {
+	outline: none;
+	border-color: var(--ard-primary);
+}
+
+.ard-cart__coupon-on {
+	flex: 1 1 100%;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.ard-cart__coupon-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 5px 10px;
+	border-radius: 8px;
+	background: var(--ard-tint-green);
+	color: var(--ard-accent-deep);
+	font-size: 11.5px;
+	font-weight: 800;
+}
+
+.ard-cart__coupon-chip a {
+	color: inherit;
+	font-size: 14px;
+	line-height: 1;
+}
+
+.ard-cart__update {
+	display: flex;
+	justify-content: flex-start;
+}
+
+/* وقتی جاوااسکریپت هست، شمارنده خودش فرم را می‌فرستد. */
+.ard-shop--js .ard-cart__update {
+	display: none;
+}
+
+/* ============================================================
+   باکس جمع سفارش
+   ============================================================ */
+
+.ard-shop__summary {
+	padding: 18px;
+	border: 1.5px solid var(--ard-tint-green-border);
+	border-radius: var(--sh-r-lg);
+	background: linear-gradient(180deg, #f7fcef, var(--sh-card));
+}
+
+.ard-shop__summary-title {
+	margin-block-end: 14px;
+	font-size: 15px;
+	font-weight: 900;
+}
+
+.ard-shop__rows {
+	display: flex;
+	flex-direction: column;
+	gap: 11px;
+	font-size: 13px;
+}
+
+.ard-shop__row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.ard-shop__row-key {
+	color: var(--sh-mute);
+}
+
+.ard-shop__row-val {
+	font-weight: 700;
+	text-align: left;
+}
+
+.ard-shop__row-val--off,
+.ard-shop__row-val .woocommerce-Price-amount.amount:has(+ .ard-none) {
+	color: var(--ard-accent-deep);
+}
+
+.ard-shop__row--off .ard-shop__row-val {
+	color: var(--ard-accent-deep);
+}
+
+.ard-shop__row-note {
+	display: block;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--sh-mute);
+	line-height: 1.9;
+}
+
+.ard-shop__ship-list {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+	text-align: right;
+}
+
+.ard-shop__ship-list li {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.ard-shop__ship-list input {
+	accent-color: var(--ard-primary);
+}
+
+.ard-shop__total {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 12px;
+	margin-block: 14px;
+	padding-block-start: 14px;
+	border-block-start: 1px solid var(--ard-tint-green-border);
+	font-size: 13.5px;
+	font-weight: 800;
+}
+
+.ard-shop__total-val {
+	font-size: 21px;
+	font-weight: 900;
+	color: var(--ard-primary-dark);
+}
+
+.ard-shop__total-val small,
+.ard-shop__total-val .includes_tax {
+	display: block;
+	font-size: 10.5px;
+	font-weight: 500;
+	color: var(--sh-mute);
+}
+
+.ard-shop__cta .checkout-button,
+.ard-shop__cta .ard-shop__btn {
+	inline-size: 100%;
+	block-size: 50px;
+	font-size: 15px;
+	font-weight: 900;
+	box-shadow: 0 6px 16px rgba(var(--ard-accent-dark-rgb, 95, 163, 21), .35);
+}
+
+.ard-shop__back {
+	display: block;
+	margin-block-start: 12px;
+	text-align: center;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ard-primary);
+}
+
+.ard-shop__guards {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin-block-start: 16px;
+	padding-block-start: 14px;
+	border-block-start: 1px solid var(--sh-line-soft);
+}
+
+.ard-shop__guards--card {
+	margin: 0;
+	padding: 16px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r);
+	background: var(--sh-card);
+}
+
+.ard-shop__guards li {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	font-size: 11.5px;
+	color: var(--sh-body);
+}
+
+.ard-shop__guard-tick {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 22px;
+	block-size: 22px;
+	border-radius: 50%;
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary);
+}
+
+/* ============================================================
+   پیشنهاد تکمیل خرید
+   ============================================================ */
+
+.ard-cart__addons {
+	margin-block-start: 34px;
+}
+
+.ard-cart__addons-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 14px;
+}
+
+.ard-cart__addon {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px;
+	border: 1px solid var(--sh-line);
+	border-radius: 14px;
+	background: var(--sh-card);
+	transition: border-color .2s, box-shadow .2s;
+}
+
+.ard-cart__addon:hover {
+	border-color: var(--ard-tint-blue-border);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, .06);
+}
+
+.ard-cart__addon-media {
+	inline-size: 62px;
+	block-size: 62px;
+	flex: none;
+	border-radius: 11px;
+	background: var(--ard-surface);
+	overflow: hidden;
+}
+
+.ard-cart__addon-media img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.ard-cart__addon-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-cart__addon-name {
+	display: block;
+	font-size: 12.5px;
+	font-weight: 700;
+	line-height: 1.7;
+}
+
+.ard-cart__addon-price {
+	margin-block-start: 6px;
+	font-size: 13.5px;
+	font-weight: 900;
+	color: var(--ard-primary-dark);
+}
+
+.ard-cart__addon-price del {
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--ard-muted);
+	margin-inline-end: 4px;
+}
+
+.ard-cart__addon-price ins {
+	text-decoration: none;
+}
+
+.ard-cart__addon-add {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 34px;
+	block-size: 34px;
+	border-radius: 50%;
+	background: var(--ard-accent);
+	color: var(--sh-green-ink);
+	font-size: 19px;
+	font-weight: 900;
+	line-height: 1;
+	transition: background .2s;
+}
+
+.ard-cart__addon-add:hover {
+	background: var(--ard-accent-hover);
+	color: var(--sh-green-ink);
+}
+
+.ard-cart__addon-add.loading {
+	opacity: .6;
+}
+
+.ard-cart__addon-add.added::after {
+	content: '✓';
+}
+
+/* ============================================================
+   حالت خالی
+   ============================================================ */
+
+.ard-shop__empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	padding: 48px 24px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r-lg);
+	background: var(--sh-card);
+	text-align: center;
+}
+
+.ard-shop__empty-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 60px;
+	block-size: 60px;
+	border-radius: 20px;
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary);
+}
+
+.ard-shop__empty-icon--red {
+	background: #fdecec;
+	color: var(--ard-sale);
+}
+
+.ard-shop__empty-note {
+	max-inline-size: 46ch;
+	font-size: 13px;
+	color: var(--sh-soft);
+	line-height: 2;
+}
+
+/* ============================================================
+   تسویه حساب — نوار مراحل
+   ============================================================ */
+
+.ard-ck__steps-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 14px 22px;
+	margin-block-end: 18px;
+	padding: 14px 16px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r);
+	background: var(--sh-card);
+}
+
+.ard-ck__steps {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+}
+
+.ard-ck__step {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12.5px;
+	color: var(--ard-muted);
+}
+
+.ard-ck__step:not(:last-child)::after {
+	content: '';
+	inline-size: 26px;
+	block-size: 2px;
+	background: var(--sh-line);
+}
+
+.ard-ck__step-num {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 26px;
+	block-size: 26px;
+	border-radius: 50%;
+	background: var(--sh-line-soft);
+	color: var(--ard-muted);
+	font-size: 12px;
+	font-weight: 900;
+}
+
+.ard-ck__step.is-done .ard-ck__step-num {
+	background: var(--ard-accent);
+	color: var(--sh-green-ink);
+}
+
+.ard-ck__step.is-done .ard-ck__step-label {
+	color: var(--sh-body);
+	font-weight: 700;
+}
+
+.ard-ck__step.is-current .ard-ck__step-num {
+	background: var(--ard-primary);
+	color: var(--ard-base);
+}
+
+.ard-ck__step.is-current .ard-ck__step-label {
+	color: var(--sh-ink);
+	font-weight: 800;
+}
+
+.ard-ck__ssl {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-inline-start: auto;
+	padding: 8px 12px;
+	border: 1px solid var(--ard-tint-green-border);
+	border-radius: var(--sh-r-sm);
+	background: var(--ard-tint-green);
+	color: var(--ard-accent-deep);
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.ard-ck__ssl-box {
+	inline-size: 12px;
+	block-size: 12px;
+	border: 2px solid var(--ard-accent-dark);
+	border-radius: 3px;
+}
+
+/* ============================================================
+   تسویه حساب — کارت‌های ستون اصلی
+   ============================================================ */
+
+.ard-ck__main {
+	gap: 16px;
+}
+
+/* ترتیب کارت‌ها: آدرس، ارسال، پرداخت، توضیحات. با display:contents
+   لایه‌های میانی ووکامرس از چیدمان حذف می‌شوند تا order کار کند. */
+.ard-ck__main #customer_details,
+.ard-ck__main #customer_details > .col-1,
+.ard-ck__main #customer_details > .col-2 {
+	display: contents;
+}
+
+.ard-ck__main .woocommerce-billing-fields { order: 1; }
+/* فیلدهای ساخت حساب برادرِ فیلدهای صورتحساب‌اند، نه فرزندشان؛ بدون این
+   ترتیب، پیش از آدرس می‌افتادند. */
+.ard-ck__main .woocommerce-account-fields { order: 1; }
+.ard-ck__main .woocommerce-shipping-fields { order: 2; }
+.ard-ck__main .ard-ck__card--ship { order: 3; }
+.ard-ck__main .ard-ck__card--pay { order: 4; }
+.ard-ck__main .woocommerce-additional-fields { order: 5; }
+
+.ard-ck__card,
+.ard-ck__main .woocommerce-billing-fields,
+.ard-ck__main .woocommerce-account-fields,
+.ard-ck__main .woocommerce-shipping-fields,
+.ard-ck__main .woocommerce-additional-fields {
+	padding: 18px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r);
+	background: var(--sh-card);
+}
+
+/* بخش‌های خالی نباید کارت خالی بسازند. */
+.ard-ck__main .woocommerce-shipping-fields:not(:has(.shipping_address)):not(:has(h3)),
+.ard-ck__main .woocommerce-additional-fields:not(:has(.woocommerce-additional-fields__field-wrapper)) {
+	display: none;
+}
+
+.ard-ck__main h3 {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-block-end: 16px;
+	font-size: 15.5px;
+	font-weight: 900;
+}
+
+.ard-ck__main h3::before {
+	content: '';
+	inline-size: 5px;
+	block-size: 20px;
+	flex: none;
+	border-radius: 3px;
+	background: var(--ard-accent);
+}
+
+/* عنوان «ارسال به آدرس دیگر» خودش چک‌باکس است، پس خط سبز نمی‌گیرد. */
+.ard-ck__main h3#ship-to-different-address {
+	margin-block-end: 12px;
+}
+
+.ard-ck__main h3#ship-to-different-address label {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	font-size: 15.5px;
+	font-weight: 900;
+	cursor: pointer;
+}
+
+.ard-ck__main h3#ship-to-different-address input {
+	inline-size: 18px;
+	block-size: 18px;
+	accent-color: var(--ard-primary);
+}
+
+/* ============================================================
+   فیلدهای فرم ووکامرس
+   ============================================================ */
+
+.ard-shop .woocommerce-billing-fields__field-wrapper,
+.ard-shop .woocommerce-shipping-fields__field-wrapper,
+.ard-shop .woocommerce-additional-fields__field-wrapper,
+.ard-shop .woocommerce-account-fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 14px;
+}
+
+.ard-shop .form-row {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 0;
+	min-inline-size: 0;
+}
+
+.ard-shop .form-row-wide,
+.ard-shop #billing_address_1_field,
+.ard-shop #billing_address_2_field,
+.ard-shop #shipping_address_1_field,
+.ard-shop #shipping_address_2_field,
+.ard-shop #order_comments_field,
+.ard-shop .woocommerce-account-fields,
+.ard-shop .ard-ck__invoice {
+	grid-column: span 2;
+}
+
+.ard-shop .form-row label {
+	margin-block-end: 8px;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--sh-soft);
+}
+
+.ard-shop .form-row .required {
+	color: var(--ard-sale);
+	text-decoration: none;
+}
+
+.ard-shop .form-row input.input-text,
+.ard-shop .form-row select,
+.ard-shop .form-row .select2-container .select2-selection--single {
+	inline-size: 100%;
+	block-size: 46px;
+	padding: 0 14px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r-sm);
+	background: var(--ard-surface);
+	color: var(--sh-ink);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 700;
+	transition: border-color .2s, background .2s;
+}
+
+.ard-shop .form-row textarea {
+	inline-size: 100%;
+	min-block-size: 76px;
+	padding: 12px;
+	border: 1px solid var(--sh-line);
+	border-radius: 11px;
+	background: var(--ard-surface);
+	color: var(--sh-ink);
+	font-family: inherit;
+	font-size: 12.5px;
+	line-height: 1.9;
+	resize: vertical;
+}
+
+.ard-shop .form-row input.input-text:focus,
+.ard-shop .form-row select:focus,
+.ard-shop .form-row textarea:focus {
+	outline: none;
+	border-color: var(--ard-primary);
+	background: var(--sh-card);
+}
+
+.ard-shop .form-row .select2-container .select2-selection--single {
+	display: flex;
+	align-items: center;
+}
+
+.ard-shop .form-row .select2-container .select2-selection__rendered {
+	padding: 0;
+	line-height: inherit;
+	color: inherit;
+}
+
+.ard-shop .form-row .select2-container .select2-selection__arrow {
+	inset-block-start: 11px;
+}
+
+/* چک‌باکس‌ها (ساخت حساب، فاکتور رسمی، قوانین) */
+.ard-shop .form-row.ard-ck__invoice label,
+.ard-shop .woocommerce-form__label-for-checkbox {
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--sh-body);
+	cursor: pointer;
+}
+
+.ard-shop .woocommerce-form__input-checkbox,
+.ard-shop .form-row input[type="checkbox"] {
+	inline-size: 18px;
+	block-size: 18px;
+	flex: none;
+	accent-color: var(--ard-primary);
+}
+
+/* ============================================================
+   ردیف‌های انتخابی (ارسال و پرداخت)
+   ============================================================ */
+
+.ard-ck__ship,
+.ard-ck__gateways {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.ard-ck__opt {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding: 13px 14px;
+	border: 1.5px solid var(--sh-line);
+	border-radius: var(--sh-r-sm);
+	background: var(--sh-card);
+	cursor: pointer;
+	transition: border-color .2s, background .2s;
+}
+
+.ard-ck__opt:hover {
+	border-color: var(--ard-accent);
+}
+
+.ard-ck__opt input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ard-ck__opt-dot {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: 17px;
+	block-size: 17px;
+	border: 2px solid var(--ard-border);
+	border-radius: 50%;
+}
+
+.ard-ck__opt-dot::after {
+	content: '';
+	inline-size: 8px;
+	block-size: 8px;
+	border-radius: 50%;
+	background: transparent;
+}
+
+.ard-ck__opt:has(input:checked),
+.ard-ck__opt.is-on {
+	border-color: var(--ard-accent);
+	background: #f7fcef;
+}
+
+.ard-ck__opt:has(input:checked) .ard-ck__opt-dot,
+.ard-ck__opt.is-on .ard-ck__opt-dot {
+	border-color: var(--ard-accent-dark);
+}
+
+.ard-ck__opt:has(input:checked) .ard-ck__opt-dot::after,
+.ard-ck__opt.is-on .ard-ck__opt-dot::after {
+	background: var(--ard-accent);
+}
+
+.ard-ck__opt:has(input:focus-visible) {
+	outline: 2px solid var(--ard-primary);
+	outline-offset: 2px;
+}
+
+.ard-ck__opt-text {
+	flex: 1 1 200px;
+	min-inline-size: 0;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.ard-ck__opt-title {
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.ard-ck__opt-note {
+	inline-size: 100%;
+	font-size: 11.5px;
+	color: var(--sh-mute);
+}
+
+.ard-ck__opt-icon img {
+	display: inline-block;
+	max-block-size: 26px;
+	inline-size: auto;
+}
+
+.ard-ck__opt-price {
+	flex: none;
+	font-size: 13px;
+	font-weight: 900;
+}
+
+.ard-ck__free {
+	color: var(--ard-accent-deep);
+	font-weight: 900;
+}
+
+.ard-ck__ship-empty,
+.ard-ck__pay-empty {
+	padding: 12px 14px;
+	border: 1px dashed var(--sh-line);
+	border-radius: var(--sh-r-sm);
+	font-size: 12.5px;
+	color: var(--sh-mute);
+}
+
+.ard-ck__gateway-box {
+	padding: 12px 14px 4px;
+	font-size: 12.5px;
+	color: var(--sh-soft);
+	line-height: 2;
+}
+
+.ard-ck__gateway-box p {
+	margin-block-end: 8px;
+}
+
+/* ============================================================
+   باکس سفارش در تسویه
+   ============================================================ */
+
+.ard-ck__summary-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-block-end: 14px;
+}
+
+.ard-ck__summary-head .ard-shop__summary-title {
+	margin: 0;
+}
+
+.ard-ck__edit {
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ard-primary);
+}
+
+.ard-ck__lines {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding-block-end: 14px;
+	border-block-end: 1px dashed var(--ard-tint-green-border);
+}
+
+.ard-ck__line {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.ard-ck__line-media {
+	inline-size: 52px;
+	block-size: 52px;
+	flex: none;
+	border-radius: 10px;
+	background: var(--ard-surface);
+	overflow: hidden;
+}
+
+.ard-ck__line-media img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.ard-ck__line-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ck__line-name {
+	display: block;
+	font-size: 11.5px;
+	font-weight: 700;
+	line-height: 1.7;
+}
+
+.ard-ck__line-meta {
+	display: block;
+	margin-block-start: 3px;
+	font-size: 10.5px;
+	color: var(--sh-mute);
+}
+
+.ard-ck__line-price {
+	flex: none;
+	font-size: 12px;
+	font-weight: 900;
+	color: var(--ard-primary-dark);
+	white-space: nowrap;
+}
+
+.ard-ck__summary .ard-shop__rows {
+	padding-block: 14px;
+}
+
+.ard-ck__place {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.ard-ck__place .ard-shop__btn,
+.ard-ck__place .button {
+	inline-size: 100%;
+	block-size: 50px;
+	font-size: 15px;
+	font-weight: 900;
+	box-shadow: 0 6px 16px rgba(95, 163, 21, .35);
+}
+
+.ard-ck__place .woocommerce-terms-and-conditions-wrapper {
+	font-size: 12px;
+	color: var(--sh-soft);
+}
+
+.ard-ck__terms-note {
+	margin-block-start: 12px;
+	font-size: 10.5px;
+	color: var(--sh-mute);
+	line-height: 1.9;
+	text-wrap: pretty;
+}
+
+/* ============================================================
+   نوار پشتیبانی و صفحهٔ ثبت سفارش
+   ============================================================ */
+
+.ard-ck__support {
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 14px 24px;
+	margin-block-start: 30px;
+	padding: 20px 22px;
+	border-radius: var(--sh-r-lg);
+	background: var(--ard-primary-dark);
+	color: var(--ard-base);
+}
+
+.ard-ck__support-stripes {
+	position: absolute;
+	inset: 0;
+	background: repeating-linear-gradient(115deg, rgba(255, 255, 255, .05) 0 14px, transparent 14px 28px);
+}
+
+.ard-ck__support-title,
+.ard-ck__support-note,
+.ard-ck__support .ard-shop__btn {
+	position: relative;
+}
+
+.ard-ck__support-title {
+	font-size: 15px;
+	font-weight: 900;
+}
+
+.ard-ck__support-note {
+	font-size: 12.5px;
+	color: #cfe4ff;
+}
+
+.ard-ck__support .ard-shop__btn {
+	margin-inline-start: auto;
+}
+
+.ard-ck__done {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	padding: 44px 24px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r-lg);
+	background: var(--sh-card);
+	text-align: center;
+}
+
+.ard-ck__done-tick {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 68px;
+	block-size: 68px;
+	border-radius: 50%;
+	background: var(--ard-tint-green);
+	color: var(--ard-accent-deep);
+}
+
+.ard-ck__done-note {
+	max-inline-size: 46ch;
+	font-size: 13px;
+	color: var(--sh-soft);
+	line-height: 2;
+}
+
+.ard-ck__facts {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 12px;
+	inline-size: 100%;
+	max-inline-size: 720px;
+	margin-block-start: 10px;
+}
+
+.ard-ck__facts li {
+	padding: 12px 14px;
+	border: 1px solid var(--sh-line-soft);
+	border-radius: var(--sh-r-sm);
+	background: var(--ard-surface);
+}
+
+.ard-ck__fact-key {
+	display: block;
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--sh-mute);
+}
+
+.ard-ck__fact-val {
+	display: block;
+	margin-block-start: 5px;
+	font-size: 13.5px;
+	font-weight: 900;
+}
+
+.ard-ck__done-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	margin-block-start: 8px;
+}
+
+/* پیام‌های ووکامرس داخل این صفحه‌ها */
+
+.ard-shop .woocommerce-message,
+.ard-shop .woocommerce-info,
+.ard-shop .woocommerce-error,
+.woocommerce-cart .woocommerce-message,
+.woocommerce-checkout .woocommerce-error {
+	margin: 0 0 16px;
+	padding: 14px 18px;
+	border: 1px solid var(--sh-line);
+	border-radius: var(--sh-r-sm);
+	background: var(--sh-card);
+	font-size: 12.5px;
+	font-weight: 700;
+	list-style: none;
+}
+
+/* ============================================================
+   واکنش‌گرایی
+   ============================================================ */
+
+@media (max-width: 900px) {
+	.ard-shop__side {
+		position: static;
+	}
+}
+
+@media (max-width: 700px) {
+	.ard-shop {
+		padding-inline: 12px;
+	}
+
+	.ard-shop .woocommerce-billing-fields__field-wrapper,
+	.ard-shop .woocommerce-shipping-fields__field-wrapper,
+	.ard-shop .woocommerce-additional-fields__field-wrapper,
+	.ard-shop .woocommerce-account-fields {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ard-shop .form-row-wide,
+	.ard-shop #billing_address_1_field,
+	.ard-shop #billing_address_2_field,
+	.ard-shop #shipping_address_1_field,
+	.ard-shop #shipping_address_2_field,
+	.ard-shop #order_comments_field,
+	.ard-shop .woocommerce-account-fields,
+	.ard-shop .ard-ck__invoice {
+		grid-column: span 1;
+	}
+
+	.ard-cart__item {
+		gap: 12px;
+	}
+
+	.ard-cart__media {
+		inline-size: 84px;
+		block-size: 84px;
+	}
+
+	.ard-cart__side {
+		flex: 1 1 100%;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.ard-cart__prices {
+		text-align: right;
+	}
+
+	.ard-cart__off-row {
+		justify-content: flex-start;
+	}
+
+	.ard-ck__steps-bar {
+		gap: 10px;
+	}
+
+	.ard-ck__step-label {
+		font-size: 11.5px;
+	}
+
+	.ard-ck__step:not(:last-child)::after {
+		inline-size: 14px;
+	}
+
+	.ard-ck__ssl {
+		margin-inline-start: 0;
+	}
+
+	.ard-ck__support .ard-shop__btn {
+		margin-inline-start: 0;
+		inline-size: 100%;
+	}
+}

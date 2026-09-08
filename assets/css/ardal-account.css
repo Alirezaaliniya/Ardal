@@ -2546,6 +2546,229 @@ body:has(.ard-mnav) .ard-ac__tabbar {
 }
 
 /* ============================================================
+   ورود، ثبت‌نام و بازیابی رمز
+   ============================================================ */
+
+.ard-ac--auth {
+	padding: 40px 20px 56px;
+}
+
+.ard-ac__auth {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 22px;
+	max-inline-size: 940px;
+	margin-inline: auto;
+}
+
+.ard-ac__auth-brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.ard-ac__auth-head {
+	text-align: center;
+}
+
+.ard-ac__auth-title {
+	font-size: 22px;
+	font-weight: 900;
+	line-height: 1.6;
+}
+
+.ard-ac__auth-sub {
+	margin-block-start: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--ac-soft);
+}
+
+.ard-ac__auth-cards {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 18px;
+	inline-size: 100%;
+	max-inline-size: 440px;
+}
+
+.ard-ac__auth-cards--two {
+	max-inline-size: 100%;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ard-ac__auth-cards .ard-ac__card {
+	padding: 24px;
+}
+
+.ard-ac__auth-form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.ard-ac__auth-form .ard-ac__field {
+	margin: 0;
+}
+
+.ard-ac__auth-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.ard-ac__check {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--ac-body);
+	cursor: pointer;
+}
+
+.ard-ac__check input {
+	inline-size: 17px;
+	block-size: 17px;
+	accent-color: var(--ac-navy);
+}
+
+.ard-ac__req {
+	color: var(--ac-red);
+}
+
+.ard-ac__auth-alt {
+	text-align: center;
+}
+
+.ard-ac__auth-back {
+	font-size: 12.5px;
+	font-weight: 800;
+	color: var(--ac-soft);
+}
+
+.ard-ac__auth-back:hover {
+	color: var(--ac-navy);
+}
+
+.ard-ac__empty-icon--green {
+	background: var(--ac-green-tint);
+	color: var(--ac-green-deep);
+}
+
+/* ============================================================
+   فایل‌های دانلودی
+   ============================================================ */
+
+.ard-ac__download {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.ard-ac__download-text {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ard-ac__download-name {
+	font-size: 13.5px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ard-ac__download-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 16px;
+	margin-block-start: 6px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--ac-soft-2);
+}
+
+/* ============================================================
+   روش‌های پرداخت
+   ============================================================ */
+
+.ard-ac__pay.is-default {
+	border-color: #b7d97a;
+}
+
+.ard-ac__pay-number {
+	margin-block-start: 4px;
+	font-size: 15px;
+	font-weight: 800;
+	letter-spacing: 1px;
+	text-align: right;
+}
+
+.ard-ac__btn--danger {
+	border: 1px solid var(--ac-red-border);
+	background: var(--ac-card);
+	color: var(--ac-red);
+}
+
+.ard-ac__btn--danger:hover {
+	background: var(--ac-red-bg);
+	color: var(--ac-red);
+}
+
+.ard-ac__gateways .payment_methods {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.ard-ac__gateway {
+	border: 1px solid var(--ac-border-2);
+	border-radius: var(--ac-r-sm);
+	overflow: hidden;
+}
+
+.ard-ac__gateway-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 14px 16px;
+	cursor: pointer;
+}
+
+.ard-ac__gateway-head input {
+	inline-size: 17px;
+	block-size: 17px;
+	accent-color: var(--ac-navy);
+}
+
+.ard-ac__gateway-title {
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.ard-ac__gateway-icon {
+	margin-inline-start: auto;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ard-ac__gateway-icon img {
+	display: inline-block;
+	max-block-size: 24px;
+	inline-size: auto;
+}
+
+.ard-ac__gateway .payment_box {
+	padding: 0 16px 16px;
+	font-size: 12.5px;
+	color: var(--ac-soft);
+	line-height: 2;
+}
+
+/* ============================================================
    محتوای پیش‌فرض ووکامرس داخل پنل (دانلودها، روش‌های پرداخت، پیام‌ها)
    ============================================================ */
 
@@ -2764,6 +2987,19 @@ body:has(.ard-mnav) .ard-ac__tabbar {
 	}
 
 	.ard-ac__prompt {
+		flex-wrap: wrap;
+	}
+
+	.ard-ac__auth-cards--two {
+		grid-template-columns: minmax(0, 1fr);
+		max-inline-size: 440px;
+	}
+
+	.ard-ac--auth {
+		padding: 24px 16px 40px;
+	}
+
+	.ard-ac__download {
 		flex-wrap: wrap;
 	}
 

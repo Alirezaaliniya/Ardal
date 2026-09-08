@@ -423,6 +423,54 @@ class Ardal_Account {
 	}
 
 	/* ============================================================
+	   پوستهٔ صفحه‌های بیرون از حساب (ورود، بازیابی رمز)
+	   ============================================================ */
+
+	/**
+	 * وقتی کاربر وارد نشده، ووکامرس پوستهٔ my-account.php را رندر نمی‌کند؛ پس
+	 * این صفحه‌ها قاب خودشان را دارند.
+	 *
+	 * @param string $title
+	 * @param string $subtitle
+	 */
+	public static function auth_open( $title, $subtitle = '' ) {
+		?>
+		<div class="ard-ac ard-ac--auth">
+			<div class="ard-ac__auth">
+				<a class="ard-ac__auth-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+					<?php if ( has_custom_logo() ) : ?>
+						<span class="ard-ac__brand-logo"><?php the_custom_logo(); ?></span>
+					<?php else : ?>
+						<span class="ard-ac__brand-mark">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+								<path d="M4 14c3-6 13-6 16 0"></path><path d="M7 19c2-3 8-3 10 0"></path>
+							</svg>
+						</span>
+					<?php endif; ?>
+					<span class="ard-ac__brand-text">
+						<span class="ard-ac__brand-name"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
+						<span class="ard-ac__brand-sub">پنل کاربری</span>
+					</span>
+				</a>
+
+				<div class="ard-ac__auth-head">
+					<h1 class="ard-ac__auth-title"><?php echo esc_html( $title ); ?></h1>
+					<?php if ( '' !== $subtitle ) : ?>
+						<p class="ard-ac__auth-sub"><?php echo esc_html( $subtitle ); ?></p>
+					<?php endif; ?>
+				</div>
+		<?php
+	}
+
+	public static function auth_close() {
+		?>
+				<a class="ard-ac__auth-back" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>">بازگشت به فروشگاه</a>
+			</div>
+		</div>
+		<?php
+	}
+
+	/* ============================================================
 	   کاربر
 	   ============================================================ */
 
