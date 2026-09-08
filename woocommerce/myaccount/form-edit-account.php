@@ -17,13 +17,7 @@ $ard_user   = $user;
 $ard_id     = $ard_user->ID;
 $ard_since  = strtotime( $ard_user->user_registered );
 $ard_orders = (int) wc_get_customer_order_count( $ard_id );
-$ard_addr   = 0;
-
-foreach ( array_keys( wc_get_account_address_types() ) as $ard_type ) {
-	if ( wc_get_account_formatted_address( $ard_type ) ) {
-		$ard_addr++;
-	}
-}
+$ard_addr   = Ardal_Account::filled_addresses();
 
 $ard_facts = array(
 	'عضو از ' . Ardal_Jalali::format( $ard_since ),

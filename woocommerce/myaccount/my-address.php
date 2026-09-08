@@ -10,31 +10,13 @@
 defined( 'ABSPATH' ) || exit;
 
 $ard_customer_id = get_current_user_id();
-
-$ard_types = wc_get_account_address_types(); // billing => عنوان، shipping => عنوان.
-
-if ( ! wc_ship_to_billing_address_only() && wc_shipping_enabled() ) {
-	$ard_labels = array(
-		'billing'  => 'آدرس صورتحساب',
-		'shipping' => 'آدرس تحویل سفارش',
-	);
-} else {
-	$ard_types  = array( 'billing' => $ard_types['billing'] );
-	$ard_labels = array( 'billing' => 'آدرس صورتحساب' );
-}
+$ard_types       = Ardal_Account::address_types();
+$ard_filled      = Ardal_Account::filled_addresses();
 
 $ard_icons = array(
 	'billing'  => 'wallet',
 	'shipping' => 'addr',
 );
-
-$ard_filled = 0;
-
-foreach ( array_keys( $ard_types ) as $ard_type ) {
-	if ( wc_get_account_formatted_address( $ard_type ) ) {
-		$ard_filled++;
-	}
-}
 ?>
 <div class="ard-ac__stack">
 
@@ -65,7 +47,7 @@ foreach ( array_keys( $ard_types ) as $ard_type ) {
 					<span class="ard-ac__addr-icon">
 						<?php echo Ardal_Account::icon( isset( $ard_icons[ $ard_type ] ) ? $ard_icons[ $ard_type ] : 'addr', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</span>
-					<h3 class="ard-ac__addr-title"><?php echo esc_html( isset( $ard_labels[ $ard_type ] ) ? $ard_labels[ $ard_type ] : $ard_title ); ?></h3>
+					<h3 class="ard-ac__addr-title"><?php echo esc_html( $ard_title ); ?></h3>
 					<?php if ( 'shipping' === $ard_type && $ard_address ) : ?>
 						<span class="ard-ac__badge ard-ac__badge--green">پیش‌فرض ارسال</span>
 					<?php endif; ?>

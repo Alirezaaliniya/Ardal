@@ -475,6 +475,45 @@ class Ardal_Account {
 	   ============================================================ */
 
 	/**
+	 * نوع آدرس‌های حساب: صورتحساب و — اگر ارسال فعال باشد — تحویل.
+	 *
+	 * ووکامرس تابع آماده‌ای برای این کار ندارد و خود تمپلیت my-address.php
+	 * همین فیلتر را می‌سازد؛ پس از همان مسیر می‌رویم تا افزونه‌هایی که به این
+	 * فیلتر وصل‌اند هم دیده شوند.
+	 *
+	 * @return array
+	 */
+	public static function address_types() {
+		$customer_id = get_current_user_id();
+
+		$types = ! wc_ship_to_billing_address_only() && wc_shipping_enabled()
+			? array(
+				'billing'  => 'آدرس صورتحساب',
+				'shipping' => 'آدرس تحویل سفارش',
+			)
+			: array( 'billing' => 'آدرس صورتحساب' );
+
+		return (array) apply_filters( 'woocommerce_my_account_get_addresses', $types, $customer_id );
+	}
+
+	/**
+	 * تعداد آدرس‌های تکمیل‌شده.
+	 *
+	 * @return int
+	 */
+	public static function filled_addresses() {
+		$count = 0;
+
+		foreach ( array_keys( self::address_types() ) as $type ) {
+			if ( wc_get_account_formatted_address( $type ) ) {
+				$count++;
+			}
+		}
+
+		return $count;
+	}
+
+	/**
 	 * نام نمایشی کاربر: نام و نام خانوادگی، وگرنه نام نمایشی حساب.
 	 *
 	 * @return string
