@@ -62,6 +62,8 @@ class Ardal_Account {
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue' ), 20 );
 
 		add_action( 'wp_ajax_ardal_wishlist', array( __CLASS__, 'ajax_wishlist' ) );
+
+		Ardal_Account_Ajax::init();
 		add_action( 'wp_loaded', array( __CLASS__, 'handle_reorder' ), 30 );
 		add_action( 'woocommerce_save_account_details', array( __CLASS__, 'save_profile_fields' ) );
 	}
@@ -344,9 +346,14 @@ class Ardal_Account {
 			'ardal-account',
 			'ardalAccount',
 			array(
-				'ajax'     => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'ardal-account' ),
-				'loggedIn' => is_user_logged_in(),
+				'ajax'       => admin_url( 'admin-ajax.php' ),
+				'nonce'      => wp_create_nonce( 'ardal-account' ),
+				'loggedIn'   => is_user_logged_in(),
+				// ناوبری ایجکسی هر لینکی را که زیر این نشانی باشد می‌گیرد؛
+				// همین باعث می‌شود آیتم افزونه‌های دیگر هم خودکار کار کند.
+				'accountUrl' => wc_get_page_permalink( 'myaccount' ),
+				'logoutUrl'  => wc_logout_url(),
+				'siteName'   => get_bloginfo( 'name' ),
 			)
 		);
 	}
@@ -427,6 +434,41 @@ class Ardal_Account {
 	   ============================================================ */
 
 	/**
+	 * نشان برند بالای پنل: لوگوی سایت اگر تنظیم شده باشد، وگرنه نشان پیش‌فرض.
+	 *
+	 * عمداً به‌جای the_custom_logo() خود تصویر چاپ می‌شود؛ آن تابع یک تگ <a>
+	 * می‌سازد و اینجا داخل لینک برند قرار می‌گیرد. لینک تودرتو HTML نامعتبر
+	 * است و مرورگر موقع پارس، لینک داخلی را از دل والدش بیرون می‌کشد — که هم
+	 * ساختار را می‌شکند و هم قاعدهٔ اندازهٔ تصویر را بی‌اثر می‌کند.
+	 *
+	 * @return string
+	 */
+	public static function brand_mark() {
+		$logo_id = (int) get_theme_mod( 'custom_logo' );
+
+		if ( $logo_id > 0 ) {
+			$image = wp_get_attachment_image(
+				$logo_id,
+				'full',
+				false,
+				array(
+					'class' => 'ard-ac__brand-img',
+					'alt'   => get_bloginfo( 'name' ),
+				)
+			);
+
+			if ( $image ) {
+				return $image;
+			}
+		}
+
+		return '<span class="ard-ac__brand-mark">'
+			. '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">'
+			. '<path d="M4 14c3-6 13-6 16 0"></path><path d="M7 19c2-3 8-3 10 0"></path>'
+			. '</svg></span>';
+	}
+
+	/**
 	 * وقتی کاربر وارد نشده، ووکامرس پوستهٔ my-account.php را رندر نمی‌کند؛ پس
 	 * این صفحه‌ها قاب خودشان را دارند.
 	 *
@@ -438,15 +480,7 @@ class Ardal_Account {
 		<div class="ard-ac ard-ac--auth">
 			<div class="ard-ac__auth">
 				<a class="ard-ac__auth-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-					<?php if ( has_custom_logo() ) : ?>
-						<span class="ard-ac__brand-logo"><?php the_custom_logo(); ?></span>
-					<?php else : ?>
-						<span class="ard-ac__brand-mark">
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
-								<path d="M4 14c3-6 13-6 16 0"></path><path d="M7 19c2-3 8-3 10 0"></path>
-							</svg>
-						</span>
-					<?php endif; ?>
+					<?php echo self::brand_mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی wp_get_attachment_image یا SVG ثابت. ?>
 					<span class="ard-ac__brand-text">
 						<span class="ard-ac__brand-name"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
 						<span class="ard-ac__brand-sub">پنل کاربری</span>

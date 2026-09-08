@@ -143,9 +143,17 @@
 	color: var(--ac-green);
 }
 
-.ard-ac__brand-logo img {
-	max-block-size: 38px;
+/* لوگوی سایت هر ابعادی داشته باشد، اینجا هم‌اندازهٔ نشان پیش‌فرض می‌نشیند.
+   `.custom-logo` هم پوشش داده شده تا اگر قالبی لوگو را جای دیگری تزریق کرد
+   باز هم بزرگ نشود. */
+.ard-ac__brand-img,
+.ard-ac__brand .custom-logo,
+.ard-ac__auth-brand .custom-logo {
+	block-size: 38px;
 	inline-size: auto;
+	max-inline-size: 190px;
+	object-fit: contain;
+	object-position: right center;
 }
 
 .ard-ac__brand-text {
@@ -2255,6 +2263,49 @@
 
 .ard-ac__empty .ard-ac__btn {
 	margin-block-start: 6px;
+}
+
+/* ============================================================
+   بارگذاری ایجکسی
+   ============================================================ */
+
+.ard-ac__content {
+	position: relative;
+	transition: opacity .18s ease;
+}
+
+.ard-ac__content:focus {
+	outline: none;
+}
+
+.ard-ac.is-loading .ard-ac__content {
+	opacity: .45;
+	pointer-events: none;
+}
+
+/* نوار باریک بالای ناحیهٔ محتوا، تا معلوم باشد چیزی در راه است. */
+.ard-ac.is-loading .ard-ac__content::before {
+	content: '';
+	position: absolute;
+	inset-block-start: -6px;
+	inset-inline: 0;
+	block-size: 3px;
+	border-radius: 3px;
+	background: linear-gradient(90deg, transparent, var(--ac-navy), transparent);
+	animation: ard-ac-progress 1s linear infinite;
+}
+
+@keyframes ard-ac-progress {
+	from { transform: translateX(-100%); }
+	to   { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-ac__content,
+	.ard-ac.is-loading .ard-ac__content::before {
+		transition: none;
+		animation: none;
+	}
 }
 
 /* ============================================================

@@ -21,15 +21,7 @@ $ard_alerts   = Ardal_Account::count_orders(
 	<header class="ard-ac__topbar">
 		<div class="ard-ac__topbar-inner">
 			<a class="ard-ac__brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-				<?php if ( has_custom_logo() ) : ?>
-					<span class="ard-ac__brand-logo"><?php the_custom_logo(); ?></span>
-				<?php else : ?>
-					<span class="ard-ac__brand-mark">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
-							<path d="M4 14c3-6 13-6 16 0"></path><path d="M7 19c2-3 8-3 10 0"></path>
-						</svg>
-					</span>
-				<?php endif; ?>
+				<?php echo Ardal_Account::brand_mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی wp_get_attachment_image یا SVG ثابت. ?>
 				<span class="ard-ac__brand-text">
 					<span class="ard-ac__brand-name"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
 					<span class="ard-ac__brand-sub">پنل کاربری</span>

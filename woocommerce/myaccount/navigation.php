@@ -76,6 +76,7 @@ $ard_is_current = function ( $key ) {
 				<a
 					class="ard-ac__nav-item<?php echo $ard_on ? ' is-active' : ''; ?>"
 					href="<?php echo esc_url( wc_get_account_endpoint_url( $ard_key ) ); ?>"
+					data-ard-endpoint="<?php echo esc_attr( $ard_key ); ?>"
 					<?php echo $ard_on ? ' aria-current="page"' : ''; ?>
 				>
 					<?php echo Ardal_Account::icon( Ardal_Account::menu_icon( $ard_key ), 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -139,6 +140,7 @@ $ard_is_current = function ( $key ) {
 			<a
 				class="ard-ac__drawer-item<?php echo $ard_on ? ' is-active' : ''; ?>"
 				href="<?php echo esc_url( wc_get_account_endpoint_url( $ard_key ) ); ?>"
+				data-ard-endpoint="<?php echo esc_attr( $ard_key ); ?>"
 			>
 				<span class="ard-ac__drawer-icon">
 					<?php echo Ardal_Account::icon( Ardal_Account::menu_icon( $ard_key ), 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
