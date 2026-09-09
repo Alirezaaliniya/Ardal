@@ -1,49 +1,76 @@
 /*!
- * Ardal — فیلدهای مگا منو در صفحه «نمایش ← فهرست‌ها».
+ * Ardal — استایل‌های پیشرفته مدیریت فهرست‌ها و مگا منو.
+ * طراحی هماهنگ با پالت رنگی کاسپین اسپرت و افزونه اردال.
  */
+
+/* -------------------------------------------------------------------------
+ * ۱. فیلدهای مگا منو در هر آیتم
+ * ------------------------------------------------------------------------- */
 
 .ardal-mm-fields {
 	clear: both;
-	margin-top: 12px;
-	padding: 12px 14px 14px;
+	margin-top: 14px;
+	padding: 14px 16px 16px;
 	border: 1px solid #dcdcde;
-	border-radius: 6px;
-	background: #f6f7f7;
+	border-radius: 8px;
+	background: #f8f9fa;
 }
 
 .ardal-mm-head {
-	margin: 0 0 10px;
-	font-weight: 600;
-	color: #1d2327;
+	margin: 0 0 12px;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: #0B3C8C;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ardal-mm-head::before {
+	content: '';
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #7DC61E;
 }
 
 .ardal-mm-row {
-	margin: 0 0 10px;
+	margin: 0 0 12px;
 }
 
 .ardal-mm-row label {
 	display: block;
-	margin-bottom: 4px;
+	margin-bottom: 5px;
 	font-size: 12px;
+	font-weight: 600;
 	color: #50575e;
 }
 
 .ardal-mm-row input[type="text"],
+.ardal-mm-row input[type="number"],
 .ardal-mm-row select {
 	width: 100%;
 	max-width: 100%;
+	border-radius: 6px;
+	border-color: #c3c4c7;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
 }
 
 .ardal-mm-row--check label {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	margin-bottom: 0;
 	font-size: 13px;
+	font-weight: 500;
 	color: #1d2327;
+	cursor: pointer;
 }
 
 .ardal-mm-row--split {
 	display: flex;
-	gap: 10px;
+	gap: 12px;
 }
 
 .ardal-mm-row--split > span {
@@ -51,21 +78,22 @@
 	min-width: 0;
 }
 
-/* گزینه‌های مخصوص پنل مگا تا وقتی تیک نخورده پنهان می‌مانند. */
+/* گزینه‌های مخصوص پنل مگا */
 .ardal-mm-fields:not(.is-mega) .ardal-mm-row--mega {
 	display: none;
 }
 
 .ardal-mm-media__preview {
 	display: block;
-	margin-bottom: 6px;
+	margin-bottom: 8px;
 }
 
 .ardal-mm-media__preview img {
-	max-width: 130px;
+	max-width: 140px;
 	height: auto;
-	border-radius: 4px;
+	border-radius: 6px;
 	border: 1px solid #dcdcde;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
 }
 
 .ardal-mm-media__actions {
@@ -79,3 +107,495 @@
 	display: block;
 	width: 100%;
 }
+
+/* -------------------------------------------------------------------------
+ * ۲. کارت تنظیمات تزریق خودکار زیردسته‌ها (Dynamic Taxonomy)
+ * ------------------------------------------------------------------------- */
+
+.ardal-mm-dynamic-box {
+	margin-top: 14px;
+	padding: 12px 14px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .03);
+}
+
+.ardal-mm-dyn-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 0 !important;
+}
+
+.ardal-mm-dyn-title {
+	font-weight: 700;
+	color: #0B3C8C;
+}
+
+.ardal-mm-dyn-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 600;
+	border-radius: 12px;
+	background: #ecfdf5;
+	color: #047857;
+	border: 1px solid #a7f3d0;
+}
+
+.ardal-mm-dyn-options {
+	display: none;
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px dashed #e2e8f0;
+}
+
+.ardal-mm-dynamic-box.is-dyn-active {
+	border-color: #93c5fd;
+	background: #f8fafc;
+}
+
+.ardal-mm-dyn-notice {
+	margin: 0 0 12px;
+	padding: 8px 10px;
+	font-size: 12px;
+	line-height: 1.8;
+	border-radius: 6px;
+	background: #eff6ff;
+	color: #1e40af;
+	border-right: 3px solid #3b82f6;
+}
+
+/* -------------------------------------------------------------------------
+ * ۳. داک و نوار ابزار مدیریت دسته‌جمعی (Bulk Organizer Toolbar)
+ * ------------------------------------------------------------------------- */
+
+.ardal-bulk-bar {
+	position: sticky;
+	top: 36px;
+	z-index: 99;
+	margin: 0 0 16px;
+	padding: 14px 18px;
+	border: 1px solid #c3c4c7;
+	border-radius: 10px;
+	background: #ffffff;
+	box-shadow: 0 4px 14px rgba(11, 60, 140, .09), 0 1px 3px rgba(0, 0, 0, .05);
+	transition: box-shadow .2s;
+}
+
+.ardal-bulk-bar__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-bottom: 10px;
+	margin-bottom: 12px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.ardal-bulk-bar__title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13.5px;
+	color: #1d2327;
+	flex-wrap: wrap;
+}
+
+.ardal-bulk-tip {
+	font-size: 11.5px;
+	font-weight: 500;
+	color: #0B3C8C;
+	margin-right: 8px;
+	padding: 2px 10px;
+	background: #f0f7ff;
+	border-radius: 6px;
+	border: 1px solid #d0e2f5;
+}
+
+.ardal-bulk-bar__mark {
+	width: 14px;
+	height: 14px;
+	border-radius: 4px;
+	background: linear-gradient(135deg, #0B3C8C, #7DC61E);
+}
+
+.ardal-bulk-bar__vars {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 10px;
+	font-size: 11.5px;
+	border-radius: 20px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+}
+
+.ardal-vars-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #646970;
+}
+
+.ardal-bulk-bar__vars.is-safe .ardal-vars-dot { background: #10b981; }
+.ardal-bulk-bar__vars.is-safe { color: #065f46; background: #ecfdf5; border-color: #a7f3d0; }
+
+.ardal-bulk-bar__vars.is-warn .ardal-vars-dot { background: #f59e0b; }
+.ardal-bulk-bar__vars.is-warn { color: #92400e; background: #fffbeb; border-color: #fde68a; }
+
+.ardal-bulk-bar__vars.is-danger .ardal-vars-dot { background: #ef4444; }
+.ardal-bulk-bar__vars.is-danger { color: #991b1b; background: #fef2f2; border-color: #fecaca; }
+
+.ardal-bulk-bar__controls {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.ardal-bulk-bar__group {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.ardal-bulk-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #50575e;
+}
+
+.ardal-bulk-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	font-size: 12.5px;
+	border-radius: 6px;
+	background: #f0f0f1;
+	cursor: pointer;
+	user-select: none;
+}
+
+.ardal-bulk-pill input[type="checkbox"] {
+	margin: 0;
+}
+
+.ardal-bulk-count {
+	font-size: 12px;
+	font-weight: 600;
+	color: #0B3C8C;
+	padding: 3px 8px;
+	background: #eff6ff;
+	border-radius: 6px;
+}
+
+.ardal-bulk-select {
+	max-width: 240px;
+	font-size: 12px !important;
+	border-radius: 6px !important;
+}
+
+.ardal-btn-move {
+	background: #0B3C8C !important;
+	border-color: #0B3C8C !important;
+	font-weight: 600 !important;
+	border-radius: 6px !important;
+	transition: background .15s !important;
+}
+
+.ardal-btn-move:hover:not(:disabled) {
+	background: #092e6b !important;
+	border-color: #092e6b !important;
+}
+
+.ardal-btn-shift {
+	border-radius: 6px !important;
+	font-size: 12px !important;
+}
+
+.ardal-sep {
+	width: 1px;
+	height: 20px;
+	background: #dcdcde;
+	margin: 0 4px;
+}
+
+.ardal-btn-delete {
+	color: #b32d2e !important;
+	text-decoration: none !important;
+	font-size: 12px !important;
+}
+
+.ardal-btn-delete:hover:not(:disabled) {
+	color: #8a2424 !important;
+	text-decoration: underline !important;
+}
+
+/* -------------------------------------------------------------------------
+ * ۴. چک‌باکس‌های روی آیتم‌های منو و هایلایت انتخاب
+ * ------------------------------------------------------------------------- */
+
+.ardal-item-cb-wrap {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+
+.ardal-item-cb-wrap input[type="checkbox"] {
+	margin: 0;
+	cursor: pointer;
+	width: 17px;
+	height: 17px;
+	border-radius: 4px;
+	border: 1.5px solid #8c8f94;
+}
+
+.ardal-item-cb-wrap input[type="checkbox"]:checked {
+	border-color: #0B3C8C;
+	background-color: #0B3C8C;
+}
+
+.ardal-branch-pick {
+	margin-right: 10px !important;
+	font-size: 11px !important;
+	color: #646970 !important;
+	text-decoration: none !important;
+}
+
+.ardal-branch-pick:hover {
+	color: #0B3C8C !important;
+	text-decoration: underline !important;
+}
+
+/* هایلایت آیتم در حالت انتخاب */
+#menu-to-edit > li.menu-item.is-bulk-selected > .menu-item-bar .menu-item-handle {
+	background: #f0f7ff !important;
+	border-color: #0B3C8C !important;
+	box-shadow: 0 0 0 1px #0B3C8C !important;
+}
+
+#menu-to-edit > li.menu-item.is-bulk-selected .item-title {
+	font-weight: 700;
+	color: #0B3C8C;
+}
+
+/* آیتم‌های خوشه حین درگ‌ودراپ هم‌زمان */
+li.menu-item.ardal-cluster-dragging {
+	display: none !important;
+}
+
+.ardal-drag-badge {
+	position: absolute;
+	top: -14px;
+	left: 14px;
+	z-index: 99999;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 12px;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: #ffffff;
+	background: linear-gradient(135deg, #0B3C8C, #092e6b);
+	border: 1.5px solid #7DC61E;
+	border-radius: 20px;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+	pointer-events: none;
+	white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------
+ * ۵. متاباکس افزودن هوشمند درختی دسته‌بندی‌ها
+ * ------------------------------------------------------------------------- */
+
+.ardal-tax-box {
+	padding: 6px 0;
+}
+
+.ardal-tax-intro {
+	margin: 0 0 10px;
+	font-size: 12px;
+	line-height: 1.8;
+	color: #646970;
+}
+
+.ardal-tax-toolbar {
+	margin-bottom: 10px;
+}
+
+.ardal-tax-search {
+	width: 100%;
+	margin-bottom: 6px;
+	font-size: 12px;
+	border-radius: 6px;
+}
+
+.ardal-tax-actions-quick {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 11px;
+}
+
+.ardal-tax-actions-quick .sep {
+	color: #c3c4c7;
+}
+
+.ardal-tax-tree-wrap {
+	max-height: 280px;
+	overflow-y: auto;
+	padding: 4px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	background: #ffffff;
+}
+
+.ardal-tax-tree {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ardal-tax-node {
+	margin: 0;
+	padding: 0;
+}
+
+.ardal-tax-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 4px 6px;
+	border-radius: 4px;
+	transition: background .12s;
+}
+
+.ardal-tax-row:hover {
+	background: #f6f7f7;
+}
+
+.ardal-tax-row label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	cursor: pointer;
+	flex: 1;
+	min-width: 0;
+}
+
+.ardal-tax-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ardal-tax-count {
+	font-size: 10.5px;
+	padding: 1px 6px;
+	border-radius: 10px;
+	background: #f0f0f1;
+	color: #646970;
+	margin: 0 6px;
+}
+
+.ardal-add-branch-btn {
+	font-size: 11px !important;
+	color: #7DC61E !important;
+	text-decoration: none !important;
+	font-weight: 600 !important;
+	white-space: nowrap;
+}
+
+.ardal-add-branch-btn:hover {
+	text-decoration: underline !important;
+	color: #639d17 !important;
+}
+
+.ardal-tax-footer {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid #f0f0f1;
+}
+
+.ardal-tax-target-wrap {
+	margin-bottom: 12px;
+}
+
+.ardal-tax-target-wrap label {
+	display: block;
+	margin-bottom: 5px;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: #1d2327;
+}
+
+.ardal-import-target-select {
+	width: 100%;
+	font-size: 12px !important;
+	border-radius: 6px !important;
+}
+
+.ardal-tax-hierarchy-opt {
+	display: block;
+	margin-bottom: 10px;
+	font-size: 12px;
+	color: #1d2327;
+}
+
+.ardal-tax-submit-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.ardal-tax-submit-row .button-primary {
+	width: 100%;
+	text-align: center;
+	border-radius: 6px;
+	font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------
+ * ۶. پیام توست اطلاع‌رسانی عملیات (Toast Notification)
+ * ------------------------------------------------------------------------- */
+
+.ardal-toast {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%) translateY(50px);
+	z-index: 100000;
+	padding: 10px 22px;
+	font-size: 13px;
+	font-weight: 600;
+	border-radius: 30px;
+	background: #1d2327;
+	color: #ffffff;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, .2);
+	opacity: 0;
+	pointer-events: none;
+	transition: transform .25s ease, opacity .25s ease;
+}
+
+.ardal-toast.is-show {
+	transform: translateX(-50%) translateY(0);
+	opacity: 1;
+}
+
+.ardal-toast.is-success {
+	background: #047857;
+}
+
+.ardal-toast.is-error {
+	background: #b91c1c;
+}
+

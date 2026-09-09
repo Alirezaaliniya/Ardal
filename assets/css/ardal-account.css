@@ -149,11 +149,11 @@
 .ard-ac__brand-img,
 .ard-ac__brand .custom-logo,
 .ard-ac__auth-brand .custom-logo {
-	block-size: 38px;
-	inline-size: auto;
-	max-inline-size: 190px;
-	object-fit: contain;
-	object-position: right center;
+	block-size: 38px!important;
+	inline-size: auto!important;
+	max-inline-size: 190px!important;
+	object-fit: contain!important;
+	object-position: right center!important;
 }
 
 .ard-ac__brand-text {
