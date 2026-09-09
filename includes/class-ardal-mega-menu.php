@@ -525,6 +525,10 @@ class Ardal_Mega_Menu {
 	 * @return array
 	 */
 	public static function inject_dynamic_taxonomy_items( $items, $args = null ) {
+		if ( is_admin() && ! wp_doing_ajax() ) {
+			return $items;
+		}
+
 		if ( empty( $items ) || ! is_array( $items ) ) {
 			return $items;
 		}

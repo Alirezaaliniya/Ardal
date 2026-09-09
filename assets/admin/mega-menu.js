@@ -71,6 +71,64 @@
 		return title || ( '#' + getMenuItemId( $item ) );
 	}
 
+	/**
+	 * بازسازی و اعتبارسنجی بنیادین ساختار درختی منو:
+	 * ۱. تراز عمق‌ها (هیچ آیتمی نمی‌تواند بیش از ۱ سطح نسبت به آیتم قبلی عمیق‌تر باشد).
+	 * ۲. پیدا کردن و تنظیم دقیق menu-item-data-parent-id بر اساس چیدمان واقعی DOM.
+	 * ۳. شماره‌گذاری دقیق موقعیت‌ها (menu-item-data-position: 1..N).
+	 * ۴. فعال‌سازی وضعیت تغییر در وردپرس جهت ذخیره مطمئن در پایگاه داده.
+	 */
+	function refreshMenuTreeAndParents() {
+		var $items = $( '#menu-to-edit > li.menu-item' );
+		if ( ! $items.length ) {
+			return;
+		}
+
+		var prevDepth = -1;
+
+		$items.each( function ( index ) {
+			var $item = $( this );
+			var curDepth = getItemDepth( $item );
+
+			// قاعده وردپرس: آیتم اول منو همواره در سطح ۰ (بدون والد) است
+			if ( 0 === index ) {
+				curDepth = 0;
+			} else {
+				// هیچ آیتمی نباید بیش از ۱ سطح نسبت به آیتم ماقبل خود فاصله داشته باشد
+				if ( curDepth > prevDepth + 1 ) {
+					curDepth = prevDepth + 1;
+				}
+			}
+
+			curDepth = Math.max( 0, Math.min( 11, curDepth ) );
+			setItemDepth( $item, curDepth );
+			prevDepth = curDepth;
+
+			// محاسبه دقیق شناسه والد:
+			// در عمق ۰ والد صفر است.
+			// در عمق بالای صفر، نزدیک‌ترین آیتم ماقبل با عمق (curDepth - 1) والد قطعی است.
+			var parentId = 0;
+			if ( curDepth > 0 ) {
+				var $prevAll = $item.prevAll( 'li.menu-item' );
+				$prevAll.each( function () {
+					var $prev = $( this );
+					if ( getItemDepth( $prev ) === curDepth - 1 ) {
+						parentId = getMenuItemId( $prev );
+						return false; // شکستن حلقه
+					}
+				} );
+			}
+
+			// تنظیم قطعی فیلدهای پنهان فرم وردپرس که مستقیماً در POST ذخیره می‌شوند
+			$item.find( '.menu-item-data-parent-id' ).val( parentId );
+			$item.find( '.menu-item-data-position' ).val( index + 1 );
+		} );
+
+		markMenuDirty();
+		updateVarsCounter();
+		updateParentOptions();
+	}
+
 	function initBulkToolbar() {
 		var $menuList = $( '#menu-to-edit' );
 		if ( ! $menuList.length || $( '#ardal-bulk-bar' ).length ) {
@@ -316,7 +374,7 @@
 		} else {
 			// والد = ریشه، انتقال به انتهای فهرست
 			targetDepth = 0;
-			$insertAfterPoint = $( '#menu-to-edit > li.menu-item' ).last();
+			$insertAfterPoint = $( '#menu-to-edit > li.menu-item' ).not( '.is-bulk-selected' ).last();
 		}
 
 		// محاسبه کمترین عمق در بین آیتم‌های انتخاب شده برای حفظ نسبت درونی
@@ -328,37 +386,26 @@
 			}
 		} );
 
-		// جابجایی عناصر در DOM و به‌روزرسانی فیلدها
+		// جابجایی عناصر در DOM با عمق‌های اولیه متناسب
 		$selectedItems.each( function () {
 			var $item = $( this );
 			var curDepth = getItemDepth( $item );
 			var relativeOffset = curDepth - minSelectedDepth;
-			var newDepth = Math.min( 11, targetDepth + relativeOffset );
+			var newDepth = Math.max( 0, Math.min( 11, targetDepth + relativeOffset ) );
 
 			setItemDepth( $item, newDepth );
 
-			// تعیین والد فیلد
-			if ( newDepth === targetDepth ) {
-				$item.find( '.menu-item-data-parent-id' ).val( targetParentId );
-			}
-
-			if ( $insertAfterPoint && $insertAfterPoint[0] !== $item[0] ) {
+			if ( $insertAfterPoint && $insertAfterPoint.length && $insertAfterPoint[0] !== $item[0] ) {
 				$item.insertAfter( $insertAfterPoint );
 				$insertAfterPoint = $item;
 			}
 		} );
 
-		// به‌روزرسانی موقعیت‌ها
-		$( '#menu-to-edit > li.menu-item' ).each( function ( index ) {
-			$( this ).find( '.menu-item-data-position' ).val( index + 1 );
-		} );
-
-		markMenuDirty();
-		updateVarsCounter();
-		updateParentOptions();
+		// بازسازی و محاسبه ۱۰۰٪ بی‌نقص تمام والدها و موقعیت‌ها در کل DOM
+		refreshMenuTreeAndParents();
 
 		var targetName = targetParentId > 0 ? getMenuItemTitle( $( '#menu-item-' + targetParentId ) ) : ( i18n.rootItem || 'سطح اصلی' );
-		var msg = ( i18n.movedSuccess || '%s آیتم با موفقیت جابجا شدند.' ).replace( '%s', $selectedItems.length ).replace( '%s', targetName );
+		var msg = ( i18n.movedSuccess || '%s آیتم با موفقیت به زیر «%s» منتقل شدند.' ).replace( '%s', $selectedItems.length ).replace( '%s', targetName );
 		notifyUser( msg, true );
 	}
 
@@ -377,30 +424,13 @@
 			var curDepth = getItemDepth( $item );
 			var newDepth = curDepth + delta;
 
-			if ( newDepth < 0 || newDepth > 11 ) {
-				return;
-			}
-
-			setItemDepth( $item, newDepth );
-
-			// در صورت برگشت به سطح ریشه، والد صفر می‌شود
-			if ( newDepth === 0 ) {
-				$item.find( '.menu-item-data-parent-id' ).val( 0 );
-			} else {
-				// یافتن نزدیک‌ترین آیتم قبلی با عمق newDepth - 1
-				var $prev = $item.prev( 'li.menu-item' );
-				while ( $prev.length ) {
-					if ( getItemDepth( $prev ) === newDepth - 1 ) {
-						$item.find( '.menu-item-data-parent-id' ).val( getMenuItemId( $prev ) );
-						break;
-					}
-					$prev = $prev.prev( 'li.menu-item' );
-				}
+			if ( newDepth >= 0 && newDepth <= 11 ) {
+				setItemDepth( $item, newDepth );
 			}
 		} );
 
-		markMenuDirty();
-		updateParentOptions();
+		// بازسازی مجدد سلسله‌مراتب و والدها
+		refreshMenuTreeAndParents();
 	}
 
 	/* -------------------------------------------------------------------------
@@ -552,9 +582,7 @@
 
 				syncAllFields();
 				refreshItemCheckboxes();
-				updateVarsCounter();
-				updateParentOptions();
-				markMenuDirty();
+				refreshMenuTreeAndParents();
 
 				var msg = ( i18n.treeSuccess || '%s دسته‌بندی با موفقیت افزوده شدند.' ).replace( '%s', response.data.count );
 				notifyUser( msg, true );
@@ -730,7 +758,6 @@
 			$( '.ardal-drag-badge' ).remove();
 
 			var targetDepth = getItemDepth( ui.item );
-			var targetParentId = ui.item.find( '.menu-item-data-parent-id' ).val();
 
 			// درج تمام آیتم‌های خوشه بلافاصله بعد از آیتم درگ‌شده
 			var $insertPoint = ui.item;
@@ -744,22 +771,12 @@
 
 				setItemDepth( $item, newDepth );
 
-				if ( newDepth === targetDepth ) {
-					$item.find( '.menu-item-data-parent-id' ).val( targetParentId );
-				}
-
 				$item.insertAfter( $insertPoint );
 				$insertPoint = $item;
 			} );
 
-			// به‌روزرسانی شماره موقعیت آیتم‌ها
-			$( '#menu-to-edit > li.menu-item' ).each( function ( index ) {
-				$( this ).find( '.menu-item-data-position' ).val( index + 1 );
-			} );
-
-			markMenuDirty();
-			updateVarsCounter();
-			updateParentOptions();
+			// بازسازی و محاسبه ۱۰۰٪ بی‌نقص تمام والدها و موقعیت‌ها در کل DOM
+			refreshMenuTreeAndParents();
 
 			var totalMoved = $draggedCluster.length + 1;
 			notifyUser( totalMoved + ' آیتم با موفقیت به‌صورت هم‌زمان جابجا شدند.', true );
@@ -767,7 +784,20 @@
 		} );
 
 	/* -------------------------------------------------------------------------
-	 * ۹. راه‌اندازی در بارگذاری صفحه و رویدادهای ایجکس وردپرس
+	 * ۹. تضمین به‌روزرسانی والدها و موقعیت‌ها هنگام ذخیره فهرست (Save Menu Guard)
+	 * ------------------------------------------------------------------------- */
+
+	// بازسازی ساختار درخت بلافاصله قبل از ارسال فرم ذخیره فهرست وردپرس
+	$( document )
+		.on( 'submit', '#update-nav-menu', function () {
+			refreshMenuTreeAndParents();
+		} )
+		.on( 'click', '#save_menu_header, #save_menu_footer, [name="save_menu"]', function () {
+			refreshMenuTreeAndParents();
+		} );
+
+	/* -------------------------------------------------------------------------
+	 * ۱۰. راه‌اندازی در بارگذاری صفحه و رویدادهای ایجکس وردپرس
 	 * ------------------------------------------------------------------------- */
 
 	function initAll() {
@@ -783,8 +813,7 @@
 		window.setTimeout( function () {
 			syncAllFields();
 			refreshItemCheckboxes();
-			updateParentOptions();
-			updateVarsCounter();
+			refreshMenuTreeAndParents();
 		}, 100 );
 	} );
 
@@ -793,8 +822,7 @@
 			window.setTimeout( function () {
 				syncAllFields();
 				refreshItemCheckboxes();
-				updateParentOptions();
-				updateVarsCounter();
+				refreshMenuTreeAndParents();
 			}, 100 );
 		}
 	} );
