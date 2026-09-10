@@ -13,8 +13,9 @@
 .elementor-widget-ardal-archive-filters,
 .elementor-widget-ardal-archive-chips,
 .elementor-widget-ardal-archive-toolbar,
-.elementor-widget-ardal-archive-products,
-.elementor-widget-ardal-archive-description {
+.elementor-widget-ardal-archive-description,
+/* شبکهٔ محصولات هم می‌تواند کارت و صفحه‌بندی آرشیو را بگیرد. */
+.elementor-widget-ardal-products {
 	--ard-arch-shadow: 0 8px 24px -16px rgba(var(--ard-primary-dark-rgb), 0.28);
 	--ard-arch-shadow-sm: 0 6px 18px -8px rgba(var(--ard-primary-dark-rgb), 0.18);
 
@@ -1165,6 +1166,12 @@ body.ard-arch-sort .ard-sheet {
 .ard-grid::before,
 .ard-grid::after {
 	display: none;
+}
+
+/* کارت آرشیو داخل شبکهٔ ویجت «شبکه محصولات»: سلولِ شبکه یک div است، پس کارت
+   باید خودش قد سلول را بگیرد تا کارت‌های یک ردیف هم‌ارتفاع بمانند. */
+.ard-pgrid__cell > .ard-acard {
+	block-size: 100%;
 }
 
 .ard-acard {

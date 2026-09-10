@@ -15,6 +15,16 @@ use Elementor\Widget_Base;
 abstract class Ardal_Widget_Base extends Widget_Base {
 
 	/**
+	 * کوئری آرشیوی که آخرین بار محصولات از آن خوانده شد.
+	 *
+	 * فقط وقتی پر است که ویجت روی کوئری اصلی نشسته باشد؛ همان شرطی که
+	 * صفحه‌بندی هم به آن نیاز دارد.
+	 *
+	 * @var WP_Query|null
+	 */
+	protected $archive_query = null;
+
+	/**
 	 * @return array
 	 */
 	public function get_categories() {
@@ -315,12 +325,17 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		$limit = isset( $settings['archive_limit'] ) ? (int) $settings['archive_limit'] : 0;
 		$main  = isset( $GLOBALS['wp_query'] ) ? $GLOBALS['wp_query'] : null;
 
+		$this->archive_query = null;
+
 		if ( $main instanceof WP_Query && $main->posts ) {
 			$is_archive = $main->is_post_type_archive( 'product' )
 				|| $main->is_tax( get_object_taxonomies( 'product' ) )
 				|| 'product_query' === $main->get( 'wc_query' );
 
 			if ( $is_archive ) {
+				// فقط وقتی روی کوئری اصلی نشسته‌ایم صفحه‌بندی معنا دارد.
+				$this->archive_query = $main;
+
 				return Ardal_Helpers::cards_from_posts( $main->posts, $limit );
 			}
 		}
@@ -521,7 +536,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 	 * @param string $inner  HTML داخل دکمه (از قبل escape شده).
 	 * @param string $label  متن aria-label، خالی یعنی لازم نیست.
 	 */
-	private function render_card_action( $item, $opts, $class, $inner, $label ) {
+	protected function render_card_action( $item, $opts, $class, $inner, $label ) {
 		$link = isset( $item['link'] ) ? $item['link'] : array( 'url' => '' );
 		$add  = isset( $item['add_url'] ) ? $item['add_url'] : array( 'url' => '' );
 
@@ -576,6 +591,302 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 	 * @param string $message
 	 * @return bool آیا پیام نمایش داده شد.
 	 */
+	/**
+	 * کارت محصول سبک آرشیو (کارت سفید با نشان تخفیف و دکمهٔ علاقه‌مندی).
+	 *
+	 * ورودی‌اش همان آرایهٔ کارت است که render_product_card می‌گیرد، پس منبع دستی
+	 * هم با این سبک کار می‌کند؛ فقط فیلدهایی که فقط از محصول ووکامرس درمی‌آیند
+	 * (موجودی، دسته، علاقه‌مندی) در حالت دستی خالی می‌مانند و بخش‌شان چاپ نمی‌شود.
+	 *
+	 * @param array $item
+	 * @param array $opts
+	 */
+	protected function render_archive_card( $item, $opts = array() ) {
+		$opts = wp_parse_args(
+			$opts,
+			array(
+				'image_ratio'       => '1',
+				'show_badge'        => true,
+				'badge_type'        => 'percent',
+				'badge_text'        => 'حراج',
+				'show_stock'        => true,
+				'show_wishlist'     => true,
+				'show_rating'       => true,
+				'rating_style'      => 'both',
+				'hide_empty_rating' => true,
+				'show_cat'          => false,
+				'show_subtitle'     => false,
+				'title_tag'         => 'h3',
+				'show_price'        => true,
+				'show_old_price'    => true,
+				'show_button'       => true,
+				'button_style'      => 'solid',
+				'button_text'       => 'افزودن به سبد',
+				'button_action'     => 'add',
+				'placeholder'       => '۸۰۰×۸۰۰',
+				// در حلقهٔ ووکامرس li است؛ داخل شبکهٔ اردال، div (چون سلول شبکه
+				// خودش لیست نیست و li بیرون از ul مارک‌آپ نامعتبر می‌سازد).
+				'tag'               => 'li',
+			)
+		);
+
+		$root = in_array( $opts['tag'], array( 'li', 'div', 'article' ), true ) ? $opts['tag'] : 'li';
+
+		$title   = isset( $item['title'] ) ? (string) $item['title'] : '';
+		$link    = isset( $item['link'] ) ? $item['link'] : array( 'url' => '' );
+		$href    = ! empty( $link['url'] ) ? $link['url'] : '';
+		$rating  = isset( $item['rating'] ) ? (float) $item['rating'] : 0;
+		$count   = isset( $item['count'] ) ? (int) $item['count'] : 0;
+		$id      = isset( $item['product_id'] ) ? (int) $item['product_id'] : 0;
+		$in_cart = ! isset( $item['in_stock'] ) || $item['in_stock'];
+		$tag     = in_array( $opts['title_tag'], array( 'h2', 'h3', 'h4', 'div' ), true ) ? $opts['title_tag'] : 'h3';
+
+		$classes = array( 'ard-acard' );
+
+		if ( ! $in_cart ) {
+			$classes[] = 'is-out';
+		}
+
+		if ( ! empty( $item['wc_classes'] ) ) {
+			$classes[] = $item['wc_classes'];
+		}
+
+		printf(
+			'<%s class="%s" style="--ard-acard-ratio:%s">',
+			esc_html( $root ),
+			esc_attr( implode( ' ', $classes ) ),
+			esc_attr( $opts['image_ratio'] )
+		);
+
+		/* ------------------------------------------------- تصویر */
+		echo '<div class="ard-acard__media">';
+
+		$image = ! empty( $item['image_id'] )
+			? wp_get_attachment_image( (int) $item['image_id'], 'woocommerce_thumbnail', false, array( 'loading' => 'lazy', 'alt' => $title ) )
+			: Ardal_Helpers::image( isset( $item['image'] ) ? $item['image'] : array(), $opts['placeholder'], $title, 'medium_large' );
+
+		if ( '' !== $href ) {
+			printf(
+				'<a class="ard-acard__media-link" href="%s" aria-label="%s">%s</a>',
+				esc_url( $href ),
+				esc_attr( $title ),
+				$image // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی وردپرس/هلپر.
+			);
+		} else {
+			printf( '<span class="ard-acard__media-link">%s</span>', $image ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+
+		if ( $opts['show_badge'] ) {
+			$off  = isset( $item['off'] ) ? (string) $item['off'] : '';
+			$text = 'text' === $opts['badge_type'] ? $opts['badge_text'] : $off;
+
+			if ( '' !== $off && '' !== $text ) {
+				printf( '<span class="ard-acard__badge">%s</span>', esc_html( $text ) );
+			}
+		}
+
+		if ( $opts['show_stock'] && ! $in_cart ) {
+			echo '<span class="ard-acard__flag">ناموجود</span>';
+		}
+
+		if ( $opts['show_wishlist'] && $id && Ardal_Product::wishlist_on() ) {
+			printf(
+				'<button type="button" class="ard-acard__wish" data-ard-wishlist data-product-id="%d" data-label-off="افزودن به علاقه‌مندی‌ها" data-label-on="حذف از علاقه‌مندی‌ها" aria-pressed="false" aria-label="افزودن به علاقه‌مندی‌ها">%s</button>',
+				$id,
+				Ardal_Helpers::icon( 'heart', 17 ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
+		}
+
+		if ( $opts['show_button'] && 'fab' === $opts['button_style'] ) {
+			$this->render_card_action( $item, $opts, 'ard-acard__fab', '<span aria-hidden="true">+</span>', 'افزودن ' . $title . ' به سبد خرید' );
+		}
+
+		echo '</div>';
+
+		/* ------------------------------------------------- امتیاز و دسته */
+		$show_rating = $opts['show_rating'] && ( $rating > 0 || ! $opts['hide_empty_rating'] );
+		$cat         = ( $opts['show_cat'] && ! empty( $item['cat'] ) ) ? (string) $item['cat'] : '';
+
+		if ( $show_rating || '' !== $cat ) {
+			echo '<div class="ard-acard__meta">';
+
+			if ( '' !== $cat ) {
+				printf( '<span class="ard-acard__cat">%s</span>', esc_html( $cat ) );
+			}
+
+			if ( $show_rating ) {
+				echo '<span class="ard-acard__rating" dir="ltr">';
+
+				if ( 'num' !== $opts['rating_style'] ) {
+					echo '<span class="ard-acard__stars">';
+
+					for ( $i = 1; $i <= 5; $i++ ) {
+						echo Ardal_Archive::star( $i <= round( $rating ), 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					}
+
+					echo '</span>';
+				}
+
+				if ( 'stars' !== $opts['rating_style'] ) {
+					printf(
+						'<span class="ard-acard__rate-num">%s</span>',
+						esc_html( Ardal_Helpers::fa_digits( number_format_i18n( $rating, 1 ) ) )
+					);
+				}
+
+				if ( $count > 0 ) {
+					printf(
+						// ard-sr مال خود افزونه است؛ screen-reader-text را قالب یا
+						// ووکامرس تعریف می‌کند و آن دو ممکن است خاموش باشند.
+						'<span class="ard-sr screen-reader-text">بر پایه %s نظر</span>',
+						esc_html( Ardal_Helpers::fa_digits( number_format_i18n( $count ) ) )
+					);
+				}
+
+				echo '</span>';
+			}
+
+			echo '</div>';
+		}
+
+		/* ------------------------------------------------- عنوان */
+		printf( '<%s class="ard-acard__name woocommerce-loop-product__title">', esc_html( $tag ) );
+
+		if ( '' !== $href ) {
+			printf( '<a href="%s">', esc_url( $href ) );
+		}
+
+		printf( '<span class="ard-acard__name-fa">%s</span>', esc_html( $title ) );
+
+		if ( $opts['show_subtitle'] && ! empty( $item['subtitle'] ) ) {
+			printf( '<span class="ard-acard__name-en">%s</span>', esc_html( $item['subtitle'] ) );
+		}
+
+		if ( '' !== $href ) {
+			echo '</a>';
+		}
+
+		printf( '</%s>', esc_html( $tag ) );
+
+		/* ------------------------------------------------- قیمت */
+		if ( $opts['show_price'] ) {
+			$price = isset( $item['price'] ) ? Ardal_Helpers::price( $item['price'] ) : '';
+			$old   = isset( $item['old_price'] ) ? Ardal_Helpers::price( $item['old_price'] ) : '';
+
+			echo '<div class="ard-acard__prices">';
+
+			if ( $opts['show_old_price'] && '' !== $old ) {
+				printf( '<del class="ard-acard__old">%s</del>', esc_html( $old ) );
+			}
+
+			if ( '' !== $price ) {
+				printf(
+					'<span class="ard-acard__price">%s %s</span>',
+					esc_html( $price ),
+					Ardal_Currency::unit() // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				);
+			} else {
+				echo '<span class="ard-acard__price ard-acard__price--call">تماس بگیرید</span>';
+			}
+
+			echo '</div>';
+		}
+
+		/* ------------------------------------------------- دکمه */
+		if ( $opts['show_button'] && 'fab' !== $opts['button_style'] ) {
+			$this->render_card_action(
+				$item,
+				$opts,
+				'ard-acard__btn ard-acard__btn--' . $opts['button_style'],
+				esc_html( $opts['button_text'] ),
+				''
+			);
+		}
+
+		printf( '</%s>', esc_html( $root ) );
+	}
+
+	/**
+	 * صفحه‌بندی حلقهٔ آرشیو.
+	 *
+	 * فقط وقتی معنا دارد که ویجت روی کوئری اصلی نشسته باشد؛ کوئری دلخواه
+	 * صفحه‌بندی ندارد.
+	 *
+	 * @param WP_Query $query
+	 * @param array    $opts mid و prev/next.
+	 */
+	protected function render_grid_pager( $query, $opts = array() ) {
+		$opts  = wp_parse_args( $opts, array( 'mid' => 2 ) );
+		$stats = Ardal_Archive::loop_stats( $query );
+
+		if ( $stats['pages'] <= 1 ) {
+			return;
+		}
+
+		$base = esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) );
+
+		echo '<nav class="ard-pager woocommerce-pagination" aria-label="صفحه‌بندی محصولات">';
+
+		echo paginate_links( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			array(
+				'base'      => $base,
+				'format'    => '',
+				'add_args'  => false,
+				'current'   => max( 1, $stats['current'] ),
+				'total'     => $stats['pages'],
+				'prev_text' => Ardal_Archive::icon( 'chev-r', 18, 2 ),
+				'next_text' => Ardal_Archive::icon( 'chev-l', 18, 2 ),
+				'type'      => 'list',
+				'end_size'  => 1,
+				'mid_size'  => max( 0, (int) $opts['mid'] ),
+			)
+		);
+
+		echo '</nav>';
+	}
+
+	/**
+	 * حالت «نتیجه‌ای نیست».
+	 *
+	 * @param array $opts title، text، button.
+	 */
+	protected function render_grid_empty( $opts = array() ) {
+		$opts = wp_parse_args(
+			$opts,
+			array(
+				'title'  => 'محصولی پیدا نشد.',
+				'text'   => '',
+				'button' => '',
+			)
+		);
+
+		$active = class_exists( 'Ardal_Archive' ) ? Ardal_Archive::active_count() : 0;
+
+		echo '<div class="ard-arch-empty woocommerce-info">';
+		printf(
+			'<span class="ard-arch-empty__art" aria-hidden="true">%s</span>',
+			Ardal_Archive::icon( 'empty', 54, 1.2 ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		);
+
+		if ( '' !== trim( (string) $opts['title'] ) ) {
+			printf( '<p class="ard-arch-empty__title">%s</p>', esc_html( $opts['title'] ) );
+		}
+
+		if ( '' !== trim( (string) $opts['text'] ) ) {
+			printf( '<p class="ard-arch-empty__text">%s</p>', esc_html( $opts['text'] ) );
+		}
+
+		if ( $active && '' !== trim( (string) $opts['button'] ) ) {
+			printf(
+				'<a class="ard-arch-empty__btn" href="%s">%s</a>',
+				esc_url( Ardal_Archive::base_url() ),
+				esc_html( $opts['button'] )
+			);
+		}
+
+		echo '</div>';
+	}
+
 	protected function render_empty( $message ) {
 		if ( ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
 			return true;

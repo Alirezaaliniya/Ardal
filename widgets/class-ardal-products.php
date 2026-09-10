@@ -29,7 +29,23 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 	}
 
 	public function get_keywords() {
-		return array( 'اردال', 'محصول', 'محصولات', 'شبکه', 'products', 'grid' );
+		return array( 'اردال', 'محصول', 'محصولات', 'شبکه', 'آرشیو', 'products', 'grid', 'archive' );
+	}
+
+	/**
+	 * سبک کارت آرشیو و صفحه‌بندی، استایل و اسکریپت آرشیو را لازم دارند.
+	 *
+	 * @return array
+	 */
+	public function get_style_depends() {
+		return array( 'ardal', 'ardal-archive' );
+	}
+
+	/**
+	 * @return array
+	 */
+	public function get_script_depends() {
+		return array( 'ardal', 'ardal-archive' );
 	}
 
 	protected function register_controls() {
@@ -227,15 +243,31 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'card_style',
+			array(
+				'label'       => 'طرح کارت',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'ardal',
+				'options'     => array(
+					'ardal'   => 'کارت اردال (صفحه اصلی)',
+					'archive' => 'کارت آرشیو فروشگاه',
+				),
+				'label_block' => true,
+				'description' => 'طرح آرشیو همان کارت سفید فهرست فروشگاه است: نشان تخفیف، برچسب ناموجود، علاقه‌مندی و دکمهٔ تمام‌عرض.',
+			)
+		);
+
+		$this->add_control(
 			'variant',
 			array(
-				'label'   => 'سبک کارت',
-				'type'    => Controls_Manager::SELECT,
-				'default' => 'framed',
-				'options' => array(
+				'label'     => 'سبک کارت',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'framed',
+				'options'   => array(
 					'framed' => 'کارت حاشیه‌دار با دکمه گرد سبز (دیزاین ۱a)',
 					'plain'  => 'بدون حاشیه با دکمه «افزودن به سبد» (دیزاین ۱b)',
 				),
+				'condition' => array( 'card_style' => 'ardal' ),
 			)
 		);
 
@@ -249,6 +281,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 					'button' => 'فقط عنوان و دکمه',
 					'box'    => 'کل کارت به محصول لینک شود',
 				),
+				'condition'   => array( 'card_style' => 'ardal' ),
 				'description' => 'در حالت «کل کارت»، دکمه همچنان کار خودش را انجام می‌دهد و کلیک روی آن به محصول نمی‌رود.',
 			)
 		);
@@ -279,10 +312,24 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		$this->add_control(
 			'button_text',
 			array(
-				'label'     => 'متن دکمه',
-				'type'      => Controls_Manager::TEXT,
-				'default'   => 'افزودن به سبد',
-				'condition' => array( 'variant' => 'plain' ),
+				'label'      => 'متن دکمه',
+				'type'       => Controls_Manager::TEXT,
+				'default'    => 'افزودن به سبد',
+				'conditions' => array(
+					'relation' => 'or',
+					'terms'    => array(
+						array(
+							'name'     => 'card_style',
+							'operator' => '===',
+							'value'    => 'archive',
+						),
+						array(
+							'name'     => 'variant',
+							'operator' => '===',
+							'value'    => 'plain',
+						),
+					),
+				),
 			)
 		);
 
@@ -296,7 +343,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label_off'    => 'خیر',
 				'return_value' => 'yes',
 				'description'  => 'گوشه کارت را دور دکمهٔ گرد می‌بُرد. با خاموش‌کردنش، کارت گوشهٔ معمولی می‌گیرد.',
-				'condition'    => array( 'variant' => 'framed' ),
+				'condition'    => array( 'card_style' => 'ardal', 'variant' => 'framed' ),
 			)
 		);
 
@@ -312,11 +359,257 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 					'{{WRAPPER}} .ard-pcard--notch' => '--ard-notch:{{SIZE}}{{UNIT}};',
 				),
 				'condition'  => array(
-					'variant' => 'framed',
-					'notch'   => 'yes',
+					'card_style' => 'ardal',
+					'variant'    => 'framed',
+					'notch'      => 'yes',
 				),
 			)
 		);
+
+		/* --------------------------------- گزینه‌های ویژهٔ کارت آرشیو */
+
+		$this->add_control(
+			'acard_heading',
+			array(
+				'label'     => 'کارت آرشیو',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+				'condition' => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'image_ratio',
+			array(
+				'label'     => 'نسبت تصویر',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => '1',
+				'options'   => array(
+					'1'    => 'مربع (۱:۱)',
+					'0.8'  => 'افقی ملایم (۵:۴)',
+					'1.25' => 'عمودی (۴:۵)',
+					'1.4'  => 'عمودی بلند (۵:۷)',
+				),
+				'condition' => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'show_badge',
+			array(
+				'label'        => 'نشان تخفیف',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'badge_type',
+			array(
+				'label'     => 'متن نشان',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'percent',
+				'options'   => array(
+					'percent' => 'درصد تخفیف',
+					'text'    => 'متن ثابت',
+				),
+				'condition' => array( 'card_style' => 'archive', 'show_badge' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'badge_text',
+			array(
+				'label'     => 'متن ثابت نشان',
+				'type'      => Controls_Manager::TEXT,
+				'default'   => 'حراج',
+				'condition' => array( 'card_style' => 'archive', 'show_badge' => 'yes', 'badge_type' => 'text' ),
+			)
+		);
+
+		$this->add_control(
+			'show_stock',
+			array(
+				'label'        => 'برچسب «ناموجود»',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'show_wishlist',
+			array(
+				'label'        => 'دکمه علاقه‌مندی',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => Ardal_Product::wishlist_on() ? '' : 'علاقه‌مندی در تنظیمات اردال خاموش است.',
+				'condition'    => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'rating_style',
+			array(
+				'label'     => 'شکل امتیاز',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'both',
+				'options'   => array(
+					'both'  => 'ستاره‌ها و عدد',
+					'stars' => 'فقط ستاره‌ها',
+					'num'   => 'فقط عدد',
+				),
+				'condition' => array( 'card_style' => 'archive', 'show_rating' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'hide_empty_rating',
+			array(
+				'label'        => 'پنهان‌کردن امتیاز صفر',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive', 'show_rating' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'show_cat',
+			array(
+				'label'        => 'نام دسته بالای عنوان',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'show_subtitle',
+			array(
+				'label'        => 'عنوان انگلیسی زیر نام',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'card_title_tag',
+			array(
+				'label'     => 'تگ عنوان کارت',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'h3',
+				'options'   => array(
+					'h2'  => 'H2',
+					'h3'  => 'H3',
+					'h4'  => 'H4',
+					'div' => 'DIV',
+				),
+				'condition' => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'title_lines',
+			array(
+				'label'     => 'حداکثر خط عنوان',
+				'type'      => Controls_Manager::SLIDER,
+				'range'     => array( 'px' => array( 'min' => 1, 'max' => 4, 'step' => 1 ) ),
+				'default'   => array( 'size' => 2 ),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-acard__name-fa' => '-webkit-line-clamp:{{SIZE}};',
+				),
+				'condition' => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'show_price',
+			array(
+				'label'        => 'نمایش قیمت',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'show_old_price',
+			array(
+				'label'        => 'قیمت خط‌خورده',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive', 'show_price' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'show_button',
+			array(
+				'label'        => 'دکمه خرید',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'button_style',
+			array(
+				'label'     => 'شکل دکمه',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'solid',
+				'options'   => array(
+					'solid'   => 'دکمه تمام‌عرض',
+					'outline' => 'دکمه خط‌دار',
+					'fab'     => 'دکمه گرد روی تصویر',
+				),
+				'condition' => array( 'card_style' => 'archive', 'show_button' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'hover',
+			array(
+				'label'     => 'افکت هاور کارت',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'lift',
+				'options'   => array(
+					'lift' => 'بالا آمدن کارت',
+					'zoom' => 'بزرگ‌نمایی تصویر',
+					'none' => 'بدون افکت',
+				),
+				'condition' => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'align',
+			array(
+				'label'     => 'چیدمان محتوای کارت',
+				'type'      => Controls_Manager::CHOOSE,
+				'default'   => 'center',
+				'options'   => array(
+					'start'  => array( 'title' => 'راست', 'icon' => 'eicon-text-align-right' ),
+					'center' => array( 'title' => 'وسط', 'icon' => 'eicon-text-align-center' ),
+				),
+				'condition' => array( 'card_style' => 'archive' ),
+			)
+		);
+
+		/* --------------------------------- شبکه (مشترک بین دو طرح) */
 
 		$this->add_responsive_control(
 			'columns',
@@ -328,6 +621,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'default'        => 5,
 				'tablet_default' => 3,
 				'mobile_default' => 2,
+				'separator'      => 'before',
 				'selectors'      => array(
 					'{{WRAPPER}} .ard-pgrid' => 'grid-template-columns:repeat({{VALUE}},minmax(0,1fr));',
 				),
@@ -374,17 +668,185 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'selectors'      => array(
 					'{{WRAPPER}} .ard-pcard__media' => 'height:{{SIZE}}{{UNIT}};',
 				),
+				// کارت آرشیو به‌جای ارتفاع ثابت، «نسبت تصویر» دارد.
+				'condition'      => array( 'card_style' => 'ardal' ),
 			)
 		);
 
 		$this->end_controls_section();
 
+		$this->add_pager_controls();
 		$this->add_card_style_controls();
 	}
 
 	/**
-	 * استایل کارت — همان چیزهایی که در «شبکه محصولات آرشیو» تنظیم‌شدنی است،
-	 * اینجا هم در دسترس باشد.
+	 * صفحه‌بندی و حالت «نتیجه‌ای نیست».
+	 *
+	 * هر دو فقط روی کوئری آرشیو معنا دارند؛ کوئری دلخواه صفحه‌بندی ندارد و
+	 * وقتی محصولی نباشد، ویجت در حالت‌های دیگر پیام ویرایشگر خودش را می‌دهد.
+	 */
+	private function add_pager_controls() {
+		$this->start_controls_section(
+			'section_pager',
+			array(
+				'label'     => 'صفحه‌بندی',
+				'condition' => array( 'source' => 'archive' ),
+			)
+		);
+
+		$this->add_control(
+			'show_pager',
+			array(
+				'label'        => 'نمایش صفحه‌بندی',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'description'  => 'فقط وقتی ویجت روی کوئری واقعی آرشیو نشسته باشد چاپ می‌شود.',
+			)
+		);
+
+		$this->add_control(
+			'pager_mid',
+			array(
+				'label'     => 'تعداد صفحه اطراف صفحه جاری',
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 0,
+				'max'       => 5,
+				'default'   => 2,
+				'condition' => array( 'show_pager' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'pager_align',
+			array(
+				'label'     => 'چیدمان',
+				'type'      => Controls_Manager::CHOOSE,
+				'default'   => 'center',
+				'options'   => array(
+					'flex-start' => array( 'title' => 'راست', 'icon' => 'eicon-text-align-right' ),
+					'center'     => array( 'title' => 'وسط', 'icon' => 'eicon-text-align-center' ),
+					'flex-end'   => array( 'title' => 'چپ', 'icon' => 'eicon-text-align-left' ),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pager ul.page-numbers' => 'justify-content:{{VALUE}};',
+				),
+				'condition' => array( 'show_pager' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'pager_size',
+			array(
+				'label'      => 'اندازه دکمه‌ها',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 28, 'max' => 64 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pager' => '--ard-pager-size:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array( 'show_pager' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'pager_bg',
+			array(
+				'label'     => 'زمینه شماره‌ها',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pager .page-numbers' => 'background:{{VALUE}};',
+				),
+				'condition' => array( 'show_pager' => 'yes' ),
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'pager_color',
+			array(
+				'label'     => 'رنگ شماره‌ها',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pager .page-numbers' => 'color:{{VALUE}};',
+				),
+				'condition' => array( 'show_pager' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'pager_active_bg',
+			array(
+				'label'     => 'زمینه صفحه جاری',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pager .page-numbers.current' => 'background:{{VALUE}};',
+				),
+				'condition' => array( 'show_pager' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'pager_active_color',
+			array(
+				'label'     => 'متن صفحه جاری',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pager .page-numbers.current' => 'color:{{VALUE}};',
+				),
+				'condition' => array( 'show_pager' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'empty_heading',
+			array(
+				'label'     => 'وقتی نتیجه‌ای نیست',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'empty_title',
+			array(
+				'label'       => 'عنوان',
+				'type'        => Controls_Manager::TEXT,
+				'default'     => 'محصولی با این فیلترها پیدا نشد.',
+				'label_block' => true,
+			)
+		);
+
+		$this->add_control(
+			'empty_text',
+			array(
+				'label'       => 'توضیح',
+				'type'        => Controls_Manager::TEXTAREA,
+				'default'     => 'یکی از فیلترها را بردارید یا بازه قیمت را بازتر کنید.',
+				'label_block' => true,
+			)
+		);
+
+		$this->add_control(
+			'empty_btn',
+			array(
+				'label'       => 'متن دکمه پاک‌کردن فیلترها',
+				'type'        => Controls_Manager::TEXT,
+				'default'     => 'پاک کردن همه فیلترها',
+				'description' => 'فقط وقتی فیلتری فعال باشد نمایش داده می‌شود.',
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * استایل کارت.
+	 *
+	 * هر کنترل هم‌زمان کارت اردال و کارت آرشیو را هدف می‌گیرد، پس با عوض‌کردن
+	 * «طرح کارت» تنظیمات رنگی از دست نمی‌رود.
 	 */
 	private function add_card_style_controls() {
 
@@ -404,7 +866,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ زمینه',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__box' => 'background:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__box, {{WRAPPER}} .ard-acard' => 'background:{{VALUE}};',
 				),
 			)
 		);
@@ -415,7 +877,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ حاشیه',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__box' => 'border-color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__box, {{WRAPPER}} .ard-acard' => 'border-color:{{VALUE}};',
 				),
 			)
 		);
@@ -426,7 +888,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ حاشیه در هاور',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard:hover .ard-pcard__box' => 'border-color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard:hover .ard-pcard__box, {{WRAPPER}} .ard-acard:hover' => 'border-color:{{VALUE}};',
 				),
 			)
 		);
@@ -439,7 +901,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'size_units' => array( 'px' ),
 				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ard-pcard, {{WRAPPER}} .ard-pcard__box' => 'border-radius:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pcard, {{WRAPPER}} .ard-pcard__box, {{WRAPPER}} .ard-acard' => 'border-radius:{{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -451,7 +913,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'type'       => Controls_Manager::DIMENSIONS,
 				'size_units' => array( 'px' ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ard-pcard__box' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pcard__box, {{WRAPPER}} .ard-acard' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 			)
 		);
@@ -464,7 +926,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'size_units' => array( 'px' ),
 				'range'      => array( 'px' => array( 'min' => 0, 'max' => 30 ) ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ard-pcard__box' => 'gap:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pcard__box, {{WRAPPER}} .ard-acard' => 'gap:{{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -479,7 +941,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			Group_Control_Box_Shadow::get_type(),
 			array(
 				'name'       => 'card_shadow',
-				'selector'   => '{{WRAPPER}} .ard-pcard__box',
+				'selector'   => '{{WRAPPER}} .ard-pcard__box, {{WRAPPER}} .ard-acard',
 				'conditions' => array(
 					'relation' => 'or',
 					'terms'    => array(
@@ -513,7 +975,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ زمینه',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__media' => 'background:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__media, {{WRAPPER}} .ard-acard__media' => 'background:{{VALUE}};',
 				),
 			)
 		);
@@ -526,7 +988,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'size_units' => array( 'px' ),
 				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ard-pcard__media' => 'border-radius:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pcard__media, {{WRAPPER}} .ard-acard__media' => 'border-radius:{{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -542,7 +1004,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 					'contain' => 'کامل دیده شود (contain)',
 				),
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__media img' => 'object-fit:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__media img, {{WRAPPER}} .ard-acard__media img' => 'object-fit:{{VALUE}};',
 				),
 			)
 		);
@@ -565,7 +1027,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ عنوان',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__title' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__title, {{WRAPPER}} .ard-acard__name' => 'color:{{VALUE}};',
 				),
 			)
 		);
@@ -576,7 +1038,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ عنوان در هاور',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__title a:hover' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__title a:hover, {{WRAPPER}} .ard-acard__name a:hover' => 'color:{{VALUE}};',
 				),
 			)
 		);
@@ -586,7 +1048,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			array(
 				'name'     => 'title_typo',
 				'label'    => 'قلم عنوان',
-				'selector' => '{{WRAPPER}} .ard-pcard__title',
+				'selector' => '{{WRAPPER}} .ard-pcard__title, {{WRAPPER}} .ard-acard__name',
 			)
 		);
 
@@ -598,7 +1060,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'size_units'  => array( 'px' ),
 				'range'       => array( 'px' => array( 'min' => 0, 'max' => 90 ) ),
 				'selectors'   => array(
-					'{{WRAPPER}} .ard-pcard__title' => 'min-block-size:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pcard__title, {{WRAPPER}} .ard-acard__name' => 'min-block-size:{{SIZE}}{{UNIT}};',
 				),
 				'description' => 'با یک عدد ثابت، قیمت‌ها در همهٔ کارت‌ها هم‌تراز می‌مانند.',
 			)
@@ -610,7 +1072,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ قیمت',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__price' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__price, {{WRAPPER}} .ard-acard__price' => 'color:{{VALUE}};',
 				),
 				'separator' => 'before',
 			)
@@ -621,7 +1083,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			array(
 				'name'     => 'price_typo',
 				'label'    => 'قلم قیمت',
-				'selector' => '{{WRAPPER}} .ard-pcard__price',
+				'selector' => '{{WRAPPER}} .ard-pcard__price, {{WRAPPER}} .ard-acard__price',
 			)
 		);
 
@@ -631,7 +1093,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ قیمت خط‌خورده',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__old' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__old, {{WRAPPER}} .ard-acard__old' => 'color:{{VALUE}};',
 				),
 			)
 		);
@@ -642,7 +1104,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ متن امتیاز',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__rate' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__rate, {{WRAPPER}} .ard-acard__rating' => 'color:{{VALUE}};',
 				),
 				'separator' => 'before',
 				'condition' => array( 'show_rating' => 'yes' ),
@@ -655,7 +1117,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ ستاره‌ها',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__rate .ard-stars' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__rate .ard-stars, {{WRAPPER}} .ard-acard__stars' => 'color:{{VALUE}};',
 				),
 				'condition' => array( 'show_rating' => 'yes' ),
 			)
@@ -667,7 +1129,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'زمینه نشان تخفیف',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard .ard-badge--sale' => 'background:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard .ard-badge--sale, {{WRAPPER}} .ard-acard__badge' => 'background:{{VALUE}};',
 				),
 				'separator' => 'before',
 			)
@@ -679,7 +1141,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'متن نشان تخفیف',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard .ard-badge--sale' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard .ard-badge--sale, {{WRAPPER}} .ard-acard__badge' => 'color:{{VALUE}};',
 				),
 			)
 		);
@@ -717,7 +1179,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ زمینه',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__fab, {{WRAPPER}} .ard-pcard__btn' => 'background:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__fab, {{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__fab, {{WRAPPER}} .ard-acard__btn' => 'background:{{VALUE}};',
 				),
 			)
 		);
@@ -728,7 +1190,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ متن',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__fab, {{WRAPPER}} .ard-pcard__btn' => 'color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__fab, {{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__fab, {{WRAPPER}} .ard-acard__btn' => 'color:{{VALUE}};',
 				),
 			)
 		);
@@ -739,7 +1201,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'رنگ حاشیه',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__btn' => 'border-color:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__btn' => 'border-color:{{VALUE}};',
 				),
 				'condition' => array( 'variant' => 'plain' ),
 			)
@@ -751,7 +1213,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'     => 'زمینه در هاور',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__fab:hover, {{WRAPPER}} .ard-pcard__btn:hover' => 'background:{{VALUE}};',
+					'{{WRAPPER}} .ard-pcard__fab:hover, {{WRAPPER}} .ard-pcard__btn:hover, {{WRAPPER}} .ard-acard__fab:hover, {{WRAPPER}} .ard-acard__btn:hover' => 'background:{{VALUE}};',
 				),
 			)
 		);
@@ -764,7 +1226,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'size_units' => array( 'px' ),
 				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ard-pcard__btn' => 'border-radius:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__btn' => 'border-radius:{{SIZE}}{{UNIT}};',
 				),
 				'condition'  => array( 'variant' => 'plain' ),
 			)
@@ -774,7 +1236,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'      => 'btn_typo',
-				'selector'  => '{{WRAPPER}} .ard-pcard__btn',
+				'selector'  => '{{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__btn',
 				'condition' => array( 'variant' => 'plain' ),
 			)
 		);
@@ -783,10 +1245,37 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 	}
 
 	protected function render() {
-		$s     = $this->get_settings_for_display();
-		$items = $this->get_product_items( $s );
+		$s       = $this->get_settings_for_display();
+		$archive = 'archive' === $s['source'];
+		$items   = $this->get_product_items( $s );
 
 		if ( empty( $items ) ) {
+			$this->render_heading();
+
+			/*
+			 * روی آرشیو، «چیزی پیدا نشد» یک حالت واقعیِ کاربر است نه خطای
+			 * پیکربندی، پس همان کارتِ خالیِ آرشیو چاپ می‌شود — در سایت زنده هم،
+			 * نه فقط در ویرایشگر.
+			 */
+			if ( $archive ) {
+				printf(
+					'<div class="ard-arch-products"%s>',
+					$this->is_filtered( $s ) ? ' data-ard-region="products"' : ''
+				);
+
+				$this->render_grid_empty(
+					array(
+						'title'  => $s['empty_title'],
+						'text'   => $s['empty_text'],
+						'button' => $s['empty_btn'],
+					)
+				);
+
+				echo '</div>';
+
+				return;
+			}
+
 			$this->render_empty( 'محصولی برای نمایش وجود ندارد. یک محصول اضافه کنید یا منبع ووکامرس را انتخاب کنید.' );
 
 			return;
@@ -817,17 +1306,33 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 
 		$this->render_row_cap_css( $s );
 
-		/*
-		 * وقتی محتوای شبکه به فیلترهای آدرس وابسته است، ناحیه نشان‌دار می‌شود تا
-		 * بارگذاری ایجکسی آرشیو بتواند همین‌جا را هم تازه کند.
-		 */
-		$filtered = 'archive' === $s['source'] || 'yes' === ( $s['respect_filters'] ?? '' );
+		$acard    = 'archive' === $s['card_style'];
+		$filtered = $this->is_filtered( $s );
+
+		// در حالت آرشیو، شبکه داخل یک قاب می‌نشیند تا صفحه‌بندی و حالت خالی هم
+		// بخشی از همان ناحیه‌ی قابل تازه‌سازی باشند.
+		if ( $archive ) {
+			printf( '<div class="ard-arch-products"%s>', $filtered ? ' data-ard-region="products"' : '' );
+		}
+
+		$classes = array( 'ard-pgrid' );
+
+		if ( $acard ) {
+			// کلاس‌های .ard-grid همان مودیفایرهای کارت آرشیو را می‌آورند؛
+			// ستون و فاصله را کنترل‌های خود ویجت روی .ard-pgrid می‌نویسند.
+			$classes[] = 'ard-grid';
+			$classes[] = 'ard-grid--' . $s['hover'];
+			$classes[] = 'ard-grid--fit-' . ( 'cover' === $s['media_fit'] ? 'cover' : 'contain' );
+			$classes[] = 'ard-grid--align-' . ( 'start' === $s['align'] ? 'start' : 'center' );
+		} else {
+			$classes[] = 'ard-pgrid--' . $s['variant'];
+		}
 
 		printf(
-			'<div class="ard-pgrid ard-pgrid--%s"%s%s>',
-			esc_attr( $s['variant'] ),
+			'<div class="%s"%s%s>',
+			esc_attr( implode( ' ', $classes ) ),
 			! empty( $tabs ) ? ' data-ard-filterable' : '',
-			$filtered ? ' data-ard-region="products"' : ''
+			( $filtered && ! $archive ) ? ' data-ard-region="products"' : ''
 		);
 
 		foreach ( $items as $item ) {
@@ -848,25 +1353,73 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 
 			$item['rating'] = $rating;
 
-			$this->render_product_card(
-				$item,
-				array(
-					'variant'       => $s['variant'],
-					'link_mode'     => $s['link_mode'],
-					'button_action' => $s['button_action'],
-					'show_rating'   => 'yes' === $s['show_rating'],
-					'show_fab'    => $framed,
-					'show_button' => ! $framed,
-					'button_text' => $s['button_text'],
-					'notch'       => $framed && 'yes' === $s['notch'],
-					'placeholder' => '۸۰۰×۸۰۰',
-				)
-			);
+			if ( $acard ) {
+				$this->render_archive_card(
+					$item,
+					array(
+						'tag'               => 'div',
+						'image_ratio'       => $s['image_ratio'],
+						'show_badge'        => 'yes' === $s['show_badge'],
+						'badge_type'        => $s['badge_type'],
+						'badge_text'        => $s['badge_text'],
+						'show_stock'        => 'yes' === $s['show_stock'],
+						'show_wishlist'     => 'yes' === $s['show_wishlist'],
+						'show_rating'       => 'yes' === $s['show_rating'],
+						'rating_style'      => $s['rating_style'],
+						'hide_empty_rating' => 'yes' === $s['hide_empty_rating'],
+						'show_cat'          => 'yes' === $s['show_cat'],
+						'show_subtitle'     => 'yes' === $s['show_subtitle'],
+						'title_tag'         => $s['card_title_tag'],
+						'show_price'        => 'yes' === $s['show_price'],
+						'show_old_price'    => 'yes' === $s['show_old_price'],
+						'show_button'       => 'yes' === $s['show_button'],
+						'button_style'      => $s['button_style'],
+						'button_text'       => $s['button_text'],
+						'button_action'     => $s['button_action'],
+						'placeholder'       => '۸۰۰×۸۰۰',
+					)
+				);
+			} else {
+				$this->render_product_card(
+					$item,
+					array(
+						'variant'       => $s['variant'],
+						'link_mode'     => $s['link_mode'],
+						'button_action' => $s['button_action'],
+						'show_rating'   => 'yes' === $s['show_rating'],
+						'show_fab'      => $framed,
+						'show_button'   => ! $framed,
+						'button_text'   => $s['button_text'],
+						'notch'         => $framed && 'yes' === $s['notch'],
+						'placeholder'   => '۸۰۰×۸۰۰',
+					)
+				);
+			}
 
 			echo '</div>';
 		}
 
 		echo '</div>';
+
+		if ( $archive && 'yes' === $s['show_pager'] && $this->archive_query instanceof WP_Query ) {
+			$this->render_grid_pager( $this->archive_query, array( 'mid' => $s['pager_mid'] ) );
+		}
+
+		if ( $archive ) {
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * آیا محتوای این شبکه به فیلترهای آدرس وابسته است؟
+	 *
+	 * فقط در این حالت ناحیه برای بارگذاری ایجکسی نشان‌دار می‌شود.
+	 *
+	 * @param array $s
+	 * @return bool
+	 */
+	private function is_filtered( $s ) {
+		return 'archive' === $s['source'] || 'yes' === ( $s['respect_filters'] ?? '' );
 	}
 
 	/**

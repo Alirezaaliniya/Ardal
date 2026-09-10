@@ -61,7 +61,6 @@ class Ardal_Elementor {
 			'archive-filters'     => 'Ardal_Widget_Archive_Filters',
 			'archive-chips'       => 'Ardal_Widget_Archive_Chips',
 			'archive-toolbar'     => 'Ardal_Widget_Archive_Toolbar',
-			'archive-products'    => 'Ardal_Widget_Archive_Products',
 			'archive-description' => 'Ardal_Widget_Archive_Description',
 		);
 	}
@@ -114,7 +113,6 @@ class Ardal_Elementor {
 			'archive-filters'     => 'فیلتر محصولات (ستون کناری)',
 			'archive-chips'       => 'فیلترهای فعال',
 			'archive-toolbar'     => 'نوار مرتب‌سازی آرشیو',
-			'archive-products'    => 'شبکه محصولات آرشیو',
 			'archive-description' => 'توضیحات دسته',
 		);
 	}

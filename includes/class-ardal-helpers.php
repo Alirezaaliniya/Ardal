@@ -551,7 +551,33 @@ class Ardal_Helpers {
 			'ajax_add'  => $product->supports( 'ajax_add_to_cart' ) && $product->is_purchasable() && $product->is_in_stock(),
 			'wc_sold'   => (int) $product->get_total_sales(),
 			'wc_stock'  => $product->managing_stock() ? (int) $product->get_stock_quantity() : 0,
+			// فیلدهای کارتِ سبک آرشیو؛ کارت اردال به آن‌ها کاری ندارد.
+			'image_id'   => (int) $product->get_image_id(),
+			'in_stock'   => $product->is_in_stock(),
+			'on_sale'    => $product->is_on_sale(),
+			'cat'        => self::first_term_name( $product->get_id() ),
+			'subtitle'   => class_exists( 'Ardal_Product' ) ? Ardal_Product::subtitle( $product ) : '',
+			'wc_classes' => implode( ' ', wc_get_product_class( '', $product ) ),
 		);
+	}
+
+	/**
+	 * نام اولین دستهٔ محصول — برای برچسب بالای عنوان کارت.
+	 *
+	 * @param int    $product_id
+	 * @param string $taxonomy
+	 * @return string
+	 */
+	public static function first_term_name( $product_id, $taxonomy = 'product_cat' ) {
+		$terms = get_the_terms( $product_id, $taxonomy );
+
+		if ( ! $terms || is_wp_error( $terms ) ) {
+			return '';
+		}
+
+		$first = reset( $terms );
+
+		return $first instanceof WP_Term ? $first->name : '';
 	}
 
 	/**
