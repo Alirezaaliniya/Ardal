@@ -1163,6 +1163,11 @@ body.ard-arch-sort .ard-sheet {
 	list-style: none;
 }
 
+/* همهٔ ردیف‌ها هم‌ارتفاع، نه فقط کارت‌های یک ردیف. */
+.ard-grid--even {
+	grid-auto-rows: 1fr;
+}
+
 .ard-grid::before,
 .ard-grid::after {
 	display: none;
@@ -1170,7 +1175,8 @@ body.ard-arch-sort .ard-sheet {
 
 /* کارت آرشیو داخل شبکهٔ ویجت «شبکه محصولات»: سلولِ شبکه یک div است، پس کارت
    باید خودش قد سلول را بگیرد تا کارت‌های یک ردیف هم‌ارتفاع بمانند. */
-.ard-pgrid__cell > .ard-acard {
+.ard-pgrid__cell > .ard-acard,
+.ard-grid > .ard-acard {
 	block-size: 100%;
 }
 
@@ -1382,10 +1388,15 @@ body.ard-arch-sort .ard-sheet {
 	color: var(--ard-primary);
 }
 
+/*
+ * عنوان همیشه به‌اندازهٔ سقفِ خطوطش جا می‌گیرد، حتی اگر یک خط باشد؛ وگرنه
+ * کارتِ با عنوان کوتاه، قیمت و دکمه‌اش بالاتر از بغل‌دستی‌اش می‌نشست.
+ */
 .ard-acard__name-fa {
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
+	-webkit-line-clamp: var(--ard-acard-lines, 2);
+	min-block-size: calc(var(--ard-acard-lines, 2) * 1.7em);
 	overflow: hidden;
 	overflow-wrap: anywhere;
 }

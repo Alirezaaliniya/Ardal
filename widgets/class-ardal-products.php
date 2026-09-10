@@ -525,8 +525,10 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'type'      => Controls_Manager::SLIDER,
 				'range'     => array( 'px' => array( 'min' => 1, 'max' => 4, 'step' => 1 ) ),
 				'default'   => array( 'size' => 2 ),
+				// همین عدد هم سقفِ خطوط را می‌سازد هم ارتفاعِ رزروشده را، تا
+				// عنوانِ یک‌خطی و دوخطی قیمت را جابه‌جا نکنند.
 				'selectors' => array(
-					'{{WRAPPER}} .ard-acard__name-fa' => '-webkit-line-clamp:{{SIZE}};',
+					'{{WRAPPER}} .ard-acard' => '--ard-acard-lines:{{SIZE}};',
 				),
 				'condition' => array( 'card_style' => 'archive' ),
 			)
@@ -639,6 +641,19 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'tablet_default' => 0,
 				'mobile_default' => 0,
 				'description'    => 'صفر یعنی همهٔ محصولات نمایش داده شوند. با عددی بزرگ‌تر از صفر، در همان اندازهٔ صفحه فقط «ردیف × ستون» کارتِ اول دیده می‌شود.',
+			)
+		);
+
+		$this->add_control(
+			'even_rows',
+			array(
+				'label'        => 'هم‌ارتفاع کردن کارت‌ها',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'description'  => 'همهٔ ردیف‌ها هم‌قد می‌شوند، پس کارتی که امتیاز یا قیمتِ قبل ندارد کوتاه‌تر از بغل‌دستی‌اش نمی‌افتد.',
 			)
 		);
 
@@ -1316,6 +1331,10 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		}
 
 		$classes = array( 'ard-pgrid' );
+
+		if ( 'yes' === $s['even_rows'] ) {
+			$classes[] = 'ard-pgrid--even';
+		}
 
 		if ( $acard ) {
 			// کلاس‌های .ard-grid همان مودیفایرهای کارت آرشیو را می‌آورند؛

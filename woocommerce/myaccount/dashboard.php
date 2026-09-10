@@ -49,6 +49,7 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 ?>
 <div class="ard-ac__stack">
 
+	<?php if ( Ardal_Account_Settings::section_on( 'welcome' ) ) : ?>
 	<div class="ard-ac__card ard-ac__welcome">
 		<div class="ard-ac__welcome-text">
 			<h2 class="ard-ac__welcome-title">سلام <?php echo esc_html( $ard_first ); ?>، خوش برگشتی</h2>
@@ -63,7 +64,9 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 			<?php endif; ?>
 		</div>
 	</div>
+	<?php endif; ?>
 
+	<?php if ( Ardal_Account_Settings::section_on( 'stats' ) ) : ?>
 	<div class="ard-ac__stats">
 		<?php foreach ( $ard_stats as $ard_stat ) : ?>
 			<div class="ard-ac__card ard-ac__stat">
@@ -81,8 +84,9 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 			</div>
 		<?php endforeach; ?>
 	</div>
+	<?php endif; ?>
 
-	<?php if ( $ard_unpaid ) : ?>
+	<?php if ( $ard_unpaid && Ardal_Account_Settings::section_on( 'alert' ) ) : ?>
 		<div class="ard-ac__alert">
 			<span class="ard-ac__alert-icon">
 				<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
@@ -110,7 +114,7 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 
 	<div class="ard-ac__cols">
 
-		<?php if ( $ard_active ) : ?>
+		<?php if ( $ard_active && Ardal_Account_Settings::section_on( 'track' ) ) : ?>
 			<?php
 			$ard_steps    = Ardal_Account::order_steps( $ard_active );
 			$ard_shipping = $ard_active->get_shipping_method();
@@ -181,6 +185,7 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 		<?php endif; ?>
 
 		<div class="ard-ac__stack">
+			<?php if ( Ardal_Account_Settings::section_on( 'chart' ) ) : ?>
 			<div class="ard-ac__card">
 				<div class="ard-ac__chead">
 					<h3 class="ard-ac__ctitle">خرید ۶ ماه گذشته</h3>
@@ -199,8 +204,9 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 					<?php endforeach; ?>
 				</div>
 			</div>
+			<?php endif; ?>
 
-			<?php if ( $ard_coupon ) : ?>
+			<?php if ( $ard_coupon && Ardal_Account_Settings::section_on( 'coupon' ) ) : ?>
 				<div class="ard-ac__card">
 					<h3 class="ard-ac__ctitle ard-ac__ctitle--mb">کد تخفیف اختصاصی</h3>
 					<div class="ard-ac__coupon">
@@ -223,7 +229,9 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 	</div>
 
 	<?php
-	$ard_suggest = Ardal_Account::suggestions( 4 );
+	$ard_suggest = Ardal_Account_Settings::section_on( 'suggest' )
+		? Ardal_Account::suggestions( max( 1, (int) Ardal_Account_Settings::get( 'suggest_count' ) ) )
+		: array();
 
 	if ( ! empty( $ard_suggest ) ) :
 		?>

@@ -439,3 +439,123 @@
 		position: static;
 	}
 }
+
+/* ============================================================
+   تب‌ها
+   ============================================================ */
+
+.ardal-tabs {
+	display: flex;
+	gap: 4px;
+	margin: 14px 0 18px;
+	border-bottom: 1px solid var(--a-border);
+}
+
+.ardal-tab {
+	position: relative;
+	padding: 10px 18px;
+	border: 0;
+	background: none;
+	color: var(--a-muted);
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.ardal-tab:hover {
+	color: var(--ard-primary, #0B62CE);
+}
+
+.ardal-tab.is-active {
+	color: var(--ard-primary-dark, #0B3C8C);
+}
+
+/* خط زیر تب فعال، دقیقاً روی خودِ خط پایینی نوار می‌نشیند. */
+.ardal-tab.is-active::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	bottom: -1px;
+	height: 2px;
+	background: var(--ard-accent, #7DC61E);
+}
+
+.ardal-panel[hidden] {
+	display: none;
+}
+
+/* تب پنل کاربری پیش‌نمایش کناری ندارد، پس تمام عرض را می‌گیرد. */
+.ardal-layout--wide {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+/* ============================================================
+   جدول منوی پنل
+   ============================================================ */
+
+.ardal-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.ardal-table th,
+.ardal-table td {
+	padding: 10px 8px;
+	border-bottom: 1px solid var(--a-border);
+	text-align: right;
+	vertical-align: middle;
+}
+
+.ardal-table th {
+	color: var(--a-muted);
+	font-size: 12.5px;
+	font-weight: 700;
+}
+
+.ardal-table tr:last-child td {
+	border-bottom: 0;
+}
+
+.ardal-table__on {
+	width: 62px;
+	text-align: center;
+}
+
+.ardal-table__ord {
+	width: 96px;
+}
+
+.ardal-table__ord input {
+	width: 80px;
+}
+
+.ardal-table td input[type="text"] {
+	width: min(320px, 100%);
+}
+
+.ardal-slug {
+	margin-inline-start: 8px;
+	color: var(--a-muted);
+	font-size: 11.5px;
+	background: #f0f0f1;
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.ardal-check--bare {
+	display: inline-flex;
+	margin: 0;
+}
+
+.ardal-sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}

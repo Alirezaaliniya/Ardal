@@ -245,36 +245,37 @@ class Ardal_Account {
 	public static function menu_items( $items ) {
 		unset( $items['customer-logout'] );
 
-		$items['wishlist'] = 'علاقه‌مندی‌ها';
-		$items['reviews']  = 'نظرات من';
-
-		if ( isset( $items['edit-address'] ) ) {
-			$items['edit-address'] = 'آدرس‌های من';
-		}
-
-		if ( isset( $items['edit-account'] ) ) {
-			$items['edit-account'] = 'اطلاعات حساب';
-		}
-
-		if ( isset( $items['orders'] ) ) {
-			$items['orders'] = 'سفارش‌های من';
-		}
-
-		$order  = array( 'dashboard', 'orders', 'wishlist', 'edit-address', 'edit-account', 'reviews' );
+		/*
+		 * فهرست، ترتیب و عنوان‌ها از «تنظیمات اردال ← پنل کاربری» می‌آید. آیتم
+		 * خاموش حذف می‌شود و آیتمی که ووکامرس اصلاً نساخته (مثلاً دانلودها وقتی
+		 * محصول دانلودی نیست) هم اضافه نمی‌شود.
+		 */
+		$wanted = Ardal_Account_Settings::menu();
+		$known  = array_keys( Ardal_Account_Settings::menu_defaults() );
 		$sorted = array();
 
-		foreach ( $order as $key ) {
-			if ( isset( $items[ $key ] ) ) {
-				$sorted[ $key ] = $items[ $key ];
-				unset( $items[ $key ] );
+		foreach ( $wanted as $slug => $label ) {
+			// اندپوینت‌های خود اردال را ووکامرس در $items ندارد.
+			$ours = array_key_exists( $slug, self::endpoints() );
+
+			if ( $ours || isset( $items[ $slug ] ) ) {
+				$sorted[ $slug ] = $label;
 			}
+
+			unset( $items[ $slug ] );
 		}
 
+		// آیتم‌هایی که ادمین خاموششان کرده نباید از بقیهٔ فهرست برگردند.
+		foreach ( $known as $slug ) {
+			unset( $items[ $slug ] );
+		}
+
+		// هر آیتمی که افزونهٔ دیگری اضافه کرده، دست‌نخورده ته فهرست می‌ماند.
 		return array_merge( $sorted, $items );
 	}
 
 	public static function wishlist_title() {
-		return 'علاقه‌مندی‌ها';
+		return Ardal_Account_Settings::get( 'wishlist_title' );
 	}
 
 	public static function reviews_title() {

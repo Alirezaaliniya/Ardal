@@ -1,6 +1,58 @@
 /**
  * Ardal — صفحه تنظیمات: انتخابگر رنگ، پالت‌های آماده و پیش‌نمایش زنده.
  */
+/**
+ * Ardal — تب‌های صفحه تنظیمات.
+ *
+ * هر دو تب داخل یک فرم‌اند و با یک «ذخیره تغییرات» ثبت می‌شوند؛ اینجا فقط
+ * نمایش عوض می‌شود. تب انتخاب‌شده در آدرس (#hash) می‌ماند تا بعد از ذخیره،
+ * وردپرس که به همین صفحه برمی‌گردد، کاربر را سر جای قبلی بگذارد.
+ */
+( function () {
+	'use strict';
+
+	var tabs = document.querySelectorAll( '[data-ardal-tab]' );
+
+	if ( ! tabs.length ) {
+		return;
+	}
+
+	function show( name ) {
+		Array.prototype.forEach.call( tabs, function ( tab ) {
+			var mine = tab.getAttribute( 'data-ardal-tab' ) === name;
+
+			tab.classList.toggle( 'is-active', mine );
+			tab.setAttribute( 'aria-selected', mine ? 'true' : 'false' );
+		} );
+
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '[data-ardal-panel]' ),
+			function ( panel ) {
+				panel.hidden = panel.getAttribute( 'data-ardal-panel' ) !== name;
+			}
+		);
+	}
+
+	Array.prototype.forEach.call( tabs, function ( tab ) {
+		tab.addEventListener( 'click', function () {
+			var name = tab.getAttribute( 'data-ardal-tab' );
+
+			show( name );
+
+			// بدون پرش صفحه: hash را دستی می‌نویسیم نه با تغییر location.
+			if ( window.history && window.history.replaceState ) {
+				window.history.replaceState( null, '', '#' + name );
+			}
+		} );
+	} );
+
+	var start = ( window.location.hash || '' ).replace( '#', '' );
+
+	if ( start && document.querySelector( '[data-ardal-panel="' + start + '"]' ) ) {
+		show( start );
+	}
+}() );
+
 ( function ( $ ) {
 	'use strict';
 

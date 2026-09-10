@@ -20,14 +20,14 @@ foreach ( $ard_products as $ard_product ) {
 
 	<div class="ard-ac__card ard-ac__chead ard-ac__chead--card">
 		<div>
-			<h2 class="ard-ac__ptitle">علاقه‌مندی‌ها</h2>
+			<h2 class="ard-ac__ptitle"><?php echo esc_html( Ardal_Account_Settings::get( 'wishlist_title' ) ); ?></h2>
 			<p class="ard-ac__csub">
 				<?php echo esc_html( Ardal_Helpers::fa_digits( count( $ard_products ) ) ); ?> کالا ·
 				<?php echo esc_html( Ardal_Helpers::fa_digits( $ard_stock ) ); ?> کالا موجود است
 			</p>
 		</div>
 
-		<?php if ( $ard_stock > 0 ) : ?>
+		<?php if ( $ard_stock > 0 && '1' === Ardal_Account_Settings::get( 'wishlist_add_all' ) ) : ?>
 			<button type="button" class="ard-ac__btn ard-ac__btn--accent" data-ard-ac-add-all>افزودن همه به سبد</button>
 		<?php endif; ?>
 	</div>
@@ -35,12 +35,15 @@ foreach ( $ard_products as $ard_product ) {
 	<?php if ( empty( $ard_products ) ) : ?>
 		<div class="ard-ac__card ard-ac__empty">
 			<span class="ard-ac__empty-icon"><?php echo Ardal_Account::icon( 'fav', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<h3 class="ard-ac__ctitle">هنوز کالایی ذخیره نکرده‌ای</h3>
-			<p class="ard-ac__csub">با زدن آیکون قلب روی هر محصول، آن را اینجا نگه دار تا بعداً سراغش بیایی.</p>
-			<a class="ard-ac__btn ard-ac__btn--primary" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>">دیدن محصول‌ها</a>
+			<h3 class="ard-ac__ctitle"><?php echo esc_html( Ardal_Account_Settings::get( 'wishlist_empty_title' ) ); ?></h3>
+			<p class="ard-ac__csub"><?php echo esc_html( Ardal_Account_Settings::get( 'wishlist_empty_text' ) ); ?></p>
+			<?php $ard_empty_btn = Ardal_Account_Settings::get( 'wishlist_empty_btn' ); ?>
+			<?php if ( '' !== $ard_empty_btn ) : ?>
+				<a class="ard-ac__btn ard-ac__btn--primary" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>"><?php echo esc_html( $ard_empty_btn ); ?></a>
+			<?php endif; ?>
 		</div>
 	<?php else : ?>
-		<div class="ard-ac__grid ard-ac__grid--4">
+		<div class="ard-ac__grid ard-ac__grid--cols" style="--ard-ac-cols:<?php echo (int) Ardal_Account_Settings::get( 'wishlist_columns' ); ?>">
 			<?php foreach ( $ard_products as $ard_product ) : ?>
 				<?php
 				$ard_id     = $ard_product->get_id();

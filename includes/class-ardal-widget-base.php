@@ -478,12 +478,20 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			}
 		}
 
-		if ( $opts['show_rating'] && $rating > 0 ) {
+		/*
+		 * سطر امتیاز حتی بدون امتیاز هم چاپ می‌شود (خالی) تا جایش رزرو بماند؛
+		 * وگرنه در کارتی که امتیاز ندارد، عنوان و قیمت بالا می‌پرند و کارت‌های
+		 * یک ردیف ناهم‌تراز می‌شوند. ارتفاعِ رزرو در CSS است.
+		 */
+		if ( $opts['show_rating'] ) {
 			echo '<div class="ard-pcard__rate">';
-			echo Ardal_Helpers::stars( $rating ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-			if ( $count > 0 ) {
-				printf( '<span>(%s)</span>', esc_html( Ardal_Helpers::fa_digits( $count ) ) );
+			if ( $rating > 0 ) {
+				echo Ardal_Helpers::stars( $rating ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+				if ( $count > 0 ) {
+					printf( '<span>(%s)</span>', esc_html( Ardal_Helpers::fa_digits( $count ) ) );
+				}
 			}
 
 			echo '</div>';
@@ -493,6 +501,9 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 
 		if ( '' !== $old ) {
 			printf( '<del class="ard-pcard__old">%s</del>', esc_html( $old ) );
+		} elseif ( '' !== $price ) {
+			// همان کار: یک سطرِ نامرئی به‌جای قیمتِ قبل، تا خطِ قیمت هم‌تراز بماند.
+			echo '<del class="ard-pcard__old ard-pcard__old--empty" aria-hidden="true">&nbsp;</del>';
 		}
 
 		if ( '' !== $price ) {
@@ -707,7 +718,12 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		$show_rating = $opts['show_rating'] && ( $rating > 0 || ! $opts['hide_empty_rating'] );
 		$cat         = ( $opts['show_cat'] && ! empty( $item['cat'] ) ) ? (string) $item['cat'] : '';
 
-		if ( $show_rating || '' !== $cat ) {
+		/*
+		 * تا وقتی یکی از این دو روشن است، سطرِ متا چاپ می‌شود — حتی خالی — تا
+		 * جایش رزرو بماند و کارتِ بدون امتیاز، عنوان و قیمتش بالا نپرد.
+		 * ارتفاعِ رزرو (min-height) در CSS است.
+		 */
+		if ( $opts['show_rating'] || $opts['show_cat'] ) {
 			echo '<div class="ard-acard__meta">';
 
 			if ( '' !== $cat ) {

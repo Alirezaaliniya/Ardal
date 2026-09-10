@@ -55,6 +55,17 @@ class Ardal_Settings {
 				'default'           => Ardal_Palette::defaults(),
 			)
 		);
+
+		// همان گروه، تا هر دو تب با یک «ذخیره تغییرات» ثبت شوند.
+		register_setting(
+			self::GROUP,
+			Ardal_Account_Settings::OPTION,
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( 'Ardal_Account_Settings', 'sanitize' ),
+				'default'           => Ardal_Account_Settings::defaults(),
+			)
+		);
 	}
 
 	/**
@@ -191,15 +202,26 @@ class Ardal_Settings {
 		<div class="wrap ardal-wrap" dir="rtl">
 			<h1 class="ardal-title">
 				<span class="ardal-title__mark"></span>
-				تنظیمات پالت رنگی اردال
+				تنظیمات اردال
 			</h1>
-			<p class="ardal-lede">
-				رنگ‌های زیر روی همه ویجت‌های اردال در المنتور اعمال می‌شوند. مقادیر پیش‌فرض دقیقاً همان پالت
-				دیزاین «فروشگاه ورزشی» است؛ با تغییر هر رنگ، پیش‌نمایش کنار صفحه بلافاصله به‌روز می‌شود.
-			</p>
+
+			<nav class="ardal-tabs" role="tablist">
+				<button type="button" class="ardal-tab is-active" data-ardal-tab="palette" role="tab" aria-selected="true">پالت و ظاهر</button>
+				<button type="button" class="ardal-tab" data-ardal-tab="account" role="tab" aria-selected="false">پنل کاربری</button>
+			</nav>
 
 			<form method="post" action="options.php" id="ardal-form">
 				<?php settings_fields( self::GROUP ); ?>
+
+				<div class="ardal-panel" data-ardal-panel="account" hidden>
+					<?php $this->render_account_tab(); ?>
+				</div>
+
+				<div class="ardal-panel" data-ardal-panel="palette">
+				<p class="ardal-lede">
+					رنگ‌های زیر روی همه ویجت‌های اردال در المنتور اعمال می‌شوند. مقادیر پیش‌فرض دقیقاً همان پالت
+					دیزاین «فروشگاه ورزشی» است؛ با تغییر هر رنگ، پیش‌نمایش کنار صفحه بلافاصله به‌روز می‌شود.
+				</p>
 
 				<div class="ardal-layout">
 					<div class="ardal-main">
@@ -355,7 +377,163 @@ class Ardal_Settings {
 						</div>
 					</aside>
 				</div>
+				</div>
 			</form>
+		</div>
+		<?php
+	}
+
+	/**
+	 * تب «پنل کاربری»: منوی پنل، بخش‌های پیشخوان و علاقه‌مندی‌ها.
+	 */
+	private function render_account_tab() {
+		$opt      = Ardal_Account_Settings::OPTION;
+		$values   = Ardal_Account_Settings::get_all();
+		$menu     = Ardal_Account_Settings::menu_defaults();
+		$sections = Ardal_Account_Settings::dashboard_sections();
+		$schema   = Ardal_Account_Settings::schema();
+		$name     = static function ( $key ) use ( $opt ) {
+			return $opt . '[' . $key . ']';
+		};
+		?>
+		<p class="ardal-lede">
+			صفحه‌های پنل کاربری، ترتیب و نامشان، و بخش‌های صفحهٔ پیشخوان از همین‌جا کنترل می‌شوند.
+			این تنظیمات روی تمپلیت‌های خود اردال اثر می‌گذارند؛ اگر قالب سایت همان فایل را داشته باشد،
+			اولویت با قالب است.
+		</p>
+
+		<div class="ardal-layout ardal-layout--wide">
+			<div class="ardal-main">
+
+				<div class="ardal-card">
+					<h2>منوی پنل کاربری</h2>
+					<p class="ardal-hint">
+						تیک هر ردیف یعنی آن صفحه در منو باشد. «ترتیب» عدد است — کوچک‌تر بالاتر.
+						صفحه‌ای که ووکامرس نساخته باشد (مثلاً دانلودها بدون محصول دانلودی) حتی با تیک هم نمایش داده نمی‌شود.
+					</p>
+
+					<table class="ardal-table">
+						<thead>
+							<tr>
+								<th class="ardal-table__on">نمایش</th>
+								<th>عنوان در منو</th>
+								<th class="ardal-table__ord">ترتیب</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php foreach ( $menu as $slug => $item ) : ?>
+								<tr>
+									<td class="ardal-table__on">
+										<label class="ardal-check ardal-check--bare">
+											<input
+												type="checkbox"
+												name="<?php echo esc_attr( $name( 'menu_' . $slug ) ); ?>"
+												value="1"
+												<?php checked( '1', $values[ 'menu_' . $slug ] ); ?>
+											/>
+											<span class="ardal-sr"><?php echo esc_html( $item['label'] ); ?></span>
+										</label>
+									</td>
+									<td>
+										<input
+											type="text"
+											class="regular-text"
+											name="<?php echo esc_attr( $name( 'menu_' . $slug . '_label' ) ); ?>"
+											value="<?php echo esc_attr( $values[ 'menu_' . $slug . '_label' ] ); ?>"
+											placeholder="<?php echo esc_attr( $item['label'] ); ?>"
+										/>
+										<code class="ardal-slug"><?php echo esc_html( $slug ); ?></code>
+									</td>
+									<td class="ardal-table__ord">
+										<input
+											type="number"
+											min="0"
+											name="<?php echo esc_attr( $name( 'menu_' . $slug . '_order' ) ); ?>"
+											value="<?php echo esc_attr( $values[ 'menu_' . $slug . '_order' ] ); ?>"
+										/>
+									</td>
+								</tr>
+							<?php endforeach; ?>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="ardal-card">
+					<h2>بخش‌های صفحه پیشخوان</h2>
+					<p class="ardal-hint">هر بخشی که خاموش شود، اصلاً رندر نمی‌شود (نه اینکه پنهان شود).</p>
+
+					<div class="ardal-fields ardal-fields--stack">
+						<?php foreach ( $sections as $key => $section ) : ?>
+							<div class="ardal-field ardal-field--checkbox">
+								<label for="ardal-dash-<?php echo esc_attr( $key ); ?>" class="ardal-check">
+									<input
+										type="checkbox"
+										id="ardal-dash-<?php echo esc_attr( $key ); ?>"
+										name="<?php echo esc_attr( $name( 'dash_' . $key ) ); ?>"
+										value="1"
+										<?php checked( '1', $values[ 'dash_' . $key ] ); ?>
+									/>
+									<span>
+										<span class="ardal-field__label"><?php echo esc_html( $section['label'] ); ?></span>
+										<span class="ardal-field__desc"><?php echo esc_html( $section['desc'] ); ?></span>
+									</span>
+								</label>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				</div>
+
+				<?php foreach ( Ardal_Account_Settings::groups() as $group_key => $group_label ) : ?>
+					<div class="ardal-card">
+						<h2><?php echo esc_html( $group_label ); ?></h2>
+						<div class="ardal-fields ardal-fields--stack">
+							<?php
+							foreach ( $schema as $key => $field ) :
+								if ( $group_key !== $field['group'] ) {
+									continue;
+								}
+
+								$id = 'ardal-ac-' . $key;
+								?>
+								<div class="ardal-field ardal-field--<?php echo esc_attr( $field['type'] ); ?>">
+									<?php if ( 'checkbox' === $field['type'] ) : ?>
+										<label for="<?php echo esc_attr( $id ); ?>" class="ardal-check">
+											<input
+												type="checkbox"
+												id="<?php echo esc_attr( $id ); ?>"
+												name="<?php echo esc_attr( $name( $key ) ); ?>"
+												value="1"
+												<?php checked( '1', $values[ $key ] ); ?>
+											/>
+											<span>
+												<span class="ardal-field__label"><?php echo esc_html( $field['label'] ); ?></span>
+												<span class="ardal-field__desc"><?php echo esc_html( $field['desc'] ); ?></span>
+											</span>
+										</label>
+									<?php else : ?>
+										<label for="<?php echo esc_attr( $id ); ?>">
+											<span class="ardal-field__label"><?php echo esc_html( $field['label'] ); ?></span>
+											<?php if ( '' !== $field['desc'] ) : ?>
+												<span class="ardal-field__desc"><?php echo esc_html( $field['desc'] ); ?></span>
+											<?php endif; ?>
+										</label>
+										<input
+											type="<?php echo esc_attr( $field['type'] ); ?>"
+											id="<?php echo esc_attr( $id ); ?>"
+											name="<?php echo esc_attr( $name( $key ) ); ?>"
+											value="<?php echo esc_attr( $values[ $key ] ); ?>"
+											class="regular-text"
+											<?php echo 'number' === $field['type'] ? 'min="1"' : ''; ?>
+										/>
+									<?php endif; ?>
+								</div>
+							<?php endforeach; ?>
+						</div>
+					</div>
+				<?php endforeach; ?>
+
+				<?php submit_button( 'ذخیره تغییرات' ); ?>
+			</div>
 		</div>
 		<?php
 	}
