@@ -415,6 +415,44 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		);
 
 		$this->add_control(
+			'ajax',
+			array(
+				'label'        => 'بارگذاری بدون رفرش صفحه (ایجکس)',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'description'  => 'فیلتر، مرتب‌سازی و صفحه‌بندی بدون بارگذاری دوبارهٔ صفحه اعمال می‌شوند. آدرس صفحه باز هم عوض می‌شود، پس دکمهٔ بازگشت مرورگر و اشتراک‌گذاری لینک سر جایشان‌اند.',
+				'separator'    => 'before',
+			)
+		);
+
+		$this->add_control(
+			'ajax_regions',
+			array(
+				'label'       => 'سلکتور ناحیه‌های اضافه',
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '.elementor-widget-loop-grid',
+				'label_block' => true,
+				'description' => 'ناحیه‌هایی بیرون از ویجت‌های اردال که باید تازه شوند؛ مثلاً «لوپ گرید» المنتور. با ویرگول جدا کنید.',
+				'condition'   => array( 'ajax' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'ajax_scroll',
+			array(
+				'label'        => 'اسکرول به بالای نتایج',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'بعد از هر بارگذاری، اگر فهرست بالاتر از دید کاربر باشد صفحه به ابتدای آن می‌رود.',
+				'condition'    => array( 'ajax' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
 			'auto_submit',
 			array(
 				'label'        => 'اعمال خودکار با هر تغییر',
@@ -579,9 +617,10 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		}
 
 		printf(
-			'<div class="%s" id="ard-filters" data-ard-filters%s>',
+			'<div class="%s" id="ard-filters" data-ard-filters%s%s>',
 			esc_attr( implode( ' ', $classes ) ),
-			'yes' === $s['auto_submit'] ? ' data-ard-auto="1"' : ''
+			'yes' === $s['auto_submit'] ? ' data-ard-auto="1"' : '',
+			$this->ajax_attrs( $s ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- در همان تابع escape شده.
 		);
 
 		echo '<div class="ard-fil__inner">';
@@ -602,7 +641,7 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		echo '</div>';
 
 		printf(
-			'<form class="ard-fil__form" method="get" action="%s" data-ard-fil-form>',
+			'<form class="ard-fil__form" method="get" action="%s" data-ard-fil-form data-ard-region="filters">',
 			esc_url( Ardal_Archive::base_url() )
 		);
 

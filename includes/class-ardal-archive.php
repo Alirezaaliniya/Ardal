@@ -35,6 +35,12 @@ class Ardal_Archive {
 	const RESERVED = array( 's', 'stock', 'sale', 'featured', 'rating', 'sort', 'view' );
 
 	/**
+	 * شناسه‌ای که در فیلد «Query ID» ویجت‌های المنتور نوشته می‌شود تا کوئری
+	 * اختصاصی آن ویجت هم فیلترهای این افزونه را بگیرد.
+	 */
+	const QUERY_ID = 'ardal_filters';
+
+	/**
 	 * نگاشت «کلید آدرس → نام تاکسونومی»؛ یک‌بار ساخته می‌شود.
 	 *
 	 * @var array|null
@@ -48,6 +54,15 @@ class Ardal_Archive {
 		// اولویت ۲۰: ووکامرس روی ۱۰ کوئری محصول را می‌سازد، پس شرط‌های ما باید
 		// روی همان چیزی که ساخته اضافه شود، نه پیش از آن.
 		add_action( 'pre_get_posts', array( __CLASS__, 'filter_query' ), 20 );
+
+		/*
+		 * ویجت‌های کوئری‌دار المنتور (لوپ گرید، لوپ کاروسل، آرشیو پست‌ها) کوئری
+		 * خودشان را می‌سازند نه کوئری اصلی را. اگر منبعشان «Current Query» باشد
+		 * خود المنتور query_vars کوئری اصلی — که همین‌جا فیلتر شده — را کپی
+		 * می‌کند و کاری لازم نیست؛ برای کوئری دلخواه، کافی است ادمین در فیلد
+		 * «Query ID» همین شناسه را بنویسد.
+		 */
+		add_action( 'elementor/query/' . self::QUERY_ID, array( __CLASS__, 'filter_elementor_query' ), 10, 2 );
 
 		foreach ( array( 'woocommerce_update_product', 'woocommerce_new_product', 'save_post_product', 'deleted_post' ) as $hook ) {
 			add_action( $hook, array( __CLASS__, 'flush' ) );
@@ -505,6 +520,41 @@ class Ardal_Archive {
 			$q->set( 'posts_per_page', $per_page );
 		}
 
+		self::apply_to_query( $q );
+	}
+
+	/**
+	 * همان فیلترها، روی کوئری اختصاصی یک ویجت المنتور.
+	 *
+	 * تعداد در هر صفحه اینجا دست نمی‌خورد؛ آن را خود ویجت تعیین می‌کند.
+	 *
+	 * @param WP_Query $q
+	 * @param mixed    $widget ویجت المنتور؛ اینجا لازم نیست ولی امضای هوک آن را می‌فرستد.
+	 */
+	public static function filter_elementor_query( $q, $widget = null ) {
+		if ( is_admin() || ! $q instanceof WP_Query ) {
+			return;
+		}
+
+		self::apply_to_query( $q );
+	}
+
+	/**
+	 * ساخت و نشاندن شرط‌های فیلتر روی یک کوئری.
+	 *
+	 * عمومی است تا ویجت‌هایی که کوئری خودشان را می‌سازند هم بتوانند همان
+	 * فیلترهای آدرس را رویش بنشانند. الگوی درست این است:
+	 *
+	 *     $q = new WP_Query();
+	 *     $q->parse_query( $args );
+	 *     Ardal_Archive::apply_to_query( $q );
+	 *     $q->get_posts();
+	 *
+	 * یعنی پیش از اجرای کوئری، نه بعدش.
+	 *
+	 * @param WP_Query $q
+	 */
+	public static function apply_to_query( $q ) {
 		$tax_query = (array) $q->get( 'tax_query' );
 
 		// کوئری خالی گاهی رشته است؛ عضو غیرآرایه‌ای در tax_query چیزی جز شلوغی نیست.

@@ -197,30 +197,65 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 	/**
 	 * کنترل‌های منبع داده محصول (دستی یا ووکامرس).
 	 *
-	 * @param int $default_limit
+	 * @param int  $default_limit
+	 * @param bool $with_archive آیا گزینهٔ «کوئری آرشیو جاری» و سازگاری با
+	 *                           فیلترهای اردال هم اضافه شود.
 	 */
-	protected function add_source_controls( $default_limit = 5 ) {
+	protected function add_source_controls( $default_limit = 5, $with_archive = false ) {
+		$options = array( 'manual' => 'دستی (وارد کردن در لیست زیر)' );
+
+		if ( Ardal_Helpers::has_woo() ) {
+			if ( $with_archive ) {
+				$options['archive'] = 'کوئری آرشیو جاری (با فیلترهای اردال)';
+			}
+
+			$options['recent']   = 'ووکامرس — جدیدترین';
+			$options['best']     = 'ووکامرس — پرفروش‌ترین';
+			$options['sale']     = 'ووکامرس — تخفیف‌دار';
+			$options['featured'] = 'ووکامرس — ویژه';
+			$options['rating']   = 'ووکامرس — پرامتیازترین';
+		} else {
+			$options['manual'] = 'دستی (ووکامرس فعال نیست)';
+		}
+
 		$this->add_control(
 			'source',
 			array(
-				'label'   => 'منبع محصولات',
-				'type'    => Controls_Manager::SELECT,
-				'default' => 'manual',
-				'options' => Ardal_Helpers::has_woo()
-					? array(
-						'manual'   => 'دستی (وارد کردن در لیست زیر)',
-						'recent'   => 'ووکامرس — جدیدترین',
-						'best'     => 'ووکامرس — پرفروش‌ترین',
-						'sale'     => 'ووکامرس — تخفیف‌دار',
-						'featured' => 'ووکامرس — ویژه',
-						'rating'   => 'ووکامرس — پرامتیازترین',
-					)
-					: array( 'manual' => 'دستی (ووکامرس فعال نیست)' ),
+				'label'       => 'منبع محصولات',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'manual',
+				'options'     => $options,
+				'label_block' => true,
 			)
 		);
 
 		if ( ! Ardal_Helpers::has_woo() ) {
 			return;
+		}
+
+		if ( $with_archive ) {
+			$this->add_control(
+				'archive_note',
+				array(
+					'type'            => Controls_Manager::RAW_HTML,
+					'raw'             => 'در این حالت، محصولات از همان کوئری صفحهٔ فروشگاه/دسته خوانده می‌شوند؛ یعنی فیلترها، جست‌وجو و مرتب‌سازی ویجت‌های آرشیو روی این شبکه هم اثر می‌گذارند.',
+					'content_classes' => 'elementor-descriptor',
+					'condition'       => array( 'source' => 'archive' ),
+				)
+			);
+
+			$this->add_control(
+				'archive_limit',
+				array(
+					'label'       => 'تعداد کل محصولات',
+					'type'        => Controls_Manager::NUMBER,
+					'min'         => 0,
+					'max'         => 96,
+					'default'     => 0,
+					'description' => 'صفر یعنی هرچه در صفحهٔ جاری آرشیو هست.',
+					'condition'   => array( 'source' => 'archive' ),
+				)
+			);
 		}
 
 		$this->add_control(
@@ -232,19 +267,69 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'options'     => Ardal_Helpers::product_category_options(),
 				'default'     => array(),
 				'label_block' => true,
-				'condition'   => array( 'source!' => 'manual' ),
+				'condition'   => array( 'source!' => array( 'manual', 'archive' ) ),
 			)
 		);
 
 		$this->add_control(
 			'wc_limit',
 			array(
-				'label'     => 'تعداد محصولات',
+				'label'     => 'تعداد کل محصولات',
 				'type'      => Controls_Manager::NUMBER,
 				'min'       => 1,
-				'max'       => 24,
+				'max'       => 48,
 				'default'   => $default_limit,
-				'condition' => array( 'source!' => 'manual' ),
+				'condition' => array( 'source!' => array( 'manual', 'archive' ) ),
+			)
+		);
+
+		if ( ! $with_archive ) {
+			return;
+		}
+
+		$this->add_control(
+			'respect_filters',
+			array(
+				'label'        => 'اعمال فیلترهای اردال روی همین کوئری',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'description'  => 'کوئری خودِ ویجت دست‌نخورده می‌ماند، فقط فیلترهای فعالِ آدرس رویش اعمال می‌شوند.',
+				'condition'    => array( 'source!' => array( 'manual', 'archive' ) ),
+			)
+		);
+	}
+
+	/**
+	 * محصولات صفحهٔ آرشیو جاری.
+	 *
+	 * روی خودِ آرشیو، کوئری اصلی خوانده می‌شود (پس صفحه‌بندی و فیلترها همان‌اند)؛
+	 * بیرون از آرشیو — مثلاً پیش‌نمایش ویرایشگر — یک کوئری نمونه با همان فیلترها.
+	 *
+	 * @param array $settings
+	 * @return array
+	 */
+	protected function get_archive_items( $settings ) {
+		$limit = isset( $settings['archive_limit'] ) ? (int) $settings['archive_limit'] : 0;
+		$main  = isset( $GLOBALS['wp_query'] ) ? $GLOBALS['wp_query'] : null;
+
+		if ( $main instanceof WP_Query && $main->posts ) {
+			$is_archive = $main->is_post_type_archive( 'product' )
+				|| $main->is_tax( get_object_taxonomies( 'product' ) )
+				|| 'product_query' === $main->get( 'wc_query' );
+
+			if ( $is_archive ) {
+				return Ardal_Helpers::cards_from_posts( $main->posts, $limit );
+			}
+		}
+
+		return Ardal_Helpers::query_products_filtered(
+			array(
+				'source'  => 'recent',
+				'limit'   => $limit > 0 ? $limit : 12,
+				'filters' => true,
 			)
 		);
 	}
@@ -265,12 +350,30 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				: array();
 		}
 
+		if ( 'archive' === $source ) {
+			return $this->get_archive_items( $settings );
+		}
+
 		$categories = isset( $settings['wc_category'] ) ? (array) $settings['wc_category'] : array();
+		$limit      = isset( $settings['wc_limit'] ) ? (int) $settings['wc_limit'] : 5;
+
+		// مسیر فیلتردار WP_Query است، چون wc_get_products شرط‌های دلخواه tax را
+		// نمی‌پذیرد. تا وقتی فیلتری خواسته نشده، همان مسیر سبک قبلی می‌ماند.
+		if ( 'yes' === ( $settings['respect_filters'] ?? '' ) ) {
+			return Ardal_Helpers::query_products_filtered(
+				array(
+					'source'   => $source,
+					'limit'    => $limit,
+					'category' => implode( ',', $categories ),
+					'filters'  => true,
+				)
+			);
+		}
 
 		return Ardal_Helpers::query_products(
 			array(
 				'source'   => $source,
-				'limit'    => isset( $settings['wc_limit'] ) ? (int) $settings['wc_limit'] : 5,
+				'limit'    => $limit,
 				'category' => implode( ',', $categories ),
 			)
 		);

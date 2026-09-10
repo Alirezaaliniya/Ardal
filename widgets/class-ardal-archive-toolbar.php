@@ -190,6 +190,43 @@ class Ardal_Widget_Archive_Toolbar extends Ardal_Archive_Widget_Base {
 		);
 
 		$this->add_control(
+			'ajax',
+			array(
+				'label'        => 'بارگذاری بدون رفرش صفحه (ایجکس)',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'description'  => 'مرتب‌سازی و صفحه‌بندی بدون بارگذاری دوبارهٔ صفحه اعمال می‌شوند.',
+				'separator'    => 'before',
+			)
+		);
+
+		$this->add_control(
+			'ajax_regions',
+			array(
+				'label'       => 'سلکتور ناحیه‌های اضافه',
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '.elementor-widget-loop-grid',
+				'label_block' => true,
+				'description' => 'ناحیه‌هایی بیرون از ویجت‌های اردال که باید تازه شوند؛ مثلاً «لوپ گرید» المنتور. با ویرگول جدا کنید.',
+				'condition'   => array( 'ajax' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'ajax_scroll',
+			array(
+				'label'        => 'اسکرول به بالای نتایج',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'ajax' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
 			'mobile_count',
 			array(
 				'label'        => 'نمایش شمارش در موبایل',
@@ -322,7 +359,11 @@ class Ardal_Widget_Archive_Toolbar extends Ardal_Archive_Widget_Base {
 			$classes[] = 'ard-tool--hide-count-m';
 		}
 
-		printf( '<div class="%s">', esc_attr( implode( ' ', $classes ) ) );
+		printf(
+			'<div class="%s" data-ard-region="toolbar"%s>',
+			esc_attr( implode( ' ', $classes ) ),
+			$this->ajax_attrs( $s ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- در همان تابع escape شده.
+		);
 
 		$this->render_mobile_bar( $s, $active );
 
@@ -458,7 +499,7 @@ class Ardal_Widget_Archive_Toolbar extends Ardal_Archive_Widget_Base {
 	 * @param array $sorts
 	 */
 	protected function render_sheet( $s, $sorts ) {
-		echo '<div class="ard-sheet" id="ard-sort" data-ard-sheet>';
+		echo '<div class="ard-sheet" id="ard-sort" data-ard-sheet data-ard-region="sheet">';
 		echo '<span class="ard-sheet__grip" aria-hidden="true"></span>';
 		printf( '<span class="ard-sheet__title">%s</span>', esc_html( $s['sheet_title'] ) );
 		echo '<ul class="ard-sheet__list">';

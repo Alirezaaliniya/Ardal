@@ -401,6 +401,122 @@ class Ardal_Helpers {
 	}
 
 	/**
+	 * همان واکشی محصولات، ولی با WP_Query تا فیلترهای آدرس (اردال) هم رویش بنشیند.
+	 *
+	 * wc_get_products آرگومان‌های خودش را دارد و tax_query دلخواه را قبول نمی‌کند،
+	 * برای همین اینجا مسیر WP_Query انتخاب شده تا Ardal_Archive بتواند دقیقاً
+	 * همان شرط‌هایی را بگذارد که روی آرشیو می‌گذارد.
+	 *
+	 * @param array $args source، limit، category (اسلاگ‌ها با کاما)، filters.
+	 * @return array آرایهٔ کارت‌ها.
+	 */
+	public static function query_products_filtered( $args ) {
+		if ( ! self::has_woo() ) {
+			return array();
+		}
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'source'   => 'recent',
+				'limit'    => 12,
+				'category' => '',
+				'filters'  => true,
+			)
+		);
+
+		$query = array(
+			'post_type'      => 'product',
+			'post_status'    => 'publish',
+			'posts_per_page' => max( 1, (int) $args['limit'] ),
+			'no_found_rows'  => true,
+			'tax_query'      => array(),
+		);
+
+		$categories = array_filter( array_map( 'trim', explode( ',', (string) $args['category'] ) ) );
+
+		if ( $categories ) {
+			$query['tax_query'][] = array(
+				'taxonomy' => 'product_cat',
+				'field'    => 'slug',
+				'terms'    => $categories,
+			);
+		}
+
+		switch ( $args['source'] ) {
+			case 'best':
+				$query['meta_key'] = 'total_sales'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				$query['orderby']  = 'meta_value_num';
+				$query['order']    = 'DESC';
+				break;
+
+			case 'sale':
+				$ids              = wc_get_product_ids_on_sale();
+				$query['post__in'] = $ids ? $ids : array( 0 );
+				break;
+
+			case 'featured':
+				$query['tax_query'][] = array(
+					'taxonomy' => 'product_visibility',
+					'field'    => 'name',
+					'terms'    => 'featured',
+				);
+				break;
+
+			case 'rating':
+				$query['meta_key'] = '_wc_average_rating'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				$query['orderby']  = 'meta_value_num';
+				$query['order']    = 'DESC';
+				break;
+
+			default:
+				$query['orderby'] = 'date';
+				$query['order']   = 'DESC';
+		}
+
+		// parse_query کوئری را نمی‌زند؛ پس هنوز جا هست که فیلترها بنشینند.
+		$wp_query = new WP_Query();
+		$wp_query->parse_query( $query );
+
+		if ( $args['filters'] && class_exists( 'Ardal_Archive' ) ) {
+			Ardal_Archive::apply_to_query( $wp_query );
+		}
+
+		$wp_query->get_posts();
+
+		return self::cards_from_posts( $wp_query->posts );
+	}
+
+	/**
+	 * تبدیل فهرست پست به کارت محصول.
+	 *
+	 * @param array $posts آرایهٔ WP_Post یا شناسه.
+	 * @param int   $limit صفر یعنی همه.
+	 * @return array
+	 */
+	public static function cards_from_posts( $posts, $limit = 0 ) {
+		if ( ! self::has_woo() || ! $posts ) {
+			return array();
+		}
+
+		if ( $limit > 0 ) {
+			$posts = array_slice( $posts, 0, $limit );
+		}
+
+		$out = array();
+
+		foreach ( $posts as $post ) {
+			$product = wc_get_product( $post );
+
+			if ( $product && $product->is_visible() ) {
+				$out[] = self::product_to_card( $product );
+			}
+		}
+
+		return $out;
+	}
+
+	/**
 	 * تبدیل یک محصول ووکامرس به آرایه‌ای که کارت محصول می‌فهمد.
 	 *
 	 * @param WC_Product $product

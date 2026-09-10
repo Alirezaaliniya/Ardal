@@ -880,7 +880,7 @@ class Ardal_Widget_Archive_Products extends Ardal_Archive_Widget_Base {
 		$query = $this->build_query( $s );
 		$main  = isset( $GLOBALS['wp_query'] ) && $query === $GLOBALS['wp_query'];
 
-		echo '<div class="ard-arch-products">';
+		echo '<div class="ard-arch-products" data-ard-region="products">';
 
 		if ( ! $query->have_posts() ) {
 			$this->render_no_results( $s );

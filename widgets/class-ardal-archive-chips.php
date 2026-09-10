@@ -219,6 +219,13 @@ class Ardal_Widget_Archive_Chips extends Ardal_Archive_Widget_Base {
 					array( 'group' => 'قیمت', 'label' => '۵۰۰٬۰۰۰ تا ۲٬۰۰۰٬۰۰۰', 'url' => '#' ),
 				);
 			} else {
+				/*
+				 * قاب خالی ولی نشان‌دار می‌ماند: در بارگذاری ایجکسی، ناحیه‌ای که
+				 * اصلاً در صفحه نباشد دیگر هیچ‌وقت پر نمی‌شود، پس با فعال‌شدن
+				 * اولین فیلتر هم چیپی نمایش داده نمی‌شد.
+				 */
+				echo '<div class="ard-chips ard-chips--empty" data-ard-region="chips" hidden></div>';
+
 				return;
 			}
 		}
@@ -229,7 +236,7 @@ class Ardal_Widget_Archive_Chips extends Ardal_Archive_Widget_Base {
 			$classes[] = 'ard-chips--boxed';
 		}
 
-		printf( '<div class="%s">', esc_attr( implode( ' ', $classes ) ) );
+		printf( '<div class="%s" data-ard-region="chips">', esc_attr( implode( ' ', $classes ) ) );
 
 		if ( '' !== trim( (string) $s['label'] ) ) {
 			printf( '<span class="ard-chips__label">%s</span>', esc_html( $s['label'] ) );

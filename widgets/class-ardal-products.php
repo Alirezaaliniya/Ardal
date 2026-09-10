@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Box_Shadow;
+use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
 
 class Ardal_Widget_Products extends Ardal_Widget_Base {
@@ -38,7 +40,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			array( 'label' => 'محصولات' )
 		);
 
-		$this->add_source_controls( 5 );
+		$this->add_source_controls( 10, true );
 
 		$repeater = new Repeater();
 
@@ -284,6 +286,38 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'notch',
+			array(
+				'label'        => 'بریدگی گوشه پایین-چپ',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'description'  => 'گوشه کارت را دور دکمهٔ گرد می‌بُرد. با خاموش‌کردنش، کارت گوشهٔ معمولی می‌گیرد.',
+				'condition'    => array( 'variant' => 'framed' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'notch_size',
+			array(
+				'label'      => 'اندازه بریدگی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 80, 'max' => 320 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 190 ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard--notch' => '--ard-notch:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array(
+					'variant' => 'framed',
+					'notch'   => 'yes',
+				),
+			)
+		);
+
 		$this->add_responsive_control(
 			'columns',
 			array(
@@ -301,6 +335,34 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		);
 
 		$this->add_responsive_control(
+			'rows',
+			array(
+				'label'          => 'تعداد ردیف',
+				'type'           => Controls_Manager::NUMBER,
+				'min'            => 0,
+				'max'            => 12,
+				'default'        => 0,
+				'tablet_default' => 0,
+				'mobile_default' => 0,
+				'description'    => 'صفر یعنی همهٔ محصولات نمایش داده شوند. با عددی بزرگ‌تر از صفر، در همان اندازهٔ صفحه فقط «ردیف × ستون» کارتِ اول دیده می‌شود.',
+			)
+		);
+
+		$this->add_responsive_control(
+			'grid_gap',
+			array(
+				'label'      => 'فاصله بین کارت‌ها',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 48 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 16 ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pgrid' => 'gap:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
 			'image_height',
 			array(
 				'label'          => 'ارتفاع تصویر',
@@ -312,6 +374,408 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'selectors'      => array(
 					'{{WRAPPER}} .ard-pcard__media' => 'height:{{SIZE}}{{UNIT}};',
 				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->add_card_style_controls();
+	}
+
+	/**
+	 * استایل کارت — همان چیزهایی که در «شبکه محصولات آرشیو» تنظیم‌شدنی است،
+	 * اینجا هم در دسترس باشد.
+	 */
+	private function add_card_style_controls() {
+
+		/* ------------------------------------------------ قاب کارت */
+
+		$this->start_controls_section(
+			'section_style_card',
+			array(
+				'label' => 'کارت محصول',
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'card_bg',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__box' => 'background:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'card_border',
+			array(
+				'label'     => 'رنگ حاشیه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__box' => 'border-color:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'card_border_hover',
+			array(
+				'label'     => 'رنگ حاشیه در هاور',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard:hover .ard-pcard__box' => 'border-color:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'card_radius',
+			array(
+				'label'      => 'گردی گوشه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard, {{WRAPPER}} .ard-pcard__box' => 'border-radius:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'card_padding',
+			array(
+				'label'      => 'فاصله داخلی',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard__box' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'card_content_gap',
+			array(
+				'label'      => 'فاصله بین بخش‌های داخل کارت',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 30 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard__box' => 'gap:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		/*
+		 * با بریدگی گوشه، کارت ماسک می‌شود و ترتیب رندر (filter → clip → mask)
+		 * یعنی box-shadow خودِ عنصرِ ماسک‌شده بریده می‌شود. پس این کنترل فقط جایی
+		 * نشان داده می‌شود که واقعاً کار می‌کند؛ سایهٔ حالت بریده را خود CSS با
+		 * drop-shadow روی والد می‌سازد.
+		 */
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'       => 'card_shadow',
+				'selector'   => '{{WRAPPER}} .ard-pcard__box',
+				'conditions' => array(
+					'relation' => 'or',
+					'terms'    => array(
+						array(
+							'name'     => 'variant',
+							'operator' => '!==',
+							'value'    => 'framed',
+						),
+						array(
+							'name'     => 'notch',
+							'operator' => '!==',
+							'value'    => 'yes',
+						),
+					),
+				),
+			)
+		);
+
+		$this->add_control(
+			'media_heading',
+			array(
+				'label'     => 'قاب تصویر',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'media_bg',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__media' => 'background:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'media_radius',
+			array(
+				'label'      => 'گردی گوشه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard__media' => 'border-radius:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'media_fit',
+			array(
+				'label'     => 'نحوه جاگرفتن تصویر',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'cover',
+				'options'   => array(
+					'cover'   => 'قاب را پر کند (cover)',
+					'contain' => 'کامل دیده شود (contain)',
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__media img' => 'object-fit:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		/* ------------------------------------------------ متن‌ها */
+
+		$this->start_controls_section(
+			'section_style_card_text',
+			array(
+				'label' => 'متن‌های کارت',
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_control(
+			'title_color',
+			array(
+				'label'     => 'رنگ عنوان',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__title' => 'color:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'title_hover',
+			array(
+				'label'     => 'رنگ عنوان در هاور',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__title a:hover' => 'color:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'title_typo',
+				'label'    => 'قلم عنوان',
+				'selector' => '{{WRAPPER}} .ard-pcard__title',
+			)
+		);
+
+		$this->add_responsive_control(
+			'title_min_height',
+			array(
+				'label'       => 'حداقل ارتفاع عنوان',
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => array( 'px' ),
+				'range'       => array( 'px' => array( 'min' => 0, 'max' => 90 ) ),
+				'selectors'   => array(
+					'{{WRAPPER}} .ard-pcard__title' => 'min-block-size:{{SIZE}}{{UNIT}};',
+				),
+				'description' => 'با یک عدد ثابت، قیمت‌ها در همهٔ کارت‌ها هم‌تراز می‌مانند.',
+			)
+		);
+
+		$this->add_control(
+			'price_color',
+			array(
+				'label'     => 'رنگ قیمت',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__price' => 'color:{{VALUE}};',
+				),
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'price_typo',
+				'label'    => 'قلم قیمت',
+				'selector' => '{{WRAPPER}} .ard-pcard__price',
+			)
+		);
+
+		$this->add_control(
+			'old_price_color',
+			array(
+				'label'     => 'رنگ قیمت خط‌خورده',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__old' => 'color:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'rate_color',
+			array(
+				'label'     => 'رنگ متن امتیاز',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__rate' => 'color:{{VALUE}};',
+				),
+				'separator' => 'before',
+				'condition' => array( 'show_rating' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'star_color',
+			array(
+				'label'     => 'رنگ ستاره‌ها',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__rate .ard-stars' => 'color:{{VALUE}};',
+				),
+				'condition' => array( 'show_rating' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'badge_bg',
+			array(
+				'label'     => 'زمینه نشان تخفیف',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard .ard-badge--sale' => 'background:{{VALUE}};',
+				),
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'badge_color',
+			array(
+				'label'     => 'متن نشان تخفیف',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard .ard-badge--sale' => 'color:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		/* ------------------------------------------------ دکمه */
+
+		$this->start_controls_section(
+			'section_style_card_btn',
+			array(
+				'label' => 'دکمه کارت',
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_size',
+			array(
+				'label'      => 'اندازه دکمه گرد',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 32, 'max' => 80 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 46 ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard' => '--ard-fab:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array( 'variant' => 'framed' ),
+			)
+		);
+
+		$this->add_control(
+			'btn_bg',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__fab, {{WRAPPER}} .ard-pcard__btn' => 'background:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'btn_color',
+			array(
+				'label'     => 'رنگ متن',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__fab, {{WRAPPER}} .ard-pcard__btn' => 'color:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'btn_border',
+			array(
+				'label'     => 'رنگ حاشیه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__btn' => 'border-color:{{VALUE}};',
+				),
+				'condition' => array( 'variant' => 'plain' ),
+			)
+		);
+
+		$this->add_control(
+			'btn_bg_hover',
+			array(
+				'label'     => 'زمینه در هاور',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__fab:hover, {{WRAPPER}} .ard-pcard__btn:hover' => 'background:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'btn_radius',
+			array(
+				'label'      => 'گردی گوشه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard__btn' => 'border-radius:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array( 'variant' => 'plain' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'      => 'btn_typo',
+				'selector'  => '{{WRAPPER}} .ard-pcard__btn',
+				'condition' => array( 'variant' => 'plain' ),
 			)
 		);
 
@@ -351,10 +815,19 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			echo '</div>';
 		}
 
+		$this->render_row_cap_css( $s );
+
+		/*
+		 * وقتی محتوای شبکه به فیلترهای آدرس وابسته است، ناحیه نشان‌دار می‌شود تا
+		 * بارگذاری ایجکسی آرشیو بتواند همین‌جا را هم تازه کند.
+		 */
+		$filtered = 'archive' === $s['source'] || 'yes' === ( $s['respect_filters'] ?? '' );
+
 		printf(
-			'<div class="ard-pgrid ard-pgrid--%s"%s>',
+			'<div class="ard-pgrid ard-pgrid--%s"%s%s>',
 			esc_attr( $s['variant'] ),
-			! empty( $tabs ) ? ' data-ard-filterable' : ''
+			! empty( $tabs ) ? ' data-ard-filterable' : '',
+			$filtered ? ' data-ard-region="products"' : ''
 		);
 
 		foreach ( $items as $item ) {
@@ -385,6 +858,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 					'show_fab'    => $framed,
 					'show_button' => ! $framed,
 					'button_text' => $s['button_text'],
+					'notch'       => $framed && 'yes' === $s['notch'],
 					'placeholder' => '۸۰۰×۸۰۰',
 				)
 			);
@@ -393,6 +867,76 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		}
 
 		echo '</div>';
+	}
+
+	/**
+	 * سقف ردیف در هر اندازهٔ صفحه.
+	 *
+	 * تعداد کارتِ قابل نمایش، «ردیف × ستون» همان اندازه است. چون این عدد از دو
+	 * کنترل ساخته می‌شود، با selectors المنتور درنمی‌آید و همین‌جا به‌شکل قاعدهٔ
+	 * nth-child چاپ می‌شود. هر مدیاکوئری بازهٔ بسته دارد تا لازم نباشد قاعدهٔ
+	 * اندازهٔ بزرگ‌تر را خنثی کنیم.
+	 *
+	 * @param array $s تنظیمات.
+	 */
+	private function render_row_cap_css( $s ) {
+		$mobile = 767;
+		$tablet = 1024;
+
+		if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->breakpoints ) ) {
+			$points = \Elementor\Plugin::$instance->breakpoints->get_active_breakpoints();
+
+			if ( isset( $points['mobile'] ) ) {
+				$mobile = (int) $points['mobile']->get_value();
+			}
+
+			if ( isset( $points['tablet'] ) ) {
+				$tablet = (int) $points['tablet']->get_value();
+			}
+		}
+
+		$devices = array(
+			array( 'suffix' => '', 'media' => sprintf( '@media (min-width:%dpx)', $tablet + 1 ) ),
+			array( 'suffix' => '_tablet', 'media' => sprintf( '@media (min-width:%dpx) and (max-width:%dpx)', $mobile + 1, $tablet ) ),
+			array( 'suffix' => '_mobile', 'media' => sprintf( '@media (max-width:%dpx)', $mobile ) ),
+		);
+
+		$scope = '.elementor-element-' . $this->get_id() . ' .ard-pgrid__cell';
+		$rules = '';
+
+		// مقدار خالیِ کنترل واکنش‌گرا یعنی «از اندازهٔ بزرگ‌تر ارث ببر».
+		$rows = 0;
+		$cols = 0;
+
+		foreach ( $devices as $device ) {
+			$row_key = 'rows' . $device['suffix'];
+			$col_key = 'columns' . $device['suffix'];
+
+			if ( isset( $s[ $row_key ] ) && '' !== $s[ $row_key ] ) {
+				$rows = (int) $s[ $row_key ];
+			}
+
+			if ( ! empty( $s[ $col_key ] ) ) {
+				$cols = (int) $s[ $col_key ];
+			}
+
+			if ( $rows < 1 || $cols < 1 ) {
+				continue;
+			}
+
+			$rules .= sprintf(
+				'%s{%s:nth-child(n+%d){display:none}}',
+				$device['media'],
+				$scope,
+				( $rows * $cols ) + 1
+			);
+		}
+
+		if ( '' === $rules ) {
+			return;
+		}
+
+		printf( '<style>%s</style>', $rules ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- همه اجزا عدد صحیح‌اند.
 	}
 
 	/**

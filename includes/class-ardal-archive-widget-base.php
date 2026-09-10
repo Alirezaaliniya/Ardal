@@ -276,6 +276,35 @@ abstract class Ardal_Archive_Widget_Base extends Ardal_Widget_Base {
 	}
 
 	/**
+	 * ویژگی‌های ایجکس روی ریشهٔ ویجت.
+	 *
+	 * جاوااسکریپت با دیدن data-ard-ajax روی هر ویجتی، کنترل‌کنندهٔ سراسری را
+	 * روشن می‌کند؛ پس فرقی ندارد کدام ویجت آن را اعلام کرده باشد.
+	 *
+	 * @param array $s تنظیمات ویجت.
+	 * @return string رشتهٔ ویژگی‌ها، از قبل escape شده.
+	 */
+	protected function ajax_attrs( $s ) {
+		if ( 'yes' !== ( $s['ajax'] ?? '' ) ) {
+			return '';
+		}
+
+		$out = ' data-ard-ajax="1"';
+
+		$extra = trim( (string) ( $s['ajax_regions'] ?? '' ) );
+
+		if ( '' !== $extra ) {
+			$out .= ' data-ard-ajax-regions="' . esc_attr( $extra ) . '"';
+		}
+
+		if ( 'yes' === ( $s['ajax_scroll'] ?? '' ) ) {
+			$out .= ' data-ard-ajax-scroll="1"';
+		}
+
+		return $out;
+	}
+
+	/**
 	 * پیام حالت ویرایش وقتی ووکامرس نیست.
 	 *
 	 * @return bool آیا پیام چاپ شد.

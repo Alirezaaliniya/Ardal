@@ -939,6 +939,201 @@
 	}
 }
 
+/* ------------------------------------------------------------
+   زیرمنوی ستونی در موبایل
+
+   روی دسکتاپ ستون‌های پنل مگا کنار هم‌اند؛ در موبایل هم همان‌جا می‌مانند تا
+   کشو به یک فهرست بسیار بلند تبدیل نشود. تعداد ستون‌ها از عرض واقعی کشو
+   می‌آید، چون کشوی کناری ۳۲۰ پیکسل است و پردهٔ موجی تا ۵۶۰.
+
+   این بلوک بعد از قواعد پردهٔ موجی می‌آید و سلکتورهایش یک کلاس بیشتر دارند،
+   پس تورفتگی و اندازه‌های آن حالت را هم بازنویسی می‌کند.
+   ------------------------------------------------------------ */
+
+/*
+ * چیدمان چندستونی است نه گرید: ستون‌های یک منو ارتفاع‌های خیلی متفاوتی دارند و
+ * در گرید، هر سطر به قد بلندترین سلولش کشیده می‌شود و زیر بقیه فضای خالی
+ * می‌ماند. multi-column آیتم‌ها را پشت‌سرهم می‌چیند، پس چیزی هدر نمی‌رود.
+ */
+.ard-mm__nav.is-mobile .ard-mm__cols,
+.ard-mm__nav.is-mobile .ard-mm__drop {
+	--ard-mm-mcolumns: var(--ard-mm-mcol, 132px);
+}
+
+.ard-mm__nav--mcols-1.is-mobile .ard-mm__cols,
+.ard-mm__nav--mcols-1.is-mobile .ard-mm__drop {
+	--ard-mm-mcolumns: 1;
+}
+
+.ard-mm__nav--mcols-2.is-mobile .ard-mm__cols,
+.ard-mm__nav--mcols-2.is-mobile .ard-mm__drop {
+	--ard-mm-mcolumns: 2;
+}
+
+.ard-mm__nav--mcols-3.is-mobile .ard-mm__cols,
+.ard-mm__nav--mcols-3.is-mobile .ard-mm__drop {
+	--ard-mm-mcolumns: 3;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__panel-inner {
+	padding: 6px 12px 12px;
+}
+
+/* --- ستون‌های پنل مگا --- */
+
+.ard-mm__nav.is-mobile .ard-mm__cols {
+	display: block;
+	columns: var(--ard-mm-mcolumns);
+	column-gap: 8px;
+}
+
+/* inline-block کنار break-inside می‌ماند: بدون آن، وب‌کیت هنوز ستون را وسط یک
+   کارت می‌شکند. */
+.ard-mm__nav.is-mobile .ard-mm__col {
+	display: inline-block;
+	inline-size: 100%;
+	min-inline-size: 0;
+	margin-block-end: 8px;
+	padding: 0;
+	break-inside: avoid;
+	-webkit-column-break-inside: avoid;
+	vertical-align: top;
+}
+
+.ard-mm__nav--mcard.is-mobile .ard-mm__col {
+	padding: 8px 10px 6px;
+	border: 1px solid var(--ard-border-soft);
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-base);
+}
+
+.ard-mm__nav.is-mobile .ard-mm__col-title {
+	display: flex;
+	margin: 0 0 4px;
+	padding: 4px 2px 6px;
+	border-block-end: 1px solid var(--ard-border-soft);
+	color: var(--ard-text);
+	font-size: 12.5px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+/* ستونی که زیرمنو ندارد فقط یک عنوان است؛ خط جداکننده زیرِ آن، جداکنندهٔ هیچ
+   است و کارت را ناتمام نشان می‌دهد. */
+.ard-mm__nav.is-mobile .ard-mm__col-title:only-child {
+	margin: 0;
+	padding-block-end: 4px;
+	border-block-end: 0;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__sub {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+/* ستونِ تنها، خودش چندستونه می‌شود؛ وگرنه چیدمان بالا هیچ سودی نداشت. */
+.ard-mm__nav.is-mobile .ard-mm__cols > .ard-mm__col:only-child .ard-mm__sub {
+	display: block;
+	columns: var(--ard-mm-mcolumns);
+	column-gap: 8px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__cols > .ard-mm__col:only-child .ard-mm__subitem {
+	break-inside: avoid;
+	-webkit-column-break-inside: avoid;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__sublink {
+	display: flex;
+	padding: 7px 2px;
+	font-size: 12.5px;
+	line-height: 1.9;
+	color: var(--ard-text-body);
+}
+
+/* --- فهرست کشویی ساده (بدون عنوان ستون) --- */
+
+.ard-mm__nav.is-mobile .ard-mm__drop {
+	display: block;
+	columns: var(--ard-mm-mcolumns);
+	column-gap: 6px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__dropitem {
+	display: inline-block;
+	inline-size: 100%;
+	min-inline-size: 0;
+	margin-block-end: 6px;
+	break-inside: avoid;
+	-webkit-column-break-inside: avoid;
+	vertical-align: top;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__drop .ard-mm__sublink {
+	padding: 9px 10px;
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-base);
+	font-size: 12.5px;
+}
+
+.ard-mm__nav--mcard.is-mobile .ard-mm__drop .ard-mm__sublink {
+	border: 1px solid var(--ard-border-soft);
+}
+
+/*
+ * آیتمی که خودش زیرمنو دارد کل عرض را می‌گیرد: کلید آکاردئون و پنل تودرتویش
+ * داخل یک سلول باریک جا نمی‌شود. واکر روی همین آیتم‌ها data-ard-mm-item
+ * می‌گذارد، پس نیازی به :has() نیست.
+ */
+.ard-mm__nav.is-mobile .ard-mm__dropitem[data-ard-mm-item] {
+	column-span: all;
+	display: block;
+	margin-block: 4px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__dropitem[data-ard-mm-item] > .ard-mm__row > .ard-mm__sublink {
+	border: 0;
+	background: none;
+	font-weight: 600;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__dropitem[data-ard-mm-item] > .ard-mm__panel > .ard-mm__panel-inner {
+	padding: 2px 10px 6px;
+}
+
+/* --- ریزکاری‌ها --- */
+
+.ard-mm__nav.is-mobile .ard-mm__sublink .ard-mm__desc {
+	font-size: 11px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__col .ard-mm__badge,
+.ard-mm__nav.is-mobile .ard-mm__drop .ard-mm__badge {
+	margin-inline-start: 4px;
+}
+
+.ard-mm__nav.is-mobile .ard-mm__promo {
+	inline-size: auto;
+	margin: 10px 0 2px;
+}
+
+/* تک‌ستونی: همان تورفتگی آشنای فهرست، بدون قاب. */
+.ard-mm__nav--mcols-1.is-mobile .ard-mm__col-title {
+	padding-inline: 16px 2px;
+	border-block-end: 0;
+}
+
+.ard-mm__nav--mcols-1.is-mobile .ard-mm__sublink {
+	padding-inline: 26px 2px;
+}
+
+.ard-mm__nav--mcols-1.is-mobile .ard-mm__drop .ard-mm__sublink {
+	padding-inline: 16px 10px;
+	border: 0;
+	background: none;
+}
+
 /* قفل اسکرول صفحه وقتی کشو باز است */
 html.ard-mm-lock,
 html.ard-mm-lock body {

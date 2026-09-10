@@ -19,6 +19,7 @@
 		'--ard-mm-gap',
 		'--ard-mm-panel-pad',
 		'--ard-mm-drawer-w',
+		'--ard-mm-mcol',
 		'--ard-mm-panel-bg',
 		'--ard-mm-link',
 		'--ard-mm-link-active',

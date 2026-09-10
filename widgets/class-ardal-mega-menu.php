@@ -167,6 +167,52 @@ class Ardal_Widget_Mega_Menu extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'mobile_cols',
+			array(
+				'label'       => 'چیدمان زیرمنو در موبایل',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'auto',
+				'options'     => array(
+					'auto' => 'خودکار — به‌اندازه‌ای که در عرض کشو جا شود',
+					'1'    => 'تک‌ستونی (فهرست بلند)',
+					'2'    => 'همیشه دو ستون',
+					'3'    => 'همیشه سه ستون',
+				),
+				'label_block' => true,
+				'description' => 'ستون‌های پنل مگا در موبایل هم کنار هم می‌مانند، پس کشو خیلی کوتاه‌تر می‌شود.',
+			)
+		);
+
+		$this->add_control(
+			'mobile_col_min',
+			array(
+				'label'       => 'کمینه عرض هر ستون',
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => array( 'px' ),
+				'range'       => array( 'px' => array( 'min' => 90, 'max' => 240 ) ),
+				'default'     => array( 'unit' => 'px', 'size' => 132 ),
+				'selectors'   => array(
+					'{{WRAPPER}} .ard-mm' => '--ard-mm-mcol: {{SIZE}}{{UNIT}};',
+				),
+				'description' => 'هر ستون از این باریک‌تر نمی‌شود؛ در کشوی باریک خودبه‌خود تک‌ستونی می‌شود.',
+				'condition'   => array( 'mobile_cols' => 'auto' ),
+			)
+		);
+
+		$this->add_control(
+			'mobile_col_card',
+			array(
+				'label'        => 'قاب دور هر ستون',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'condition'    => array( 'mobile_cols!' => '1' ),
+			)
+		);
+
+		$this->add_control(
 			'burger_text',
 			array(
 				'label'       => 'متن کنار آیکون همبرگری',
@@ -441,6 +487,14 @@ class Ardal_Widget_Mega_Menu extends Ardal_Widget_Base {
 
 		$root_cls = array( 'ard-mm', 'ard-mm--' . $s['variant'], 'ard-mm--bp-' . $bp_key );
 		$nav_cls  = array( 'ard-mm__nav', 'ard-mm__nav--bp-' . $bp_key );
+
+		$mcols = in_array( $s['mobile_cols'], array( '1', '2', '3' ), true ) ? $s['mobile_cols'] : 'auto';
+
+		$nav_cls[] = 'ard-mm__nav--mcols-' . $mcols;
+
+		if ( '1' !== $mcols && 'yes' === $s['mobile_col_card'] ) {
+			$nav_cls[] = 'ard-mm__nav--mcard';
+		}
 
 		if ( $wave ) {
 			$root_cls[] = 'ard-mm--wave';
