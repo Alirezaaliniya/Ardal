@@ -1,0 +1,916 @@
+<?php
+/**
+ * موتور آرشیو فروشگاه — خواندن پارامترهای فیلتر از آدرس، اعمالشان روی کوئری اصلی
+ * و در اختیار گذاشتن داده‌های مشترک (گزینه‌ها، شمارش‌ها، بازه قیمت، مرتب‌سازی)
+ * برای ویجت‌های آرشیو.
+ *
+ * فیلترها عمداً بدون ایجکس‌اند: همه چیز پارامتر آدرس است و با یک فرم GET ساده
+ * ارسال می‌شود. نتیجه این است که چند فیلتر هم‌زمان، صفحه‌بندی، مرتب‌سازی و آرشیو
+ * دسته با هم جمع می‌شوند و آدرس نهایی قابل اشتراک‌گذاری و ایندکس است.
+ *
+ * پارامترها:
+ *   ard_{key}[]                    → تاکسونومی‌های محصول (key = نام تاکسونومی بدون pa_/product_)
+ *   ard_s                          → جست‌وجو داخل همین آرشیو
+ *   ard_stock, ard_sale, ard_featured → کلیدهای یک‌ضربی
+ *   ard_rating[]                   → امتیاز، هر عدد یعنی «همان امتیاز به بالا»
+ *   min_price, max_price, orderby, paged → پارامترهای خود ووکامرس
+ *
+ * @package Ardal
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class Ardal_Archive {
+
+	/**
+	 * پیشوند پارامترهای این افزونه در آدرس.
+	 */
+	const PREFIX = 'ard_';
+
+	/**
+	 * کلیدهایی که معنای ثابت دارند و نباید با کلید تاکسونومی اشتباه شوند.
+	 */
+	const RESERVED = array( 's', 'stock', 'sale', 'featured', 'rating', 'sort', 'view' );
+
+	/**
+	 * نگاشت «کلید آدرس → نام تاکسونومی»؛ یک‌بار ساخته می‌شود.
+	 *
+	 * @var array|null
+	 */
+	protected static $map = null;
+
+	/**
+	 * ثبت هوک‌ها.
+	 */
+	public static function init() {
+		// اولویت ۲۰: ووکامرس روی ۱۰ کوئری محصول را می‌سازد، پس شرط‌های ما باید
+		// روی همان چیزی که ساخته اضافه شود، نه پیش از آن.
+		add_action( 'pre_get_posts', array( __CLASS__, 'filter_query' ), 20 );
+
+		foreach ( array( 'woocommerce_update_product', 'woocommerce_new_product', 'save_post_product', 'deleted_post' ) as $hook ) {
+			add_action( $hook, array( __CLASS__, 'flush' ) );
+		}
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* تاکسونومی‌ها                                                            */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * تاکسونومی‌های عمومی محصول، برای کنترل‌های المنتور.
+	 *
+	 * @return array نام تاکسونومی => برچسب فارسی.
+	 */
+	public static function taxonomy_options() {
+		if ( ! Ardal_Helpers::has_woo() ) {
+			return array();
+		}
+
+		$out = array();
+
+		foreach ( get_object_taxonomies( 'product', 'objects' ) as $taxonomy ) {
+			if ( ! $taxonomy->public || 'product_visibility' === $taxonomy->name ) {
+				continue;
+			}
+
+			$out[ $taxonomy->name ] = $taxonomy->labels->singular_name
+				? $taxonomy->labels->singular_name
+				: $taxonomy->name;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * کلید کوتاه آدرس برای یک تاکسونومی: product_cat → cat، pa_color → color.
+	 *
+	 * @param string $taxonomy
+	 * @return string
+	 */
+	public static function key_for_taxonomy( $taxonomy ) {
+		$key = (string) $taxonomy;
+
+		foreach ( array( 'product_', 'pa_' ) as $prefix ) {
+			if ( 0 === strpos( $key, $prefix ) ) {
+				$key = substr( $key, strlen( $prefix ) );
+				break;
+			}
+		}
+
+		$key = sanitize_key( $key );
+
+		// کلید رزروشده یعنی معنی دیگری دارد؛ نام کامل تاکسونومی جایش می‌نشیند.
+		if ( '' === $key || in_array( $key, self::RESERVED, true ) ) {
+			$key = sanitize_key( $taxonomy );
+		}
+
+		return $key;
+	}
+
+	/**
+	 * نگاشت کامل «کلید → تاکسونومی».
+	 *
+	 * @return array
+	 */
+	public static function key_map() {
+		if ( null !== self::$map ) {
+			return self::$map;
+		}
+
+		self::$map = array();
+
+		if ( ! Ardal_Helpers::has_woo() ) {
+			return self::$map;
+		}
+
+		foreach ( array_keys( self::taxonomy_options() ) as $taxonomy ) {
+			$key = self::key_for_taxonomy( $taxonomy );
+
+			// اولین صاحبِ کلید برنده است؛ بقیه با نام کامل ثبت می‌شوند.
+			if ( isset( self::$map[ $key ] ) ) {
+				$key = sanitize_key( $taxonomy );
+			}
+
+			self::$map[ $key ] = $taxonomy;
+		}
+
+		return self::$map;
+	}
+
+	/**
+	 * تاکسونومی متناظر یک کلید آدرس.
+	 *
+	 * @param string $key
+	 * @return string رشته خالی یعنی کلید شناخته‌شده نیست.
+	 */
+	public static function taxonomy_for_key( $key ) {
+		$map = self::key_map();
+
+		return isset( $map[ $key ] ) ? $map[ $key ] : '';
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* خواندن پارامترها                                                        */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * مقدارهای انتخاب‌شده‌ی یک پارامتر (هم آرایه و هم رشته‌ی کاماگذاری‌شده).
+	 *
+	 * @param string $key کلید کوتاه، بدون پیشوند.
+	 * @return string[] اسلاگ‌ها.
+	 */
+	public static function selected( $key ) {
+		$name = self::PREFIX . $key;
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$raw = isset( $_GET[ $name ] ) ? wp_unslash( $_GET[ $name ] ) : array();
+
+		if ( is_string( $raw ) ) {
+			$raw = explode( ',', $raw );
+		}
+
+		$out = array();
+
+		foreach ( (array) $raw as $value ) {
+			if ( ! is_scalar( $value ) ) {
+				continue;
+			}
+
+			$value = sanitize_title( wp_strip_all_tags( (string) $value ) );
+
+			if ( '' !== $value && ! in_array( $value, $out, true ) ) {
+				$out[] = $value;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * آیا یک کلید یک‌ضربی (سوییچ) روشن است.
+	 *
+	 * @param string $key
+	 * @return bool
+	 */
+	public static function is_on( $key ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$value = isset( $_GET[ self::PREFIX . $key ] ) ? sanitize_text_field( wp_unslash( $_GET[ self::PREFIX . $key ] ) ) : '';
+
+		return '' !== $value && '0' !== $value && 'no' !== $value;
+	}
+
+	/**
+	 * یک پارامتر ساده (بدون پیشوند) از آدرس.
+	 *
+	 * @param string $key
+	 * @return string
+	 */
+	public static function param( $key ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return isset( $_GET[ $key ] ) ? sanitize_text_field( wp_unslash( $_GET[ $key ] ) ) : '';
+	}
+
+	/**
+	 * عبارت جست‌وجوی داخل آرشیو.
+	 *
+	 * @return string
+	 */
+	public static function search_term() {
+		$term = self::param( self::PREFIX . 's' );
+
+		return '' !== $term ? $term : self::param( 's' );
+	}
+
+	/**
+	 * امتیازهای انتخاب‌شده؛ هر عدد یعنی «همان امتیاز به بالا».
+	 *
+	 * @return int[]
+	 */
+	public static function ratings() {
+		$out = array();
+
+		foreach ( self::selected( 'rating' ) as $value ) {
+			$value = (int) $value;
+
+			if ( $value >= 1 && $value <= 5 && ! in_array( $value, $out, true ) ) {
+				$out[] = $value;
+			}
+		}
+
+		sort( $out );
+
+		return $out;
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* آدرس‌ها                                                                 */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * نشانی پایه‌ی آرشیو جاری، بدون هیچ پارامتری.
+	 *
+	 * @return string
+	 */
+	public static function base_url() {
+		if ( Ardal_Helpers::has_woo() && is_product_taxonomy() ) {
+			$term = get_queried_object();
+
+			if ( $term instanceof WP_Term ) {
+				$link = get_term_link( $term );
+
+				if ( ! is_wp_error( $link ) ) {
+					return $link;
+				}
+			}
+		}
+
+		$shop = Ardal_Helpers::has_woo() ? get_permalink( wc_get_page_id( 'shop' ) ) : '';
+
+		if ( $shop ) {
+			return $shop;
+		}
+
+		$current = get_permalink();
+
+		return $current ? $current : home_url( '/' );
+	}
+
+	/**
+	 * نشانی جاری با تغییر چند پارامتر (برای مرتب‌سازی، چیپ‌ها و صفحه‌بندی).
+	 *
+	 * مقدار null یعنی «این پارامتر حذف شود».
+	 *
+	 * @param array $args
+	 * @return string
+	 */
+	public static function url_with( $args ) {
+		$base = self::base_url();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$current = wp_unslash( $_GET );
+		$current = is_array( $current ) ? $current : array();
+
+		// شماره صفحه بعد از هر تغییر فیلتر بی‌معناست.
+		unset( $current['paged'], $current['product-page'], $current['add-to-cart'] );
+
+		$query = array_merge( $current, $args );
+
+		foreach ( $query as $key => $value ) {
+			if ( null === $value || '' === $value || array() === $value ) {
+				unset( $query[ $key ] );
+				continue;
+			}
+
+			// add_query_arg خودش کدگذاری می‌کند؛ اینجا فقط پاکسازی لازم است.
+			$query[ $key ] = map_deep( $value, 'sanitize_text_field' );
+		}
+
+		return $query ? add_query_arg( $query, $base ) : $base;
+	}
+
+	/**
+	 * نشانی جاری بدون یک مقدار مشخص از یک فیلتر چندگزینه‌ای.
+	 *
+	 * @param string $key   کلید کوتاه.
+	 * @param string $value اسلاگی که باید برداشته شود؛ خالی یعنی کل فیلتر.
+	 * @return string
+	 */
+	public static function url_dropping( $key, $value = '' ) {
+		$name = self::PREFIX . $key;
+
+		if ( '' === $value ) {
+			return self::url_with( array( $name => null ) );
+		}
+
+		$left = array_values( array_diff( self::selected( $key ), array( $value ) ) );
+
+		return self::url_with( array( $name => $left ? $left : null ) );
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* فیلترهای فعال                                                          */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * فهرست فیلترهای فعال، آماده‌ی نمایش به‌شکل چیپ.
+	 *
+	 * @return array هر آیتم: group، label، url (نشانی حذف همان فیلتر).
+	 */
+	public static function active_filters() {
+		$out = array();
+
+		foreach ( self::key_map() as $key => $taxonomy ) {
+			$slugs = self::selected( $key );
+
+			if ( ! $slugs ) {
+				continue;
+			}
+
+			$label = get_taxonomy( $taxonomy );
+			$label = ( $label && ! empty( $label->labels->singular_name ) ) ? $label->labels->singular_name : '';
+
+			foreach ( $slugs as $slug ) {
+				$term = get_term_by( 'slug', $slug, $taxonomy );
+
+				$out[] = array(
+					'group' => $label,
+					'label' => ( $term instanceof WP_Term ) ? $term->name : $slug,
+					'url'   => self::url_dropping( $key, $slug ),
+				);
+			}
+		}
+
+		$search = self::search_term();
+
+		if ( '' !== $search ) {
+			$out[] = array(
+				'group' => 'جست‌وجو',
+				'label' => $search,
+				'url'   => self::url_with(
+					array(
+						self::PREFIX . 's' => null,
+						's'                => null,
+					)
+				),
+			);
+		}
+
+		$min = self::param( 'min_price' );
+		$max = self::param( 'max_price' );
+
+		if ( '' !== $min || '' !== $max ) {
+			$bounds = self::price_bounds();
+			$from   = '' !== $min ? (float) $min : $bounds['min'];
+			$to     = '' !== $max ? (float) $max : $bounds['max'];
+
+			$out[] = array(
+				'group' => 'قیمت',
+				'label' => sprintf(
+					'%s تا %s',
+					Ardal_Helpers::price( $from ),
+					Ardal_Helpers::price( $to )
+				),
+				'url'   => self::url_with(
+					array(
+						'min_price' => null,
+						'max_price' => null,
+					)
+				),
+			);
+		}
+
+		$ratings = self::ratings();
+
+		if ( $ratings ) {
+			$out[] = array(
+				'group' => 'امتیاز',
+				'label' => sprintf( '%s ستاره به بالا', Ardal_Helpers::fa_digits( min( $ratings ) ) ),
+				'url'   => self::url_with( array( self::PREFIX . 'rating' => null ) ),
+			);
+		}
+
+		foreach ( self::switch_labels() as $key => $label ) {
+			if ( ! self::is_on( $key ) ) {
+				continue;
+			}
+
+			$out[] = array(
+				'group' => '',
+				'label' => $label,
+				'url'   => self::url_with( array( self::PREFIX . $key => null ) ),
+			);
+		}
+
+		return $out;
+	}
+
+	/**
+	 * پرده‌ی پشت کشو و شیت.
+	 *
+	 * چند ویجت آرشیو می‌توانند در یک صفحه باشند، ولی پرده باید یکی بماند وگرنه
+	 * دو لایه‌ی تیره روی هم می‌نشیند.
+	 */
+	public static function render_scrim() {
+		static $done = false;
+
+		if ( $done ) {
+			return;
+		}
+
+		$done = true;
+
+		echo '<div class="ard-arch-scrim" data-ard-arch-close aria-hidden="true"></div>';
+	}
+
+	/**
+	 * برچسب پیش‌فرض کلیدهای یک‌ضربی.
+	 *
+	 * @return array
+	 */
+	public static function switch_labels() {
+		return array(
+			'stock'    => 'فقط کالاهای موجود',
+			'sale'     => 'کالاهای تخفیف‌دار',
+			'featured' => 'محصولات ویژه',
+		);
+	}
+
+	/**
+	 * شمار فیلترهای فعال (برای نشان روی دکمه‌ی موبایل).
+	 *
+	 * @return int
+	 */
+	public static function active_count() {
+		return count( self::active_filters() );
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* اعمال روی کوئری                                                        */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * آیا این کوئری، آرشیو محصول است؟
+	 *
+	 * @param WP_Query $q
+	 * @return bool
+	 */
+	protected static function is_product_query( $q ) {
+		if ( ! Ardal_Helpers::has_woo() ) {
+			return false;
+		}
+
+		return $q->is_post_type_archive( 'product' )
+			|| $q->is_tax( get_object_taxonomies( 'product' ) )
+			|| 'product_query' === $q->get( 'wc_query' );
+	}
+
+	/**
+	 * افزودن شرط‌های فیلتر به کوئری اصلی آرشیو.
+	 *
+	 * قیمت، امتیاز، مرتب‌سازی و صفحه‌بندی دست خود ووکامرس است و اینجا لمس نمی‌شود.
+	 *
+	 * @param WP_Query $q
+	 */
+	public static function filter_query( $q ) {
+		if ( is_admin() || ! $q->is_main_query() || ! self::is_product_query( $q ) ) {
+			return;
+		}
+
+		/* --------------------------------------------- تعداد در هر صفحه */
+		$per_page = (int) Ardal_Palette::get( 'archive_per_page' );
+
+		if ( $per_page > 0 ) {
+			$q->set( 'posts_per_page', $per_page );
+		}
+
+		$tax_query = (array) $q->get( 'tax_query' );
+
+		// کوئری خالی گاهی رشته است؛ عضو غیرآرایه‌ای در tax_query چیزی جز شلوغی نیست.
+		foreach ( $tax_query as $index => $clause ) {
+			if ( 'relation' !== $index && ! is_array( $clause ) ) {
+				unset( $tax_query[ $index ] );
+			}
+		}
+
+		/* --------------------------------------------- تاکسونومی‌ها */
+		foreach ( self::key_map() as $key => $taxonomy ) {
+			$slugs = self::selected( $key );
+
+			if ( ! $slugs || ! taxonomy_exists( $taxonomy ) ) {
+				continue;
+			}
+
+			// داخل یک فیلتر همیشه «یا»، بین فیلترها «و».
+			$tax_query[] = array(
+				'taxonomy'         => $taxonomy,
+				'field'            => 'slug',
+				'terms'            => $slugs,
+				'operator'         => 'IN',
+				'include_children' => true,
+			);
+		}
+
+		/* --------------------------------------------- فقط موجود */
+		if ( self::is_on( 'stock' ) ) {
+			$tax_query[] = array(
+				'taxonomy' => 'product_visibility',
+				'field'    => 'name',
+				'terms'    => 'outofstock',
+				'operator' => 'NOT IN',
+			);
+		}
+
+		/* --------------------------------------------- فقط ویژه */
+		if ( self::is_on( 'featured' ) ) {
+			$tax_query[] = array(
+				'taxonomy' => 'product_visibility',
+				'field'    => 'name',
+				'terms'    => 'featured',
+				'operator' => 'IN',
+			);
+		}
+
+		/* --------------------------------------------- امتیاز */
+		$ratings = self::ratings();
+
+		if ( $ratings ) {
+			$visibility = wc_get_product_visibility_term_ids();
+			$ids        = array();
+
+			// «۴ ستاره به بالا» یعنی ۴ و ۵؛ پس از کمینه‌ی انتخاب‌شده تا ۵ باز می‌شود.
+			for ( $star = min( $ratings ); $star <= 5; $star++ ) {
+				if ( ! empty( $visibility[ 'rated-' . $star ] ) ) {
+					$ids[] = (int) $visibility[ 'rated-' . $star ];
+				}
+			}
+
+			$tax_query[] = array(
+				'taxonomy' => 'product_visibility',
+				'field'    => 'term_taxonomy_id',
+				'terms'    => $ids ? $ids : array( 0 ),
+				'operator' => 'IN',
+			);
+		}
+
+		if ( $tax_query ) {
+			$q->set( 'tax_query', $tax_query );
+		}
+
+		/* --------------------------------------------- فقط تخفیف‌دار */
+		if ( self::is_on( 'sale' ) ) {
+			$on_sale = wc_get_product_ids_on_sale();
+			$on_sale = $on_sale ? $on_sale : array( 0 );
+			$current = array_filter( (array) $q->get( 'post__in' ) );
+
+			// اگر کوئری از قبل محدود شده، اشتراک گرفته می‌شود نه جایگزینی.
+			$post_in = $current ? array_intersect( $current, $on_sale ) : $on_sale;
+
+			$q->set( 'post__in', $post_in ? array_values( $post_in ) : array( 0 ) );
+		}
+
+		/* --------------------------------------------- جست‌وجو داخل آرشیو */
+		$search = self::param( self::PREFIX . 's' );
+
+		if ( '' !== $search && '' === (string) $q->get( 's' ) ) {
+			$q->set( 's', $search );
+		}
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* داده‌ی گزینه‌ها                                                          */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * ترم‌های یک تاکسونومی، آماده‌ی نمایش در باکس فیلتر.
+	 *
+	 * @param string $taxonomy
+	 * @param array  $args limit، parent، include، hide_empty، orderby.
+	 * @return array هر آیتم: slug، label، count، checked، url.
+	 */
+	public static function terms_for( $taxonomy, $args = array() ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return array();
+		}
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'limit'      => 0,
+				'parent'     => '',
+				'include'    => array(),
+				'hide_empty' => true,
+				'orderby'    => 'name',
+			)
+		);
+
+		$query = array(
+			'taxonomy'   => $taxonomy,
+			'hide_empty' => (bool) $args['hide_empty'],
+		);
+
+		switch ( $args['orderby'] ) {
+			case 'count':
+				$query['orderby'] = 'count';
+				$query['order']   = 'DESC';
+				break;
+
+			case 'order':
+				$query['orderby'] = 'menu_order';
+				break;
+
+			case 'id':
+				$query['orderby'] = 'term_id';
+				break;
+
+			default:
+				$query['orderby'] = 'name';
+		}
+
+		if ( $args['include'] ) {
+			$query['include'] = array_map( 'absint', (array) $args['include'] );
+			$query['orderby'] = 'include';
+			unset( $query['order'] );
+		} elseif ( '' !== $args['parent'] ) {
+			$query['parent'] = (int) $args['parent'];
+		}
+
+		if ( $args['limit'] > 0 ) {
+			$query['number'] = (int) $args['limit'];
+		}
+
+		$terms = get_terms( $query );
+
+		if ( is_wp_error( $terms ) || ! $terms ) {
+			return array();
+		}
+
+		$key     = self::key_for_taxonomy( $taxonomy );
+		$chosen  = self::selected( $key );
+		$options = array();
+
+		foreach ( $terms as $term ) {
+			$options[] = array(
+				'slug'    => $term->slug,
+				'label'   => $term->name,
+				'count'   => (int) $term->count,
+				'term_id' => (int) $term->term_id,
+				'checked' => in_array( $term->slug, $chosen, true ),
+			);
+		}
+
+		return $options;
+	}
+
+	/**
+	 * کمینه و بیشینه‌ی قیمت فروشگاه.
+	 *
+	 * @return array min و max به‌صورت عدد صحیح.
+	 */
+	public static function price_bounds() {
+		$cache = get_transient( 'ardal_price_bounds' );
+
+		if ( is_array( $cache ) && isset( $cache['min'], $cache['max'] ) ) {
+			return $cache;
+		}
+
+		global $wpdb;
+
+		$min = 0;
+		$max = 0;
+
+		if ( Ardal_Helpers::has_woo() && ! empty( $wpdb->wc_product_meta_lookup ) ) {
+			$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				"SELECT MIN( min_price ) AS low, MAX( max_price ) AS high
+				FROM {$wpdb->wc_product_meta_lookup}
+				WHERE min_price IS NOT NULL AND min_price > 0",
+				ARRAY_A
+			);
+
+			$min = isset( $row['low'] ) ? (float) $row['low'] : 0;
+			$max = isset( $row['high'] ) ? (float) $row['high'] : 0;
+		}
+
+		if ( $max <= $min ) {
+			$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				"SELECT MIN( meta_value + 0 ) AS low, MAX( meta_value + 0 ) AS high
+				FROM {$wpdb->postmeta} pm
+				INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+				WHERE pm.meta_key = '_price' AND pm.meta_value != ''
+				AND p.post_type IN ( 'product', 'product_variation' ) AND p.post_status = 'publish'",
+				ARRAY_A
+			);
+
+			$min = isset( $row['low'] ) ? (float) $row['low'] : 0;
+			$max = isset( $row['high'] ) ? (float) $row['high'] : 0;
+		}
+
+		if ( $max <= $min ) {
+			$max = $min + 1000000;
+		}
+
+		$bounds = array(
+			'min' => (int) floor( $min ),
+			'max' => (int) ceil( $max ),
+		);
+
+		set_transient( 'ardal_price_bounds', $bounds, HOUR_IN_SECONDS );
+
+		return $bounds;
+	}
+
+	/**
+	 * پاک کردن کش‌های آرشیو.
+	 */
+	public static function flush() {
+		delete_transient( 'ardal_price_bounds' );
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* مرتب‌سازی                                                               */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * فهرست کامل گزینه‌های مرتب‌سازی (برای کنترل المنتور).
+	 *
+	 * @return array
+	 */
+	public static function sort_labels() {
+		return array(
+			'menu_order' => 'پیش‌فرض',
+			'popularity' => 'پرفروش‌ترین',
+			'rating'     => 'بیشترین امتیاز',
+			'date'       => 'جدیدترین',
+			'price'      => 'ارزان‌ترین',
+			'price-desc' => 'گران‌ترین',
+		);
+	}
+
+	/**
+	 * گزینه‌های مرتب‌سازی به‌شکل لینک؛ همان فهرست ووکامرس، فقط بدون select.
+	 *
+	 * @param array $allowed کلیدهای مجاز؛ خالی یعنی همه.
+	 * @param array $labels  برچسب‌های جایگزین.
+	 * @return array
+	 */
+	public static function sort_options( $allowed = array(), $labels = array() ) {
+		$options = self::sort_labels();
+
+		foreach ( $labels as $key => $label ) {
+			if ( isset( $options[ $key ] ) && '' !== trim( (string) $label ) ) {
+				$options[ $key ] = $label;
+			}
+		}
+
+		if ( $allowed ) {
+			$options = array_intersect_key( $options, array_flip( (array) $allowed ) );
+		}
+
+		$default = Ardal_Helpers::has_woo()
+			? (string) apply_filters( 'woocommerce_default_catalog_orderby', get_option( 'woocommerce_default_catalog_orderby', 'menu_order' ) )
+			: 'menu_order';
+
+		$current = self::param( 'orderby' );
+		$current = '' !== $current ? $current : $default;
+
+		$out = array();
+
+		foreach ( $options as $value => $label ) {
+			$out[ $value ] = array(
+				'value'   => $value,
+				'label'   => $label,
+				'current' => $value === $current,
+				'url'     => self::url_with( array( 'orderby' => $value ) ),
+			);
+		}
+
+		return $out;
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* حلقه محصولات                                                            */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * آمار حلقه‌ی جاری برای «نمایش ۱ تا ۱۲ از ۹۸ نتیجه».
+	 *
+	 * از ویژگی‌های حلقه‌ی ووکامرس می‌خواند و اگر تنظیم نشده بودند، از کوئری اصلی.
+	 *
+	 * @param WP_Query|null $query
+	 * @return array total، per_page، current، first، last، pages.
+	 */
+	public static function loop_stats( $query = null ) {
+		$total   = 0;
+		$per     = 0;
+		$current = 0;
+		$pages   = 0;
+
+		if ( Ardal_Helpers::has_woo() && function_exists( 'wc_get_loop_prop' ) ) {
+			$total   = (int) wc_get_loop_prop( 'total' );
+			$per     = (int) wc_get_loop_prop( 'per_page' );
+			$current = (int) wc_get_loop_prop( 'current_page' );
+			$pages   = (int) wc_get_loop_prop( 'total_pages' );
+		}
+
+		if ( ! $query instanceof WP_Query ) {
+			$query = isset( $GLOBALS['wp_query'] ) ? $GLOBALS['wp_query'] : null;
+		}
+
+		if ( $query instanceof WP_Query ) {
+			$total = $total ? $total : (int) $query->found_posts;
+			$per   = $per ? $per : (int) $query->get( 'posts_per_page' );
+			$pages = $pages ? $pages : (int) $query->max_num_pages;
+		}
+
+		$current = max( 1, $current, (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) );
+		$per     = $per > 0 ? $per : 12;
+
+		return array(
+			'total'    => $total,
+			'per_page' => $per,
+			'current'  => $current,
+			'pages'    => max( 1, $pages ),
+			'first'    => $total ? ( ( $current - 1 ) * $per ) + 1 : 0,
+			'last'     => min( $total, $current * $per ),
+		);
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* آیکون‌ها                                                                */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * آیکون‌های اختصاصی آرشیو که در مجموعه‌ی عمومی هلپر نیستند.
+	 *
+	 * @param string $name
+	 * @param int    $size
+	 * @param float  $width ضخامت خط.
+	 * @return string
+	 */
+	public static function icon( $name, $size = 18, $width = 1.8 ) {
+		$paths = array(
+			'filter'  => '<path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/>',
+			'sort'    => '<path d="M7 5v14"/><path d="M4 8l3-3 3 3"/><path d="M17 19V5"/><path d="M14 16l3 3 3-3"/>',
+			'check'   => '<path d="M5 12.5l4.5 4.5L19 7"/>',
+			'close'   => '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>',
+			'chev-d'  => '<path d="M6 9.5l6 6 6-6"/>',
+			'chev-r'  => '<path d="M9.5 6.5L15 12l-5.5 5.5"/>',
+			'chev-l'  => '<path d="M14.5 6.5L9 12l5.5 5.5"/>',
+			'search'  => '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
+			'empty'   => '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/>',
+			'spark'   => '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>',
+			'heart'   => '<path d="M12 20s-7.3-4.5-7.3-9.4A4.2 4.2 0 0 1 12 8.2a4.2 4.2 0 0 1 7.3 2.4C19.3 15.5 12 20 12 20z"/>',
+			'cart'    => '<path d="M3 4h2.2l2.3 11.2h10.2L20 7H6"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/>',
+			'refresh' => '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4.5V10h-5.5"/>',
+		);
+
+		if ( ! isset( $paths[ $name ] ) ) {
+			$name = 'chev-d';
+		}
+
+		return sprintf(
+			'<svg class="ard-ai ard-ai--%1$s" width="%2$d" height="%2$d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="%3$s" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">%4$s</svg>',
+			esc_attr( $name ),
+			(int) $size,
+			esc_attr( (string) $width ),
+			$paths[ $name ]
+		);
+	}
+
+	/**
+	 * ستاره‌ی پر یا خالی برای امتیاز کارت و باکس فیلتر.
+	 *
+	 * @param bool $on
+	 * @param int  $size
+	 * @return string
+	 */
+	public static function star( $on, $size = 14 ) {
+		return sprintf(
+			'<svg class="ard-ai ard-ai--star%1$s" width="%2$d" height="%2$d" viewBox="0 0 24 24" fill="%3$s" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 9.7l5.4-.8z"/></svg>',
+			$on ? ' is-on' : '',
+			(int) $size,
+			$on ? 'currentColor' : 'none'
+		);
+	}
+}

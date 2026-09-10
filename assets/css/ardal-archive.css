@@ -1,0 +1,1947 @@
+/*!
+ * Ardal — پوسته آرشیو فروشگاه (ریل دسته، فیلتر، نوار مرتب‌سازی، شبکه محصول)
+ *
+ * چیدمان از دیزاین آرشیو فروشگاه گرفته شده و رنگ‌ها همگی از توکن‌های --ard-*
+ * می‌آیند، پس با تغییر پالت در تنظیمات، کل صفحه با آن جابه‌جا می‌شود.
+ */
+
+/* ============================================================
+   پایه
+   ============================================================ */
+
+.elementor-widget-ardal-archive-rail,
+.elementor-widget-ardal-archive-filters,
+.elementor-widget-ardal-archive-chips,
+.elementor-widget-ardal-archive-toolbar,
+.elementor-widget-ardal-archive-products,
+.elementor-widget-ardal-archive-description {
+	--ard-arch-shadow: 0 8px 24px -16px rgba(var(--ard-primary-dark-rgb), 0.28);
+	--ard-arch-shadow-sm: 0 6px 18px -8px rgba(var(--ard-primary-dark-rgb), 0.18);
+
+	direction: rtl;
+	font-family: var(--ard-font);
+	color: var(--ard-text);
+	text-align: right;
+}
+
+.ard-ai {
+	display: block;
+	flex: 0 0 auto;
+	max-width: none;
+}
+
+/* عنوان مشترک بالای ویجت‌های آرشیو. */
+.ard-arch__title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin: 0 0 18px;
+	color: var(--ard-text);
+	font-size: 19px;
+	font-weight: 700;
+	line-height: 1.7;
+}
+
+.ard-arch__title-icon {
+	display: inline-flex;
+	color: var(--ard-accent);
+}
+
+/* ============================================================
+   ریل دسته‌بندی
+   ============================================================ */
+
+.ard-rail {
+	--ard-rail-size: 112px;
+	--ard-rail-ring: 4px;
+	--ard-rail-inner: 6px;
+	--ard-rail-from: var(--ard-primary-light);
+	--ard-rail-to: var(--ard-accent);
+}
+
+.ard-rail--boxed {
+	padding: 22px 24px 20px;
+	border-radius: var(--ard-radius-lg);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow);
+}
+
+.ard-rail__row {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.ard-rail__nav {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 38px;
+	height: 38px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--ard-surface);
+	color: var(--ard-primary-dark);
+	cursor: pointer;
+	transition: background 0.18s, color 0.18s;
+}
+
+.ard-rail__nav:hover {
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary);
+}
+
+.ard-rail__track {
+	display: flex;
+	flex: 1 1 auto;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 26px;
+	min-width: 0;
+	margin: 0;
+	padding: 2px 0;
+	overflow-x: auto;
+	scroll-behavior: smooth;
+	list-style: none;
+	scrollbar-width: none;
+}
+
+.ard-rail__track::-webkit-scrollbar {
+	display: none;
+}
+
+/* سرریز که شد، از ابتدا بچیند تا با کشیدن به همه دسته‌ها برسیم. */
+.ard-rail__track.is-scrollable {
+	justify-content: flex-start;
+	cursor: grab;
+}
+
+.ard-rail__track.is-dragging {
+	cursor: grabbing;
+	scroll-behavior: auto;
+	user-select: none;
+}
+
+.ard-rail__track.is-dragging a,
+.ard-rail__track.is-dragging .ard-rail__img {
+	pointer-events: none;
+	-webkit-user-drag: none;
+}
+
+.ard-rail__item {
+	flex: 0 0 auto;
+	width: calc(var(--ard-rail-size) + 16px);
+	margin: 0;
+	list-style: none;
+}
+
+.ard-rail__item > a {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	text-decoration: none;
+}
+
+.ard-rail__ring {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--ard-rail-size);
+	height: var(--ard-rail-size);
+	padding: var(--ard-rail-ring);
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--ard-rail-from), var(--ard-rail-to));
+	transition: transform 0.2s;
+}
+
+.ard-rail--squircle .ard-rail__ring,
+.ard-rail--squircle .ard-rail__img {
+	border-radius: var(--ard-radius);
+}
+
+.ard-rail--ring-solid .ard-rail__ring {
+	background: var(--ard-rail-from);
+}
+
+.ard-rail--ring-soft .ard-rail__ring {
+	background: var(--ard-tint-blue);
+}
+
+.ard-rail--ring-none .ard-rail__ring {
+	padding: 0;
+	background: none;
+}
+
+.ard-rail__item > a:hover .ard-rail__ring {
+	transform: translateY(-3px);
+}
+
+.ard-rail__img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: var(--ard-rail-inner) solid var(--ard-base);
+	border-radius: 50%;
+	background-color: var(--ard-base);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.ard-rail__img--icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--ard-primary);
+}
+
+.ard-rail__label {
+	color: var(--ard-text-body);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.7;
+	text-align: center;
+}
+
+.ard-rail__count {
+	color: var(--ard-muted);
+	font-size: 11.5px;
+	font-weight: 500;
+}
+
+.ard-rail__item.is-current .ard-rail__label {
+	color: var(--ard-primary-dark);
+	font-weight: 700;
+}
+
+/* ============================================================
+   ستون فیلتر
+   ============================================================ */
+
+.ard-fil {
+	--ard-fil-accent: var(--ard-primary);
+	--ard-fil-line: var(--ard-border-soft);
+	--ard-fil-top: 20px;
+
+	position: relative;
+	min-width: 0;
+}
+
+.ard-fil--sticky {
+	position: sticky;
+	top: var(--ard-fil-top);
+	align-self: start;
+	/* بلندتر از صفحه که شد، خودِ ستون اسکرول می‌خورد نه کل صفحه. */
+	max-height: calc(100vh - (var(--ard-fil-top) * 2));
+}
+
+.ard-fil__inner {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	max-height: inherit;
+}
+
+.ard-fil--boxed .ard-fil__inner {
+	padding: 8px 20px 14px;
+	border-radius: var(--ard-radius);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow);
+}
+
+.ard-fil__grip,
+.ard-fil__head {
+	display: none;
+}
+
+.ard-fil__form {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	margin: 0;
+	/* باز شدن آکاردئون نباید دکمه «اعمال» را از دسترس بیرون ببرد. */
+	overflow-y: auto;
+	padding: 2px;
+}
+
+.ard-fil__card-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 14px 0 12px;
+	border-bottom: 1px solid var(--ard-fil-line);
+}
+
+.ard-fil__card-title {
+	color: var(--ard-primary-dark);
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.ard-fil__card-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 6px;
+	border-radius: var(--ard-radius-pill);
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary);
+	font-size: 12px;
+	font-weight: 700;
+}
+
+/* ------------------------------------------------ آکاردئون */
+
+.ard-fil__sec {
+	border-bottom: 1px solid var(--ard-fil-line);
+}
+
+.ard-fil__sec:last-of-type {
+	border-bottom: 0;
+}
+
+.ard-fil__sec-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 15px 0;
+	color: var(--ard-text-body);
+	cursor: pointer;
+	list-style: none;
+}
+
+.ard-fil__sec-head::-webkit-details-marker {
+	display: none;
+}
+
+.ard-fil__sec-title {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--ard-text);
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.ard-fil__sec[open] > .ard-fil__sec-head .ard-ai {
+	transform: rotate(180deg);
+	transition: transform 0.2s;
+}
+
+.ard-fil__body {
+	padding-bottom: 12px;
+}
+
+/* شمارنده خالی نباید دیده شود. */
+.ard-fil__pill[hidden] {
+	display: none;
+}
+
+.ard-fil__pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: var(--ard-tint-green);
+	color: var(--ard-accent-deep);
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+/* ------------------------------------------------ جست‌وجو */
+
+.ard-fil__search,
+.ard-fil__find {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: 46px;
+	padding: 0 12px;
+	border: 1px solid var(--ard-border);
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-base);
+	color: var(--ard-muted);
+}
+
+.ard-fil__find {
+	height: 40px;
+	margin-bottom: 8px;
+	background: var(--ard-surface);
+	border-color: transparent;
+}
+
+.ard-fil__search:focus-within,
+.ard-fil__find:focus-within {
+	border-color: var(--ard-fil-accent);
+	box-shadow: 0 0 0 3px rgba(var(--ard-primary-rgb), 0.12);
+}
+
+.ard-fil__search input,
+.ard-fil__find input {
+	flex: 1 1 auto;
+	min-width: 0;
+	height: 100%;
+	padding: 0;
+	border: 0;
+	background: none;
+	box-shadow: none;
+	color: var(--ard-text);
+	font-family: inherit;
+	font-size: 13px;
+	outline: none;
+}
+
+/* ------------------------------------------------ گزینه‌ها */
+
+.ard-fil__opts {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+	overflow-y: auto;
+	list-style: none;
+}
+
+.ard-fil__opts > li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-fil__opts > li[hidden] {
+	display: none;
+}
+
+.ard-fil__opt {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 9px 6px;
+	border-radius: var(--ard-radius-sm);
+	color: var(--ard-text-body);
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s;
+}
+
+.ard-fil__opt:hover {
+	background: var(--ard-surface);
+}
+
+.ard-fil__opt.is-on {
+	color: var(--ard-primary-dark);
+	font-weight: 700;
+}
+
+.ard-fil__opt input[type="checkbox"] {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.ard-fil__box {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 20px;
+	height: 20px;
+	border: 1.5px solid var(--ard-border);
+	border-radius: 6px;
+	background: var(--ard-base);
+	color: var(--ard-base);
+	transition: border-color 0.15s, background 0.15s;
+}
+
+.ard-fil__box .ard-ai {
+	opacity: 0;
+}
+
+.ard-fil__opt input:checked + .ard-fil__box {
+	border-color: var(--ard-fil-accent);
+	background: var(--ard-fil-accent);
+}
+
+.ard-fil__opt input:checked + .ard-fil__box .ard-ai {
+	opacity: 1;
+}
+
+.ard-fil__opt input:focus-visible + .ard-fil__box,
+.ard-fil__opt input:focus-visible + .ard-fil__swatch {
+	box-shadow: 0 0 0 3px rgba(var(--ard-primary-rgb), 0.22);
+}
+
+.ard-fil__opt-label {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.ard-fil__opt-count {
+	flex: 0 0 auto;
+	color: var(--ard-muted);
+	font-size: 12px;
+	font-weight: 500;
+}
+
+/* چیپ‌ها */
+
+.ard-fil__opts--chip {
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding-top: 4px;
+}
+
+.ard-fil__opts--chip .ard-fil__opt {
+	gap: 6px;
+	padding: 7px 12px;
+	border: 1px solid var(--ard-border);
+	border-radius: var(--ard-radius-pill);
+	font-size: 13px;
+}
+
+.ard-fil__opts--chip .ard-fil__opt:has(input:checked) {
+	border-color: var(--ard-fil-accent);
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary-dark);
+}
+
+.ard-fil__opts--chip .ard-fil__opt.is-on {
+	border-color: var(--ard-fil-accent);
+	background: var(--ard-tint-blue);
+}
+
+.ard-fil__opts--chip .ard-fil__opt-count {
+	font-size: 11px;
+}
+
+/* نمونه‌رنگ */
+
+.ard-fil__opts--swatch {
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding-top: 4px;
+}
+
+.ard-fil__opts--swatch .ard-fil__opt {
+	flex-direction: column;
+	gap: 6px;
+	width: 62px;
+	padding: 6px 2px;
+	font-size: 11.5px;
+	text-align: center;
+}
+
+.ard-fil__swatch {
+	display: block;
+	width: 30px;
+	height: 30px;
+	border: 2px solid var(--ard-base);
+	border-radius: 50%;
+	box-shadow: 0 0 0 1.5px var(--ard-border);
+	transition: box-shadow 0.15s;
+}
+
+.ard-fil__opts--swatch .ard-fil__opt input:checked ~ .ard-fil__swatch,
+.ard-fil__opts--swatch .ard-fil__opt.is-on .ard-fil__swatch {
+	box-shadow: 0 0 0 2px var(--ard-fil-accent);
+}
+
+.ard-fil__opts--swatch .ard-fil__opt-count {
+	display: none;
+}
+
+/* امتیاز */
+
+.ard-fil__stars {
+	display: inline-flex;
+	gap: 1px;
+	color: var(--ard-star);
+}
+
+/* ------------------------------------------------ کلیدها */
+
+.ard-fil__switches {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 2px 0;
+}
+
+.ard-fil__switch {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 11px 2px;
+	cursor: pointer;
+}
+
+.ard-fil__switch-label {
+	color: var(--ard-text-body);
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.ard-fil__switch input[type="checkbox"] {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.ard-fil__track {
+	position: relative;
+	display: inline-block;
+	flex: 0 0 auto;
+	width: 44px;
+	height: 24px;
+	border-radius: 12px;
+	background: var(--ard-border);
+	transition: background 0.2s;
+}
+
+.ard-fil__dot {
+	position: absolute;
+	top: 3px;
+	inset-inline-start: 3px;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: var(--ard-base);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+	transition: transform 0.2s;
+}
+
+.ard-fil__switch input:checked + .ard-fil__track {
+	background: var(--ard-fil-accent);
+}
+
+.ard-fil__switch input:checked + .ard-fil__track .ard-fil__dot {
+	transform: translateX(-20px);
+}
+
+.ard-fil__switch input:focus-visible + .ard-fil__track {
+	box-shadow: 0 0 0 3px rgba(var(--ard-primary-rgb), 0.22);
+}
+
+/* ------------------------------------------------ بازه قیمت */
+
+.ard-fil__range {
+	position: relative;
+	height: 20px;
+	margin: 10px 4px 0;
+}
+
+.ard-fil__range-track,
+.ard-fil__range-fill {
+	position: absolute;
+	top: 50%;
+	height: 5px;
+	border-radius: 3px;
+	transform: translateY(-50%);
+}
+
+.ard-fil__range-track {
+	right: 0;
+	left: 0;
+	background: var(--ard-border-soft);
+}
+
+.ard-fil__range-fill {
+	background: var(--ard-fil-accent);
+}
+
+.ard-fil__range-input {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	left: 0;
+	width: 100%;
+	height: 20px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	transform: translateY(-50%);
+	pointer-events: none;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.ard-fil__range-input::-webkit-slider-thumb {
+	width: 20px;
+	height: 20px;
+	border: 3px solid var(--ard-base);
+	border-radius: 50%;
+	background: var(--ard-fil-accent);
+	box-shadow: 0 1px 5px rgba(var(--ard-primary-dark-rgb), 0.4);
+	cursor: pointer;
+	pointer-events: auto;
+	-webkit-appearance: none;
+}
+
+.ard-fil__range-input::-moz-range-thumb {
+	width: 18px;
+	height: 18px;
+	border: 3px solid var(--ard-base);
+	border-radius: 50%;
+	background: var(--ard-fil-accent);
+	box-shadow: 0 1px 5px rgba(var(--ard-primary-dark-rgb), 0.4);
+	cursor: pointer;
+	pointer-events: auto;
+}
+
+.ard-fil__range-input[data-ard-range-min] {
+	z-index: 3;
+}
+
+.ard-fil__range-input[data-ard-range-max] {
+	z-index: 4;
+}
+
+.ard-fil__range-values {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	margin: 16px 0 0;
+	color: var(--ard-primary-dark);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.ard-fil__range-sep,
+.ard-fil__range-unit {
+	color: var(--ard-muted);
+	font-weight: 400;
+}
+
+/* ------------------------------------------------ دکمه‌ها */
+
+/* نوار دکمه‌ها همیشه پایین ستون می‌چسبد؛ «اعمال» بدون اسکرول در دسترس است. */
+.ard-fil__actions {
+	position: sticky;
+	bottom: 0;
+	z-index: 3;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: auto;
+	padding: 10px 0 2px;
+	background: var(--ard-base);
+}
+
+.ard-fil__actions-row {
+	display: flex;
+	gap: 10px;
+}
+
+.ard-fil__dirty {
+	display: none;
+	align-items: center;
+	gap: 7px;
+	margin: 0;
+	padding: 9px 12px;
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-tint-green);
+	color: var(--ard-accent-deep);
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1.7;
+}
+
+.ard-fil__actions.is-dirty .ard-fil__dirty {
+	display: flex;
+}
+
+.ard-fil__actions.is-dirty .ard-fil__apply {
+	animation: ard-fil-pulse 1.6s ease-out 2;
+}
+
+@keyframes ard-fil-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(var(--ard-accent-rgb), 0.55);
+	}
+
+	70% {
+		box-shadow: 0 0 0 12px rgba(var(--ard-accent-rgb), 0);
+	}
+
+	100% {
+		box-shadow: 0 0 0 0 rgba(var(--ard-accent-rgb), 0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-fil__actions.is-dirty .ard-fil__apply {
+		animation: none;
+	}
+}
+
+.ard-fil__apply,
+.ard-fil__clear {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 50px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: var(--ard-radius-sm);
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 700;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.ard-fil__apply {
+	flex: 1 1 auto;
+	background: var(--ard-primary);
+	color: #fff;
+	transition: background 0.2s;
+}
+
+.ard-fil__apply:hover {
+	background: var(--ard-primary-hover);
+}
+
+.ard-fil__apply-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 22px;
+	margin-inline-start: 8px;
+	padding: 0 6px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.24);
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.ard-fil__apply-count[hidden] {
+	display: none;
+}
+
+.ard-fil__clear {
+	flex: 0 0 auto;
+	border: 1.5px solid var(--ard-border);
+	background: var(--ard-base);
+	color: var(--ard-text-soft);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.ard-fil__clear:hover {
+	border-color: var(--ard-primary);
+	color: var(--ard-primary);
+}
+
+.ard-fil__active-note {
+	color: var(--ard-muted);
+	font-size: 11.5px;
+	text-align: center;
+}
+
+/* دکمه شناور موبایل */
+
+.ard-fil__fab {
+	display: none;
+	position: fixed;
+	inset-inline-start: 50%;
+	bottom: 18px;
+	z-index: 99;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 20px;
+	border: 0;
+	border-radius: var(--ard-radius-pill);
+	background: var(--ard-primary);
+	color: #fff;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 700;
+	box-shadow: 0 10px 28px -10px rgba(var(--ard-primary-dark-rgb), 0.65);
+	transform: translateX(50%);
+	cursor: pointer;
+}
+
+.ard-fil__fab-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 20px;
+	height: 20px;
+	padding: 0 5px;
+	border-radius: 10px;
+	background: var(--ard-accent);
+	font-size: 11px;
+}
+
+/* ============================================================
+   پرده و قفل اسکرول
+   ============================================================ */
+
+.ard-arch-scrim {
+	display: none;
+}
+
+body.ard-arch-locked {
+	overflow: hidden;
+}
+
+/* ============================================================
+   نوار مرتب‌سازی
+   ============================================================ */
+
+.ard-tool {
+	--ard-tool-active: var(--ard-primary-dark);
+	--ard-tool-line: var(--ard-accent);
+
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin: 0;
+}
+
+.ard-tool--boxed {
+	padding: 14px 22px;
+	border-radius: var(--ard-radius);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow);
+}
+
+.ard-tool__mobile {
+	display: none;
+	gap: 10px;
+}
+
+.ard-tool__count {
+	margin: 0;
+	padding: 0;
+	color: var(--ard-text-soft);
+	font-size: 13px;
+	float: none;
+}
+
+.ard-tool__count b {
+	color: var(--ard-primary-dark);
+	font-weight: 700;
+}
+
+.ard-tool__sorts {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.ard-tool__sorts-cap {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--ard-primary-dark);
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.ard-tool__sort {
+	color: var(--ard-text-soft);
+	font-size: 13px;
+	font-weight: 500;
+	white-space: nowrap;
+	text-decoration: none;
+	transition: color 0.18s;
+}
+
+.ard-tool__sort:hover {
+	color: var(--ard-primary);
+}
+
+.ard-tool--links .ard-tool__sort {
+	padding-bottom: 3px;
+	border-bottom: 2px solid transparent;
+}
+
+.ard-tool--links .ard-tool__sort.is-on {
+	border-bottom-color: var(--ard-tool-line);
+	color: var(--ard-tool-active);
+	font-weight: 700;
+}
+
+.ard-tool--pills .ard-tool__sorts {
+	gap: 8px;
+}
+
+.ard-tool--pills .ard-tool__sort {
+	padding: 7px 14px;
+	border: 1px solid var(--ard-border);
+	border-radius: var(--ard-radius-pill);
+}
+
+.ard-tool--pills .ard-tool__sort.is-on {
+	border-color: transparent;
+	background: var(--ard-tool-active);
+	color: #fff;
+	font-weight: 700;
+}
+
+.ard-tool__select {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--ard-text-soft);
+	font-size: 13px;
+}
+
+.ard-tool__select select {
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid var(--ard-border);
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-base);
+	color: var(--ard-text);
+	font-family: inherit;
+	font-size: 13px;
+}
+
+.ard-tool__mbtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	height: 46px;
+	padding: 0 14px;
+	border: 0;
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow-sm);
+	color: var(--ard-primary-dark);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.ard-tool__mbtn--filter {
+	flex: 1 1 auto;
+}
+
+.ard-tool__mbtn--sort {
+	flex: 0 0 auto;
+	width: 46px;
+	padding: 0;
+}
+
+.ard-tool__badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: var(--ard-primary);
+	color: #fff;
+	font-size: 10px;
+	font-weight: 700;
+}
+
+/* ============================================================
+   شیت پایینی
+   ============================================================ */
+
+.ard-sheet {
+	position: fixed;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	z-index: 100001;
+	padding: 8px 0 20px;
+	border-radius: var(--ard-radius-xl) var(--ard-radius-xl) 0 0;
+	background: var(--ard-base);
+	box-shadow: 0 -10px 40px rgba(var(--ard-primary-dark-rgb), 0.22);
+	transform: translateY(105%);
+	transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+	visibility: hidden;
+}
+
+.ard-sheet__grip {
+	display: block;
+	width: 44px;
+	height: 5px;
+	margin: 6px auto 8px;
+	border-radius: 3px;
+	background: var(--ard-border);
+}
+
+.ard-sheet__title {
+	display: block;
+	padding: 6px 0 10px;
+	color: var(--ard-text);
+	font-size: 15px;
+	font-weight: 700;
+	text-align: center;
+}
+
+.ard-sheet__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-sheet__list > li {
+	margin: 0;
+	list-style: none;
+}
+
+.ard-sheet__list a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 14px 24px;
+	color: var(--ard-text-body);
+	font-size: 14px;
+	text-decoration: none;
+}
+
+.ard-sheet__list a.is-on {
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary-dark);
+	font-weight: 700;
+}
+
+body.ard-arch-sort .ard-sheet {
+	transform: translateY(0);
+	visibility: visible;
+}
+
+/* ============================================================
+   شبکه محصولات
+   ============================================================ */
+
+.ard-grid {
+	--ard-grid-cols: 4;
+
+	display: grid;
+	grid-template-columns: repeat(var(--ard-grid-cols), minmax(0, 1fr));
+	gap: 20px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-grid::before,
+.ard-grid::after {
+	display: none;
+}
+
+.ard-acard {
+	--ard-acard-ratio: 1;
+
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	width: auto;
+	min-width: 0;
+	margin: 0;
+	padding: 14px;
+	float: none;
+	clear: none;
+	border: 1px solid transparent;
+	border-radius: var(--ard-radius);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow-sm);
+	text-align: center;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ard-grid--lift .ard-acard:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 14px 28px -14px rgba(var(--ard-primary-dark-rgb), 0.35);
+}
+
+.ard-acard__media {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-surface);
+	aspect-ratio: 1 / var(--ard-acard-ratio);
+}
+
+.ard-acard__media-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.ard-acard__media img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	object-fit: contain;
+	transition: transform 0.35s;
+}
+
+.ard-grid--fit-contain .ard-acard__media img {
+	width: 86%;
+	height: 86%;
+	object-fit: contain;
+}
+
+.ard-grid--fit-cover .ard-acard__media img {
+	object-fit: cover;
+}
+
+.ard-grid--zoom .ard-acard:hover .ard-acard__media img {
+	transform: scale(1.06);
+}
+
+.ard-acard__badge {
+	position: absolute;
+	top: 10px;
+	inset-inline-start: 10px;
+	padding: 3px 10px;
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-sale);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.8;
+}
+
+.ard-acard__flag {
+	position: absolute;
+	bottom: 10px;
+	inset-inline-start: 10px;
+	padding: 3px 10px;
+	border-radius: var(--ard-radius-sm);
+	background: rgba(var(--ard-text-rgb), 0.8);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.ard-acard__wish {
+	position: absolute;
+	top: 10px;
+	inset-inline-end: 10px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	border: 0;
+	border-radius: var(--ard-radius-sm);
+	background: rgba(255, 255, 255, 0.9);
+	color: var(--ard-text-soft);
+	cursor: pointer;
+	transition: color 0.18s, background 0.18s;
+}
+
+.ard-acard__wish:hover {
+	color: var(--ard-sale);
+}
+
+.ard-acard__wish.is-active {
+	background: var(--ard-sale-soft);
+	color: var(--ard-sale);
+}
+
+.ard-acard__wish.is-active .ard-ai {
+	fill: currentColor;
+}
+
+.ard-acard__fab {
+	position: absolute;
+	bottom: 10px;
+	inset-inline-end: 10px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	background: var(--ard-accent);
+	color: #fff;
+	font-size: 20px;
+	font-weight: 700;
+	line-height: 1;
+	text-decoration: none;
+	transition: background 0.18s;
+}
+
+.ard-acard__fab:hover {
+	background: var(--ard-accent-hover);
+}
+
+.ard-acard__meta {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 22px;
+}
+
+.ard-grid--align-start .ard-acard {
+	text-align: right;
+}
+
+.ard-grid--align-start .ard-acard__meta,
+.ard-grid--align-start .ard-acard__prices {
+	justify-content: flex-start;
+}
+
+.ard-grid--align-start .ard-acard__btn {
+	width: 100%;
+}
+
+.ard-acard__cat {
+	color: var(--ard-muted);
+	font-size: 11.5px;
+	font-weight: 500;
+}
+
+.ard-acard__rating {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	color: var(--ard-text-body);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.ard-acard__stars {
+	display: inline-flex;
+	gap: 1px;
+	color: var(--ard-star);
+}
+
+.ard-acard__rate-num {
+	font-weight: 700;
+}
+
+.ard-acard__name {
+	margin: 0;
+	padding: 0;
+	color: var(--ard-text);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.7;
+}
+
+.ard-acard__name a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.ard-acard__name a:hover {
+	color: var(--ard-primary);
+}
+
+.ard-acard__name-fa {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	overflow-wrap: anywhere;
+}
+
+.ard-acard__name-en {
+	display: block;
+	margin-top: 3px;
+	color: var(--ard-muted);
+	direction: ltr;
+	font-size: 11.5px;
+	font-weight: 500;
+}
+
+.ard-acard__prices {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: auto;
+}
+
+.ard-acard__old {
+	color: var(--ard-muted);
+	font-size: 12px;
+	font-weight: 500;
+	text-decoration: line-through;
+}
+
+.ard-acard__price {
+	color: var(--ard-primary-dark);
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.ard-acard__price--call {
+	color: var(--ard-muted);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.ard-acard__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+	padding: 11px 16px;
+	border: 1px solid transparent;
+	border-radius: var(--ard-radius-sm);
+	font-size: 13px;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.ard-acard__btn--solid {
+	background: var(--ard-accent);
+	color: #fff;
+}
+
+.ard-acard__btn--solid:hover {
+	background: var(--ard-accent-hover);
+}
+
+.ard-acard__btn--outline {
+	border-color: var(--ard-accent);
+	background: var(--ard-base);
+	color: var(--ard-accent-deep);
+}
+
+.ard-acard__btn--outline:hover {
+	background: var(--ard-tint-green);
+}
+
+.ard-acard.is-out .ard-acard__media img {
+	opacity: 0.6;
+}
+
+/* ============================================================
+   صفحه‌بندی
+   ============================================================ */
+
+.ard-pager {
+	--ard-pager-size: 42px;
+
+	display: block;
+	margin: 30px 0 8px;
+	padding: 0;
+	border: 0;
+	text-align: center;
+}
+
+.ard-pager ul.page-numbers {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	width: auto;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	list-style: none;
+	white-space: normal;
+}
+
+/*
+ * استایل قدیمی ووکامرس روی این li ها overflow:hidden می‌گذارد؛ در فلکس یعنی
+ * کمینه عرض خودکار صفر می‌شود و شماره داخلش بریده و نامرئی می‌شود.
+ */
+.ard-pager ul.page-numbers > li {
+	flex: 0 0 auto;
+	overflow: visible;
+	float: none;
+	width: auto;
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	list-style: none;
+}
+
+.ard-pager .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--ard-pager-size);
+	height: var(--ard-pager-size);
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow-sm);
+	color: var(--ard-text-soft);
+	font-size: 14px;
+	line-height: 1;
+	text-decoration: none;
+	transition: background 0.18s, color 0.18s;
+}
+
+.ard-pager .page-numbers:hover {
+	color: var(--ard-primary);
+}
+
+.ard-pager .page-numbers.current {
+	background: var(--ard-primary);
+	color: #fff;
+	font-weight: 700;
+}
+
+.ard-pager .page-numbers.next,
+.ard-pager .page-numbers.prev {
+	color: var(--ard-primary-dark);
+}
+
+.ard-pager .page-numbers.dots {
+	box-shadow: none;
+	background: none;
+	letter-spacing: 1px;
+}
+
+/* ============================================================
+   نبود نتیجه
+   ============================================================ */
+
+.ard-arch-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	padding: 48px 24px;
+	border: 0;
+	border-radius: var(--ard-radius);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow);
+	text-align: center;
+}
+
+.ard-arch-empty::before {
+	display: none;
+}
+
+.ard-arch-empty__art {
+	color: var(--ard-border);
+}
+
+.ard-arch-empty__title {
+	margin: 0;
+	color: var(--ard-text);
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.ard-arch-empty__text {
+	margin: 0;
+	color: var(--ard-text-soft);
+	font-size: 13px;
+}
+
+.ard-arch-empty__btn {
+	margin-top: 8px;
+	padding: 12px 24px;
+	border-radius: var(--ard-radius-sm);
+	background: var(--ard-primary);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+/* ============================================================
+   چیپ‌های فیلتر فعال
+   ============================================================ */
+
+.ard-chips {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.ard-chips--boxed {
+	padding: 12px 16px;
+	border-radius: var(--ard-radius);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow-sm);
+}
+
+.ard-chips__label {
+	color: var(--ard-text-soft);
+	font-size: 12.5px;
+	font-weight: 600;
+}
+
+.ard-chips__item {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border: 1px solid var(--ard-tint-blue-border);
+	border-radius: var(--ard-radius-pill);
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary-dark);
+	font-size: 12.5px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: background 0.18s, border-color 0.18s;
+}
+
+.ard-chips__item:hover {
+	border-color: var(--ard-sale);
+	background: var(--ard-sale-soft);
+	color: var(--ard-sale);
+}
+
+.ard-chips__clear {
+	color: var(--ard-sale);
+	font-size: 12.5px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+/* ============================================================
+   توضیحات دسته
+   ============================================================ */
+
+.ard-desc--boxed {
+	padding: 22px 24px;
+	border-radius: var(--ard-radius-lg);
+	background: var(--ard-base);
+	box-shadow: var(--ard-arch-shadow);
+}
+
+.ard-desc__body {
+	--ard-desc-h: 180px;
+
+	color: var(--ard-text-soft);
+	font-size: 14px;
+	line-height: 2.1;
+	text-align: justify;
+}
+
+.ard-desc--collapse .ard-desc__body.is-clamped {
+	position: relative;
+	max-height: var(--ard-desc-h);
+	overflow: hidden;
+}
+
+.ard-desc--collapse .ard-desc__body.is-clamped::after {
+	content: "";
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 70px;
+	background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--ard-base));
+	pointer-events: none;
+}
+
+.ard-desc__body > :first-child {
+	margin-top: 0;
+}
+
+.ard-desc__body > :last-child {
+	margin-bottom: 0;
+}
+
+.ard-desc__body h1,
+.ard-desc__body h2,
+.ard-desc__body h3,
+.ard-desc__body h4 {
+	margin: 18px 0 8px;
+	color: var(--ard-primary-dark);
+	font-weight: 700;
+	line-height: 1.7;
+}
+
+.ard-desc__body a {
+	color: var(--ard-primary);
+	text-decoration: underline;
+}
+
+.ard-desc__body img {
+	max-width: 100%;
+	height: auto;
+	border-radius: var(--ard-radius-sm);
+}
+
+.ard-desc__more {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 10px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--ard-primary);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.ard-desc__more[hidden] {
+	display: none;
+}
+
+.ard-desc.is-open .ard-desc__more .ard-ai {
+	transform: rotate(180deg);
+}
+
+/* ============================================================
+   موبایل و تبلت
+   ============================================================ */
+
+@media screen and (max-width: 1024px) {
+	/*
+	 * ستون فیلتر در موبایل همان شیت پایینی می‌شود: از پایین بالا می‌آید، همان
+	 * گردی گوشه و همان گذار؛ فقط بلندتر است چون فرم دارد.
+	 */
+	.ard-fil--drawer {
+		position: fixed;
+		top: auto;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 100001;
+		display: flex;
+		flex-direction: column;
+		width: auto;
+		max-width: none;
+		max-height: 86vh;
+		border-radius: var(--ard-radius-xl) var(--ard-radius-xl) 0 0;
+		background: var(--ard-base);
+		box-shadow: 0 -10px 40px rgba(var(--ard-primary-dark-rgb), 0.22);
+		transform: translateY(105%);
+		transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+		visibility: hidden;
+	}
+
+	body.ard-arch-filters .ard-fil--drawer {
+		transform: translateY(0);
+		visibility: visible;
+	}
+
+	.ard-fil--drawer .ard-fil__inner {
+		flex: 1 1 auto;
+		height: auto;
+		min-height: 0;
+		max-height: 100%;
+		padding: 0;
+		border-radius: 0;
+		box-shadow: none;
+	}
+
+	.ard-fil--drawer .ard-fil__grip {
+		display: block;
+		flex: 0 0 auto;
+		width: 44px;
+		height: 5px;
+		margin: 8px auto 2px;
+		border-radius: 3px;
+		background: var(--ard-border);
+	}
+
+	.ard-fil--drawer .ard-fil__head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex: 0 0 auto;
+		padding: 14px 18px 12px;
+		border-bottom: 1px solid var(--ard-fil-line);
+	}
+
+	.ard-fil__head-title {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--ard-text);
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.ard-fil__close {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		padding: 0;
+		border: 0;
+		border-radius: var(--ard-radius-sm);
+		background: var(--ard-surface);
+		color: var(--ard-primary-dark);
+		cursor: pointer;
+	}
+
+	.ard-fil--drawer .ard-fil__form {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow-y: auto;
+		padding: 8px 18px 0;
+	}
+
+	.ard-fil--drawer .ard-fil__card-head {
+		display: none;
+	}
+
+	.ard-fil--drawer .ard-fil__actions {
+		margin: 12px -18px 0;
+		padding: 12px 18px;
+		border-top: 1px solid var(--ard-fil-line);
+	}
+
+	.ard-fil__fab {
+		display: inline-flex;
+	}
+
+	.ard-arch-scrim {
+		position: fixed;
+		inset: 0;
+		z-index: 100000;
+		display: block;
+		background: rgba(var(--ard-text-rgb), 0.55);
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.28s;
+		border: 0;
+		padding: 0;
+	}
+
+	body.ard-arch-filters .ard-arch-scrim,
+	body.ard-arch-sort .ard-arch-scrim {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	/* نوار بالای فهرست، به دو دکمه موبایلی تبدیل می‌شود. */
+	.ard-tool {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 10px;
+	}
+
+	.ard-tool--boxed {
+		padding: 0;
+		background: none;
+		box-shadow: none;
+	}
+
+	.ard-tool__mobile {
+		display: flex;
+	}
+
+	.ard-tool__sorts {
+		display: none;
+	}
+
+	.ard-tool__count {
+		font-size: 11.5px;
+		text-align: center;
+	}
+
+	.ard-tool--hide-count-m .ard-tool__count {
+		display: none;
+	}
+
+	.ard-acard {
+		gap: 8px;
+		padding: 8px;
+	}
+
+	.ard-acard__wish {
+		top: 6px;
+		inset-inline-end: 6px;
+		width: 28px;
+		height: 28px;
+	}
+
+	.ard-acard__name {
+		font-size: 12px;
+	}
+
+	.ard-acard__price {
+		font-size: 12.5px;
+	}
+
+	.ard-pager {
+		--ard-pager-size: 36px;
+	}
+
+	.ard-desc--boxed {
+		padding: 16px 14px;
+	}
+
+	.ard-desc__body {
+		font-size: 13px;
+		line-height: 2;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.ard-arch__title {
+		font-size: 16px;
+	}
+
+	.ard-rail--boxed {
+		padding: 16px 12px 14px;
+	}
+
+	.ard-rail__track {
+		justify-content: flex-start;
+	}
+
+	.ard-rail__nav {
+		width: 30px;
+		height: 30px;
+	}
+
+	.ard-acard__meta {
+		gap: 4px;
+	}
+
+	.ard-acard__rating {
+		font-size: 11px;
+	}
+}

@@ -185,6 +185,7 @@ class Ardal_Palette {
 			'type'    => 'تایپوگرافی و ابعاد',
 			'money'   => 'واحد پول و اعداد',
 			'product' => 'صفحه محصول',
+			'archive' => 'آرشیو فروشگاه',
 			'account' => 'پنل کاربری',
 			'woocommerce_assets' => 'فایل‌های ووکامرس',
 		);
@@ -252,6 +253,13 @@ class Ardal_Palette {
 				'type'    => 'text',
 				'desc'    => 'نام متای محصول که عنوان انگلیسی از آن خوانده می‌شود. اگر خالی یا موجود نبود، از متن ویجت استفاده می‌شود.',
 				'group'   => 'product',
+			),
+			'archive_per_page' => array(
+				'label'   => 'تعداد محصول در هر صفحه آرشیو',
+				'default' => '0',
+				'type'    => 'number',
+				'desc'    => 'روی صفحه فروشگاه و آرشیو دسته‌ها اعمال می‌شود. صفر یعنی همان مقدار پیش‌فرض ووکامرس.',
+				'group'   => 'archive',
 			),
 			'account_support_phone' => array(
 				'label'   => 'شماره پشتیبانی',

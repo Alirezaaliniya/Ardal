@@ -37,6 +37,7 @@ final class Ardal {
 		Ardal_Mega_Menu::init();
 		Ardal_Account::init();
 		Ardal_Shop::init();
+		Ardal_Archive::init();
 
 		add_action( 'plugins_loaded', array( $this, 'boot_elementor' ) );
 	}

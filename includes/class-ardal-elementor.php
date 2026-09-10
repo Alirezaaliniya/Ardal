@@ -13,6 +13,7 @@ class Ardal_Elementor {
 
 	const CATEGORY         = 'ardal';
 	const CATEGORY_PRODUCT = 'ardal-product';
+	const CATEGORY_ARCHIVE = 'ardal-archive';
 
 	/**
 	 * نگاشت اسلاگ فایل به نام کلاس.
@@ -55,6 +56,13 @@ class Ardal_Elementor {
 			'product-tabs'        => 'Ardal_Widget_Product_Tabs',
 			'product-related'     => 'Ardal_Widget_Product_Related',
 			'product-sticky-bar'  => 'Ardal_Widget_Product_Sticky_Bar',
+			// آرشیو فروشگاه
+			'archive-rail'        => 'Ardal_Widget_Archive_Rail',
+			'archive-filters'     => 'Ardal_Widget_Archive_Filters',
+			'archive-chips'       => 'Ardal_Widget_Archive_Chips',
+			'archive-toolbar'     => 'Ardal_Widget_Archive_Toolbar',
+			'archive-products'    => 'Ardal_Widget_Archive_Products',
+			'archive-description' => 'Ardal_Widget_Archive_Description',
 		);
 	}
 
@@ -91,6 +99,12 @@ class Ardal_Elementor {
 			'تب‌های جامع محصول',
 			'محصولات مرتبط',
 			'نوار چسبان خرید محصول',
+			'ریل دسته‌بندی آرشیو',
+			'فیلتر محصولات (ستون کناری)',
+			'فیلترهای فعال',
+			'نوار مرتب‌سازی آرشیو',
+			'شبکه محصولات آرشیو',
+			'توضیحات دسته',
 		);
 	}
 
@@ -118,6 +132,14 @@ class Ardal_Elementor {
 				'icon'  => 'eicon-single-product',
 			)
 		);
+
+		$manager->add_category(
+			self::CATEGORY_ARCHIVE,
+			array(
+				'title' => 'اردال — آرشیو فروشگاه',
+				'icon'  => 'eicon-product-categories',
+			)
+		);
 	}
 
 	/**
@@ -126,6 +148,7 @@ class Ardal_Elementor {
 	public function register_widgets( $manager ) {
 		// در این نقطه المنتور Widget_Base را require کرده است.
 		require_once ARDAL_PATH . 'includes/class-ardal-widget-base.php';
+		require_once ARDAL_PATH . 'includes/class-ardal-archive-widget-base.php';
 
 		foreach ( self::widgets() as $slug => $class ) {
 			$file = ARDAL_PATH . 'widgets/class-ardal-' . $slug . '.php';
