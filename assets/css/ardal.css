@@ -696,6 +696,22 @@ a.ard-topbar__item:hover {
 	visibility: visible;
 }
 
+/*
+ * تصویر سمت راست.
+ *
+ * با کلاس انجام می‌شود نه با استایل المنتور، چون قانون تک‌ستونی موبایل پایین
+ * همین فایل داخل مدیا کوئری است و استایل ویجت — که وزنش بیشتر است — آن را
+ * می‌شکست و تصویر در موبایل کنار متن می‌ماند.
+ */
+.ard-hero--media-start .ard-hero__slide {
+	flex-direction: row-reverse;
+}
+
+.ard-hero--media-start .ard-hero__dots {
+	right: auto;
+	left: 44px;
+}
+
 .ard-hero__copy {
 	position: relative;
 	flex: 1;
@@ -2857,6 +2873,11 @@ a.ard-brand:hover img {
 		margin-block-end: 16px;
 	}
 
+	/* در موبایل همیشه تک‌ستونی، حتی وقتی «تصویر سمت راست» انتخاب شده. */
+	.ard-hero--media-start .ard-hero__slide {
+		flex-direction: column;
+	}
+
 	.ard-hero__media {
 		order: -1;
 		inline-size: 100%;
@@ -2867,6 +2888,10 @@ a.ard-brand:hover img {
 	.ard-hero__dots {
 		right: 18px;
 		bottom: 14px;
+	}
+
+	.ard-hero--media-start .ard-hero__dots {
+		left: 18px;
 	}
 
 	.ard-hero__arrow {

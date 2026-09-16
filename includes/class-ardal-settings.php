@@ -105,6 +105,8 @@ class Ardal_Settings {
 				'optionKey' => Ardal_Palette::OPTION,
 				'presets'   => $this->presets(),
 				'confirm'   => 'همه رنگ‌ها به مقادیر پیش‌فرض دیزاین برگردند؟',
+				// برای پیش‌نمایش زندهٔ سلکت‌های آیکون در تب پنل کاربری.
+				'iconPaths' => Ardal_Account::icon_paths(),
 			)
 		);
 	}
@@ -392,6 +394,8 @@ class Ardal_Settings {
 		$menu     = Ardal_Account_Settings::menu_defaults();
 		$sections = Ardal_Account_Settings::dashboard_sections();
 		$schema   = Ardal_Account_Settings::schema();
+		$texts    = Ardal_Account_Settings::dashboard_texts();
+		$icons    = Ardal_Account::icon_options();
 		$name     = static function ( $key ) use ( $opt ) {
 			return $opt . '[' . $key . ']';
 		};
@@ -458,30 +462,96 @@ class Ardal_Settings {
 					</table>
 				</div>
 
-				<div class="ardal-card">
-					<h2>بخش‌های صفحه پیشخوان</h2>
-					<p class="ardal-hint">هر بخشی که خاموش شود، اصلاً رندر نمی‌شود (نه اینکه پنهان شود).</p>
+				<?php
+				/*
+				 * هر باکس پیشخوان یک کارت می‌شود: کلید روشن/خاموشش بالا، و
+				 * متن‌ها و آیکون‌هایش زیرش. این‌طوری برای پیدا کردن «آن جمله»
+				 * لازم نیست کاربر بین دو فهرست بلند بالا و پایین برود.
+				 */
+				foreach ( $sections as $key => $section ) :
+					?>
+					<div class="ardal-card">
+						<h2><?php echo esc_html( $section['label'] ); ?></h2>
+						<p class="ardal-hint"><?php echo esc_html( $section['desc'] ); ?></p>
 
-					<div class="ardal-fields ardal-fields--stack">
-						<?php foreach ( $sections as $key => $section ) : ?>
-							<div class="ardal-field ardal-field--checkbox">
-								<label for="ardal-dash-<?php echo esc_attr( $key ); ?>" class="ardal-check">
-									<input
-										type="checkbox"
-										id="ardal-dash-<?php echo esc_attr( $key ); ?>"
-										name="<?php echo esc_attr( $name( 'dash_' . $key ) ); ?>"
-										value="1"
-										<?php checked( '1', $values[ 'dash_' . $key ] ); ?>
-									/>
-									<span>
-										<span class="ardal-field__label"><?php echo esc_html( $section['label'] ); ?></span>
-										<span class="ardal-field__desc"><?php echo esc_html( $section['desc'] ); ?></span>
-									</span>
-								</label>
-							</div>
-						<?php endforeach; ?>
+						<div class="ardal-field ardal-field--checkbox ardal-field--top">
+							<label for="ardal-dash-<?php echo esc_attr( $key ); ?>" class="ardal-check">
+								<input
+									type="checkbox"
+									id="ardal-dash-<?php echo esc_attr( $key ); ?>"
+									name="<?php echo esc_attr( $name( 'dash_' . $key ) ); ?>"
+									value="1"
+									<?php checked( '1', $values[ 'dash_' . $key ] ); ?>
+								/>
+								<span>
+									<span class="ardal-field__label">این باکس نمایش داده شود</span>
+									<span class="ardal-field__desc">خاموش که باشد اصلاً رندر نمی‌شود، نه اینکه پنهان شود.</span>
+								</span>
+							</label>
+						</div>
+
+						<div class="ardal-fields ardal-fields--stack">
+							<?php
+							foreach ( $texts as $t_key => $field ) :
+								if ( $key !== $field['section'] ) {
+									continue;
+								}
+
+								$t_id   = 'ardal-ac-' . $t_key;
+								$t_desc = isset( $field['desc'] ) ? $field['desc'] : '';
+
+								if ( isset( $field['tokens'] ) ) {
+									$t_desc = trim( $t_desc . ' جای‌گذار: ' . $field['tokens'] );
+								}
+								?>
+								<div class="ardal-field ardal-field--<?php echo esc_attr( $field['type'] ); ?>">
+									<label for="<?php echo esc_attr( $t_id ); ?>">
+										<span class="ardal-field__label"><?php echo esc_html( $field['label'] ); ?></span>
+										<?php if ( '' !== $t_desc ) : ?>
+											<span class="ardal-field__desc"><?php echo esc_html( $t_desc ); ?></span>
+										<?php endif; ?>
+									</label>
+
+									<?php if ( 'icon' === $field['type'] ) : ?>
+										<span class="ardal-icon-row">
+										<select
+											id="<?php echo esc_attr( $t_id ); ?>"
+											name="<?php echo esc_attr( $name( $t_key ) ); ?>"
+										>
+											<?php foreach ( $icons as $icon_key => $icon_label ) : ?>
+												<option
+													value="<?php echo esc_attr( $icon_key ); ?>"
+													<?php selected( $icon_key, $values[ $t_key ] ); ?>
+												><?php echo esc_html( $icon_label ); ?></option>
+											<?php endforeach; ?>
+										</select>
+										<span class="ardal-icon-preview"><?php echo Ardal_Account::icon( Ardal_Account_Settings::icon_name( $t_key ), 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+										</span>
+									<?php elseif ( 'textarea' === $field['type'] ) : ?>
+										<textarea
+											id="<?php echo esc_attr( $t_id ); ?>"
+											name="<?php echo esc_attr( $name( $t_key ) ); ?>"
+											rows="2"
+											class="large-text"
+											placeholder="<?php echo esc_attr( $field['default'] ); ?>"
+										><?php echo esc_textarea( $values[ $t_key ] ); ?></textarea>
+									<?php else : ?>
+										<input
+											type="text"
+											id="<?php echo esc_attr( $t_id ); ?>"
+											name="<?php echo esc_attr( $name( $t_key ) ); ?>"
+											value="<?php echo esc_attr( $values[ $t_key ] ); ?>"
+											class="regular-text"
+											placeholder="<?php echo esc_attr( $field['default'] ); ?>"
+										/>
+									<?php endif; ?>
+								</div>
+							<?php endforeach; ?>
+						</div>
 					</div>
-				</div>
+					<?php
+				endforeach;
+				?>
 
 				<?php foreach ( Ardal_Account_Settings::groups() as $group_key => $group_label ) : ?>
 					<div class="ardal-card">

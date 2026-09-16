@@ -22,11 +22,11 @@ $ard_wish   = Ardal_Account::wishlist_products();
 $ard_lines = array();
 
 if ( $ard_active ) {
-	$ard_lines[] = 'یک سفارش در حال ارسال داری';
+	$ard_lines[] = Ardal_Account_Settings::text( 'welcome_line_ship' );
 }
 
 if ( $ard_unpaid ) {
-	$ard_lines[] = 'یک سفارش منتظر پرداخت است';
+	$ard_lines[] = Ardal_Account_Settings::text( 'welcome_line_pay' );
 }
 
 $ard_in_stock = 0;
@@ -38,11 +38,17 @@ foreach ( $ard_wish as $ard_product ) {
 }
 
 if ( $ard_in_stock > 0 ) {
-	$ard_lines[] = sprintf( '%s کالای علاقه‌مندی‌ات موجود است', Ardal_Helpers::fa_digits( $ard_in_stock ) );
+	$ard_lines[] = Ardal_Account_Settings::text(
+		'welcome_line_wish',
+		array( '{count}' => Ardal_Helpers::fa_digits( $ard_in_stock ) )
+	);
 }
 
+// جمله‌های خالی کنار گذاشته می‌شوند تا «، ، » پشت هم نیفتد.
+$ard_lines = array_filter( array_map( 'trim', $ard_lines ) );
+
 $ard_summary = empty( $ard_lines )
-	? 'اینجا خلاصهٔ سفارش‌ها، علاقه‌مندی‌ها و اطلاعات حسابت را می‌بینی.'
+	? Ardal_Account_Settings::text( 'welcome_sub' )
 	: implode( '، ', $ard_lines ) . '.';
 
 $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
@@ -50,17 +56,30 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 <div class="ard-ac__stack">
 
 	<?php if ( Ardal_Account_Settings::section_on( 'welcome' ) ) : ?>
+	<?php
+	$ard_w_title = Ardal_Account_Settings::text( 'welcome_title', array( '{name}' => $ard_first ) );
+	$ard_w_btn   = Ardal_Account_Settings::text( 'welcome_btn' );
+
+	// دکمهٔ دوم بسته به این‌که کاربر فایل دانلودی دارد یا نه، مقصد و متنش فرق می‌کند.
+	$ard_w_btn2 = ! empty( $ard_downloads )
+		? array( Ardal_Account_Settings::text( 'welcome_btn_down' ), wc_get_account_endpoint_url( 'downloads' ) )
+		: array( Ardal_Account_Settings::text( 'welcome_btn_orders' ), wc_get_account_endpoint_url( 'orders' ) );
+	?>
 	<div class="ard-ac__card ard-ac__welcome">
 		<div class="ard-ac__welcome-text">
-			<h2 class="ard-ac__welcome-title">سلام <?php echo esc_html( $ard_first ); ?>، خوش برگشتی</h2>
-			<p class="ard-ac__welcome-sub"><?php echo esc_html( $ard_summary ); ?></p>
+			<?php if ( '' !== trim( $ard_w_title ) ) : ?>
+				<h2 class="ard-ac__welcome-title"><?php echo esc_html( $ard_w_title ); ?></h2>
+			<?php endif; ?>
+			<?php if ( '' !== trim( $ard_summary ) ) : ?>
+				<p class="ard-ac__welcome-sub"><?php echo esc_html( $ard_summary ); ?></p>
+			<?php endif; ?>
 		</div>
 		<div class="ard-ac__welcome-actions">
-			<a class="ard-ac__btn ard-ac__btn--primary" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>">ادامه خرید</a>
-			<?php if ( ! empty( $ard_downloads ) ) : ?>
-				<a class="ard-ac__btn ard-ac__btn--ghost" href="<?php echo esc_url( wc_get_account_endpoint_url( 'downloads' ) ); ?>">فایل‌های دانلودی</a>
-			<?php else : ?>
-				<a class="ard-ac__btn ard-ac__btn--ghost" href="<?php echo esc_url( wc_get_account_endpoint_url( 'orders' ) ); ?>">سفارش‌های من</a>
+			<?php if ( '' !== trim( $ard_w_btn ) ) : ?>
+				<a class="ard-ac__btn ard-ac__btn--primary" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>"><?php echo esc_html( $ard_w_btn ); ?></a>
+			<?php endif; ?>
+			<?php if ( '' !== trim( $ard_w_btn2[0] ) ) : ?>
+				<a class="ard-ac__btn ard-ac__btn--ghost" href="<?php echo esc_url( $ard_w_btn2[1] ); ?>"><?php echo esc_html( $ard_w_btn2[0] ); ?></a>
 			<?php endif; ?>
 		</div>
 	</div>
@@ -78,7 +97,9 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 				</div>
 				<div class="ard-ac__stat-value">
 					<?php echo esc_html( $ard_stat['value'] ); ?>
-					<span class="ard-ac__stat-unit"><?php echo esc_html( $ard_stat['unit'] ); ?></span>
+					<?php if ( '' !== trim( $ard_stat['unit'] ) ) : ?>
+						<span class="ard-ac__stat-unit"><?php echo esc_html( $ard_stat['unit'] ); ?></span>
+					<?php endif; ?>
 				</div>
 				<div class="ard-ac__stat-label"><?php echo esc_html( $ard_stat['label'] ); ?></div>
 			</div>
@@ -93,22 +114,27 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 					<circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path>
 				</svg>
 			</span>
+			<?php
+			$ard_a_tokens = array(
+				'{number}' => Ardal_Helpers::fa_digits( $ard_unpaid->get_order_number() ),
+				'{count}'  => Ardal_Helpers::fa_digits( Ardal_Account::order_item_count( $ard_unpaid ) ),
+				'{total}'  => Ardal_Helpers::price( $ard_unpaid->get_total() ),
+			);
+
+			$ard_a_note = Ardal_Account_Settings::text( 'alert_note', $ard_a_tokens );
+			$ard_a_btn  = Ardal_Account_Settings::text( 'alert_btn' );
+			?>
 			<div class="ard-ac__alert-text">
 				<div class="ard-ac__alert-title">
-					سفارش <?php echo esc_html( Ardal_Helpers::fa_digits( $ard_unpaid->get_order_number() ) ); ?> در انتظار پرداخت
+					<?php echo esc_html( Ardal_Account_Settings::text( 'alert_title', $ard_a_tokens ) ); ?>
 				</div>
-				<div class="ard-ac__alert-note">
-					<?php
-					printf(
-						'%s کالا · %s %s',
-						esc_html( Ardal_Helpers::fa_digits( Ardal_Account::order_item_count( $ard_unpaid ) ) ),
-						esc_html( Ardal_Helpers::price( $ard_unpaid->get_total() ) ),
-						'تومان'
-					);
-					?>
-				</div>
+				<?php if ( '' !== trim( $ard_a_note ) ) : ?>
+					<div class="ard-ac__alert-note"><?php echo esc_html( $ard_a_note ); ?></div>
+				<?php endif; ?>
 			</div>
-			<a class="ard-ac__btn ard-ac__btn--amber" href="<?php echo esc_url( $ard_unpaid->get_checkout_payment_url() ); ?>">پرداخت سفارش</a>
+			<?php if ( '' !== trim( $ard_a_btn ) ) : ?>
+				<a class="ard-ac__btn ard-ac__btn--amber" href="<?php echo esc_url( $ard_unpaid->get_checkout_payment_url() ); ?>"><?php echo esc_html( $ard_a_btn ); ?></a>
+			<?php endif; ?>
 		</div>
 	<?php endif; ?>
 
@@ -127,13 +153,16 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 				)
 			);
 			?>
+			<?php $ard_t_btn = Ardal_Account_Settings::text( 'track_btn' ); ?>
 			<div class="ard-ac__card ard-ac__track">
 				<div class="ard-ac__chead">
 					<div>
-						<h3 class="ard-ac__ctitle">سفارش در حال ارسال</h3>
+						<h3 class="ard-ac__ctitle"><?php echo esc_html( Ardal_Account_Settings::text( 'track_title' ) ); ?></h3>
 						<p class="ard-ac__csub"><?php echo esc_html( implode( ' · ', $ard_meta ) ); ?></p>
 					</div>
-					<a class="ard-ac__btn ard-ac__btn--soft" href="<?php echo esc_url( $ard_active->get_view_order_url() ); ?>">جزئیات و رهگیری</a>
+					<?php if ( '' !== trim( $ard_t_btn ) ) : ?>
+						<a class="ard-ac__btn ard-ac__btn--soft" href="<?php echo esc_url( $ard_active->get_view_order_url() ); ?>"><?php echo esc_html( $ard_t_btn ); ?></a>
+					<?php endif; ?>
 				</div>
 
 				<ol class="ard-ac__steps">
@@ -176,20 +205,34 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 				</div>
 			</div>
 		<?php else : ?>
+			<?php
+			$ard_e_title = Ardal_Account_Settings::text( 'track_empty_title' );
+			$ard_e_text  = Ardal_Account_Settings::text( 'track_empty_text' );
+			$ard_e_btn   = Ardal_Account_Settings::text( 'track_empty_btn' );
+			?>
 			<div class="ard-ac__card ard-ac__track ard-ac__empty">
-				<span class="ard-ac__empty-icon"><?php echo Ardal_Account::icon( 'truck', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-				<h3 class="ard-ac__ctitle">سفارشی در راه نیست</h3>
-				<p class="ard-ac__csub">هر سفارشی که ثبت کنی، مراحل آماده‌سازی و ارسالش را همین‌جا می‌بینی.</p>
-				<a class="ard-ac__btn ard-ac__btn--primary" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>">شروع خرید</a>
+				<span class="ard-ac__empty-icon"><?php echo Ardal_Account::icon( Ardal_Account_Settings::icon_name( 'track_empty_icon' ), 22 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<?php if ( '' !== trim( $ard_e_title ) ) : ?>
+					<h3 class="ard-ac__ctitle"><?php echo esc_html( $ard_e_title ); ?></h3>
+				<?php endif; ?>
+				<?php if ( '' !== trim( $ard_e_text ) ) : ?>
+					<p class="ard-ac__csub"><?php echo esc_html( $ard_e_text ); ?></p>
+				<?php endif; ?>
+				<?php if ( '' !== trim( $ard_e_btn ) ) : ?>
+					<a class="ard-ac__btn ard-ac__btn--primary" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>"><?php echo esc_html( $ard_e_btn ); ?></a>
+				<?php endif; ?>
 			</div>
 		<?php endif; ?>
 
 		<div class="ard-ac__stack">
 			<?php if ( Ardal_Account_Settings::section_on( 'chart' ) ) : ?>
 			<div class="ard-ac__card">
+				<?php $ard_c_note = Ardal_Account_Settings::text( 'chart_note' ); ?>
 				<div class="ard-ac__chead">
-					<h3 class="ard-ac__ctitle">خرید ۶ ماه گذشته</h3>
-					<span class="ard-ac__chead-note">میلیون تومان</span>
+					<h3 class="ard-ac__ctitle"><?php echo esc_html( Ardal_Account_Settings::text( 'chart_title' ) ); ?></h3>
+					<?php if ( '' !== trim( $ard_c_note ) ) : ?>
+						<span class="ard-ac__chead-note"><?php echo esc_html( $ard_c_note ); ?></span>
+					<?php endif; ?>
 				</div>
 				<div class="ard-ac__chart">
 					<?php foreach ( $ard_chart as $ard_bar ) : ?>
@@ -208,7 +251,7 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 
 			<?php if ( $ard_coupon && Ardal_Account_Settings::section_on( 'coupon' ) ) : ?>
 				<div class="ard-ac__card">
-					<h3 class="ard-ac__ctitle ard-ac__ctitle--mb">کد تخفیف اختصاصی</h3>
+					<h3 class="ard-ac__ctitle ard-ac__ctitle--mb"><?php echo esc_html( Ardal_Account_Settings::text( 'coupon_title' ) ); ?></h3>
 					<div class="ard-ac__coupon">
 						<div class="ard-ac__coupon-text">
 							<div class="ard-ac__coupon-code"><?php echo esc_html( $ard_coupon['code'] ); ?></div>
@@ -218,7 +261,7 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 							type="button"
 							class="ard-ac__btn ard-ac__btn--accent"
 							data-ard-ac-copy="<?php echo esc_attr( $ard_coupon['code'] ); ?>"
-						>کپی</button>
+						><?php echo esc_html( Ardal_Account_Settings::text( 'coupon_btn' ) ); ?></button>
 					</div>
 					<?php if ( '' !== $ard_coupon['expires'] ) : ?>
 						<p class="ard-ac__coupon-expiry"><?php echo esc_html( $ard_coupon['expires'] ); ?></p>
@@ -236,12 +279,20 @@ $ard_downloads = wc_get_customer_available_downloads( get_current_user_id() );
 	if ( ! empty( $ard_suggest ) ) :
 		?>
 		<div class="ard-ac__card">
+			<?php
+			$ard_s_sub  = Ardal_Account_Settings::text( 'suggest_sub' );
+			$ard_s_link = Ardal_Account_Settings::text( 'suggest_link' );
+			?>
 			<div class="ard-ac__chead">
 				<div>
-					<h3 class="ard-ac__ctitle">بر اساس خریدهای تو</h3>
-					<p class="ard-ac__csub">انتخاب‌هایی از دسته‌هایی که بیشتر سراغشان رفته‌ای</p>
+					<h3 class="ard-ac__ctitle"><?php echo esc_html( Ardal_Account_Settings::text( 'suggest_title' ) ); ?></h3>
+					<?php if ( '' !== trim( $ard_s_sub ) ) : ?>
+						<p class="ard-ac__csub"><?php echo esc_html( $ard_s_sub ); ?></p>
+					<?php endif; ?>
 				</div>
-				<a class="ard-ac__link" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>">مشاهده همه</a>
+				<?php if ( '' !== trim( $ard_s_link ) ) : ?>
+					<a class="ard-ac__link" href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>"><?php echo esc_html( $ard_s_link ); ?></a>
+				<?php endif; ?>
 			</div>
 
 			<div class="ard-ac__grid ard-ac__grid--4">

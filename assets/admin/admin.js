@@ -53,6 +53,34 @@
 	}
 }() );
 
+/**
+ * پیش‌نمایش زندهٔ سلکت‌های آیکون.
+ *
+ * فقط مسیر SVG عوض می‌شود، نه کل عنصر؛ این‌طوری لازم نیست مارک‌آپ آیکون در
+ * جاوااسکریپت هم تکرار شود و همان چیزی می‌ماند که PHP چاپ کرده.
+ */
+( function () {
+	'use strict';
+
+	var paths = ( window.ardalAdmin || {} ).iconPaths || {};
+	var rows = document.querySelectorAll( '.ardal-icon-row' );
+
+	Array.prototype.forEach.call( rows, function ( row ) {
+		var select = row.querySelector( 'select' );
+		var path = row.querySelector( '.ardal-icon-preview path' );
+
+		if ( ! select || ! path ) {
+			return;
+		}
+
+		select.addEventListener( 'change', function () {
+			if ( paths[ select.value ] ) {
+				path.setAttribute( 'd', paths[ select.value ] );
+			}
+		} );
+	} );
+}() );
+
 ( function ( $ ) {
 	'use strict';
 

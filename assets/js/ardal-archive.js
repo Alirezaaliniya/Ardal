@@ -23,8 +23,93 @@
 	   کشوی فیلتر و شیت مرتب‌سازی
 	   ================================================================== */
 
+	/*
+	 * کشو، شیت و پرده position: fixed اند، ولی fixed زیر هر والدی که transform
+	 * (یا filter و will-change و…) داشته باشد، نسبت به همان والد جا می‌گیرد نه
+	 * نسبت به صفحه‌نمایش — و المنتور مدام transform می‌گذارد: انیمیشن ورود،
+	 * بخش چسبان، افکت حرکتی. نتیجه‌اش این بود که کشو باز می‌شد ولی بیرون از کادر
+	 * دید می‌افتاد و کاربر فکر می‌کرد دکمه کار نمی‌کند.
+	 *
+	 * راه‌حل: موقع باز شدن، عنصر به body منتقل می‌شود. میزبانی که می‌سازیم
+	 * کلاس‌های المنتورِ ویجت اصلی را می‌گیرد، پس استایل‌های {{WRAPPER}} (رنگ‌ها،
+	 * فاصله‌ها، عرض) همچنان می‌چسبند. با بسته شدن، دقیقاً سر جای خودش برمی‌گردد.
+	 */
+	var PORTALS = '.ard-fil--drawer, .ard-sheet, .ard-arch-scrim';
+
+	function portal( el ) {
+		if ( el.ardHost || 'fixed' !== window.getComputedStyle( el ).position ) {
+			return;
+		}
+
+		var source = el.closest( '.elementor-element' );
+		var host = document.createElement( 'div' );
+		var keep = [ 'ard-arch-portal' ];
+
+		if ( source ) {
+			Array.prototype.forEach.call( source.classList, function ( name ) {
+				// فقط کلاس‌هایی که سلکتورها به آن‌ها تکیه دارند؛ کلاس‌های
+				// انیمیشن المنتور (مثل elementor-invisible) نباید همراه بیایند.
+				if ( 0 === name.indexOf( 'elementor-element-' ) || 0 === name.indexOf( 'elementor-widget-' ) ) {
+					keep.push( name );
+				}
+			} );
+		}
+
+		host.className = keep.join( ' ' );
+
+		var mark = document.createComment( 'ard-portal' );
+
+		el.parentNode.insertBefore( mark, el );
+		host.appendChild( el );
+		document.body.appendChild( host );
+
+		el.ardHost = host;
+		el.ardMark = mark;
+	}
+
+	function unportal( el ) {
+		if ( ! el.ardHost ) {
+			return;
+		}
+
+		// اگر جای اولیه در این فاصله عوض شده باشد (مثلاً با بارگذاری ایجکسی)،
+		// دست‌کم میزبان را جمع می‌کنیم تا چیزی روی body نماند.
+		if ( el.ardMark && el.ardMark.parentNode ) {
+			el.ardMark.parentNode.insertBefore( el, el.ardMark );
+			el.ardMark.parentNode.removeChild( el.ardMark );
+		}
+
+		if ( el.ardHost.parentNode ) {
+			el.ardHost.parentNode.removeChild( el.ardHost );
+		}
+
+		el.ardHost = null;
+		el.ardMark = null;
+	}
+
 	function setPanel( name ) {
 		var body = document.body;
+
+		Array.prototype.forEach.call(
+			document.querySelectorAll( PORTALS ),
+			function ( el ) {
+				if ( name ) {
+					portal( el );
+
+					return;
+				}
+
+				// حالت تمام‌قد یادگاری نمی‌ماند؛ دفعهٔ بعد از اندازهٔ عادی باز شود.
+				el.classList.remove( 'is-full' );
+				unportal( el );
+			}
+		);
+
+		if ( name ) {
+			// جابه‌جایی در DOM و افزودن کلاسِ باز در یک فریم جمع می‌شوند و کشو
+			// به‌جای سُر خوردن، می‌پرد. این خواندن، حالت بسته را تثبیت می‌کند.
+			void document.body.offsetHeight;
+		}
 
 		body.classList.toggle( 'ard-arch-filters', 'filters' === name );
 		body.classList.toggle( 'ard-arch-sort', 'sort' === name );
@@ -77,6 +162,195 @@
 		} else if ( wide.addListener ) {
 			wide.addListener( onWide );
 		}
+	}
+
+	/* ==================================================================
+	   کشیدن شیت‌ها با انگشت
+
+	   همان رفتاری که ظاهرِ «شیت پایینی» وعده می‌دهد: از دستگیره یا سربرگ
+	   می‌گیری، شیت پای انگشت می‌آید، پایین که بکشی بسته می‌شود و بالا که بکشی
+	   تمام‌قد می‌شود. تصمیم روی رها کردن گرفته می‌شود: یا مسافت از یک‌چهارمِ
+	   ارتفاع بیشتر شده، یا سرعت آن‌قدر بوده که نیت کاربر روشن است.
+	   ================================================================== */
+
+	// ناحیه‌ای که می‌شود از آن کشید. بقیهٔ شیت باید آزاد بماند تا فرم اسکرول شود.
+	var DRAG_HANDLES = '.ard-fil__grip, .ard-fil__head, .ard-sheet__grip, .ard-sheet__title';
+
+	// کمتر از این مقدار، حرکت را کشیدن حساب نمی‌کنیم تا تپ ساده گرفتار نشود.
+	var DRAG_SLOP = 4;
+
+	function initSheetDrag( sheet ) {
+		/*
+		 * پرچم اختصاصی، نه پرچم مشترکِ each: کشوی فیلتر با سلکتور دیگری هم
+		 * راه‌اندازی می‌شود و پرچم مشترک باعث می‌شد این یکی هیچ‌وقت اجرا نشود.
+		 */
+		if ( sheet.ardDragReady ) {
+			return;
+		}
+
+		sheet.ardDragReady = true;
+
+		var drag = null;
+
+		function height() {
+			return sheet.getBoundingClientRect().height || 1;
+		}
+
+		function move( dy ) {
+			sheet.style.transform = 'translateY(' + dy + 'px)';
+		}
+
+		// گذار را برمی‌گرداند و شیت را از جای کشیده‌شده به حالت CSS می‌بَرد.
+		function release( closing ) {
+			sheet.classList.remove( 'is-dragging' );
+
+			if ( ! closing ) {
+				sheet.style.transform = '';
+
+				return;
+			}
+
+			setPanel( '' );
+
+			/*
+			 * حالت بسته را صریح می‌نویسیم تا شیت از همان‌جا که انگشت رهایش کرده
+			 * پایین برود؛ اگر فقط استایل درون‌خطی را پاک می‌کردیم، اول به صفر
+			 * می‌پرید و بعد بسته می‌شد. بعد از پایان گذار پاکش می‌کنیم تا دوباره
+			 * دست CSS باشد — با یک تور ایمنی، چون گذار ممکن است اصلاً شلیک نشود
+			 * (کاهش حرکت، یا تبی که در پس‌زمینه است).
+			 */
+			sheet.style.transform = 'translateY(105%)';
+
+			var done = function () {
+				sheet.removeEventListener( 'transitionend', done );
+				sheet.style.transform = '';
+			};
+
+			sheet.addEventListener( 'transitionend', done );
+			window.setTimeout( done, 400 );
+		}
+
+		sheet.addEventListener( 'pointerdown', function ( event ) {
+			if ( event.button && 0 !== event.button ) {
+				return;
+			}
+
+			// دکمهٔ بستن و هر کنترلی داخل سربرگ، کار خودش را بکند.
+			if ( event.target.closest( 'button:not(.ard-fil__grip), a, input, select, textarea' ) ) {
+				return;
+			}
+
+			if ( ! event.target.closest( DRAG_HANDLES ) ) {
+				return;
+			}
+
+			drag = {
+				id: event.pointerId,
+				y: event.clientY,
+				at: Date.now(),
+				moved: false,
+				full: sheet.classList.contains( 'is-full' )
+			};
+
+			if ( sheet.setPointerCapture ) {
+				sheet.setPointerCapture( event.pointerId );
+			}
+		} );
+
+		sheet.addEventListener( 'pointermove', function ( event ) {
+			if ( ! drag ) {
+				return;
+			}
+
+			var dy = event.clientY - drag.y;
+
+			if ( ! drag.moved ) {
+				if ( Math.abs( dy ) < DRAG_SLOP ) {
+					return;
+				}
+
+				drag.moved = true;
+				sheet.classList.add( 'is-dragging' );
+			}
+
+			/*
+			 * بالا کشیدن وقتی شیت از قبل تمام‌قد است جایی برای رفتن ندارد، پس
+			 * با مقاومت (یک‌سوم) حرکت می‌کند؛ همان حسی که کاربر موبایل از
+			 * «ته مسیر» انتظار دارد.
+			 */
+			if ( dy < 0 && drag.full ) {
+				dy /= 3;
+			}
+
+			move( dy );
+			event.preventDefault();
+		} );
+
+		function finish( event ) {
+			if ( ! drag ) {
+				return;
+			}
+
+			var dy = event.clientY - drag.y;
+			var speed = dy / Math.max( 1, Date.now() - drag.at );
+			var far = Math.abs( dy ) > height() / 4;
+
+			/*
+			 * «تند بود» به‌تنهایی کافی نیست: یک تکان کوچکِ سریع هم سرعت بالایی
+			 * می‌سازد و شیت را می‌بست. پس فلیک فقط وقتی شمرده می‌شود که دست‌کم
+			 * این مقدار هم جابه‌جا شده باشد.
+			 */
+			var fast = Math.abs( speed ) > 0.5 && Math.abs( dy ) > 40;
+			var moved = drag.moved;
+			var full = drag.full;
+
+			if ( sheet.releasePointerCapture && sheet.hasPointerCapture && sheet.hasPointerCapture( drag.id ) ) {
+				sheet.releasePointerCapture( drag.id );
+			}
+
+			drag = null;
+
+			if ( ! moved ) {
+				release( false );
+
+				return;
+			}
+
+			if ( dy > 0 && ( far || fast ) ) {
+				// از تمام‌قد، اولین کشیدنِ پایین فقط جمعش می‌کند نه می‌بنددش.
+				if ( full ) {
+					sheet.classList.remove( 'is-full' );
+					release( false );
+
+					return;
+				}
+
+				release( true );
+
+				return;
+			}
+
+			if ( dy < 0 && ( far || fast ) && ! full ) {
+				sheet.classList.add( 'is-full' );
+			}
+
+			release( false );
+		}
+
+		sheet.addEventListener( 'pointerup', finish );
+		sheet.addEventListener( 'pointercancel', function () {
+			if ( drag ) {
+				drag = null;
+				release( false );
+			}
+		} );
+
+		// کشیدن نباید تصویر یا متن را «بردارد».
+		sheet.addEventListener( 'dragstart', function ( event ) {
+			if ( drag ) {
+				event.preventDefault();
+			}
+		} );
 	}
 
 	/* ==================================================================
@@ -878,6 +1152,15 @@
 		each( '[data-ard-rail-track]', initRail );
 		each( '[data-ard-sort-select]', initSortSelect );
 		each( '[data-ard-desc]', initDesc );
+
+		// each پرچمش را روی خودِ عنصر می‌گذارد و کشوی فیلتر بالاتر همان پرچم را
+		// گرفته؛ پس اینجا مستقیم پیمایش می‌کنیم و خودِ initSheetDrag تکرار را
+		// می‌گیرد.
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '.ard-fil--drawer, .ard-sheet' ),
+			initSheetDrag
+		);
+
 		initAjax();
 	}
 

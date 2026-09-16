@@ -62,6 +62,8 @@ class Ardal_Elementor {
 			'archive-chips'       => 'Ardal_Widget_Archive_Chips',
 			'archive-toolbar'     => 'Ardal_Widget_Archive_Toolbar',
 			'archive-description' => 'Ardal_Widget_Archive_Description',
+			// پنل کاربری
+			'account'             => 'Ardal_Widget_Account',
 		);
 	}
 
@@ -114,6 +116,7 @@ class Ardal_Elementor {
 			'archive-chips'       => 'فیلترهای فعال',
 			'archive-toolbar'     => 'نوار مرتب‌سازی آرشیو',
 			'archive-description' => 'توضیحات دسته',
+			'account'             => 'پنل کاربری',
 		);
 	}
 

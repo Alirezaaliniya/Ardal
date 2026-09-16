@@ -189,10 +189,15 @@
 	gap: 3px;
 }
 
-/* کد رنگ و اعداد همیشه چپ‌چین خوانده می‌شوند، حتی داخل صفحه RTL. */
+/*
+ * کد رنگ و اعداد همیشه چپ‌چین خوانده می‌شوند، حتی داخل صفحه RTL.
+ *
+ * فیلدهای متنیِ چپ‌چین فقط مال تب پالت‌اند (hex و px)؛ تب پنل کاربری پر از
+ * جملهٔ فارسی است و آنجا چپ‌چینی متن را به هم می‌ریزد.
+ */
 .ardal-color,
 .ardal-field--number input,
-.ardal-field--text input {
+[data-ardal-panel="palette"] .ardal-field--text input {
 	direction: ltr;
 	text-align: left;
 }
@@ -558,4 +563,51 @@
 	overflow: hidden;
 	clip-path: inset(50%);
 	white-space: nowrap;
+}
+
+/* ============================================================
+   کارت‌های باکس پیشخوان
+   ============================================================ */
+
+/* کلید روشن/خاموش بالای هر کارت، جدا از فیلدهای متنی زیرش. */
+.ardal-field--top {
+	margin-top: 12px;
+	padding-bottom: 14px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.ardal-field--icon {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+}
+
+/*
+ * سلکت آیکون و پیش‌نمایشش کنار هم — پیش‌نمایش برای این است که کاربر بدون
+ * ذخیره‌کردن بداند «بسته» یا «ارسال» کدام شکل است.
+ */
+.ardal-icon-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.ardal-field--icon select {
+	max-width: 240px;
+}
+
+.ardal-icon-preview {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 34px;
+	block-size: 34px;
+	border-radius: 9px;
+	background: #f2f7fc;
+	color: #0B3C8C;
+	vertical-align: middle;
+}
+
+.ardal-field--textarea textarea {
+	min-block-size: 58px;
 }

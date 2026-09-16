@@ -338,10 +338,28 @@ class Ardal_Account {
 			return;
 		}
 
+		self::enqueue_assets();
+	}
+
+	/**
+	 * فایل‌ها و دادهٔ پنل.
+	 *
+	 * جدا از enqueue() است تا ویجت المنتور هم — که ممکن است در هر صفحه‌ای
+	 * نشسته باشد، نه فقط صفحهٔ حساب کاربری — بتواند همین را صدا بزند.
+	 * دو بار صدا زدن مشکلی ندارد؛ wp_enqueue_* خودش تکراری را نادیده می‌گیرد
+	 * و برای localize یک نگهبان گذاشته‌ایم تا متغیر دوبار چاپ نشود.
+	 */
+	public static function enqueue_assets() {
+		static $done = false;
+
 		wp_enqueue_style( 'ardal' );
 		wp_enqueue_style( 'ardal-account' );
 		wp_enqueue_script( 'ardal' );
 		wp_enqueue_script( 'ardal-account' );
+
+		if ( $done ) {
+			return;
+		}
 
 		wp_localize_script(
 			'ardal-account',
@@ -357,6 +375,8 @@ class Ardal_Account {
 				'siteName'   => get_bloginfo( 'name' ),
 			)
 		);
+
+		$done = true;
 	}
 
 	/* ============================================================
@@ -369,8 +389,16 @@ class Ardal_Account {
 	 * @param string $class
 	 * @return string
 	 */
-	public static function icon( $name, $size = 18, $class = '' ) {
-		$paths = array(
+	/**
+	 * مسیر SVG هر آیکون.
+	 *
+	 * جدا از icon() است چون صفحهٔ تنظیمات هم برای پیش‌نمایش زندهٔ سلکت‌ها
+	 * همین نگاشت را لازم دارد و نباید نسخهٔ دومی از آن ساخته شود.
+	 *
+	 * @return array
+	 */
+	public static function icon_paths() {
+		return array(
 			'dash'    => 'M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z',
 			'orders'  => 'M6 4h12l1 16H5zM9 8h6',
 			'fav'     => 'M12 20s-7-4.4-7-9a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 4.6-7 9-7 9z',
@@ -395,6 +423,10 @@ class Ardal_Account {
 			'thumb'   => 'M7 20V9l4-6 1 1v5h6l1 1-2 10z',
 			'down'    => 'M12 4v12m0 0l-4-4m4 4l4-4M5 20h14',
 		);
+	}
+
+	public static function icon( $name, $size = 18, $class = '' ) {
+		$paths = self::icon_paths();
 
 		if ( ! isset( $paths[ $name ] ) ) {
 			$name = 'dash';
@@ -405,6 +437,38 @@ class Ardal_Account {
 			'' !== $class ? ' ' . esc_attr( $class ) : '',
 			(int) $size,
 			esc_attr( $paths[ $name ] )
+		);
+	}
+
+	/**
+	 * فهرست آیکون‌های پنل با نام فارسی — برای سلکت‌های تنظیمات و المنتور.
+	 *
+	 * ترتیبش دستی است تا آیکون‌های پرکاربرد بالا بمانند.
+	 *
+	 * @return array نام => برچسب.
+	 */
+	public static function icon_options() {
+		return array(
+			'dash'    => 'خانه',
+			'orders'  => 'سفارش',
+			'box'     => 'بسته',
+			'truck'   => 'ارسال',
+			'cart'    => 'سبد خرید',
+			'fav'     => 'قلب',
+			'chart'   => 'نمودار',
+			'wallet'  => 'کیف پول',
+			'ticket'  => 'کد تخفیف',
+			'review'  => 'دیدگاه',
+			'user'    => 'کاربر',
+			'addr'    => 'آدرس',
+			'bell'    => 'زنگ',
+			'clock'   => 'ساعت',
+			'check'   => 'تیک',
+			'plus'    => 'به‌علاوه',
+			'down'    => 'دانلود',
+			'work'    => 'فروشگاه',
+			'thumb'   => 'پسندیدن',
+			'logout'  => 'خروج',
 		);
 	}
 
@@ -615,33 +679,34 @@ class Ardal_Account {
 			? number_format( $spent / 1000000, 1, '٫', '' )
 			: number_format( $spent / 1000000, 2, '٫', '' );
 
+		// عنوان، واحد و آیکون هر کارت از تنظیمات می‌آید؛ فقط عددش اینجاست.
 		return array(
 			array(
 				'value' => Ardal_Helpers::fa_digits( $orders ),
-				'unit'  => 'سفارش',
-				'label' => 'مجموع سفارش‌ها',
-				'icon'  => 'box',
+				'unit'  => Ardal_Account_Settings::text( 'stat_orders_unit' ),
+				'label' => Ardal_Account_Settings::text( 'stat_orders_label' ),
+				'icon'  => Ardal_Account_Settings::icon_name( 'stat_orders_icon' ),
 				'delta' => self::recent_order_delta(),
 			),
 			array(
 				'value' => Ardal_Helpers::fa_digits( $millions ),
-				'unit'  => 'میلیون',
-				'label' => 'مبلغ کل خرید',
-				'icon'  => 'chart',
+				'unit'  => Ardal_Account_Settings::text( 'stat_spent_unit' ),
+				'label' => Ardal_Account_Settings::text( 'stat_spent_label' ),
+				'icon'  => Ardal_Account_Settings::icon_name( 'stat_spent_icon' ),
 				'delta' => '',
 			),
 			array(
 				'value' => Ardal_Helpers::fa_digits( count( self::wishlist_ids() ) ),
-				'unit'  => 'کالا',
-				'label' => 'علاقه‌مندی‌ها',
-				'icon'  => 'fav',
+				'unit'  => Ardal_Account_Settings::text( 'stat_wish_unit' ),
+				'label' => Ardal_Account_Settings::text( 'stat_wish_label' ),
+				'icon'  => Ardal_Account_Settings::icon_name( 'stat_wish_icon' ),
 				'delta' => '',
 			),
 			array(
 				'value' => Ardal_Helpers::fa_digits( $reviews['approved'] ),
-				'unit'  => 'دیدگاه',
-				'label' => 'نظرات ثبت شده',
-				'icon'  => 'review',
+				'unit'  => Ardal_Account_Settings::text( 'stat_review_unit' ),
+				'label' => Ardal_Account_Settings::text( 'stat_review_label' ),
+				'icon'  => Ardal_Account_Settings::icon_name( 'stat_review_icon' ),
 				'delta' => '',
 			),
 		);
@@ -1486,4 +1551,179 @@ class Ardal_Account {
 
 		return $count;
 	}
+
+	/* ============================================================
+	   رندر پوستهٔ پنل
+	   ============================================================ */
+
+	/**
+	 * پوستهٔ پنل کاربری: نوار بالا، سربرگ موبایل، ستون کناری، محتوا و نوار پایین.
+	 *
+	 * هم تمپلیت myaccount/my-account.php از این استفاده می‌کند و هم ویجت المنتور،
+	 * تا مارک‌آپ یک جا بماند و دو نسخه از هم فاصله نگیرند.
+	 *
+	 * @param array $args کدام بخش‌ها چاپ شوند و متن‌های قابل تغییر.
+	 */
+	public static function render_panel( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'topbar'    => true,
+				'mhead'     => true,
+				'sidebar'   => true,
+				'tabbar'    => true,
+				'bell'      => true,
+				'chip'      => true,
+				'brand_sub' => 'پنل کاربری',
+				'side'      => 'right',
+			)
+		);
+
+		$name     = self::name();
+		$initials = self::initials();
+		$phone    = self::phone();
+		$alerts   = self::count_orders(
+			array_merge( array( 'pending', 'processing' ), self::shipping_statuses() )
+		);
+
+		$classes = array( 'ard-ac' );
+
+		if ( 'left' === $args['side'] ) {
+			$classes[] = 'ard-ac--side-left';
+		}
+
+		if ( ! $args['sidebar'] ) {
+			$classes[] = 'ard-ac--no-side';
+		}
+
+		printf( '<div class="%s" data-ard-account>', esc_attr( implode( ' ', $classes ) ) );
+
+		if ( $args['topbar'] ) {
+			?>
+			<header class="ard-ac__topbar">
+				<div class="ard-ac__topbar-inner">
+					<a class="ard-ac__brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+						<?php echo self::brand_mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="ard-ac__brand-text">
+							<span class="ard-ac__brand-name"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
+							<?php if ( '' !== trim( (string) $args['brand_sub'] ) ) : ?>
+								<span class="ard-ac__brand-sub"><?php echo esc_html( $args['brand_sub'] ); ?></span>
+							<?php endif; ?>
+						</span>
+					</a>
+
+					<div class="ard-ac__topbar-side">
+						<?php if ( $args['bell'] ) : ?>
+							<a class="ard-ac__bell" href="<?php echo esc_url( wc_get_account_endpoint_url( 'orders' ) ); ?>" aria-label="سفارش‌های در جریان">
+								<?php echo self::icon( 'bell', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								<?php if ( $alerts > 0 ) : ?>
+									<span class="ard-ac__bell-badge"><?php echo esc_html( Ardal_Helpers::fa_digits( $alerts ) ); ?></span>
+								<?php endif; ?>
+							</a>
+						<?php endif; ?>
+
+						<?php if ( $args['chip'] ) : ?>
+							<a class="ard-ac__chip" href="<?php echo esc_url( wc_get_account_endpoint_url( 'edit-account' ) ); ?>">
+								<span class="ard-ac__chip-avatar"><?php echo esc_html( $initials ); ?></span>
+								<span class="ard-ac__chip-text">
+									<span class="ard-ac__chip-name"><?php echo esc_html( $name ); ?></span>
+									<?php if ( '' !== $phone ) : ?>
+										<span class="ard-ac__chip-phone"><?php echo esc_html( $phone ); ?></span>
+									<?php endif; ?>
+								</span>
+							</a>
+						<?php endif; ?>
+					</div>
+				</div>
+			</header>
+			<?php
+		}
+
+		if ( $args['mhead'] ) {
+			?>
+			<header class="ard-ac__mhead">
+				<div class="ard-ac__mhead-inner">
+					<?php if ( $args['sidebar'] ) : ?>
+						<button type="button" class="ard-ac__burger" aria-expanded="false" aria-controls="ard-ac-drawer" data-ard-ac-burger>
+							<span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+							<span class="ard-sr">باز کردن منوی پنل</span>
+						</button>
+					<?php endif; ?>
+
+					<span class="ard-ac__mhead-avatar"><?php echo esc_html( $initials ); ?></span>
+
+					<span class="ard-ac__mhead-text">
+						<span class="ard-ac__mhead-name"><?php echo esc_html( $name ); ?></span>
+						<?php if ( '' !== $phone ) : ?>
+							<span class="ard-ac__mhead-phone"><?php echo esc_html( $phone ); ?></span>
+						<?php endif; ?>
+					</span>
+
+					<?php if ( $args['bell'] ) : ?>
+						<a class="ard-ac__mbell" href="<?php echo esc_url( wc_get_account_endpoint_url( 'orders' ) ); ?>" aria-label="سفارش‌های در جریان">
+							<?php echo self::icon( 'bell', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<?php if ( $alerts > 0 ) : ?>
+								<span class="ard-ac__mbell-badge"><?php echo esc_html( Ardal_Helpers::fa_digits( $alerts ) ); ?></span>
+							<?php endif; ?>
+						</a>
+					<?php endif; ?>
+				</div>
+			</header>
+			<?php
+		}
+		?>
+		<div class="ard-ac__body">
+			<?php
+			if ( $args['sidebar'] ) {
+				/**
+				 * ستون کناری و کشوی موبایل — myaccount/navigation.php
+				 *
+				 * @since 2.6.0
+				 */
+				do_action( 'woocommerce_account_navigation' );
+			}
+			?>
+
+			<div class="ard-ac__content woocommerce-MyAccount-content">
+				<?php
+				/**
+				 * محتوای اندپوینت جاری.
+				 *
+				 * @since 2.6.0
+				 */
+				do_action( 'woocommerce_account_content' );
+				?>
+			</div>
+		</div>
+		<?php
+
+		if ( $args['tabbar'] ) {
+			// اگر ویجت «نوار پایین موبایل» اردال در همین صفحه باشد، CSS این یکی
+			// را پنهان می‌کند تا دو نوار روی هم نیفتد.
+			$tabs = array(
+				array( 'خانه', 'dash', home_url( '/' ), false ),
+				array( 'دسته‌ها', 'box', get_permalink( wc_get_page_id( 'shop' ) ), false ),
+				array( 'سبد خرید', 'cart', wc_get_cart_url(), false ),
+				array( 'علاقه‌مندی', 'fav', wc_get_account_endpoint_url( 'wishlist' ), false ),
+				array( 'پنل من', 'user', wc_get_page_permalink( 'myaccount' ), true ),
+			);
+			?>
+			<nav class="ard-ac__tabbar" aria-label="ناوبری موبایل">
+				<?php foreach ( $tabs as $tab ) : ?>
+					<a
+						class="ard-ac__tab<?php echo $tab[3] ? ' is-active' : ''; ?>"
+						href="<?php echo esc_url( $tab[2] ); ?>"
+						<?php echo $tab[3] ? ' aria-controls="ard-ac-drawer"' : ''; ?>
+					>
+						<?php echo self::icon( $tab[1], 21 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span><?php echo esc_html( $tab[0] ); ?></span>
+					</a>
+				<?php endforeach; ?>
+			</nav>
+			<?php
+		}
+
+		echo '</div>';
+	}
+
 }

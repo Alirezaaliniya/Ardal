@@ -915,6 +915,21 @@
 	display: none;
 }
 
+/*
+ * میزبانِ عناصرِ منتقل‌شده به body. کلاس‌های المنتورِ ویجت را می‌گیرد تا
+ * استایل‌های {{WRAPPER}} همچنان بچسبند — ولی خودش هرگز نباید containing block
+ * بسازد، وگرنه همان مشکلی که برای حلش ساخته شده دوباره برمی‌گردد. تب «پیشرفته»
+ * المنتور می‌تواند روی همان کلاس transform بنویسد، پس اینجا important لازم است.
+ */
+.ard-arch-portal {
+	transform: none !important;
+	filter: none !important;
+	perspective: none !important;
+	contain: none !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
 body.ard-arch-locked {
 	overflow: hidden;
 }
@@ -1088,6 +1103,7 @@ body.ard-arch-locked {
 	left: 0;
 	bottom: 0;
 	z-index: 100001;
+	max-height: var(--ard-sheet-max, 86vh);
 	padding: 8px 0 20px;
 	border-radius: var(--ard-radius-xl) var(--ard-radius-xl) 0 0;
 	background: var(--ard-base);
@@ -1095,6 +1111,7 @@ body.ard-arch-locked {
 	transform: translateY(105%);
 	transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
 	visibility: hidden;
+	overflow-y: auto;
 }
 
 .ard-sheet__grip {
@@ -1146,6 +1163,53 @@ body.ard-arch-locked {
 body.ard-arch-sort .ard-sheet {
 	transform: translateY(0);
 	visibility: visible;
+}
+
+/* ============================================================
+   کشیدن شیت‌ها با انگشت
+   ============================================================ */
+
+/*
+ * دستگیره و سربرگ، ناحیهٔ کشیدن‌اند. touch-action: none لازم است وگرنه مرورگر
+ * خودش حرکت را به اسکرول تبدیل می‌کند و pointermove دیگر نمی‌رسد.
+ */
+.ard-fil--drawer .ard-fil__grip,
+.ard-fil--drawer .ard-fil__head,
+.ard-sheet__grip,
+.ard-sheet__title {
+	touch-action: none;
+	cursor: grab;
+	user-select: none;
+}
+
+/* دکمهٔ بستن داخل سربرگ باید کلیک‌پذیر بماند، نه دستگیره. */
+.ard-fil--drawer .ard-fil__head .ard-fil__close {
+	touch-action: auto;
+	cursor: pointer;
+}
+
+/* حین کشیدن، جابه‌جایی باید دقیقاً پای انگشت باشد نه با گذار. */
+.ard-fil--drawer.is-dragging,
+.ard-sheet.is-dragging {
+	transition: none;
+	cursor: grabbing;
+}
+
+.ard-fil--drawer.is-dragging .ard-fil__grip,
+.ard-sheet.is-dragging .ard-sheet__grip {
+	cursor: grabbing;
+}
+
+/* حالت تمام‌قد، وقتی کاربر شیت را بالا می‌کشد. */
+.ard-fil--drawer.is-full,
+.ard-sheet.is-full {
+	--ard-sheet-max: 96vh;
+}
+
+/* دستگیره در حالت تمام‌قد کمی پررنگ‌تر، تا معلوم باشد هنوز قابل کشیدن است. */
+.ard-fil--drawer.is-full .ard-fil__grip,
+.ard-sheet.is-full .ard-sheet__grip {
+	background: var(--ard-muted);
 }
 
 /* ============================================================
@@ -1852,7 +1916,7 @@ body.ard-arch-busy {
 		flex-direction: column;
 		width: auto;
 		max-width: none;
-		max-height: 86vh;
+		max-height: var(--ard-sheet-max, 86vh);
 		border-radius: var(--ard-radius-xl) var(--ard-radius-xl) 0 0;
 		background: var(--ard-base);
 		box-shadow: 0 -10px 40px rgba(var(--ard-primary-dark-rgb), 0.22);

@@ -46,6 +46,9 @@
 	--ac-r-sm: 12px;
 	--ac-r-xs: 10px;
 
+	/* عرض ستون کناری — ویجت المنتور همین را می‌گرداند. */
+	--ac-side-w: 250px;
+
 	direction: rtl;
 	text-align: right;
 	background: var(--ac-bg);
@@ -396,7 +399,7 @@
 
 .ard-ac__body {
 	display: grid;
-	grid-template-columns: 250px minmax(0, 1fr);
+	grid-template-columns: var(--ac-side-w, 250px) minmax(0, 1fr);
 	gap: 22px;
 	align-items: start;
 	max-inline-size: 1440px;
@@ -412,6 +415,33 @@
 
 .ard-ac__content {
 	min-inline-size: 0;
+}
+
+/*
+ * ستون کناری در سمت چپ.
+ *
+ * پنل RTL است، پس ستون اولِ گرید سمت راست می‌افتد. برای جابه‌جایی نمی‌شود
+ * فقط ترتیب ستون‌ها را عوض کرد؛ چون ترتیب مارک‌آپ (اول منو، بعد محتوا) ثابت
+ * است، هرکدام را صریح در ستون خودش می‌نشانیم.
+ */
+.ard-ac--side-left .ard-ac__body {
+	grid-template-columns: minmax(0, 1fr) var(--ac-side-w, 250px);
+}
+
+.ard-ac--side-left .ard-ac__side {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+.ard-ac--side-left .ard-ac__content {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+/* بدون ستون کناری — محتوا تمام عرض را می‌گیرد. */
+.ard-ac--no-side .ard-ac__body,
+.ard-ac--guest .ard-ac__body {
+	grid-template-columns: minmax(0, 1fr);
 }
 
 .ard-ac__stack {
@@ -2939,10 +2969,16 @@ body:has(.ard-mnav) .ard-ac__tabbar {
 		display: block;
 	}
 
-	.ard-ac__body {
+	/* تک‌ستونی در موبایل — «سمت چپ» هم اینجا وزنِ بیشترش را از دست می‌دهد. */
+	.ard-ac__body,
+	.ard-ac--side-left .ard-ac__body {
 		grid-template-columns: minmax(0, 1fr);
 		gap: 14px;
 		padding: 16px 16px 20px;
+	}
+
+	.ard-ac--side-left .ard-ac__content {
+		grid-column: 1;
 	}
 
 	.ard-ac__side {
