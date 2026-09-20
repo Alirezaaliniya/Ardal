@@ -173,6 +173,8 @@ class Ardal_Widget_Hero extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'title_tag', 'تگ عنوان اسلایدها', 'h2' );
+
 		$this->add_control(
 			'show_arrows',
 			array(
@@ -1013,6 +1015,7 @@ class Ardal_Widget_Hero extends Ardal_Widget_Base {
 
 		$interval = 'yes' === $s['autoplay'] ? max( 2, (int) $s['interval'] ) * 1000 : 0;
 		$size     = '' !== $s['image_size'] ? $s['image_size'] : 'large';
+		$ard_tag  = self::tag( $s['title_tag'], 'h2' );
 
 		$classes = array( 'ard-hero', 'ard-hero--' . $s['variant'] );
 
@@ -1045,7 +1048,7 @@ class Ardal_Widget_Hero extends Ardal_Widget_Base {
 								<span class="ard-hero__tag"><?php echo esc_html( $slide['tag'] ); ?></span>
 							<?php endif; ?>
 
-							<h2 class="ard-hero__title"><?php echo esc_html( $slide['title'] ); ?></h2>
+							<<?php echo esc_html( $ard_tag ); ?> class="ard-hero__title"><?php echo esc_html( $slide['title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 
 							<?php if ( '' !== trim( (string) $slide['subtitle'] ) ) : ?>
 								<p class="ard-hero__sub"><?php echo esc_html( $slide['subtitle'] ); ?></p>

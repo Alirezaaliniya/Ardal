@@ -274,6 +274,13 @@ class Ardal_Widget_Account extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control(
+			'guest_title_tag',
+			'تگ عنوان پیام',
+			'h3',
+			array( 'condition' => array( 'guest_mode' => 'message' ) )
+		);
+
 		$this->add_control(
 			'guest_btn',
 			array(
@@ -774,7 +781,11 @@ class Ardal_Widget_Account extends Ardal_Widget_Base {
 		);
 
 		if ( '' !== trim( (string) $s['guest_title'] ) ) {
-			printf( '<h3 class="ard-ac__ctitle">%s</h3>', esc_html( $s['guest_title'] ) );
+			printf(
+				'<%1$s class="ard-ac__ctitle">%2$s</%1$s>',
+				esc_html( self::tag( $s['guest_title_tag'], 'h3' ) ),
+				esc_html( $s['guest_title'] )
+			);
 		}
 
 		if ( '' !== trim( (string) $s['guest_text'] ) ) {

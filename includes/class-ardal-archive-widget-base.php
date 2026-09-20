@@ -142,21 +142,12 @@ abstract class Ardal_Archive_Widget_Base extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_control(
+		// همان فهرست تگِ بقیهٔ ویجت‌ها، تا انتخاب‌ها در کل افزونه یکی باشد.
+		$this->add_tag_control(
 			'title_tag',
-			array(
-				'label'     => 'تگ عنوان',
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'h2',
-				'options'   => array(
-					'h2'   => 'H2',
-					'h3'   => 'H3',
-					'h4'   => 'H4',
-					'div'  => 'DIV',
-					'span' => 'SPAN',
-				),
-				'condition' => array( 'show_title' => 'yes' ),
-			)
+			'تگ عنوان',
+			'h2',
+			array( 'condition' => array( 'show_title' => 'yes' ) )
 		);
 
 		$this->add_control(
@@ -260,7 +251,7 @@ abstract class Ardal_Archive_Widget_Base extends Ardal_Widget_Base {
 			return;
 		}
 
-		$tag = in_array( $s['title_tag'] ?? 'h2', array( 'h2', 'h3', 'h4', 'div', 'span' ), true ) ? $s['title_tag'] : 'h2';
+		$tag = self::tag( $s['title_tag'] ?? 'h2', 'h2' );
 
 		printf( '<%s class="ard-arch__title">', esc_html( $tag ) );
 

@@ -1313,6 +1313,96 @@ a.ard-service__inner:hover {
 	gap: 16px 12px;
 }
 
+/* حالت اسلایدر — همان کروسل «پیشنهاد ویژه»، با کلاس‌های خودش. */
+.ard-cats-slider {
+	position: relative;
+}
+
+.ard-cats--slider {
+	--ard-per: 6;
+	--ard-gap: 12px;
+
+	display: flex;
+	gap: var(--ard-gap);
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	overscroll-behavior-x: contain;
+}
+
+.ard-cats--slider::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-cats--slider > .ard-cat {
+	flex: 0 0 calc((100% - (var(--ard-per) - 1) * var(--ard-gap)) / var(--ard-per));
+	min-inline-size: 0;
+	scroll-snap-align: start;
+}
+
+.ard-cats__dots {
+	display: flex;
+	justify-content: center;
+	gap: 5px;
+	margin-block-start: 12px;
+}
+
+.ard-cats__dots:empty {
+	display: none;
+}
+
+.ard-cats__dot {
+	inline-size: 7px;
+	block-size: 7px;
+	padding: 0;
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--ard-primary) 25%, var(--ard-base));
+	transition: inline-size .25s, background .25s;
+}
+
+.ard-cats__dot.is-active {
+	inline-size: 20px;
+	background: var(--ard-primary);
+}
+
+/*
+ * فلش‌ها بیرون از خود اسلایدر می‌نشینند چون کروسل مشترک، دکمه‌ها را در والدِ
+ * ریشه‌اش می‌گردد؛ اینجا هم همان قرارداد رعایت شده.
+ */
+.ard-cats__arrow {
+	position: absolute;
+	top: calc(var(--ard-cat-ring, 126px) / 2);
+	translate: 0 -50%;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 34px;
+	block-size: 34px;
+	padding: 0;
+	border: 1px solid var(--ard-border);
+	border-radius: 50%;
+	background: var(--ard-base);
+	color: var(--ard-primary-dark);
+	box-shadow: 0 4px 14px rgba(var(--ard-primary-dark-rgb), .10);
+	transition: background .2s, border-color .2s, color .2s;
+}
+
+.ard-cats__arrow:hover {
+	background: var(--ard-tint-blue);
+	border-color: var(--ard-tint-blue-border);
+}
+
+.ard-cats__arrow--prev {
+	right: -6px;
+}
+
+.ard-cats__arrow--next {
+	left: -6px;
+}
+
 .ard-cat__inner {
 	display: flex;
 	flex-direction: column;
@@ -2760,7 +2850,7 @@ a.ard-brand:hover img {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	.ard-cats:not(.ard-cats--scroll) {
+	.ard-cats:not(.ard-cats--scroll):not(.ard-cats--slider) {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 
@@ -2957,7 +3047,7 @@ a.ard-brand:hover img {
 		font-size: 19px;
 	}
 
-	.ard-cats--scroll {
+	.ard-cats--scroll:not(.ard-cats--slider) {
 		display: flex;
 		gap: 14px;
 		overflow-x: auto;
@@ -2969,9 +3059,14 @@ a.ard-brand:hover img {
 		display: none;
 	}
 
-	.ard-cats--scroll .ard-cat {
+	.ard-cats--scroll:not(.ard-cats--slider) .ard-cat {
 		flex: none;
 		scroll-snap-align: start;
+	}
+
+	/* در موبایل فلش‌ها جا نمی‌شوند؛ کشیدن با انگشت کار خودش را می‌کند. */
+	.ard-cats__arrow {
+		display: none;
 	}
 
 	/* دایره باید دایره بماند حتی وقتی ستون از قطر تنظیم‌شده باریک‌تر است. */

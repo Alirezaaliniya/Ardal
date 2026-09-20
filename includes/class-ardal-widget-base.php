@@ -65,6 +65,68 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 	 * @param string $default_title
 	 * @param string $accent پیش‌فرض رنگ خط کنار عنوان: accent یا primary.
 	 */
+	/**
+	 * تگ‌هایی که یک عنوان می‌تواند بگیرد.
+	 *
+	 * یک فهرست برای همهٔ ویجت‌ها، تا ساختار تیترهای صفحه (h1 یکی، بقیه
+	 * زیرمجموعه) دست خود کاربر باشد و هر ویجت سلیقهٔ خودش را نداشته باشد.
+	 *
+	 * @return array
+	 */
+	public static function tag_options() {
+		return array(
+			'h1'   => 'H1',
+			'h2'   => 'H2',
+			'h3'   => 'H3',
+			'h4'   => 'H4',
+			'h5'   => 'H5',
+			'h6'   => 'H6',
+			'div'  => 'div (بدون وزن تیتر)',
+			'p'    => 'p',
+			'span' => 'span',
+		);
+	}
+
+	/**
+	 * نام تگ معتبر، وگرنه پیش‌فرض.
+	 *
+	 * جلوی تزریق از راه تنظیمات ذخیره‌شده را هم می‌گیرد، چون خروجی مستقیم
+	 * داخل `<...>` چاپ می‌شود.
+	 *
+	 * @param string $value
+	 * @param string $fallback
+	 * @return string
+	 */
+	public static function tag( $value, $fallback = 'h2' ) {
+		$value = is_string( $value ) ? $value : '';
+
+		return isset( self::tag_options()[ $value ] ) ? $value : $fallback;
+	}
+
+	/**
+	 * یک کنترل «تگ عنوان».
+	 *
+	 * @param string $name
+	 * @param string $label
+	 * @param string $default
+	 * @param array  $args کلیدهای اضافه مثل condition و separator.
+	 */
+	protected function add_tag_control( $name, $label = 'تگ عنوان', $default = 'h2', $args = array() ) {
+		$this->add_control(
+			$name,
+			array_merge(
+				array(
+					'label'       => $label,
+					'type'        => Controls_Manager::SELECT,
+					'default'     => $default,
+					'options'     => self::tag_options(),
+					'description' => 'فقط ساختار HTML را عوض می‌کند؛ ظاهر و اندازه از استایل می‌آید.',
+				),
+				$args
+			)
+		);
+	}
+
 	protected function add_heading_controls( $default_title, $accent = 'accent' ) {
 		$this->start_controls_section(
 			'section_heading',
@@ -102,6 +164,13 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'description' => 'اختیاری — زیر عنوان اصلی نمایش داده می‌شود.',
 				'condition'   => array( 'show_heading' => 'yes' ),
 			)
+		);
+
+		$this->add_tag_control(
+			'heading_tag',
+			'تگ عنوان',
+			'h2',
+			array( 'condition' => array( 'show_heading' => 'yes' ) )
 		);
 
 		$this->add_control(
@@ -181,8 +250,14 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			printf( '<span class="ard-shead__rule ard-shead__rule--%s"></span>', esc_attr( $rule ) );
 		}
 
+		$tag = self::tag( $s['heading_tag'] ?? 'h2', 'h2' );
+
 		echo '<div class="ard-shead__text">';
-		printf( '<h2 class="ard-shead__title">%s</h2>', esc_html( $s['heading'] ) );
+		printf(
+			'<%1$s class="ard-shead__title">%2$s</%1$s>',
+			esc_html( $tag ),
+			esc_html( $s['heading'] )
+		);
 
 		if ( '' !== trim( (string) $s['subheading'] ) ) {
 			printf( '<p class="ard-shead__sub">%s</p>', esc_html( $s['subheading'] ) );
@@ -415,8 +490,11 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'notch'       => null,
 				'link_mode'   => 'button',
 				'button_action' => 'add',
+				'title_tag'   => 'h3',
 			)
 		);
+
+		$title_tag = self::tag( $opts['title_tag'], 'h3' );
 
 		// بریدگی گوشه فقط وقتی معنا دارد که دکمهٔ گرد روی همان گوشه بنشیند.
 		if ( null === $opts['notch'] ) {
@@ -469,12 +547,13 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		if ( '' !== $title || $box_link ) {
 			if ( ! empty( $link['url'] ) ) {
 				printf(
-					'<h3 class="ard-pcard__title"><a%s>%s</a></h3>',
+					'<%1$s class="ard-pcard__title"><a%2$s>%3$s</a></%1$s>',
+					esc_html( $title_tag ),
 					Ardal_Helpers::link_attrs( $link ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					esc_html( $title )
 				);
 			} else {
-				printf( '<h3 class="ard-pcard__title">%s</h3>', esc_html( $title ) );
+				printf( '<%1$s class="ard-pcard__title">%2$s</%1$s>', esc_html( $title_tag ), esc_html( $title ) );
 			}
 		}
 
@@ -650,7 +729,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		$count   = isset( $item['count'] ) ? (int) $item['count'] : 0;
 		$id      = isset( $item['product_id'] ) ? (int) $item['product_id'] : 0;
 		$in_cart = ! isset( $item['in_stock'] ) || $item['in_stock'];
-		$tag     = in_array( $opts['title_tag'], array( 'h2', 'h3', 'h4', 'div' ), true ) ? $opts['title_tag'] : 'h3';
+		$tag     = self::tag( $opts['title_tag'], 'h3' );
 
 		$classes = array( 'ard-acard' );
 

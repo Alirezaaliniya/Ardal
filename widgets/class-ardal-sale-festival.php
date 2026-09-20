@@ -56,6 +56,9 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'title_tag', 'تگ عنوان جشنواره', 'h2' );
+		$this->add_tag_control( 'item_tag', 'تگ نام محصول', 'h3' );
+
 		$this->add_control(
 			'badge',
 			array(
@@ -274,7 +277,7 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 						<?php if ( $wide && '' !== trim( (string) $s['eyebrow'] ) ) : ?>
 							<span class="ard-fest__eyebrow"><?php echo esc_html( $s['eyebrow'] ); ?></span>
 						<?php endif; ?>
-						<h2 class="ard-fest__title"><?php echo esc_html( $s['title'] ); ?></h2>
+						<<?php echo esc_html( self::tag( $s['title_tag'], 'h2' ) ); ?> class="ard-fest__title"><?php echo esc_html( $s['title'] ); ?></<?php echo esc_html( self::tag( $s['title_tag'], 'h2' ) ); ?>>
 					</div>
 
 					<?php if ( '' !== trim( (string) $s['badge'] ) ) : ?>
@@ -332,13 +335,14 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 			</div>
 
 			<div class="ard-fest__body">
-				<h3 class="ard-fest__name">
+				<?php $ard_name_tag = self::tag( $s['item_tag'], 'h3' ); ?>
+				<<?php echo esc_html( $ard_name_tag ); ?> class="ard-fest__name">
 					<?php if ( ! empty( $link['url'] ) ) : ?>
 						<a<?php echo Ardal_Helpers::link_attrs( $link ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $title ); ?></a>
 					<?php else : ?>
 						<?php echo esc_html( $title ); ?>
 					<?php endif; ?>
-				</h3>
+				</<?php echo esc_html( $ard_name_tag ); ?>>
 
 				<div class="ard-fest__prices">
 					<?php if ( ! $wide && '' !== $off ) : ?>

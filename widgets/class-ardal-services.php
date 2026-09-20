@@ -106,6 +106,8 @@ class Ardal_Widget_Services extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'title_tag', 'تگ عنوان هر مزیت', 'span' );
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -161,6 +163,8 @@ class Ardal_Widget_Services extends Ardal_Widget_Base {
 
 			return;
 		}
+
+		$ard_tag = self::tag( $s['title_tag'], 'span' );
 		?>
 		<ul class="ard-services ard-services--<?php echo esc_attr( $s['variant'] ); ?>">
 			<?php foreach ( $items as $item ) : ?>
@@ -169,7 +173,7 @@ class Ardal_Widget_Services extends Ardal_Widget_Base {
 					<<?php echo esc_html( $tag ); ?> class="ard-service__inner"<?php echo 'a' === $tag ? Ardal_Helpers::link_attrs( $item['link'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 						<span class="ard-service__icon"><?php echo Ardal_Helpers::icon( $item['icon'], 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						<span class="ard-service__text">
-							<span class="ard-service__title"><?php echo esc_html( $item['title'] ); ?></span>
+							<<?php echo esc_html( $ard_tag ); ?> class="ard-service__title"><?php echo esc_html( $item['title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 							<?php if ( '' !== trim( (string) $item['subtitle'] ) ) : ?>
 								<span class="ard-service__sub"><?php echo esc_html( $item['subtitle'] ); ?></span>
 							<?php endif; ?>

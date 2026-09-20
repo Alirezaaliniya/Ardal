@@ -36,6 +36,8 @@ class Ardal_Widget_Footer extends Ardal_Widget_Base {
 			array( 'label' => 'ستون برند' )
 		);
 
+		$this->add_tag_control( 'coltitle_tag', 'تگ عنوان ستون‌ها', 'h3' );
+
 		$this->add_control(
 			'logo',
 			array(
@@ -234,7 +236,8 @@ class Ardal_Widget_Footer extends Ardal_Widget_Base {
 	}
 
 	protected function render() {
-		$s = $this->get_settings_for_display();
+		$s       = $this->get_settings_for_display();
+		$ard_tag = self::tag( $s['coltitle_tag'], 'h3' );
 		?>
 		<footer class="ard-footer ard-footer--<?php echo esc_attr( $s['variant'] ); ?>">
 			<div class="ard-footer__grid">
@@ -254,7 +257,7 @@ class Ardal_Widget_Footer extends Ardal_Widget_Base {
 
 				<?php foreach ( (array) $s['columns'] as $column ) : ?>
 					<div class="ard-footer__col">
-						<h3 class="ard-footer__coltitle"><?php echo esc_html( $column['title'] ); ?></h3>
+						<<?php echo esc_html( $ard_tag ); ?> class="ard-footer__coltitle"><?php echo esc_html( $column['title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 						<ul class="ard-footer__links">
 							<?php foreach ( $this->parse_links( $column['links'] ) as $link ) : ?>
 								<li>
@@ -272,7 +275,7 @@ class Ardal_Widget_Footer extends Ardal_Widget_Base {
 				<?php if ( ! empty( $s['badges'] ) ) : ?>
 					<div class="ard-footer__col">
 						<?php if ( '' !== trim( (string) $s['badges_title'] ) ) : ?>
-							<h3 class="ard-footer__coltitle"><?php echo esc_html( $s['badges_title'] ); ?></h3>
+							<<?php echo esc_html( $ard_tag ); ?> class="ard-footer__coltitle"><?php echo esc_html( $s['badges_title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 						<?php endif; ?>
 
 						<div class="ard-footer__badges">

@@ -142,6 +142,8 @@ class Ardal_Widget_Posts extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'item_tag', 'تگ عنوان مطلب', 'h3' );
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -204,13 +206,14 @@ class Ardal_Widget_Posts extends Ardal_Widget_Base {
 					</div>
 
 					<div class="ard-post__body">
-						<h3 class="ard-post__title">
+						<?php $ard_item_tag = self::tag( $s['item_tag'], 'h3' ); ?>
+						<<?php echo esc_html( $ard_item_tag ); ?> class="ard-post__title">
 							<?php if ( ! empty( $item['link']['url'] ) ) : ?>
 								<a<?php echo Ardal_Helpers::link_attrs( $item['link'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $item['title'] ); ?></a>
 							<?php else : ?>
 								<?php echo esc_html( $item['title'] ); ?>
 							<?php endif; ?>
-						</h3>
+						</<?php echo esc_html( $ard_item_tag ); ?>>
 
 						<?php
 						$meta = array();

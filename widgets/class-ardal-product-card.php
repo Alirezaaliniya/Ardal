@@ -197,6 +197,8 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'card_title_tag', 'تگ نام محصول', 'h3' );
+
 		$this->add_control(
 			'show_off',
 			array(
@@ -376,6 +378,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'button_text' => $s['button_text'],
 				'placeholder' => $s['placeholder'],
 				'notch'       => $framed && 'yes' === $s['notch'],
+				'title_tag'   => $s['card_title_tag'],
 			)
 		);
 

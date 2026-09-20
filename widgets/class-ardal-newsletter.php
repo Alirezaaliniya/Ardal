@@ -44,6 +44,8 @@ class Ardal_Widget_Newsletter extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'title_tag', 'تگ عنوان', 'h2' );
+
 		$this->add_control(
 			'subtitle',
 			array(
@@ -173,7 +175,8 @@ class Ardal_Widget_Newsletter extends Ardal_Widget_Base {
 		<section class="ard-news ard-news--<?php echo esc_attr( $s['variant'] ); ?>">
 			<div class="ard-news__inner">
 				<div class="ard-news__copy">
-					<h2 class="ard-news__title"><?php echo esc_html( $s['title'] ); ?></h2>
+					<?php $ard_tag = self::tag( $s['title_tag'], 'h2' ); ?>
+					<<?php echo esc_html( $ard_tag ); ?> class="ard-news__title"><?php echo esc_html( $s['title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 					<?php if ( '' !== trim( (string) $s['subtitle'] ) ) : ?>
 						<p class="ard-news__sub"><?php echo esc_html( $s['subtitle'] ); ?></p>
 					<?php endif; ?>

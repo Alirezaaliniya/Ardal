@@ -93,6 +93,8 @@ class Ardal_Widget_Product_Sticky_Bar extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'title_tag', 'تگ نام محصول', 'div' );
+
 		$this->add_control(
 			'show_variant',
 			array(
@@ -223,6 +225,7 @@ class Ardal_Widget_Product_Sticky_Bar extends Ardal_Widget_Base {
 			return;
 		}
 
+		$ard_tag     = self::tag( $s['title_tag'], 'div' );
 		$scroll_only = 'yes' === $s['show_on_scroll_only'];
 		$classes     = array( 'ard-prod-sticky-bar' );
 
@@ -242,7 +245,7 @@ class Ardal_Widget_Product_Sticky_Bar extends Ardal_Widget_Base {
 				</div>
 
 				<div class="ard-prod-sticky-bar__info">
-					<div class="ard-prod-sticky-bar__title"><?php echo esc_html( $data['title'] ); ?></div>
+					<<?php echo esc_html( $ard_tag ); ?> class="ard-prod-sticky-bar__title"><?php echo esc_html( $data['title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 					<?php if ( 'yes' === $s['show_variant'] ) : ?>
 						<div class="ard-prod-sticky-bar__variant" data-ard-sticky-variant></div>
 					<?php endif; ?>

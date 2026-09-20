@@ -62,6 +62,9 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'label_tag', 'تگ عنوان باکس', 'h2' );
+		$this->add_tag_control( 'item_tag', 'تگ نام محصول', 'h3' );
+
 		$this->add_control(
 			'meta',
 			array(
@@ -473,7 +476,8 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 		<section class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
 
 			<div class="ard-deal__head">
-				<h2 class="ard-deal__label"><?php echo esc_html( $s['label'] ); ?></h2>
+				<?php $ard_tag = self::tag( $s['label_tag'], 'h2' ); ?>
+				<<?php echo esc_html( $ard_tag ); ?> class="ard-deal__label"><?php echo esc_html( $s['label'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 
 				<?php if ( 'yes' === $s['show_meta'] ) : ?>
 					<span class="ard-deal__meta"><?php echo esc_html( $this->meta_text( $s, count( $items ) ) ); ?></span>
@@ -550,13 +554,14 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			</div>
 
 			<div class="ard-deal__info">
-				<h3 class="ard-deal__title">
+				<?php $ard_item_tag = self::tag( $s['item_tag'], 'h3' ); ?>
+				<<?php echo esc_html( $ard_item_tag ); ?> class="ard-deal__title">
 					<?php if ( ! empty( $link['url'] ) ) : ?>
 						<a<?php echo Ardal_Helpers::link_attrs( $link ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $title ); ?></a>
 					<?php else : ?>
 						<?php echo esc_html( $title ); ?>
 					<?php endif; ?>
-				</h3>
+				</<?php echo esc_html( $ard_item_tag ); ?>>
 
 				<div class="ard-deal__prices">
 					<?php if ( '' !== $old ) : ?>

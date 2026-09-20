@@ -154,6 +154,8 @@ class Ardal_Widget_Banners extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'title_tag', 'تگ عنوان بنر', 'h3' );
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -207,6 +209,8 @@ class Ardal_Widget_Banners extends Ardal_Widget_Base {
 
 			return;
 		}
+
+		$ard_tag = self::tag( $s['title_tag'], 'h3' );
 		?>
 		<div class="ard-banners">
 			<?php foreach ( $items as $item ) : ?>
@@ -219,7 +223,7 @@ class Ardal_Widget_Banners extends Ardal_Widget_Base {
 							<span class="ard-banner__eyebrow"><?php echo esc_html( $item['eyebrow'] ); ?></span>
 						<?php endif; ?>
 
-						<h3 class="ard-banner__title"><?php echo esc_html( $item['title'] ); ?></h3>
+						<<?php echo esc_html( $ard_tag ); ?> class="ard-banner__title"><?php echo esc_html( $item['title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 
 						<?php if ( '' !== trim( (string) $item['text'] ) ) : ?>
 							<p class="ard-banner__text"><?php echo esc_html( $item['text'] ); ?></p>

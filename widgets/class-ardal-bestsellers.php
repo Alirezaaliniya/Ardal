@@ -127,6 +127,8 @@ class Ardal_Widget_Bestsellers extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'item_tag', 'تگ نام محصول', 'h3' );
+
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -226,13 +228,14 @@ class Ardal_Widget_Bestsellers extends Ardal_Widget_Base {
 						<?php endif; ?>
 					</div>
 
-					<h3 class="ard-best__title">
+					<?php $ard_item_tag = self::tag( $s['item_tag'], 'h3' ); ?>
+					<<?php echo esc_html( $ard_item_tag ); ?> class="ard-best__title">
 						<?php if ( ! empty( $link['url'] ) ) : ?>
 							<a<?php echo Ardal_Helpers::link_attrs( $link ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $title ); ?></a>
 						<?php else : ?>
 							<?php echo esc_html( $title ); ?>
 						<?php endif; ?>
-					</h3>
+					</<?php echo esc_html( $ard_item_tag ); ?>>
 
 					<?php if ( 'framed' === $s['variant'] && 'yes' === $s['show_rating'] && $rating > 0 ) : ?>
 						<div class="ard-best__stars"><?php echo Ardal_Helpers::stars( $rating ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>

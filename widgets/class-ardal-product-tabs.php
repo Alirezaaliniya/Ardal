@@ -40,6 +40,8 @@ class Ardal_Widget_Product_Tabs extends Ardal_Widget_Base {
 			array( 'label' => 'تب‌ها' )
 		);
 
+		$this->add_tag_control( 'panel_tag', 'تگ عنوان داخل تب', 'h3' );
+
 		$this->add_control(
 			'source',
 			array(
@@ -423,8 +425,9 @@ class Ardal_Widget_Product_Tabs extends Ardal_Widget_Base {
 	}
 
 	protected function render() {
-		$s    = $this->get_settings_for_display();
-		$auto = 'auto' === $s['source'];
+		$s       = $this->get_settings_for_display();
+		$auto    = 'auto' === $s['source'];
+		$ard_tag = self::tag( $s['panel_tag'], 'h3' );
 
 		$product = $auto ? Ardal_Product::current() : null;
 
@@ -540,7 +543,7 @@ class Ardal_Widget_Product_Tabs extends Ardal_Widget_Base {
 						<?php echo ( ! $sections && 0 !== $i ) ? ' hidden' : ''; ?>
 					>
 						<?php if ( $sections ) : ?>
-							<h3 class="ard-ptabs__panel-title"><?php echo esc_html( $panel['label'] ); ?></h3>
+							<<?php echo esc_html( $ard_tag ); ?> class="ard-ptabs__panel-title"><?php echo esc_html( $panel['label'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 						<?php endif; ?>
 						<?php $this->render_panel( $key, $panel['data'], $s, $product ); ?>
 					</div>

@@ -216,6 +216,13 @@
 		}
 
 		var dotsBox = root.querySelector( '[data-ard-dots]' );
+
+		/*
+		 * کلاس نقطه‌ها از خود عنصر خوانده می‌شود تا کروسل مشترک بماند؛ قبلاً
+		 * ثابت و مال «پیشنهاد ویژه» بود و هر ویجت تازه‌ای نقطه‌هایش استایل
+		 * غریبه می‌گرفت.
+		 */
+		var dotClass = ( dotsBox && dotsBox.getAttribute( 'data-ard-dots' ) ) || 'ard-deal__dot';
 		var prev = root.parentNode ? root.parentNode.querySelector( '[data-ard-prev]' ) : null;
 		var next = root.parentNode ? root.parentNode.querySelector( '[data-ard-next]' ) : null;
 		var interval = parseInt( root.getAttribute( 'data-interval' ), 10 ) || 0;
@@ -305,7 +312,7 @@
 					var dot = document.createElement( 'button' );
 
 					dot.type = 'button';
-					dot.className = 'ard-deal__dot';
+					dot.className = dotClass;
 					dot.setAttribute( 'role', 'tab' );
 					dot.setAttribute( 'aria-label', 'صفحه ' + toFa( page + 1 ) );
 					dot.addEventListener( 'click', function () {

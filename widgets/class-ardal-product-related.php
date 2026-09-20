@@ -142,6 +142,8 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'card_title_tag', 'تگ نام محصول', 'h3' );
+
 		$this->add_control(
 			'button_text',
 			array(
@@ -216,6 +218,7 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 					'show_button'   => ! $framed,
 					'button_text'   => $s['button_text'],
 					'placeholder'   => '۸۰۰×۸۰۰',
+					'title_tag'     => $s['card_title_tag'],
 				)
 			);
 

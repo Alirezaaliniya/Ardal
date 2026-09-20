@@ -45,6 +45,8 @@ class Ardal_Widget_Brands extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_tag_control( 'title_tag', 'تگ عنوان', 'h2' );
+
 		$this->add_control(
 			'more_text',
 			array(
@@ -188,7 +190,8 @@ class Ardal_Widget_Brands extends Ardal_Widget_Base {
 		<section class="ard-brands ard-brands--<?php echo esc_attr( $s['variant'] ); ?>">
 			<?php if ( '' !== trim( (string) $s['title'] ) ) : ?>
 				<div class="ard-brands__head">
-					<h2 class="ard-brands__title"><?php echo esc_html( $s['title'] ); ?></h2>
+					<?php $ard_tag = self::tag( $s['title_tag'], 'h2' ); ?>
+					<<?php echo esc_html( $ard_tag ); ?> class="ard-brands__title"><?php echo esc_html( $s['title'] ); ?></<?php echo esc_html( $ard_tag ); ?>>
 					<span class="ard-brands__line" aria-hidden="true"></span>
 					<?php if ( '' !== trim( (string) $s['more_text'] ) ) : ?>
 						<a class="ard-brands__more"<?php echo Ardal_Helpers::link_attrs( $s['more_link'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $s['more_text'] ); ?></a>
