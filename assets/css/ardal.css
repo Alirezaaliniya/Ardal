@@ -1556,6 +1556,27 @@ a.ard-service__inner:hover {
 	transition: box-shadow .25s, transform .25s;
 }
 
+/*
+ * کارت ناموجود — همان قاعدهٔ کارت آرشیو.
+ *
+ * grayscale روی کل کارت می‌نشیند تا نشان تخفیف و دکمهٔ سبز هم خاموش شوند؛
+ * تخفیفِ چیزی که نمی‌شود خرید، فقط کاربر را سر کار می‌گذارد.
+ */
+.ard-pcard--oos {
+	filter: grayscale(0.85);
+	opacity: 0.72;
+}
+
+.ard-pcard--oos:hover {
+	filter: grayscale(0.6);
+	opacity: 0.85;
+}
+
+.ard-pcard--oos .ard-pcard__fab,
+.ard-pcard--oos .ard-pcard__btn {
+	pointer-events: none;
+}
+
 .ard-pcard__box {
 	display: flex;
 	flex-direction: column;
@@ -3851,6 +3872,55 @@ a.ard-breadcrumb__item:hover {
 	background: color-mix(in srgb, var(--ard-tint-green) 55%, var(--ard-base));
 }
 
+/*
+ * رنگِ ناموجود: خط‌خورده و کم‌رنگ، ولی همچنان دیده می‌شود.
+ *
+ * برداشتنش از فهرست این توهم را می‌سازد که فروشگاه این رنگ را اصلاً ندارد؛
+ * دیدنِ خط‌خورده‌اش اطلاعات بیشتری به کاربر می‌دهد و انتظار «شاید بعداً بیاید»
+ * را هم درست می‌کند.
+ */
+/*
+ * «با انتخاب فعلی نمی‌خواند» با «اصلاً نیست» فرق دارد: اولی کلیک‌شدنی است و
+ * با زدنش آن یکی ویژگی خودش جابه‌جا می‌شود، پس اشاره‌گرش هم باید امیدوار
+ * باشد نه ممنوع.
+ */
+.ard-prod-color.is-conflict,
+.ard-prod-size.is-conflict {
+	cursor: pointer;
+	opacity: .85;
+}
+
+.ard-prod-color.is-disabled {
+	border-color: var(--ard-border-soft);
+	background: var(--ard-surface-alt);
+	color: color-mix(in srgb, var(--ard-muted) 55%, var(--ard-base));
+	cursor: not-allowed;
+}
+
+.ard-prod-color.is-disabled .ard-prod-color__name {
+	text-decoration: line-through;
+}
+
+.ard-prod-color.is-disabled .ard-prod-color__swatch {
+	position: relative;
+	opacity: .45;
+}
+
+/* خطِ مورب روی نمونهٔ رنگ: برای کسی که خط‌خوردگیِ متن را نمی‌بیند هم روشن است. */
+.ard-prod-color.is-disabled .ard-prod-color__swatch::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to top left,
+		transparent calc(50% - 1px),
+		var(--ard-muted) calc(50% - 1px),
+		var(--ard-muted) calc(50% + 1px),
+		transparent calc(50% + 1px)
+	);
+	border-radius: inherit;
+}
+
 .ard-prod-color__swatch {
 	width: 18px;
 	height: 18px;
@@ -4095,6 +4165,33 @@ a.ard-breadcrumb__item:hover {
 	box-shadow: 0 6px 16px rgba(95, 163, 21, 0.35);
 	transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 	text-decoration: none;
+}
+
+/*
+ * دکمهٔ ناموجود.
+ *
+ * !important لازم است چون خودِ دکمه رنگ سبزش را با !important می‌گیرد (برای
+ * غلبه بر استایل دکمهٔ ووکامرس و قالب)؛ بدون آن، «ناموجود» هم سبزِ سرحال
+ * دیده می‌شد. این حالت هم از سمت سرور می‌آید (محصول ساده ناموجود) و هم از
+ * جاوااسکریپت (واریاسیونی که موجود نیست).
+ */
+.ard-prod-buybox__btn.is-disabled {
+	background: var(--ard-surface) !important;
+	color: var(--ard-muted) !important;
+	box-shadow: none;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.ard-prod-buybox__btn.is-disabled:hover {
+	background: var(--ard-surface) !important;
+	transform: none;
+}
+
+/* کل باکس خرید هم وقتی ترکیب انتخابی موجود نیست، کمی عقب می‌نشیند. */
+.ard-prod-buybox.is-out .ard-prod-buybox__price-main,
+.ard-prod-buybox.is-out .ard-prod-buybox__price-row {
+	opacity: .55;
 }
 
 .ard-prod-buybox__btn:hover {

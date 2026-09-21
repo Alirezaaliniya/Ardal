@@ -561,6 +561,16 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 
 		$classes = array( 'ard-pcard', 'ard-pcard--' . $opts['variant'] );
 
+		/*
+		 * کارتِ ناموجود کم‌رنگ می‌شود.
+		 *
+		 * in_stock فقط وقتی معنا دارد که از ووکامرس آمده باشد؛ در حالت دستی
+		 * این کلید نیست و کارت باید عادی بماند، نه اینکه همه‌شان خاکستری شوند.
+		 */
+		if ( isset( $item['in_stock'] ) && ! $item['in_stock'] ) {
+			$classes[] = 'ard-pcard--oos';
+		}
+
 		if ( $opts['notch'] ) {
 			$classes[] = 'ard-pcard--notch';
 		}

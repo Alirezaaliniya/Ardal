@@ -1195,9 +1195,16 @@
 	   انتخاب رنگ و سایز و متغیرهای محصول
 	   -------------------------------------------------------- */
 
-	// رنگ و سایز حالا ویجت‌های جدا هستند، پس انتخاب کاربر در یک وضعیت مشترکِ
-	// سطح صفحه نگه داشته می‌شود تا نوار چسبان و هر مصرف‌کنندهٔ دیگری ببیندش.
-	var variantState = { color: '', size: '' };
+	var variantState = { color: '', size: '', colorSlug: '', sizeSlug: '', currentVariation: null, map: null };
+
+	function formatPriceNumber( n ) {
+		if ( ! n && n !== 0 ) {
+			return '';
+		}
+		var parts = String( n ).split( '.' );
+		parts[0] = parts[0].replace( /\B(?=(\d{3})+(?!\d))/g, '٫' );
+		return toFa( parts[0] );
+	}
 
 	function paintVariantTargets() {
 		var parts = [];
@@ -1224,58 +1231,457 @@
 		);
 	}
 
+	/* --------------------------------------------------------
+	   واریاسیون‌ها
+
+	   یک منبع حقیقت: نقشهٔ سبکی که ویجت باکس خرید در data-variations
+	   می‌گذارد. همهٔ ویجت‌های صفحه (رنگ، سایز، قیمت، نوار چسبان) از همین
+	   می‌خوانند تا دو جا دو جور حساب نکنند.
+	   -------------------------------------------------------- */
+
+	/**
+	 * نقشهٔ واریاسیون‌های صفحه، یک‌بار خوانده و نگه داشته می‌شود.
+	 */
+	function variationMap() {
+		if ( variantState.map ) {
+			return variantState.map;
+		}
+
+		var box = document.querySelector( '[data-ard-buybox][data-is-variable="true"]' );
+		var raw = box ? box.getAttribute( 'data-variations' ) : '';
+
+		try {
+			variantState.map = raw ? JSON.parse( raw ) : [];
+		} catch ( e ) {
+			variantState.map = [];
+		}
+
+		return variantState.map;
+	}
+
+	/**
+	 * ویژگی‌هایی که کاربر تا الان انتخاب کرده: کلید ویژگی → اسلاگ.
+	 *
+	 * کلید از خود گروه خوانده می‌شود (data-attr)، نه از نام ثابت
+	 * attribute_pa_color؛ هر فروشگاهی ویژگی‌اش را جور دیگری نامیده است.
+	 */
+	function chosenAttributes( skipGroup ) {
+		var out = {};
+
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '[data-ard-color-group],[data-ard-size-group]' ),
+			function ( group ) {
+				if ( group === skipGroup ) {
+					return;
+				}
+
+				var key = group.getAttribute( 'data-attr' );
+				var active = group.querySelector( '.is-active' );
+
+				if ( ! key || ! active ) {
+					return;
+				}
+
+				var slug = active.getAttribute( 'data-color-slug' ) || active.getAttribute( 'data-size-slug' ) || '';
+
+				if ( slug ) {
+					out[ key ] = slug;
+				}
+			}
+		);
+
+		return out;
+	}
+
+	/**
+	 * آیا این واریاسیون با انتخاب‌های داده‌شده می‌خواند؟
+	 *
+	 * ویژگیِ خالی در واریاسیون یعنی «هر مقداری»، پس رد نمی‌شود.
+	 */
+	function variationMatches( variation, wanted ) {
+		for ( var key in wanted ) {
+			if ( ! Object.prototype.hasOwnProperty.call( wanted, key ) ) {
+				continue;
+			}
+
+			var have = variation.attrs[ key ];
+
+			if ( have && have !== wanted[ key ] ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * باریک‌شدن دوطرفه: با انتخاب یک رنگ، سایزهایی که در آن رنگ موجود نیستند
+	 * خط می‌خورند و برعکس.
+	 *
+	 * بدون این، کاربر سایزی را انتخاب می‌کرد که برای رنگ انتخابی‌اش وجود
+	 * نداشت و فقط با خاکستری شدن دکمهٔ خرید می‌فهمید — آن هم بعد از دو کلیک.
+	 */
+	function narrowVariantOptions() {
+		var map = variationMap();
+
+		if ( ! map.length ) {
+			return;
+		}
+
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '[data-ard-color-group],[data-ard-size-group]' ),
+			function ( group ) {
+				var key = group.getAttribute( 'data-attr' );
+
+				if ( ! key ) {
+					return;
+				}
+
+				// انتخاب‌های بقیهٔ گروه‌ها، بدون خودِ این گروه.
+				var others = chosenAttributes( group );
+
+				Array.prototype.forEach.call(
+					group.querySelectorAll( '.ard-prod-color, .ard-prod-size' ),
+					function ( btn ) {
+						var slug = btn.getAttribute( 'data-color-slug' ) || btn.getAttribute( 'data-size-slug' ) || '';
+
+						if ( ! slug ) {
+							return;
+						}
+
+						var wanted = {};
+						var k;
+
+						for ( k in others ) {
+							if ( Object.prototype.hasOwnProperty.call( others, k ) ) {
+								wanted[ k ] = others[ k ];
+							}
+						}
+
+						wanted[ key ] = slug;
+
+						// با انتخاب‌های فعلی می‌خواند؟
+						var usable = map.some( function ( v ) {
+							return v.stock && v.buy && variationMatches( v, wanted );
+						} );
+
+						// اصلاً در هیچ ترکیبی موجود است؟
+						var only = {};
+						only[ key ] = slug;
+
+						var anywhere = map.some( function ( v ) {
+							return v.stock && v.buy && variationMatches( v, only );
+						} );
+
+						/*
+						 * دو نوع «نمی‌شود»:
+						 *
+						 *   بن‌بست  — این رنگ/سایز در هیچ ترکیبی موجود نیست.
+						 *             خط‌خورده و واقعاً غیرفعال.
+						 *   ناسازگار — خودش موجود است، ولی با انتخاب فعلیِ
+						 *             آن یکی ویژگی جور نیست. این هم خط‌خورده
+						 *             است ولی کلیک‌شدنی می‌ماند: کلیک که شد،
+						 *             خودش انتخاب می‌شود و آن یکی ویژگی به
+						 *             نزدیک‌ترین گزینهٔ موجود می‌رود.
+						 *
+						 * بدون این تفکیک، کاربر روی «مشکی + M» گیر می‌کرد و
+						 * برای رسیدن به قرمز باید حدس می‌زد که اول باید سایز
+						 * را عوض کند.
+						 */
+						btn.classList.toggle( 'is-disabled', ! usable );
+						btn.classList.toggle( 'is-conflict', ! usable && anywhere );
+						btn.disabled = ! anywhere;
+
+						if ( usable ) {
+							btn.removeAttribute( 'aria-disabled' );
+							btn.removeAttribute( 'title' );
+						} else {
+							btn.setAttribute( 'aria-disabled', anywhere ? 'false' : 'true' );
+
+							if ( anywhere ) {
+								btn.setAttribute( 'title', 'با انتخاب فعلی موجود نیست؛ بزنید تا نزدیک‌ترین ترکیب موجود انتخاب شود.' );
+							} else {
+								btn.setAttribute( 'title', 'ناموجود' );
+							}
+						}
+					}
+				);
+			}
+		);
+	}
+
+	/**
+	 * واریاسیونی که با انتخاب فعلی می‌خواند.
+	 */
+	/**
+	 * وقتی کاربر گزینه‌ای را می‌زند که با انتخاب فعلی نمی‌خواند، بقیهٔ
+	 * ویژگی‌ها به نزدیک‌ترین ترکیبِ موجود منتقل می‌شوند.
+	 *
+	 * @param {string} key  کلید ویژگی‌ای که کاربر زده.
+	 * @param {string} slug مقدارش.
+	 */
+	function resolveConflict( key, slug ) {
+		var map = variationMap();
+		var wanted = {};
+
+		wanted[ key ] = slug;
+
+		var target = null;
+
+		map.forEach( function ( v ) {
+			if ( target || ! v.stock || ! v.buy || ! variationMatches( v, wanted ) ) {
+				return;
+			}
+
+			target = v;
+		} );
+
+		if ( ! target ) {
+			return;
+		}
+
+		// بقیهٔ گروه‌ها روی مقدارهای همین واریاسیون تنظیم می‌شوند.
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '[data-ard-color-group],[data-ard-size-group]' ),
+			function ( group ) {
+				var groupKey = group.getAttribute( 'data-attr' );
+
+				if ( ! groupKey || groupKey === key || ! target.attrs[ groupKey ] ) {
+					return;
+				}
+
+				var want = target.attrs[ groupKey ];
+
+				Array.prototype.forEach.call(
+					group.querySelectorAll( '.ard-prod-color, .ard-prod-size' ),
+					function ( b ) {
+						var bs = b.getAttribute( 'data-color-slug' ) || b.getAttribute( 'data-size-slug' ) || '';
+						var on = bs === want;
+
+						b.classList.toggle( 'is-active', on );
+
+						if ( ! on ) {
+							return;
+						}
+
+						// وضعیتِ نمایشی هم باید با انتخاب تازه جلو برود.
+						if ( b.getAttribute( 'data-color-name' ) ) {
+							variantState.color = b.getAttribute( 'data-color-name' ) || '';
+							variantState.colorSlug = bs;
+
+							var t = group.querySelector( '[data-ard-color-target]' );
+
+							if ( t ) {
+								t.textContent = variantState.color;
+							}
+						} else {
+							variantState.size = b.getAttribute( 'data-size-label' ) || '';
+							variantState.sizeSlug = bs;
+						}
+					}
+				);
+			}
+		);
+	}
+
+	function currentVariation() {
+		var map = variationMap();
+		var wanted = chosenAttributes( null );
+		var match = null;
+
+		map.forEach( function ( v ) {
+			if ( match || ! variationMatches( v, wanted ) ) {
+				return;
+			}
+
+			match = v;
+		} );
+
+		return match;
+	}
+
+	function syncVariationState() {
+		paintVariantTargets();
+		narrowVariantOptions();
+
+		var buyboxes = document.querySelectorAll( '[data-ard-buybox]' );
+		Array.prototype.forEach.call( buyboxes, function ( buybox ) {
+			if ( 'true' !== buybox.getAttribute( 'data-is-variable' ) ) {
+				return;
+			}
+
+			var match = currentVariation();
+
+			variantState.currentVariation = match;
+
+			var priceMain = buybox.querySelector( '.ard-prod-buybox__price-main' );
+			var oldPriceEl = buybox.querySelector( '.ard-prod-buybox__old' );
+			var badgeEl = buybox.querySelector( '.ard-prod-buybox__badge' );
+			var priceRow = buybox.querySelector( '.ard-prod-buybox__price-row' );
+			var btnAdd = buybox.querySelector( '[data-ard-add-to-cart]' );
+
+			var stickyPrice = document.querySelector( '.ard-prod-sticky-bar__price-main' );
+			var stickyOldPrice = document.querySelector( '.ard-prod-sticky-bar__old' );
+
+			if ( match ) {
+				if ( priceMain ) {
+					var unit = priceMain.querySelector( '.ard-prod-buybox__unit' );
+					var unitHtml = unit ? unit.outerHTML : '';
+					priceMain.innerHTML = formatPriceNumber( match.price ) + ' ' + unitHtml;
+				}
+
+				if ( stickyPrice ) {
+					var sUnit = stickyPrice.querySelector( '.ard-prod-sticky-bar__unit' );
+					var sUnitHtml = sUnit ? sUnit.outerHTML : '';
+					stickyPrice.innerHTML = formatPriceNumber( match.price ) + ' ' + sUnitHtml;
+				}
+
+				if ( match.off > 0 ) {
+					var discountPercent = match.off;
+					if ( oldPriceEl ) {
+						oldPriceEl.textContent = formatPriceNumber( match.reg );
+						oldPriceEl.style.display = '';
+					}
+					if ( badgeEl ) {
+						badgeEl.textContent = toFa( discountPercent ) + '٪';
+						badgeEl.style.display = '';
+					}
+					if ( priceRow ) {
+						priceRow.style.display = '';
+					}
+					if ( stickyOldPrice ) {
+						stickyOldPrice.textContent = formatPriceNumber( match.reg );
+						stickyOldPrice.style.display = '';
+					}
+				} else {
+					if ( oldPriceEl ) {
+						oldPriceEl.style.display = 'none';
+					}
+					if ( badgeEl ) {
+						badgeEl.style.display = 'none';
+					}
+					if ( stickyOldPrice ) {
+						stickyOldPrice.style.display = 'none';
+					}
+				}
+
+				setAddState( buybox, btnAdd, match.stock && match.buy );
+			} else {
+				/*
+				 * هیچ واریاسیونی با این ترکیب نمی‌خواند (مثلاً رنگی که در آن
+				 * سایز ساخته نشده). دکمه باید خاموش باشد، وگرنه کاربر روی
+				 * چیزی کلیک می‌کند که وجود ندارد.
+				 */
+				setAddState( buybox, btnAdd, false );
+			}
+		} );
+	}
+
+	/**
+	 * روشن/خاموش کردن دکمهٔ خرید و کل باکس.
+	 *
+	 * @param {Element} buybox
+	 * @param {Element} btn
+	 * @param {boolean} on
+	 */
+	function setAddState( buybox, btn, on ) {
+		if ( buybox ) {
+			buybox.classList.toggle( 'is-out', ! on );
+		}
+
+		if ( ! btn ) {
+			return;
+		}
+
+		btn.classList.toggle( 'is-disabled', ! on );
+
+		if ( on ) {
+			btn.removeAttribute( 'aria-disabled' );
+		} else {
+			btn.setAttribute( 'aria-disabled', 'true' );
+		}
+	}
+
 	function initColorGroup( group ) {
-		var buttons = Array.prototype.slice.call( group.querySelectorAll( '.ard-prod-color:not(.is-disabled)' ) );
+		/*
+		 * شنونده روی همهٔ دکمه‌ها می‌نشیند، نه فقط فعال‌ها: با باریک‌شدن
+		 * دوطرفه یک دکمه ممکن است بعداً فعال شود و اگر آن موقع شنونده نداشته
+		 * باشد، کلیکش بی‌اثر می‌ماند. جلوی کلیکِ غیرفعال را خودِ handler
+		 * می‌گیرد.
+		 */
+		var buttons = Array.prototype.slice.call( group.querySelectorAll( '.ard-prod-color' ) );
 		var target = group.querySelector( '[data-ard-color-target]' );
 		var active = group.querySelector( '.ard-prod-color.is-active' );
 
 		if ( active ) {
 			variantState.color = active.getAttribute( 'data-color-name' ) || '';
+			variantState.colorSlug = active.getAttribute( 'data-color-slug' ) || '';
 		}
 
 		buttons.forEach( function ( btn ) {
 			btn.addEventListener( 'click', function () {
+				// بن‌بست واقعی: هیچ کاری نمی‌شود کرد.
+				if ( btn.classList.contains( 'is-disabled' ) && ! btn.classList.contains( 'is-conflict' ) ) {
+					return;
+				}
+
 				buttons.forEach( function ( c ) {
 					c.classList.remove( 'is-active' );
 				} );
 
 				btn.classList.add( 'is-active' );
 				variantState.color = btn.getAttribute( 'data-color-name' ) || '';
+				variantState.colorSlug = btn.getAttribute( 'data-color-slug' ) || '';
 
 				if ( target ) {
 					target.textContent = variantState.color;
 				}
 
-				paintVariantTargets();
+				if ( btn.classList.contains( 'is-conflict' ) ) {
+					resolveConflict( group.getAttribute( 'data-attr' ), variantState.colorSlug );
+				}
+
+				syncVariationState();
 			} );
 		} );
 
-		paintVariantTargets();
+		syncVariationState();
 	}
 
 	function initSizeGroup( group ) {
-		var buttons = Array.prototype.slice.call( group.querySelectorAll( '.ard-prod-size:not(.is-disabled)' ) );
+		// توضیحش پای initColorGroup است.
+		var buttons = Array.prototype.slice.call( group.querySelectorAll( '.ard-prod-size' ) );
 		var active = group.querySelector( '.ard-prod-size.is-active' );
 
-		// مارک‌آپ `data-size-label` می‌دهد؛ قبلاً اینجا `data-size-val` خوانده
-		// می‌شد و برای همین سایز انتخاب‌شده همیشه خالی می‌ماند.
 		if ( active ) {
 			variantState.size = active.getAttribute( 'data-size-label' ) || '';
+			variantState.sizeSlug = active.getAttribute( 'data-size-slug' ) || '';
 		}
 
 		buttons.forEach( function ( btn ) {
 			btn.addEventListener( 'click', function () {
+				// بن‌بست واقعی؛ توضیحش پای initColorGroup است.
+				if ( btn.classList.contains( 'is-disabled' ) && ! btn.classList.contains( 'is-conflict' ) ) {
+					return;
+				}
+
 				buttons.forEach( function ( b ) {
 					b.classList.remove( 'is-active' );
 				} );
 
 				btn.classList.add( 'is-active' );
 				variantState.size = btn.getAttribute( 'data-size-label' ) || '';
-				paintVariantTargets();
+				variantState.sizeSlug = btn.getAttribute( 'data-size-slug' ) || '';
+
+				if ( btn.classList.contains( 'is-conflict' ) ) {
+					resolveConflict( group.getAttribute( 'data-attr' ), variantState.sizeSlug );
+				}
+
+				syncVariationState();
 			} );
 		} );
 
-		paintVariantTargets();
+		syncVariationState();
 	}
 
 	/* --------------------------------------------------------
@@ -1337,16 +1743,89 @@
 			} );
 		}
 
-		// وقتی دکمه واقعاً دکمهٔ ایجکس ووکامرس است، بازخورد را خود ووکامرس
-		// می‌دهد و دست‌کاری متن باعث دوباره‌کاری می‌شود.
-		if ( btnAdd && ! btnAdd.classList.contains( 'ajax_add_to_cart' ) ) {
-			btnAdd.addEventListener( 'click', function () {
-				var original = btnAdd.textContent;
+		if ( btnAdd ) {
+			btnAdd.addEventListener( 'click', function ( e ) {
+				var buybox = root.closest( '[data-ard-buybox]' ) || root;
+				var isVariable = 'true' === buybox.getAttribute( 'data-is-variable' );
 
-				btnAdd.textContent = 'به سبد خرید اضافه شد ✓';
-				window.setTimeout( function () {
-					btnAdd.textContent = original;
-				}, 1800 );
+				if ( isVariable ) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					if ( btnAdd.classList.contains( 'is-disabled' ) || btnAdd.classList.contains( 'loading' ) ) {
+						return false;
+					}
+
+					var variation = variantState.currentVariation;
+					var productId = buybox.getAttribute( 'data-product-id' );
+
+					if ( ! variation || ! variation.variation_id ) {
+						alert( 'لطفاً رنگ و سایز مورد نظر را انتخاب کنید.' );
+						return false;
+					}
+
+					if ( ! variation.is_in_stock || ! variation.is_purchasable ) {
+						alert( 'این متغیر در حال حاضر موجود نیست.' );
+						return false;
+					}
+
+					var originalText = btnAdd.textContent;
+					btnAdd.classList.add( 'loading' );
+					btnAdd.textContent = 'در حال افزودن...';
+
+					var postData = new FormData();
+					postData.append( 'product_id', variation.variation_id );
+					postData.append( 'variation_id', variation.variation_id );
+					postData.append( 'quantity', qtyVal );
+
+					if ( variantState.colorSlug ) {
+						postData.append( 'attribute_pa_color', variantState.colorSlug );
+					}
+					if ( variantState.sizeSlug ) {
+						postData.append( 'attribute_pa_size', variantState.sizeSlug );
+					}
+
+					var ajaxUrl = ( window.wc_add_to_cart_params && window.wc_add_to_cart_params.wc_ajax_url )
+						? window.wc_add_to_cart_params.wc_ajax_url.replace( '%%endpoint%%', 'add_to_cart' )
+						: ( window.woocommerce_params && window.woocommerce_params.wc_ajax_url )
+							? window.woocommerce_params.wc_ajax_url.replace( '%%endpoint%%', 'add_to_cart' )
+							: '/caspiansport/?wc-ajax=add_to_cart';
+
+					fetch( ajaxUrl, {
+						method: 'POST',
+						body: postData,
+					} )
+					.then( function ( res ) { return res.json(); } )
+					.then( function ( response ) {
+						btnAdd.classList.remove( 'loading' );
+						if ( response && response.error && response.product_url ) {
+							window.location.href = response.product_url;
+							return;
+						}
+						btnAdd.textContent = 'به سبد خرید اضافه شد ✓';
+						if ( window.jQuery && response && response.fragments ) {
+							window.jQuery( document.body ).trigger( 'added_to_cart', [ response.fragments, response.cart_hash, window.jQuery( btnAdd ) ] );
+						}
+						window.setTimeout( function () {
+							btnAdd.textContent = originalText;
+						}, 2000 );
+					} )
+					.catch( function () {
+						btnAdd.classList.remove( 'loading' );
+						btnAdd.textContent = originalText;
+					} );
+
+					return false;
+				}
+
+				if ( ! btnAdd.classList.contains( 'ajax_add_to_cart' ) ) {
+					var original = btnAdd.textContent;
+
+					btnAdd.textContent = 'به سبد خرید اضافه شد ✓';
+					window.setTimeout( function () {
+						btnAdd.textContent = original;
+					}, 1800 );
+				}
 			} );
 		}
 
@@ -1457,6 +1936,18 @@
 
 	function initProductStickyBar( root ) {
 		relocateStickyBar( root );
+
+		var stickyBtn = root.querySelector( '[data-ard-add-to-cart]' );
+		if ( stickyBtn ) {
+			stickyBtn.addEventListener( 'click', function ( e ) {
+				var mainBtn = document.querySelector( '[data-ard-buybox] [data-ard-add-to-cart]' );
+				if ( mainBtn ) {
+					e.preventDefault();
+					e.stopPropagation();
+					mainBtn.click();
+				}
+			} );
+		}
 
 		if ( ! root.classList.contains( 'ard-prod-sticky-bar--scroll' ) ) {
 			// نوار همیشه دیدنی است، پس انتهای صفحه نباید زیرش گم شود.

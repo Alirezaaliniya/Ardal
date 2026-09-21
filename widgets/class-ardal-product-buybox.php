@@ -337,16 +337,20 @@ class Ardal_Widget_Product_Buybox extends Ardal_Widget_Base {
 			? Ardal_Helpers::fa_digits( $s['discount'] )
 			: Ardal_Helpers::discount( $data['old_price'], $data['price'] );
 		?>
-		<div class="ard-prod-buybox" data-ard-buybox>
+		<div class="ard-prod-buybox" data-ard-buybox<?php if ( ! empty( $data['is_variable'] ) ) : ?> data-is-variable="true" data-product-id="<?php echo esc_attr( $data['product_id'] ); ?>" data-variations="<?php echo esc_attr( wp_json_encode( $data['variations'] ) ); ?>"<?php endif; ?>>
 
-			<?php if ( '' !== $discount || '' !== $data['old_price'] ) : ?>
+			<?php
+			/*
+			 * روی محصول متغیر این سطر همیشه چاپ می‌شود (حتی خالی) چون با عوض
+			 * شدن واریاسیون ممکن است تخفیف پیدا کند؛ جاوااسکریپت باید عنصری
+			 * برای پر کردن داشته باشد. خالی بودنش با display:none پنهان است،
+			 * نه با نبودن در DOM.
+			 */
+			if ( ! empty( $data['is_variable'] ) || '' !== $discount || '' !== $data['old_price'] ) :
+				?>
 				<div class="ard-prod-buybox__price-row">
-					<?php if ( '' !== $discount ) : ?>
-						<span class="ard-prod-buybox__badge"><?php echo esc_html( $discount ); ?></span>
-					<?php endif; ?>
-					<?php if ( '' !== $data['old_price'] ) : ?>
-						<del class="ard-prod-buybox__old"><?php echo esc_html( $data['old_price'] ); ?></del>
-					<?php endif; ?>
+					<span class="ard-prod-buybox__badge"<?php echo '' === $discount ? ' style="display:none"' : ''; ?>><?php echo esc_html( $discount ); ?></span>
+					<del class="ard-prod-buybox__old"<?php echo '' === $data['old_price'] ? ' style="display:none"' : ''; ?>><?php echo esc_html( $data['old_price'] ); ?></del>
 				</div>
 			<?php endif; ?>
 
@@ -537,12 +541,32 @@ class Ardal_Widget_Product_Buybox extends Ardal_Widget_Base {
 			return null;
 		}
 
-		$regular = $product->get_regular_price();
-		$active  = $product->get_price();
+		$regular     = $product->get_regular_price();
+		$active      = $product->get_price();
+		$is_variable = $product->is_type( 'variable' );
+
+		/*
+		 * محصول متغیر با همان واریاسیونی باز می‌شود که کارت نشانش داده بود
+		 * (بیشترین تخفیف). get_regular_price() روی محصول متغیر خالی است و
+		 * get_price() کمترین قیمت را می‌دهد، پس بدون این، صفحه نه قیمتِ
+		 * خط‌خورده داشت و نه نشان تخفیف — و جاوااسکریپت هم جایی برای پر کردن
+		 * پیدا نمی‌کرد چون آن سطر اصلاً رندر نشده بود.
+		 */
+		if ( $is_variable ) {
+			$deal = Ardal_Product::best_deal( $product );
+
+			if ( $deal ) {
+				$active  = $deal['price'];
+				$regular = $deal['regular'];
+			}
+		}
+		// نقشهٔ سبک، نه خروجی خام؛ خام برای ۱۶ واریاسیون حدود ۱۹۰ کیلوبایت
+		// JSON داخل یک صفت HTML می‌شد.
+		$variations  = $is_variable ? Ardal_Product::variation_map( $product ) : array();
 
 		return array(
 			'price'        => $active ? Ardal_Helpers::price( $active ) : '',
-			'old_price'    => ( $product->is_on_sale() && $regular ) ? Ardal_Helpers::price( $regular ) : '',
+			'old_price'    => ( $regular && (float) $regular > (float) $active ) ? Ardal_Helpers::price( $regular ) : '',
 			'seconds_left' => $this->seconds_left( $s, $product ),
 			// وقتی محصول مدیریت موجودی ندارد، عددِ باقی‌مانده ساختگی است و
 			// نمایش «فقط N عدد باقی مانده» گمراه‌کننده می‌شود.
@@ -557,6 +581,8 @@ class Ardal_Widget_Product_Buybox extends Ardal_Widget_Base {
 			'max_qty'      => $product->managing_stock() && $product->get_stock_quantity() > 0
 				? (int) $product->get_stock_quantity()
 				: 99,
+			'is_variable'  => $is_variable,
+			'variations'   => $variations,
 		);
 	}
 

@@ -1546,8 +1546,31 @@ body.ard-arch-sort .ard-sheet {
 	background: var(--ard-tint-green);
 }
 
+/*
+ * کارت ناموجود.
+ *
+ * قبلاً فقط تصویر کم‌رنگ می‌شد و قیمت و دکمه سرحال می‌ماندند؛ کاربر تا کلیک
+ * نکرده نمی‌فهمید نمی‌تواند بخرد. حالا کل کارت خاکستری و بی‌رنگ می‌شود، ولی
+ * عنوان خوانا می‌ماند تا هنوز بشود محصول را پیدا و باز کرد.
+ */
+.ard-acard.is-out {
+	filter: grayscale(0.85);
+	opacity: 0.72;
+}
+
 .ard-acard.is-out .ard-acard__media img {
 	opacity: 0.6;
+}
+
+.ard-acard.is-out .ard-acard__name,
+.ard-acard.is-out .ard-acard__name-fa {
+	color: var(--ard-text-soft);
+}
+
+/* خودِ عنوان نباید قربانی خاکستری شدن شود. */
+.ard-acard.is-out:hover {
+	filter: grayscale(0.6);
+	opacity: 0.85;
 }
 
 /* ============================================================

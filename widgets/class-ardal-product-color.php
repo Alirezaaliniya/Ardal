@@ -222,6 +222,9 @@ class Ardal_Widget_Product_Color extends Ardal_Widget_Base {
 
 			$variants = Ardal_Product::variation_options( $product, $s['color_attribute'] );
 			$options  = $variants['options'];
+			$attr_key = isset( $variants['key'] ) ? $variants['key'] : '';
+			$preset   = Ardal_Product::default_variation( $product );
+			$chosen   = ( $attr_key && isset( $preset[ $attr_key ] ) ) ? $preset[ $attr_key ] : '';
 
 			foreach ( $options as $i => $option ) {
 				$options[ $i ]['hex'] = Ardal_Helpers::guess_color( $option['label'] );
@@ -234,17 +237,38 @@ class Ardal_Widget_Product_Color extends Ardal_Widget_Base {
 			return;
 		}
 
-		$first = '';
+		$chosen = isset( $chosen ) ? $chosen : '';
+		$first  = '';
 
+		// گزینهٔ از پیش انتخاب‌شده، وگرنه اولین گزینهٔ موجود.
 		foreach ( $options as $option ) {
-			if ( ! empty( $option['available'] ) ) {
+			if ( '' !== $chosen && isset( $option['slug'] ) && $option['slug'] === $chosen ) {
 				$first = $option['label'];
 
 				break;
 			}
 		}
+
+		if ( '' === $first ) {
+			foreach ( $options as $option ) {
+				if ( ! empty( $option['available'] ) ) {
+					$first  = $option['label'];
+					$chosen = isset( $option['slug'] ) ? $option['slug'] : '';
+
+					break;
+				}
+			}
+		}
+
+		// کلید ویژگی به جاوااسکریپت می‌رسد تا تطبیق واریاسیون به نام ثابت
+		// attribute_pa_color گره نخورد؛ فروشگاه‌ها ویژگی‌شان را هرجور می‌نامند.
+		$attr_key = isset( $attr_key ) ? $attr_key : '';
 		?>
-		<div class="ard-prod-variants ard-prod-variants--colors" data-ard-color-group>
+		<div
+			class="ard-prod-variants ard-prod-variants--colors"
+			data-ard-color-group
+			data-attr="<?php echo esc_attr( $attr_key ); ?>"
+		>
 			<div class="ard-prod-variants__header">
 				<span class="ard-prod-variants__label"><?php echo esc_html( $s['label'] ); ?>:</span>
 				<?php if ( 'yes' === $s['show_selected'] ) : ?>
@@ -255,9 +279,25 @@ class Ardal_Widget_Product_Color extends Ardal_Widget_Base {
 				<?php
 				$active_set = false;
 
+				// همان تور ایمنیِ ویجت سایز: اسلاگِ نایافته به «اولین موجود» برمی‌گردد.
+				$found = false;
+
+				foreach ( $options as $c ) {
+					if ( '' !== $chosen && isset( $c['slug'] ) && $c['slug'] === $chosen && ! empty( $c['available'] ) ) {
+						$found = true;
+
+						break;
+					}
+				}
+
+				if ( ! $found ) {
+					$chosen = '';
+				}
+
 				foreach ( $options as $c ) :
 					$available = ! empty( $c['available'] );
-					$active    = ! $active_set && $available;
+					$slug      = isset( $c['slug'] ) ? $c['slug'] : '';
+					$active    = ! $active_set && $available && ( '' === $chosen || $slug === $chosen );
 
 					if ( $active ) {
 						$active_set = true;
@@ -267,6 +307,7 @@ class Ardal_Widget_Product_Color extends Ardal_Widget_Base {
 						type="button"
 						class="ard-prod-color<?php echo $active ? ' is-active' : ''; ?><?php echo $available ? '' : ' is-disabled'; ?>"
 						data-color-name="<?php echo esc_attr( $c['label'] ); ?>"
+						data-color-slug="<?php echo esc_attr( isset( $c['slug'] ) ? $c['slug'] : '' ); ?>"
 						style="--swatch-color:<?php echo esc_attr( $c['hex'] ); ?>"
 						<?php echo $available ? '' : ' disabled aria-disabled="true"'; ?>
 					>

@@ -226,6 +226,9 @@ class Ardal_Widget_Product_Size extends Ardal_Widget_Base {
 
 			$variants = Ardal_Product::variation_options( $product, $s['size_attribute'] );
 			$options  = $variants['options'];
+			$attr_key = isset( $variants['key'] ) ? $variants['key'] : '';
+			$preset   = Ardal_Product::default_variation( $product );
+			$chosen   = ( $attr_key && isset( $preset[ $attr_key ] ) ) ? $preset[ $attr_key ] : '';
 		}
 
 		if ( empty( $options ) ) {
@@ -235,8 +238,16 @@ class Ardal_Widget_Product_Size extends Ardal_Widget_Base {
 		}
 
 		$has_guide = '' !== trim( (string) $s['size_guide_text'] ) && ! empty( $s['size_guide_link']['url'] );
+
+		// توضیحش پای همین کلید در ویجت رنگ است.
+		$attr_key = isset( $attr_key ) ? $attr_key : '';
+		$chosen   = isset( $chosen ) ? $chosen : '';
 		?>
-		<div class="ard-prod-variants ard-prod-variants--sizes" data-ard-size-group>
+		<div
+			class="ard-prod-variants ard-prod-variants--sizes"
+			data-ard-size-group
+			data-attr="<?php echo esc_attr( $attr_key ); ?>"
+		>
 			<div class="ard-prod-variants__header">
 				<span class="ard-prod-variants__label"><?php echo esc_html( $s['label'] ); ?>:</span>
 				<?php if ( $has_guide ) : ?>
@@ -247,8 +258,24 @@ class Ardal_Widget_Product_Size extends Ardal_Widget_Base {
 				<?php
 				$active_set = false;
 
+				// اگر اسلاگِ پیش‌فرض در این فهرست نبود، به «اولین موجود» برمی‌گردیم.
+				$found = false;
+
+				foreach ( $options as $sz ) {
+					if ( '' !== $chosen && isset( $sz['slug'] ) && $sz['slug'] === $chosen && $sz['available'] ) {
+						$found = true;
+
+						break;
+					}
+				}
+
+				if ( ! $found ) {
+					$chosen = '';
+				}
+
 				foreach ( $options as $sz ) :
-					$active = ! $active_set && $sz['available'];
+					$slug   = isset( $sz['slug'] ) ? $sz['slug'] : '';
+					$active = ! $active_set && $sz['available'] && ( '' === $chosen || $slug === $chosen );
 
 					if ( $active ) {
 						$active_set = true;
@@ -258,6 +285,7 @@ class Ardal_Widget_Product_Size extends Ardal_Widget_Base {
 						type="button"
 						class="ard-prod-size<?php echo $active ? ' is-active' : ''; ?><?php echo $sz['available'] ? '' : ' is-disabled'; ?>"
 						data-size-label="<?php echo esc_attr( $sz['label'] ); ?>"
+						data-size-slug="<?php echo esc_attr( isset( $sz['slug'] ) ? $sz['slug'] : '' ); ?>"
 						<?php echo $sz['available'] ? '' : ' disabled aria-disabled="true"'; ?>
 					><?php echo esc_html( $sz['label'] ); ?></button>
 				<?php endforeach; ?>

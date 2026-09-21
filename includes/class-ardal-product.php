@@ -253,16 +253,33 @@ class Ardal_Product {
 			return $empty;
 		}
 
+		/*
+		 * دو فهرست جدا:
+		 *   $exists    → این مقدار اصلاً واریاسیونی دارد یا نه
+		 *   $available → واریاسیونی دارد که هم خریدنی باشد هم موجود
+		 *
+		 * تفاوتشان همان چیزی است که کاربر می‌بیند: مقداری که وجود دارد ولی
+		 * همه‌جا ناموجود است باید خط‌خورده و غیرفعال دیده شود، نه اینکه از
+		 * فهرست حذف شود؛ حذف کردنش این توهم را می‌سازد که فروشگاه آن رنگ یا
+		 * سایز را اصلاً ندارد.
+		 */
+		$exists    = array();
 		$available = array();
 
 		if ( $product->is_type( 'variable' ) ) {
 			foreach ( $product->get_available_variations() as $variation ) {
+				$in_stock = ! empty( $variation['is_in_stock'] ) && ! empty( $variation['is_purchasable'] );
+
 				foreach ( $variation['attributes'] as $attr_key => $attr_value ) {
 					if ( '' === $attr_value ) {
 						continue;
 					}
 
-					$available[ $attr_key ][] = $attr_value;
+					$exists[ $attr_key ][] = $attr_value;
+
+					if ( $in_stock ) {
+						$available[ $attr_key ][] = $attr_value;
+					}
 				}
 			}
 		}
@@ -280,6 +297,7 @@ class Ardal_Product {
 
 			$key  = 'attribute_' . sanitize_title( $attribute->get_name() );
 			$have = isset( $available[ $key ] ) ? $available[ $key ] : null;
+			$any  = isset( $exists[ $key ] ) ? $exists[ $key ] : null;
 
 			$options = array();
 
@@ -295,6 +313,8 @@ class Ardal_Product {
 						'label'     => $term->name,
 						'slug'      => $term->slug,
 						'available' => null === $have || in_array( $term->slug, $have, true ),
+						// «وجود دارد ولی ناموجود است» از «اصلاً نیست» جدا می‌ماند.
+						'exists'    => null === $any || in_array( $term->slug, $any, true ),
 					);
 				}
 			} else {
@@ -309,6 +329,7 @@ class Ardal_Product {
 						'label'     => $option,
 						'slug'      => sanitize_title( $option ),
 						'available' => null === $have || in_array( $option, $have, true ),
+						'exists'    => null === $any || in_array( $option, $any, true ),
 					);
 				}
 			}
@@ -320,10 +341,123 @@ class Ardal_Product {
 			return array(
 				'label'   => $label,
 				'options' => $options,
+				'key'     => $key,
 			);
 		}
 
 		return $empty;
+	}
+
+	/**
+	 * واریاسیون‌ها، خلاصه‌شده برای جاوااسکریپت.
+	 *
+	 * خروجیِ خام `get_available_variations()` برای هر واریاسیون یک آرایهٔ بزرگ
+	 * (با مارک‌آپ تصویر و توضیحات) می‌سازد؛ روی محصولی با ۱۶ واریاسیون این
+	 * یعنی ده‌ها کیلوبایت JSON داخل یک صفت HTML. اینجا فقط چیزی می‌ماند که
+	 * برای عوض کردن قیمت، تخفیف و وضعیت دکمه لازم است.
+	 *
+	 * @param WC_Product $product
+	 * @return array
+	 */
+	public static function variation_map( $product ) {
+		if ( ! $product instanceof WC_Product || ! $product->is_type( 'variable' ) ) {
+			return array();
+		}
+
+		$out = array();
+
+		foreach ( $product->get_available_variations() as $variation ) {
+			$price   = (float) $variation['display_price'];
+			$regular = (float) $variation['display_regular_price'];
+
+			$out[] = array(
+				'id'    => (int) $variation['variation_id'],
+				// فقط ویژگی‌هایی که مقدار دارند؛ خالی یعنی «هر مقداری».
+				'attrs' => array_filter( (array) $variation['attributes'], 'strlen' ),
+				'price' => $price,
+				'reg'   => $regular,
+				'off'   => ( $regular > $price && $regular > 0 ) ? (int) round( ( ( $regular - $price ) / $regular ) * 100 ) : 0,
+				'stock' => ! empty( $variation['is_in_stock'] ),
+				'buy'   => ! empty( $variation['is_purchasable'] ),
+				'max'   => isset( $variation['max_qty'] ) && '' !== $variation['max_qty'] ? (int) $variation['max_qty'] : 0,
+			);
+		}
+
+		return $out;
+	}
+
+	/**
+	 * واریاسیونی که صفحه با آن باز می‌شود: کلید ویژگی → اسلاگ.
+	 *
+	 * اول بهترین تخفیف، وگرنه اولین ترکیبِ موجود. دلیلش هم کاربردی است و هم
+	 * از سر سازگاری:
+	 *
+	 *   - کارت محصول قیمت و تخفیفِ همان «بهترین معامله» را نشان می‌دهد، پس
+	 *     صفحه هم باید روی همان باز شود؛ وگرنه کاربر روی «۲۰٪ تخفیف» کلیک
+	 *     می‌کند و صفحه‌ای می‌بیند که تخفیف ندارد.
+	 *   - انتخابِ کورِ «اولین گزینهٔ هر ویژگی» ترکیبی می‌ساخت که ممکن بود
+	 *     ناموجود باشد، و آن‌وقت بقیهٔ رنگ‌ها هم به‌غلط خط‌خورده می‌شدند.
+	 *
+	 * @param WC_Product $product
+	 * @return array
+	 */
+	public static function default_variation( $product ) {
+		$deal = self::best_deal( $product );
+
+		if ( $deal ) {
+			foreach ( self::variation_map( $product ) as $variation ) {
+				if ( $variation['id'] === $deal['id'] ) {
+					return $variation['attrs'];
+				}
+			}
+		}
+
+		foreach ( self::variation_map( $product ) as $variation ) {
+			if ( $variation['stock'] && $variation['buy'] ) {
+				return $variation['attrs'];
+			}
+		}
+
+		return array();
+	}
+
+	/**
+	 * بهترین معاملهٔ یک محصول متغیر: واریاسیونی که بیشترین درصد تخفیف را دارد.
+	 *
+	 * کارت محصول یک قیمت بیشتر جا ندارد، و نشان دادن «کمترین قیمت» (کاری که
+	 * ووکامرس می‌کند) با نشانِ تخفیف نمی‌خواند؛ ممکن است ارزان‌ترین واریاسیون
+	 * اصلاً تخفیف نداشته باشد. پس همان واریاسیونی را نشان می‌دهیم که نشانِ
+	 * تخفیف به آن اشاره می‌کند.
+	 *
+	 * فقط واریاسیون‌های موجود حساب می‌شوند؛ تخفیفِ چیزی که نمی‌شود خرید،
+	 * تبلیغِ بیهوده است.
+	 *
+	 * @param WC_Product $product
+	 * @return array|null price، regular و off — یا null اگر تخفیفی نباشد.
+	 */
+	public static function best_deal( $product ) {
+		$best = null;
+
+		foreach ( self::variation_map( $product ) as $variation ) {
+			if ( ! $variation['stock'] || ! $variation['buy'] || $variation['off'] < 1 ) {
+				continue;
+			}
+
+			if ( null === $best || $variation['off'] > $best['off'] ) {
+				$best = $variation;
+			}
+		}
+
+		if ( null === $best ) {
+			return null;
+		}
+
+		return array(
+			'price'   => $best['price'],
+			'regular' => $best['reg'],
+			'off'     => $best['off'],
+			'id'      => $best['id'],
+		);
 	}
 
 	/**

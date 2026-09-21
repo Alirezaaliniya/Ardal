@@ -527,6 +527,24 @@ class Ardal_Helpers {
 		$active  = $product->get_price();
 		$image   = wp_get_attachment_image_src( $product->get_image_id(), 'woocommerce_thumbnail' );
 
+		/*
+		 * محصول متغیر: قیمتِ واریاسیونی نشان داده می‌شود که بیشترین تخفیف را
+		 * دارد، نه ارزان‌ترین.
+		 *
+		 * get_regular_price() روی محصول متغیر رشتهٔ خالی برمی‌گرداند و
+		 * get_price() کمترین قیمت را می‌دهد؛ نتیجه‌اش کارتی بود که نشانِ تخفیف
+		 * داشت ولی قیمت خط‌خورده نداشت، یا تخفیفش به قیمتی اشاره می‌کرد که
+		 * مالِ واریاسیون دیگری بود. حالا هر دو عدد از یک واریاسیون می‌آیند.
+		 */
+		if ( $product->is_type( 'variable' ) && class_exists( 'Ardal_Product' ) ) {
+			$deal = Ardal_Product::best_deal( $product );
+
+			if ( $deal ) {
+				$active  = $deal['price'];
+				$regular = $deal['regular'];
+			}
+		}
+
 		$off = '';
 
 		if ( $product->is_on_sale() && $regular && $active && (float) $regular > (float) $active ) {
@@ -536,7 +554,7 @@ class Ardal_Helpers {
 		return array(
 			'title'     => $product->get_name(),
 			'price'     => $active ? self::price( $active ) : '',
-			'old_price' => ( $product->is_on_sale() && $regular ) ? self::price( $regular ) : '',
+			'old_price' => ( $product->is_on_sale() && $regular && (float) $regular > (float) $active ) ? self::price( $regular ) : '',
 			'off'       => $off,
 			'rating'    => (float) $product->get_average_rating(),
 			// برچسب «نظر» همهٔ دیدگاه‌ها را می‌شمارد، نه فقط دیدگاه‌های امتیازدار.
