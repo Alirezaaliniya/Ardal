@@ -246,11 +246,30 @@
 			return 'rtl' === window.getComputedStyle( viewport ).direction;
 		}
 
+		/*
+		 * آیا اسکرول به ته رسیده؟
+		 *
+		 * وقتی تعداد اسلایدها مضرب «تعداد در هر نما» نباشد، صفحهٔ آخر تا ته
+		 * اسکرول نمی‌شود؛ مثلاً ۱۰ تا با نمای ۷تایی فقط ۳ تا جا دارد جلو برود.
+		 * بدون این بررسی، currentPage هنوز صفر گزارش می‌کرد و دکمهٔ «بعدی»
+		 * بار دوم به همان جایی می‌رفت که بودیم — یعنی فقط یک بار کار می‌کرد.
+		 */
+		function atEnd() {
+			var box = viewport.getBoundingClientRect();
+			var last = slides[ slides.length - 1 ].getBoundingClientRect();
+
+			return isRtl() ? last.left >= box.left - 2 : last.right <= box.right + 2;
+		}
+
 		function currentPage() {
 			var box = viewport.getBoundingClientRect();
 			var rtl = isRtl();
 			var best = 0;
 			var bestDist = Infinity;
+
+			if ( atEnd() ) {
+				return pageCount() - 1;
+			}
 
 			slides.forEach( function ( slide, i ) {
 				var r = slide.getBoundingClientRect();
@@ -276,10 +295,21 @@
 				block: 'nearest',
 				inline: 'start'
 			} );
+
+			/*
+			 * نقطهٔ فعال همین‌جا عوض می‌شود، نه بعد از رسیدن اسکرول.
+			 * اسکرول نرم چند قاب طول می‌کشد و تا آن موقع currentPage هنوز
+			 * صفحهٔ قبلی را می‌خواند؛ نتیجه‌اش این بود که نقطه‌ها یک کلیک عقب
+			 * می‌ماندند یا اصلاً تکان نمی‌خوردند.
+			 */
+			paint( wrapped );
 		}
 
-		function paint() {
-			var active = currentPage();
+		/**
+		 * @param {number} [page] صفحهٔ دلخواه؛ نیامده باشد از روی اسکرول حساب می‌شود.
+		 */
+		function paint( page ) {
+			var active = 'number' === typeof page ? page : currentPage();
 
 			dots.forEach( function ( dot, i ) {
 				dot.classList.toggle( 'is-active', i === active );
@@ -361,6 +391,8 @@
 			} );
 		}
 
+		initDragScroll( viewport );
+
 		var raf = null;
 
 		viewport.addEventListener( 'scroll', function () {
@@ -387,6 +419,113 @@
 
 		buildDots();
 		start();
+	}
+
+	/**
+	 * کشیدن افقی با ماوس.
+	 *
+	 * لمس دست‌نخورده می‌ماند: مرورگر خودش اسکرول لمسی را بهتر از هر کدی که
+	 * اینجا بنویسیم انجام می‌دهد (اینرسی، لبه، snap). این فقط برای ماوس و قلم
+	 * است، که بدون آن کاربر دسکتاپ راهی جز دکمه‌ها ندارد.
+	 */
+	function initDragScroll( viewport ) {
+		// کمتر از این مقدار، حرکت را کشیدن حساب نمی‌کنیم تا کلیک ساده نسوزد.
+		var SLOP = 5;
+		var drag = null;
+		var snap = '';
+
+		viewport.classList.add( 'ard-drag' );
+
+		viewport.addEventListener( 'pointerdown', function ( event ) {
+			if ( 'touch' === event.pointerType || ( event.button && 0 !== event.button ) ) {
+				return;
+			}
+
+			drag = {
+				id: event.pointerId,
+				x: event.clientX,
+				left: viewport.scrollLeft,
+				moved: false
+			};
+		} );
+
+		viewport.addEventListener( 'pointermove', function ( event ) {
+			if ( ! drag ) {
+				return;
+			}
+
+			var dx = event.clientX - drag.x;
+
+			if ( ! drag.moved ) {
+				if ( Math.abs( dx ) < SLOP ) {
+					return;
+				}
+
+				drag.moved = true;
+				viewport.classList.add( 'is-dragging' );
+
+				/*
+				 * snap باید موقع کشیدن خاموش باشد، وگرنه مرورگر هر قاب،
+				 * اسکرول را به نزدیک‌ترین اسلاید برمی‌گرداند و کشیدن می‌لرزد.
+				 */
+				snap = viewport.style.scrollSnapType;
+				viewport.style.scrollSnapType = 'none';
+
+				if ( viewport.setPointerCapture ) {
+					viewport.setPointerCapture( drag.id );
+				}
+			}
+
+			viewport.scrollLeft = drag.left - dx;
+			event.preventDefault();
+		} );
+
+		function release() {
+			if ( ! drag ) {
+				return;
+			}
+
+			var moved = drag.moved;
+
+			if ( viewport.releasePointerCapture && viewport.hasPointerCapture && viewport.hasPointerCapture( drag.id ) ) {
+				viewport.releasePointerCapture( drag.id );
+			}
+
+			drag = null;
+			viewport.classList.remove( 'is-dragging' );
+
+			if ( moved ) {
+				viewport.style.scrollSnapType = snap;
+
+				/*
+				 * کلیکی که ته یک کشیدن می‌آید نباید لینک دسته را باز کند.
+				 * شنونده در فاز capture می‌نشیند تا پیش از لینک برسد، و در
+				 * همان تیک بعدی برداشته می‌شود — کلیکِ بعد از pointerup
+				 * هم‌زمان می‌آید، پس این مهلت کافی است و شنونده هم نمی‌ماند.
+				 */
+				var swallow = function ( e ) {
+					e.preventDefault();
+					e.stopPropagation();
+				};
+
+				viewport.addEventListener( 'click', swallow, true );
+
+				window.setTimeout( function () {
+					viewport.removeEventListener( 'click', swallow, true );
+				}, 0 );
+			}
+		}
+
+		viewport.addEventListener( 'pointerup', release );
+		viewport.addEventListener( 'pointercancel', release );
+		viewport.addEventListener( 'pointerleave', release );
+
+		// کشیدن نباید تصویر یا متن را «بردارد».
+		viewport.addEventListener( 'dragstart', function ( event ) {
+			if ( drag && drag.moved ) {
+				event.preventDefault();
+			}
+		} );
 	}
 
 	/* --------------------------------------------------------

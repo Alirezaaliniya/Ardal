@@ -76,6 +76,31 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'woo_hide_empty',
+			array(
+				'label'        => 'دسته‌های بدون محصول نمایش داده نشوند',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'condition'    => array( 'source' => 'woo' ),
+			)
+		);
+
+		$this->add_control(
+			'woo_exclude',
+			array(
+				'label'       => 'دسته‌هایی که نمایش داده نشوند',
+				'type'        => Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'options'     => $this->cat_options(),
+				'default'     => array(),
+				'label_block' => true,
+				'description' => 'دستهٔ پیش‌فرض ووکامرس («دسته‌بندی نشده») همیشه کنار گذاشته می‌شود و لازم نیست اینجا انتخابش کنید.',
+				'condition'   => array( 'source' => 'woo' ),
+			)
+		);
+
 		$repeater = new Repeater();
 
 		$repeater->add_control(
@@ -498,6 +523,66 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 	}
 
 	/**
+	 * شناسهٔ دسته‌هایی که نباید بیایند.
+	 *
+	 * دستهٔ پیش‌فرض ووکامرس همیشه کنار می‌رود: هر محصولی که دسته‌اش را تعیین
+	 * نکرده باشد آنجا می‌افتد، پس در ویترینِ «خرید بر اساس دسته‌بندی» یک ردیف
+	 * بی‌معنا می‌شود. اسلاگِ خام هم بررسی می‌شود چون در سایت‌های مهاجرت‌شده
+	 * ممکن است آپشنِ پیش‌فرض به ترمِ دیگری اشاره کند.
+	 *
+	 * @param array $s
+	 * @return array
+	 */
+	private function excluded_cats( $s ) {
+		$out = array( (int) get_option( 'default_product_cat' ) );
+
+		foreach ( array( 'uncategorized', 'دسته-بندی-نشده', 'دسته‌بندی-نشده' ) as $slug ) {
+			$term = get_term_by( 'slug', $slug, 'product_cat' );
+
+			if ( $term ) {
+				$out[] = (int) $term->term_id;
+			}
+		}
+
+		foreach ( (array) ( $s['woo_exclude'] ?? array() ) as $id ) {
+			$out[] = (int) $id;
+		}
+
+		return array_values( array_filter( array_unique( $out ) ) );
+	}
+
+	/**
+	 * فهرست دسته‌ها برای سلکت تنظیمات.
+	 *
+	 * @return array
+	 */
+	private function cat_options() {
+		if ( ! Ardal_Helpers::has_woo() ) {
+			return array();
+		}
+
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => false,
+				'number'     => 200,
+			)
+		);
+
+		if ( is_wp_error( $terms ) ) {
+			return array();
+		}
+
+		$out = array();
+
+		foreach ( $terms as $term ) {
+			$out[ $term->term_id ] = $term->name;
+		}
+
+		return $out;
+	}
+
+	/**
 	 * @param array $s
 	 * @return array
 	 */
@@ -508,10 +593,11 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 
 		$args = array(
 			'taxonomy'   => 'product_cat',
-			'hide_empty' => false,
+			'hide_empty' => 'yes' === $s['woo_hide_empty'],
 			'number'     => max( 1, (int) $s['woo_limit'] ),
 			'orderby'    => 'count',
 			'order'      => 'DESC',
+			'exclude'    => $this->excluded_cats( $s ),
 		);
 
 		if ( 'yes' === $s['woo_parent_only'] ) {

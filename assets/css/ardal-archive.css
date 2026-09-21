@@ -260,6 +260,13 @@
 }
 
 .ard-fil__form {
+	/*
+	 * این position فقط برای زیبایی نیست: فرم اسکرول‌شونده است و عنصرِ
+	 * absolute ای که بلوک دربرگیرنده‌اش بیرون از فرم باشد، از این اسکرول
+	 * فرار می‌کند و ارتفاع کل صفحه را بالا می‌برد. با relative شدنِ فرم،
+	 * هر چیز absolute داخلش هم داخل همین اسکرول بریده می‌شود.
+	 */
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	flex: 1 1 auto;
@@ -428,6 +435,8 @@
 }
 
 .ard-fil__opt {
+	/* بلوک دربرگیرندهٔ چک‌باکس پنهان؛ توضیحش پای .ard-fil__form است. */
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 10px;
@@ -593,6 +602,8 @@
 }
 
 .ard-fil__switch {
+	/* بلوک دربرگیرندهٔ چک‌باکس پنهان؛ توضیحش پای .ard-fil__form است. */
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

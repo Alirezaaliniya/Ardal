@@ -1313,6 +1313,22 @@ a.ard-service__inner:hover {
 	gap: 16px 12px;
 }
 
+/*
+ * کشیدن با ماوس.
+ *
+ * کلاس را خود جاوااسکریپت می‌گذارد، پس اگر اسکریپت بالا نیامده باشد شکل
+ * اشاره‌گر هم وعدهٔ الکی نمی‌دهد.
+ */
+.ard-drag {
+	cursor: grab;
+}
+
+.ard-drag.is-dragging {
+	cursor: grabbing;
+	scroll-behavior: auto;
+	user-select: none;
+}
+
 /* حالت اسلایدر — همان کروسل «پیشنهاد ویژه»، با کلاس‌های خودش. */
 .ard-cats-slider {
 	position: relative;
