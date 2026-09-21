@@ -553,8 +553,9 @@ class Ardal_Archive {
 	 * یعنی پیش از اجرای کوئری، نه بعدش.
 	 *
 	 * @param WP_Query $q
+	 * @param string   $skip_taxonomy تاکسونومی‌ای که فیلترش اعمال نشود (برای شمارش).
 	 */
-	public static function apply_to_query( $q ) {
+	public static function apply_to_query( $q, $skip_taxonomy = '' ) {
 		$tax_query = (array) $q->get( 'tax_query' );
 
 		// کوئری خالی گاهی رشته است؛ عضو غیرآرایه‌ای در tax_query چیزی جز شلوغی نیست.
@@ -569,6 +570,17 @@ class Ardal_Archive {
 			$slugs = self::selected( $key );
 
 			if ( ! $slugs || ! taxonomy_exists( $taxonomy ) ) {
+				continue;
+			}
+
+			/*
+			 * یک تاکسونومی می‌تواند از شمارش کنار گذاشته شود.
+			 *
+			 * ریل دسته‌ها برای شمردن محصولات هر دسته، فیلترِ خودِ دسته را
+			 * نادیده می‌گیرد؛ وگرنه به‌محض انتخاب یک دسته، بقیه صفر می‌شدند و
+			 * ریل — که کارش جابه‌جا شدن بین دسته‌هاست — خالی می‌ماند.
+			 */
+			if ( $skip_taxonomy && $skip_taxonomy === $taxonomy ) {
 				continue;
 			}
 
@@ -646,6 +658,49 @@ class Ardal_Archive {
 		if ( '' !== $search && '' === (string) $q->get( 's' ) ) {
 			$q->set( 's', $search );
 		}
+
+		self::apply_price( $q );
+	}
+
+	/**
+	 * بازهٔ قیمت روی کوئری‌های جانبی.
+	 *
+	 * ووکامرس فیلتر قیمت را با `posts_clauses` و فقط روی کوئری اصلی اعمال
+	 * می‌کند. هر کوئری دیگری که ما می‌سازیم — شبکهٔ محصولاتِ «کوئری آرشیو
+	 * جاری»، شمارش ترم‌های ریل، لوپ گرید — آن قلاب را به ارث نمی‌برد و تا
+	 * امروز قیمت را نادیده می‌گرفت؛ یعنی اسلایدر قیمت روی آن‌ها بی‌اثر بود.
+	 *
+	 * روی کوئری اصلی دست نمی‌زنیم تا شرط دوباره و با پیاده‌سازی متفاوت اضافه
+	 * نشود؛ آنجا کار خود ووکامرس دقیق‌تر است (محصول متغیر را از جدول lookup
+	 * می‌خواند).
+	 *
+	 * @param WP_Query $q
+	 */
+	protected static function apply_price( $q ) {
+		if ( method_exists( $q, 'is_main_query' ) && $q->is_main_query() ) {
+			return;
+		}
+
+		$min = self::param( 'min_price' );
+		$max = self::param( 'max_price' );
+
+		if ( '' === $min && '' === $max ) {
+			return;
+		}
+
+		$meta = (array) $q->get( 'meta_query' );
+
+		$meta[] = array(
+			'key'     => '_price',
+			'type'    => 'NUMERIC',
+			'compare' => 'BETWEEN',
+			'value'   => array(
+				'' === $min ? 0 : (float) $min,
+				'' === $max ? PHP_FLOAT_MAX : (float) $max,
+			),
+		);
+
+		$q->set( 'meta_query', $meta );
 	}
 
 	/* --------------------------------------------------------------------- */
@@ -731,6 +786,119 @@ class Ardal_Archive {
 		}
 
 		return $options;
+	}
+
+	/**
+	 * تعداد محصولِ هر ترم، داخل همان چیزی که الان روی صفحه است.
+	 *
+	 * شمارشِ خودِ ترم (`$term->count`) کل فروشگاه را می‌شمارد و به فیلترها و
+	 * صفحهٔ جاری کاری ندارد. اینجا کوئری واقعی آرشیو بازسازی می‌شود — زمینهٔ
+	 * صفحه (ترم آرشیو، جست‌وجو) به‌علاوهٔ فیلترهای اردال — و محصول‌هایش شمرده
+	 * می‌شوند.
+	 *
+	 * شمارش به بالادست هم سرایت می‌کند: محصولی که در یک زیردسته است، برای
+	 * دستهٔ والدش هم شمرده می‌شود، وگرنه دسته‌های سطح اول همیشه صفر می‌شدند.
+	 * هر محصول برای هر ترم یک بار حساب می‌شود، حتی اگر هم به والد و هم به
+	 * فرزند وصل باشد.
+	 *
+	 * @param string $taxonomy
+	 * @param bool   $skip_self آیا فیلترِ خود همین تاکسونومی نادیده گرفته شود.
+	 * @return array شناسهٔ ترم => تعداد.
+	 */
+	public static function counts_for( $taxonomy, $skip_self = true ) {
+		static $cache = array();
+
+		if ( ! taxonomy_exists( $taxonomy ) || ! Ardal_Helpers::has_woo() ) {
+			return array();
+		}
+
+		$memo = $taxonomy . ( $skip_self ? '|skip' : '' );
+
+		if ( isset( $cache[ $memo ] ) ) {
+			return $cache[ $memo ];
+		}
+
+		$args = array(
+			'post_type'              => 'product',
+			'post_status'            => 'publish',
+			'fields'                 => 'ids',
+			'ignore_sticky_posts'    => true,
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+			'tax_query'              => array(),
+			/**
+			 * سقف شمارش.
+			 *
+			 * یک کوئری شناسه‌ای است و برای فروشگاه‌های معمولی ارزان؛ اگر جایی
+			 * سنگین شد، با همین فیلتر محدودش کنید.
+			 *
+			 * @since 2.9.0
+			 * @param int $limit
+			 */
+			'posts_per_page'         => (int) apply_filters( 'ardal_counts_limit', -1 ),
+		);
+
+		// زمینهٔ صفحه: اگر روی آرشیو یک ترم هستیم، همان‌جا بماند.
+		$object = get_queried_object();
+
+		if ( $object instanceof WP_Term && taxonomy_exists( $object->taxonomy ) ) {
+			$args['tax_query'][] = array(
+				'taxonomy'         => $object->taxonomy,
+				'field'            => 'term_id',
+				'terms'            => (int) $object->term_id,
+				'include_children' => true,
+			);
+		}
+
+		if ( is_search() ) {
+			$args['s'] = get_search_query();
+		}
+
+		$query = new WP_Query();
+		$query->parse_query( $args );
+
+		self::apply_to_query( $query, $skip_self ? $taxonomy : '' );
+
+		$ids = $query->get_posts();
+
+		if ( ! $ids ) {
+			$cache[ $memo ] = array();
+
+			return $cache[ $memo ];
+		}
+
+		$rows = wp_get_object_terms( $ids, $taxonomy, array( 'fields' => 'all_with_object_id' ) );
+
+		if ( is_wp_error( $rows ) || ! $rows ) {
+			$cache[ $memo ] = array();
+
+			return $cache[ $memo ];
+		}
+
+		// به‌جای شمارنده، مجموعهٔ شناسه‌ها نگه داشته می‌شود تا تکراری‌ها یکی شوند.
+		$sets = array();
+
+		foreach ( $rows as $row ) {
+			$term_id = (int) $row->term_id;
+			$object_id = (int) $row->object_id;
+
+			$sets[ $term_id ][ $object_id ] = true;
+
+			foreach ( get_ancestors( $term_id, $taxonomy, 'taxonomy' ) as $ancestor ) {
+				$sets[ (int) $ancestor ][ $object_id ] = true;
+			}
+		}
+
+		$out = array();
+
+		foreach ( $sets as $term_id => $objects ) {
+			$out[ $term_id ] = count( $objects );
+		}
+
+		$cache[ $memo ] = $out;
+
+		return $out;
 	}
 
 	/**

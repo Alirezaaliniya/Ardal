@@ -130,6 +130,31 @@ class Ardal_Widget_Archive_Rail extends Ardal_Archive_Widget_Base {
 		);
 
 		$this->add_control(
+			'dynamic',
+			array(
+				'label'        => 'هم‌گام با نتیجهٔ صفحه',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+				'return_value' => 'yes',
+				'description'  => 'فقط ترم‌هایی می‌مانند که در نتیجهٔ همین صفحه (با فیلترها و جست‌وجوی فعلی) محصول دارند، و تعدادها هم همان نتیجه را نشان می‌دهند. اگر چیزی نماند، کل ریل چاپ نمی‌شود.',
+			)
+		);
+
+		$this->add_control(
+			'dynamic_self',
+			array(
+				'label'       => 'انتخاب خود این ریل هم لحاظ شود',
+				'type'        => Controls_Manager::SWITCHER,
+				'default'     => '',
+				'return_value' => 'yes',
+				'description' => 'پیش‌فرض خاموش است: وقتی کاربر یک دسته را انتخاب می‌کند، بقیهٔ دسته‌ها باید سر جایشان بمانند تا بشود بینشان جابه‌جا شد. روشن که باشد، ریل هم مثل بقیهٔ فیلترها جمع می‌شود.',
+				'condition'   => array( 'dynamic' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
 			'show_count',
 			array(
 				'label'        => 'نمایش تعداد محصول',
@@ -452,10 +477,17 @@ class Ardal_Widget_Archive_Rail extends Ardal_Archive_Widget_Base {
 		$taxonomy = taxonomy_exists( $s['taxonomy'] ) ? $s['taxonomy'] : 'product_cat';
 		$limit    = max( 1, (int) $s['limit'] );
 
+		$dynamic = 'yes' === $s['dynamic'];
+
 		$args = array(
 			'taxonomy'   => $taxonomy,
 			'hide_empty' => 'yes' === $s['hide_empty'],
-			'number'     => $limit,
+			/*
+			 * در حالت هم‌گام، سقف بعد از غربال اعمال می‌شود نه قبلش؛ وگرنه
+			 * ممکن بود ۱۲ ترم اول همه بی‌محصول باشند و ریل خالی بماند در حالی
+			 * که ترم‌های بعدی محصول داشتند.
+			 */
+			'number'     => $dynamic ? 0 : $limit,
 		);
 
 		switch ( $s['orderby'] ) {
@@ -512,7 +544,49 @@ class Ardal_Widget_Archive_Rail extends Ardal_Archive_Widget_Base {
 
 		$terms = get_terms( $args );
 
-		return is_wp_error( $terms ) ? array() : $terms;
+		if ( is_wp_error( $terms ) || ! $terms ) {
+			return array();
+		}
+
+		if ( ! $dynamic ) {
+			return $terms;
+		}
+
+		$terms = $this->narrow_to_query( $terms, $taxonomy, $s );
+
+		// انتخاب دستی سقف ندارد؛ بقیه دارند.
+		return 'manual' === $s['source'] ? $terms : array_slice( $terms, 0, $limit );
+	}
+
+	/**
+	 * ترم‌ها را به آن‌هایی که در نتیجهٔ جاری محصول دارند محدود می‌کند.
+	 *
+	 * تعداد هر ترم هم با همان شمارش جایگزین می‌شود، وگرنه روی دایره عددی
+	 * می‌نشست که با چیزی که کاربر بعد از کلیک می‌بیند نمی‌خواند.
+	 *
+	 * @param WP_Term[] $terms
+	 * @param string    $taxonomy
+	 * @param array     $s
+	 * @return WP_Term[]
+	 */
+	protected function narrow_to_query( $terms, $taxonomy, $s ) {
+		$counts = Ardal_Archive::counts_for( $taxonomy, 'yes' !== $s['dynamic_self'] );
+		$out    = array();
+
+		foreach ( $terms as $term ) {
+			$count = isset( $counts[ $term->term_id ] ) ? (int) $counts[ $term->term_id ] : 0;
+
+			if ( $count < 1 ) {
+				continue;
+			}
+
+			// کلون می‌گیریم تا کش ترم‌های وردپرس با عدد صفحه‌ایِ ما آلوده نشود.
+			$copy        = clone $term;
+			$copy->count = $count;
+			$out[]       = $copy;
+		}
+
+		return $out;
 	}
 
 	/**
@@ -567,7 +641,12 @@ class Ardal_Widget_Archive_Rail extends Ardal_Archive_Widget_Base {
 		$s     = $this->get_settings_for_display();
 		$terms = $this->rail_terms( $s );
 
-		if ( ! $terms && 'yes' !== $s['show_all'] ) {
+		/*
+		 * در حالت هم‌گام، خالی بودن یعنی «این صفحه دسته‌ای برای نشان دادن
+		 * ندارد» — پس حتی آیتم «همه» هم چاپ نمی‌شود؛ یک ریل تک‌دایره‌ای زیر
+		 * نتیجهٔ خالی، فقط جای خالی درست می‌کند.
+		 */
+		if ( ! $terms && ( 'yes' === $s['dynamic'] || 'yes' !== $s['show_all'] ) ) {
 			$this->render_empty( 'ترمی برای نمایش پیدا نشد؛ منبع یا تاکسونومی را بررسی کنید.' );
 
 			return;
