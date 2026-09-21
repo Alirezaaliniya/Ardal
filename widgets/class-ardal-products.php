@@ -502,21 +502,9 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'card_title_tag',
-			array(
-				'label'     => 'تگ عنوان کارت',
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'h3',
-				'options'   => array(
-					'h2'  => 'H2',
-					'h3'  => 'H3',
-					'h4'  => 'H4',
-					'div' => 'DIV',
-				),
-				'condition' => array( 'card_style' => 'archive' ),
-			)
-		);
+		// فهرست تگ‌ها همان فهرست مشترک افزونه است و به سبک کارت ربطی ندارد؛
+		// هر دو سبک عنوان چاپ می‌کنند، پس هر دو باید قابل انتخاب باشند.
+		$this->add_tag_control( 'card_title_tag', 'تگ عنوان کارت', 'h3' );
 
 		$this->add_control(
 			'title_lines',
@@ -1010,21 +998,8 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'media_fit',
-			array(
-				'label'     => 'نحوه جاگرفتن تصویر',
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'cover',
-				'options'   => array(
-					'cover'   => 'قاب را پر کند (cover)',
-					'contain' => 'کامل دیده شود (contain)',
-				),
-				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard__media img, {{WRAPPER}} .ard-acard__media img' => 'object-fit:{{VALUE}};',
-				),
-			)
-		);
+		// هر دو سبک کارت یک تصویر دارند، پس یک کنترل برای هر دو.
+		$this->add_media_fit_control( array( '.ard-pcard__media img', '.ard-acard__media img' ) );
 
 		$this->end_controls_section();
 
@@ -1427,6 +1402,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 						'notch'         => $framed && 'yes' === $s['notch'],
 						'placeholder'   => '۸۰۰×۸۰۰',
 						'reserve_old'   => $reserve_old,
+						'title_tag'     => $s['card_title_tag'],
 					)
 				);
 			}

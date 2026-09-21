@@ -67,19 +67,8 @@ class Ardal_Widget_Product_Title extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'title_tag',
-			array(
-				'label'   => 'تگ عنوان',
-				'type'    => Controls_Manager::SELECT,
-				'default' => 'h1',
-				'options' => array(
-					'h1' => 'H1',
-					'h2' => 'H2',
-					'h3' => 'H3',
-				),
-			)
-		);
+		// همان فهرست مشترک افزونه؛ پیش‌فرض h1 چون عنوان اصلی صفحهٔ محصول است.
+		$this->add_tag_control( 'title_tag', 'تگ عنوان', 'h1' );
 
 		$this->add_control(
 			'subtitle',
@@ -193,7 +182,7 @@ class Ardal_Widget_Product_Title extends Ardal_Widget_Base {
 
 		// زیرعنوان فقط وقتی می‌آید که در تنظیمات افزونه روشن باشد.
 		$subtitle = Ardal_Product::subtitle( $product, $s['subtitle'] );
-		$tag      = in_array( $s['title_tag'], array( 'h1', 'h2', 'h3' ), true ) ? $s['title_tag'] : 'h1';
+		$tag      = self::tag( $s['title_tag'], 'h1' );
 		?>
 		<div class="ard-prod-title-block">
 			<<?php echo esc_html( $tag ); ?> class="ard-prod-hero__title"><?php echo esc_html( $title ); ?></<?php echo esc_html( $tag ); ?>>

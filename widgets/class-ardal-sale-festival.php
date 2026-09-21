@@ -234,6 +234,8 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_media_fit_control( '.ard-fest__media img' );
+
 		$this->add_control(
 			'show_bars',
 			array(

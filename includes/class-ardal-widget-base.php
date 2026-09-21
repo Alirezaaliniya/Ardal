@@ -127,6 +127,44 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		);
 	}
 
+	/**
+	 * کنترل «نحوه جاگرفتن تصویر» (cover / contain).
+	 *
+	 * یک جا تعریف شده تا برچسب و گزینه‌ها در همهٔ ویجت‌ها یکی باشد و هر کارتی
+	 * که تصویر دارد همین انتخاب را داشته باشد.
+	 *
+	 * @param string|array $selector سلکتور تصویر (یا چند سلکتور)، بدون {{WRAPPER}}.
+	 * @param string       $default  cover یا contain.
+	 * @param array        $args     کلیدهای اضافه مثل condition و separator.
+	 */
+	protected function add_media_fit_control( $selector, $default = 'cover', $args = array() ) {
+		$parts = array();
+
+		foreach ( (array) $selector as $one ) {
+			$parts[] = '{{WRAPPER}} ' . $one;
+		}
+
+		$this->add_control(
+			'media_fit',
+			array_merge(
+				array(
+					'label'       => 'نحوه جاگرفتن تصویر',
+					'type'        => Controls_Manager::SELECT,
+					'default'     => $default,
+					'options'     => array(
+						'cover'   => 'قاب را پر کند (cover) — لبه‌ها بریده می‌شود',
+						'contain' => 'کامل دیده شود (contain) — کنارش جا می‌ماند',
+					),
+					'label_block' => true,
+					'selectors'   => array(
+						implode( ', ', $parts ) => 'object-fit:{{VALUE}};',
+					),
+				),
+				$args
+			)
+		);
+	}
+
 	protected function add_heading_controls( $default_title, $accent = 'accent' ) {
 		$this->start_controls_section(
 			'section_heading',

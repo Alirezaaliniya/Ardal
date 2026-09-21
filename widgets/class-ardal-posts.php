@@ -167,6 +167,8 @@ class Ardal_Widget_Posts extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_media_fit_control( '.ard-post__media img' );
+
 		$this->add_responsive_control(
 			'columns',
 			array(

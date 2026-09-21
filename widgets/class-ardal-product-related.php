@@ -106,6 +106,8 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_media_fit_control( '.ard-pcard__media img' );
+
 		$this->add_control(
 			'link_mode',
 			array(

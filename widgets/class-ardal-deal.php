@@ -396,6 +396,8 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_media_fit_control( '.ard-deal__media img' );
+
 		$this->add_control(
 			'stretch',
 			array(

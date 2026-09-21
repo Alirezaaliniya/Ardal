@@ -152,6 +152,8 @@ class Ardal_Widget_Bestsellers extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_media_fit_control( '.ard-best__media img' );
+
 		$this->add_control(
 			'layout',
 			array(
