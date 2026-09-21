@@ -204,6 +204,16 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 
 		echo '<div class="ard-pgrid ard-pgrid--' . esc_attr( $s['variant'] ) . '">';
 
+		// سطرِ رزروِ «قیمت قبل» فقط وقتی معنا دارد که کسی در فهرست تخفیف داشته باشد.
+		$reserve_old = false;
+
+		foreach ( $items as $item ) {
+			if ( isset( $item['old_price'] ) && '' !== trim( (string) $item['old_price'] ) ) {
+				$reserve_old = true;
+				break;
+			}
+		}
+
 		foreach ( $items as $item ) {
 			echo '<div class="ard-pgrid__cell">';
 
@@ -219,6 +229,7 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 					'button_text'   => $s['button_text'],
 					'placeholder'   => '۸۰۰×۸۰۰',
 					'title_tag'     => $s['card_title_tag'],
+					'reserve_old'   => $reserve_old,
 				)
 			);
 

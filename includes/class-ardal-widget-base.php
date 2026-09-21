@@ -491,6 +491,13 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'link_mode'   => 'button',
 				'button_action' => 'add',
 				'title_tag'   => 'h3',
+				/*
+				 * آیا جای «قیمت قبل» رزرو شود؟
+				 *
+				 * صدازننده‌ای که کل فهرست را می‌بیند بهتر می‌داند: اگر هیچ
+				 * محصولی تخفیف ندارد، آن سطرِ نامرئی فقط فضای خالی است.
+				 */
+				'reserve_old' => true,
 			)
 		);
 
@@ -545,15 +552,26 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		echo '</div>';
 
 		if ( '' !== $title || $box_link ) {
+			/*
+			 * متن عنوان داخل یک span می‌نشیند و کوتاه‌کردن چندخطی هم روی همان
+			 * span است، نه روی خود عنوان یا لینک. دلیلش حالت «کل کارت لینک»
+			 * است: آنجا لینکِ عنوان یک لایهٔ ::after روی کل کارت می‌کشد و اگر
+			 * overflow: hidden روی عنوان یا لینک بنشیند، آن لایه بریده می‌شود
+			 * و کلیکِ کارت از کار می‌افتد.
+			 */
 			if ( ! empty( $link['url'] ) ) {
 				printf(
-					'<%1$s class="ard-pcard__title"><a%2$s>%3$s</a></%1$s>',
+					'<%1$s class="ard-pcard__title"><a%2$s><span class="ard-pcard__title-text">%3$s</span></a></%1$s>',
 					esc_html( $title_tag ),
 					Ardal_Helpers::link_attrs( $link ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					esc_html( $title )
 				);
 			} else {
-				printf( '<%1$s class="ard-pcard__title">%2$s</%1$s>', esc_html( $title_tag ), esc_html( $title ) );
+				printf(
+					'<%1$s class="ard-pcard__title"><span class="ard-pcard__title-text">%2$s</span></%1$s>',
+					esc_html( $title_tag ),
+					esc_html( $title )
+				);
 			}
 		}
 
@@ -580,8 +598,10 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 
 		if ( '' !== $old ) {
 			printf( '<del class="ard-pcard__old">%s</del>', esc_html( $old ) );
-		} elseif ( '' !== $price ) {
-			// همان کار: یک سطرِ نامرئی به‌جای قیمتِ قبل، تا خطِ قیمت هم‌تراز بماند.
+		} elseif ( '' !== $price && $opts['reserve_old'] ) {
+			// یک سطرِ نامرئی به‌جای قیمتِ قبل، تا خطِ قیمت با کارت‌های تخفیف‌دارِ
+			// همان ردیف هم‌تراز بماند. اگر در کل فهرست تخفیفی نباشد، صدازننده
+			// reserve_old را خاموش می‌کند و این سطر اصلاً چاپ نمی‌شود.
 			echo '<del class="ard-pcard__old ard-pcard__old--empty" aria-hidden="true">&nbsp;</del>';
 		}
 

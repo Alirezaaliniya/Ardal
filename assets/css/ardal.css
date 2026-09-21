@@ -1543,6 +1543,13 @@ a.ard-service__inner:hover {
 .ard-pcard {
 	--ard-fab: 46px;
 
+	/*
+	 * سقف خط عنوان. روی خودِ کارت تعریف می‌شود نه روی عنوان: کنترل المنتور هم
+	 * همین‌جا می‌نویسد و اگر پیش‌فرض روی عنصر پایین‌تری بود، مقدارِ ارث‌رسیده
+	 * را می‌پوشاند و تنظیم بی‌اثر می‌شد.
+	 */
+	--ard-pcard-lines: 2;
+
 	position: relative;
 	block-size: 100%;
 	border-radius: var(--ard-radius);
@@ -1643,11 +1650,27 @@ a.ard-service__inner:hover {
 }
 
 .ard-pcard__title {
-	min-block-size: 44px;
+	/* ارتفاع رزرو از همان شمارش خط می‌آید تا عنوانِ یک‌خطی و دوخطی، قیمت را
+	   در کارت‌های یک ردیف جابه‌جا نکنند. */
+	min-block-size: calc(var(--ard-pcard-lines, 2) * 1.75em);
 	font-size: 13px;
 	font-weight: 700;
 	line-height: 1.75;
 	color: var(--ard-text);
+}
+
+/*
+ * کوتاه‌کردن روی همین span است نه روی عنوان یا لینک: در حالت «کل کارت لینک»
+ * لینکِ عنوان یک لایهٔ ::after روی کل کارت می‌کشد و overflow روی لینک آن را
+ * می‌بُرد. این span خواهرِ آن لایه است، پس چیزی را نمی‌برد.
+ */
+.ard-pcard__title-text {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: var(--ard-pcard-lines, 2);
+	line-clamp: var(--ard-pcard-lines, 2);
+	overflow: hidden;
+	overflow-wrap: anywhere;
 }
 
 .ard-pcard__title a:hover {
@@ -3101,7 +3124,8 @@ a.ard-brand:hover img {
 	}
 
 	.ard-pcard__title {
-		min-block-size: 41px;
+		/* در موبایل هم ارتفاع از همان شمارش خط می‌آید، نه عدد ثابت. */
+		min-block-size: calc(var(--ard-pcard-lines, 2) * 1.75em);
 		font-size: 12px;
 	}
 

@@ -521,16 +521,18 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		$this->add_control(
 			'title_lines',
 			array(
-				'label'     => 'حداکثر خط عنوان',
-				'type'      => Controls_Manager::SLIDER,
-				'range'     => array( 'px' => array( 'min' => 1, 'max' => 4, 'step' => 1 ) ),
-				'default'   => array( 'size' => 2 ),
+				'label'       => 'حداکثر خط عنوان',
+				'type'        => Controls_Manager::SLIDER,
+				'range'       => array( 'px' => array( 'min' => 1, 'max' => 4, 'step' => 1 ) ),
+				'default'     => array( 'size' => 2 ),
+				'description' => 'یک یعنی عنوان‌ها یک‌خطی شوند و بقیه‌اش با «…» کوتاه شود.',
 				// همین عدد هم سقفِ خطوط را می‌سازد هم ارتفاعِ رزروشده را، تا
-				// عنوانِ یک‌خطی و دوخطی قیمت را جابه‌جا نکنند.
-				'selectors' => array(
+				// عنوانِ یک‌خطی و دوخطی قیمت را جابه‌جا نکنند. هر دو سبک کارت
+				// یک کنترل دارند، چون از دید کاربر یک تنظیم است.
+				'selectors'   => array(
 					'{{WRAPPER}} .ard-acard' => '--ard-acard-lines:{{SIZE}};',
+					'{{WRAPPER}} .ard-pcard' => '--ard-pcard-lines:{{SIZE}};',
 				),
-				'condition' => array( 'card_style' => 'archive' ),
 			)
 		);
 
@@ -1354,6 +1356,19 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			( $filtered && ! $archive ) ? ' data-ard-region="products"' : ''
 		);
 
+		/*
+		 * اگر هیچ محصولی قیمت قبل ندارد، سطرِ نامرئیِ رزرو هم لازم نیست؛ آن سطر
+		 * فقط برای هم‌تراز ماندن با کارت‌های تخفیف‌دارِ همان ردیف است.
+		 */
+		$reserve_old = false;
+
+		foreach ( $items as $item ) {
+			if ( isset( $item['old_price'] ) && '' !== trim( (string) $item['old_price'] ) ) {
+				$reserve_old = true;
+				break;
+			}
+		}
+
 		foreach ( $items as $item ) {
 			$tab = isset( $item['tab'] ) ? (string) $item['tab'] : '';
 
@@ -1411,6 +1426,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 						'button_text'   => $s['button_text'],
 						'notch'         => $framed && 'yes' === $s['notch'],
 						'placeholder'   => '۸۰۰×۸۰۰',
+						'reserve_old'   => $reserve_old,
 					)
 				);
 			}
