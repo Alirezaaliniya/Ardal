@@ -708,6 +708,53 @@ class Ardal_Archive {
 	/* --------------------------------------------------------------------- */
 
 	/**
+	 * ترم‌هایی که در هیچ فهرستِ نمایشی نباید بیایند.
+	 *
+	 * فعلاً فقط دستهٔ پیش‌فرض ووکامرس («دسته‌بندی نشده»): هر محصولی که دسته‌اش
+	 * تعیین نشده باشد آنجا می‌افتد، پس در ریل، فیلتر یا ویترین دسته‌ها یک ردیف
+	 * بی‌معناست. کنار `default_product_cat` اسلاگ `uncategorized` هم بررسی
+	 * می‌شود، چون در سایت‌های مهاجرت‌شده آن آپشن گاهی به ترم دیگری اشاره
+	 * می‌کند.
+	 *
+	 * @param string $taxonomy
+	 * @return int[]
+	 */
+	public static function excluded_terms( $taxonomy = 'product_cat' ) {
+		static $cache = array();
+
+		if ( isset( $cache[ $taxonomy ] ) ) {
+			return $cache[ $taxonomy ];
+		}
+
+		$out = array();
+
+		if ( 'product_cat' === $taxonomy ) {
+			$out[] = (int) get_option( 'default_product_cat' );
+
+			foreach ( array( 'uncategorized', 'دسته-بندی-نشده', 'دسته‌بندی-نشده' ) as $slug ) {
+				$term = get_term_by( 'slug', $slug, 'product_cat' );
+
+				if ( $term ) {
+					$out[] = (int) $term->term_id;
+				}
+			}
+		}
+
+		$out = array_values( array_filter( array_unique( array_map( 'absint', $out ) ) ) );
+
+		/**
+		 * ترم‌هایی که از فهرست‌های نمایشی کنار گذاشته می‌شوند.
+		 *
+		 * @since 2.9.0
+		 * @param int[]  $out
+		 * @param string $taxonomy
+		 */
+		$cache[ $taxonomy ] = (array) apply_filters( 'ardal_excluded_terms', $out, $taxonomy );
+
+		return $cache[ $taxonomy ];
+	}
+
+	/**
 	 * ترم‌های یک تاکسونومی، آماده‌ی نمایش در باکس فیلتر.
 	 *
 	 * @param string $taxonomy
@@ -753,12 +800,27 @@ class Ardal_Archive {
 				$query['orderby'] = 'name';
 		}
 
+		$skip = self::excluded_terms( $taxonomy );
+
 		if ( $args['include'] ) {
-			$query['include'] = array_map( 'absint', (array) $args['include'] );
+			// include و exclude با هم کار نمی‌کنند؛ پس پیش از کوئری کم می‌شوند.
+			$include = array_diff( array_map( 'absint', (array) $args['include'] ), $skip );
+
+			if ( ! $include ) {
+				return array();
+			}
+
+			$query['include'] = array_values( $include );
 			$query['orderby'] = 'include';
 			unset( $query['order'] );
-		} elseif ( '' !== $args['parent'] ) {
-			$query['parent'] = (int) $args['parent'];
+		} else {
+			if ( '' !== $args['parent'] ) {
+				$query['parent'] = (int) $args['parent'];
+			}
+
+			if ( $skip ) {
+				$query['exclude'] = $skip;
+			}
 		}
 
 		if ( $args['limit'] > 0 ) {
@@ -890,9 +952,14 @@ class Ardal_Archive {
 			}
 		}
 
-		$out = array();
+		$out  = array();
+		$skip = self::excluded_terms( $taxonomy );
 
 		foreach ( $sets as $term_id => $objects ) {
+			if ( in_array( (int) $term_id, $skip, true ) ) {
+				continue;
+			}
+
 			$out[ $term_id ] = count( $objects );
 		}
 

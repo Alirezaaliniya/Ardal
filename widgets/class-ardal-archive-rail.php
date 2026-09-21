@@ -508,15 +508,18 @@ class Ardal_Widget_Archive_Rail extends Ardal_Archive_Widget_Base {
 				$args['orderby'] = 'name';
 		}
 
+		$skip = Ardal_Archive::excluded_terms( $taxonomy );
+
 		switch ( $s['source'] ) {
 			case 'manual':
-				$ids = array_filter( array_map( 'absint', (array) $s['terms'] ) );
+				// include و exclude با هم کار نمی‌کنند؛ پیش از کوئری کم می‌شوند.
+				$ids = array_diff( array_filter( array_map( 'absint', (array) $s['terms'] ) ), $skip );
 
 				if ( ! $ids ) {
 					return array();
 				}
 
-				$args['include'] = $ids;
+				$args['include'] = array_values( $ids );
 				$args['orderby'] = 'include';
 				$args['number']  = 0;
 				unset( $args['order'] );
@@ -540,6 +543,10 @@ class Ardal_Widget_Archive_Rail extends Ardal_Archive_Widget_Base {
 				$kids    = get_terms( array_merge( $args, array( 'parent' => $parent, 'fields' => 'ids' ) ) );
 
 				$args['parent'] = ( ! is_wp_error( $kids ) && $kids ) ? $parent : 0;
+		}
+
+		if ( $skip && empty( $args['include'] ) ) {
+			$args['exclude'] = $skip;
 		}
 
 		$terms = get_terms( $args );

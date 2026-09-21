@@ -525,24 +525,15 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 	/**
 	 * شناسهٔ دسته‌هایی که نباید بیایند.
 	 *
-	 * دستهٔ پیش‌فرض ووکامرس همیشه کنار می‌رود: هر محصولی که دسته‌اش را تعیین
-	 * نکرده باشد آنجا می‌افتد، پس در ویترینِ «خرید بر اساس دسته‌بندی» یک ردیف
-	 * بی‌معنا می‌شود. اسلاگِ خام هم بررسی می‌شود چون در سایت‌های مهاجرت‌شده
-	 * ممکن است آپشنِ پیش‌فرض به ترمِ دیگری اشاره کند.
+	 * دستهٔ پیش‌فرض ووکامرس همیشه کنار می‌رود؛ تعریفش در
+	 * Ardal_Archive::excluded_terms() است تا همه‌جای افزونه یکی باشد.
 	 *
 	 * @param array $s
 	 * @return array
 	 */
 	private function excluded_cats( $s ) {
-		$out = array( (int) get_option( 'default_product_cat' ) );
-
-		foreach ( array( 'uncategorized', 'دسته-بندی-نشده', 'دسته‌بندی-نشده' ) as $slug ) {
-			$term = get_term_by( 'slug', $slug, 'product_cat' );
-
-			if ( $term ) {
-				$out[] = (int) $term->term_id;
-			}
-		}
+		// فهرست پایه یک جا نگه داشته شده تا ریل، فیلتر و اینجا یک‌جور رفتار کنند.
+		$out = Ardal_Archive::excluded_terms( 'product_cat' );
 
 		foreach ( (array) ( $s['woo_exclude'] ?? array() ) as $id ) {
 			$out[] = (int) $id;
