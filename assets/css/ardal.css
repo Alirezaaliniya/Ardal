@@ -1671,9 +1671,14 @@ a.ard-service__inner:hover {
 }
 
 .ard-pcard__title {
-	/* ارتفاع رزرو از همان شمارش خط می‌آید تا عنوانِ یک‌خطی و دوخطی، قیمت را
-	   در کارت‌های یک ردیف جابه‌جا نکنند. */
-	min-block-size: calc(var(--ard-pcard-lines, 2) * 1.75em);
+	/*
+	 * بدون ارتفاع رزرو.
+	 *
+	 * قبلاً به اندازهٔ سقفِ خط (پیش‌فرض دو خط) جا می‌گرفت تا قیمت‌ها هم‌تراز
+	 * بمانند؛ ولی این کار را از قبل `margin-block-start: auto`ِ بلوک قیمت و
+	 * ردیف‌های هم‌ارتفاع گرید انجام می‌دهند. نتیجهٔ آن رزرو فقط این بود که
+	 * کارتِ «توپ» همان‌قدر بلند شود که کارتِ یک عنوان دوخطی.
+	 */
 	font-size: 13px;
 	font-weight: 700;
 	line-height: 1.75;
@@ -1727,10 +1732,19 @@ a.ard-service__inner:hover {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	/* جای یک سطر رزرو می‌ماند تا عنوانِ کارتِ بدون امتیاز بالا نپرد. */
-	min-block-size: 1.6em;
 	font-size: 11.5px;
 	color: var(--ard-muted);
+}
+
+/*
+ * سطر امتیازِ خالی اصلاً جا نمی‌گیرد.
+ *
+ * رزرو فقط وقتی معنا دارد که در همان شبکه کارتِ امتیازداری هم باشد؛ آن را
+ * ویجت تصمیم می‌گیرد و اگر لازم نبود این سطر را اصلاً چاپ نمی‌کند. این قانون
+ * تورِ ایمنی است برای کارت‌هایی که از مسیر دیگری ساخته می‌شوند.
+ */
+.ard-pcard__rate:empty {
+	display: none;
 }
 
 .ard-pcard__prices {
@@ -3145,8 +3159,6 @@ a.ard-brand:hover img {
 	}
 
 	.ard-pcard__title {
-		/* در موبایل هم ارتفاع از همان شمارش خط می‌آید، نه عدد ثابت. */
-		min-block-size: calc(var(--ard-pcard-lines, 2) * 1.75em);
 		font-size: 12px;
 	}
 
@@ -3359,9 +3371,17 @@ a.ard-breadcrumb__item:hover {
 	justify-content: center;
 }
 
-/* تصویر کادر را پر می‌کند تا در ستون‌های عریض ریز نماند؛ contain نسبت
-   تصویر را حفظ می‌کند پس کشیدگی رخ نمی‌دهد. */
-.ard-prod-gallery__active-img {
+/*
+ * تصویر کادر را پر می‌کند تا در ستون‌های عریض ریز نماند؛ object-fit نسبت
+ * تصویر را حفظ می‌کند پس کشیدگی رخ نمی‌دهد.
+ *
+ * چرا با نام اسلاید و نه تنها با کلاس خودش: روی صفحهٔ محصول، قالب/افزونه‌های
+ * دیگر قانونی با وزن دو کلاس روی تصویرها دارند و `block-size: 100%`ِ تک‌کلاسی
+ * را می‌بردند. نتیجه‌اش این بود که تصویر به‌جای پر کردن قاب، با نسبت ذاتی خودش
+ * کشیده می‌شد و از کادر بیرون می‌زد — و چون کادرِ تصویر دقیقاً نسبت خودش را
+ * داشت، cover و contain هیچ فرقی نمی‌کردند.
+ */
+.ard-prod-gallery__slide .ard-prod-gallery__active-img {
 	inline-size: 100%;
 	block-size: 100%;
 	object-fit: contain;
@@ -4014,6 +4034,30 @@ a.ard-breadcrumb__item:hover {
 	background: linear-gradient(180deg, color-mix(in srgb, var(--ard-tint-green) 55%, var(--ard-base)), var(--ard-base));
 	padding: 18px;
 	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+}
+
+/*
+ * فرم استاندارد ووکامرس دور تعداد و دکمه پیچیده شده.
+ *
+ * `display: contents` یعنی خودِ فرم جعبه‌ای نمی‌سازد و بچه‌هایش همان‌جایی
+ * می‌نشینند که قبلاً بودند — پس چیدمان و فاصله‌ها دست‌نخورده می‌مانند.
+ * margin هم صفر می‌شود چون قالب‌ها معمولاً به form.cart مارجین می‌دهند.
+ */
+.ard-prod-buybox__form {
+	display: contents;
+	margin: 0;
+}
+
+/* ظرفِ استاندارد دکمه هم نباید جعبهٔ تازه‌ای بسازد. */
+.ard-prod-buybox .woocommerce-variation-add-to-cart {
+	display: contents;
+}
+
+/* دکمه حالا <button> است نه <a>؛ ریست لازم دارد تا مثل قبل دیده شود. */
+.ard-prod-buybox__btn {
+	inline-size: 100%;
+	border: 0;
+	font-family: inherit;
 }
 
 .ard-prod-buybox__price-row {
@@ -5222,4 +5266,138 @@ a.ard-breadcrumb__item:hover {
 .ard-price-date__value {
 	font-weight: 800;
 	color: var(--ard-text);
+}
+
+/* ============================================================
+   توست — جای پیام‌های ووکامرس
+   ============================================================ */
+
+/*
+ * فیلتر ژله‌ای فقط باید تعریف شود، نه دیده. صفر در صفر با visibility:hidden
+ * کافی است و برخلاف display:none، فیلتر همچنان قابل ارجاع می‌ماند.
+ */
+.ard-toasts__filter {
+	position: absolute;
+	inline-size: 0;
+	block-size: 0;
+	visibility: hidden;
+}
+
+.ard-toasts {
+	position: fixed;
+	z-index: 100020;
+	inset-block-end: 24px;
+	inset-inline-start: 24px;
+	display: flex;
+	flex-direction: column-reverse;
+	gap: 6px;
+	max-inline-size: min(380px, calc(100vw - 32px));
+	/* خودِ ظرف کلیک نمی‌گیرد تا صفحه زیرش قابل استفاده بماند. */
+	pointer-events: none;
+	/*
+	 * ژله‌ای شدن: توست‌های نزدیک به هم با بلور + کنتراست به هم می‌چسبند و
+	 * موقع رفتن مثل قطره از هم جدا می‌شوند. گذارِ خود توست‌ها این حرکت را
+	 * می‌سازد؛ فیلتر فقط لبه‌ها را می‌دوزد.
+	 */
+	filter: url(#ard-gooey);
+}
+
+.ard-toast {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px;
+	border-radius: 16px;
+	background: var(--ard-primary-dark);
+	color: var(--ard-base);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.7;
+	pointer-events: auto;
+	opacity: 0;
+	transform: translateY(14px) scale(.86);
+	transition: opacity .28s ease, transform .38s cubic-bezier(.22, 1.2, .36, 1);
+}
+
+.ard-toast.is-in {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+}
+
+.ard-toast.is-out {
+	opacity: 0;
+	transform: translateY(-6px) scale(.8);
+}
+
+.ard-toast--success {
+	background: var(--ard-accent-deep);
+}
+
+.ard-toast--error {
+	background: var(--ard-sale);
+}
+
+.ard-toast--info {
+	background: var(--ard-primary-dark);
+}
+
+.ard-toast__icon {
+	display: flex;
+	flex: 0 0 auto;
+	inline-size: 20px;
+	block-size: 20px;
+}
+
+.ard-toast__icon svg {
+	inline-size: 100%;
+	block-size: 100%;
+}
+
+.ard-toast__text {
+	flex: 1 1 auto;
+	min-inline-size: 0;
+}
+
+.ard-toast__close {
+	flex: 0 0 auto;
+	padding: 0 2px;
+	background: none;
+	border: 0;
+	color: inherit;
+	font-size: 19px;
+	line-height: 1;
+	opacity: .7;
+	cursor: pointer;
+}
+
+.ard-toast__close:hover {
+	opacity: 1;
+}
+
+@media (max-width: 600px) {
+	.ard-toasts {
+		inset-block-end: 16px;
+		inset-inline: 16px;
+		max-inline-size: none;
+	}
+}
+
+/*
+ * بدون انیمیشن: فیلتر ژله‌ای هم کنار می‌رود. آن افکت از حرکت معنا می‌گیرد و
+ * بدون حرکت فقط لبه‌ها را مبهم می‌کند.
+ */
+@media (prefers-reduced-motion: reduce) {
+	.ard-toasts {
+		filter: none;
+	}
+
+	.ard-toast {
+		transition: opacity .01ms;
+		transform: none;
+	}
+
+	.ard-toast.is-in,
+	.ard-toast.is-out {
+		transform: none;
+	}
 }

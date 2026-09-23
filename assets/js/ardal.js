@@ -199,6 +199,262 @@
 	}
 
 	/* --------------------------------------------------------
+	   توست
+
+	   جای alert مرورگر و جای نوارهای پیام ووکامرس. «ژله‌ای» است: چند توست که
+	   کنار هم می‌نشینند با فیلتر SVG (بلور + کنتراست) به هم می‌چسبند و مثل
+	   قطره از هم جدا می‌شوند.
+	   -------------------------------------------------------- */
+
+	var TOAST_LIFE = 5000;
+
+	/**
+	 * ظرف توست‌ها را می‌سازد (یک بار) و برمی‌گرداند.
+	 */
+	function toastHost() {
+		var host = document.querySelector( '.ard-toasts' );
+
+		if ( host ) {
+			return host;
+		}
+
+		/*
+		 * فیلتر ژله‌ای یک بار ساخته می‌شود و همان‌جا کنار ظرف می‌ماند.
+		 * چسبیدن قطره‌ها کارِ همین است: alpha را تار می‌کند و بعد کنتراستش را
+		 * بالا می‌برد، پس لبه‌های نزدیک به هم یکی می‌شوند.
+		 */
+		var svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+
+		svg.setAttribute( 'class', 'ard-toasts__filter' );
+		svg.setAttribute( 'aria-hidden', 'true' );
+		svg.innerHTML =
+			'<defs><filter id="ard-gooey">' +
+			'<feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b"/>' +
+			'<feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="g"/>' +
+			'<feComposite in="SourceGraphic" in2="g" operator="atop"/>' +
+			'</filter></defs>';
+
+		host = document.createElement( 'div' );
+		host.className = 'ard-toasts';
+		// نقش status: صفحه‌خوان پیام تازه را می‌خواند بدون اینکه تمرکز را بدزدد.
+		host.setAttribute( 'role', 'status' );
+		host.setAttribute( 'aria-live', 'polite' );
+
+		document.body.appendChild( svg );
+		document.body.appendChild( host );
+
+		return host;
+	}
+
+	/**
+	 * یک توست نشان می‌دهد.
+	 *
+	 * @param {string} text متن پیام.
+	 * @param {string} kind success | error | info
+	 * @param {number} [life] مدت ماندن به میلی‌ثانیه.
+	 */
+	function ardToast( text, kind, life ) {
+		text = String( text || '' ).trim();
+
+		if ( ! text ) {
+			return null;
+		}
+
+		var host = toastHost();
+
+		// پیام تکراریِ پشت‌سرهم دوباره ساخته نمی‌شود؛ فقط عمرش تازه می‌شود.
+		var twin = Array.prototype.filter.call( host.children, function ( el ) {
+			return el.getAttribute( 'data-text' ) === text;
+		} )[ 0 ];
+
+		if ( twin ) {
+			window.clearTimeout( twin.ardTimer );
+			twin.ardTimer = window.setTimeout( function () {
+				closeToast( twin );
+			}, life || TOAST_LIFE );
+
+			return twin;
+		}
+
+		var toast = document.createElement( 'div' );
+
+		toast.className = 'ard-toast ard-toast--' + ( kind || 'info' );
+		toast.setAttribute( 'data-text', text );
+
+		var icon = document.createElement( 'span' );
+
+		icon.className = 'ard-toast__icon';
+		icon.setAttribute( 'aria-hidden', 'true' );
+		icon.innerHTML = toastIcon( kind );
+
+		var body = document.createElement( 'span' );
+
+		body.className = 'ard-toast__text';
+		body.textContent = text;
+
+		var close = document.createElement( 'button' );
+
+		close.type = 'button';
+		close.className = 'ard-toast__close';
+		close.setAttribute( 'aria-label', 'بستن پیام' );
+		close.innerHTML = '&times;';
+		close.addEventListener( 'click', function () {
+			closeToast( toast );
+		} );
+
+		toast.appendChild( icon );
+		toast.appendChild( body );
+		toast.appendChild( close );
+		host.appendChild( toast );
+
+		// یک فریم بعد، تا گذارِ ورود واقعاً اجرا شود.
+		window.requestAnimationFrame( function () {
+			toast.classList.add( 'is-in' );
+		} );
+
+		toast.ardTimer = window.setTimeout( function () {
+			closeToast( toast );
+		}, life || TOAST_LIFE );
+
+		// روی توست که باشی، نباید زیر دستت برود.
+		toast.addEventListener( 'mouseenter', function () {
+			window.clearTimeout( toast.ardTimer );
+		} );
+
+		toast.addEventListener( 'mouseleave', function () {
+			toast.ardTimer = window.setTimeout( function () {
+				closeToast( toast );
+			}, 1500 );
+		} );
+
+		return toast;
+	}
+
+	function closeToast( toast ) {
+		if ( ! toast || toast.ardClosing ) {
+			return;
+		}
+
+		toast.ardClosing = true;
+		window.clearTimeout( toast.ardTimer );
+		toast.classList.remove( 'is-in' );
+		toast.classList.add( 'is-out' );
+
+		var done = function () {
+			if ( toast.parentNode ) {
+				toast.parentNode.removeChild( toast );
+			}
+		};
+
+		toast.addEventListener( 'transitionend', done, { once: true } );
+
+		// تور ایمنی: اگر گذار اجرا نشد (تب پنهان، reduced motion) هم برود.
+		window.setTimeout( done, 500 );
+	}
+
+	function toastIcon( kind ) {
+		var paths = {
+			success: '<path d="M5 13l4 4L19 7"></path>',
+			error: '<path d="M12 8v5"></path><path d="M12 16.5v.01"></path><circle cx="12" cy="12" r="9"></circle>',
+			info: '<path d="M12 11v5"></path><path d="M12 7.5v.01"></path><circle cx="12" cy="12" r="9"></circle>'
+		};
+
+		return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+			( paths[ kind ] || paths.info ) + '</svg>';
+	}
+
+	/**
+	 * نوارهای پیام ووکامرس را برمی‌دارد و به‌جایشان توست نشان می‌دهد.
+	 *
+	 * چرا حذف و نه پنهان‌کردن: این نوارها بالای محتوا می‌نشینند و چیدمان صفحه
+	 * را جابه‌جا می‌کنند؛ پنهان‌کردنشان با CSS هم فضای خالی به جا می‌گذاشت.
+	 *
+	 * @param {Element} scope
+	 */
+	function collectWooNotices( scope ) {
+		var root = scope || document;
+		var map = [
+			[ '.woocommerce-error li, .woocommerce-error', 'error' ],
+			[ '.woocommerce-message', 'success' ],
+			[ '.woocommerce-info, .woocommerce-notice--info', 'info' ]
+		];
+
+		map.forEach( function ( pair ) {
+			Array.prototype.forEach.call( root.querySelectorAll( pair[ 0 ] ), function ( el ) {
+				if ( el.ardTaken || el.closest( '.ard-toasts' ) ) {
+					return;
+				}
+
+				// <li> داخل .woocommerce-error جداگانه خوانده می‌شود؛ خودِ ظرف نه.
+				if ( 'UL' === el.tagName && el.querySelector( 'li' ) ) {
+					return;
+				}
+
+				el.ardTaken = true;
+
+				var clone = el.cloneNode( true );
+
+				Array.prototype.forEach.call( clone.querySelectorAll( 'a, button' ), function ( n ) {
+					n.parentNode.removeChild( n );
+				} );
+
+				ardToast( ( clone.textContent || '' ).replace( /\s+/g, ' ' ).trim(), pair[ 1 ] );
+
+				var host = ( 'LI' === el.tagName ) ? ( el.closest( '.woocommerce-error' ) || el ) : el;
+
+				if ( host.parentNode ) {
+					host.parentNode.removeChild( host );
+				}
+			} );
+		} );
+	}
+
+	/**
+	 * پیام‌های ووکامرس را — چه در بارگذاری صفحه و چه بعد از ایجکس — می‌گیرد.
+	 */
+	function initWooNotices() {
+		collectWooNotices( document );
+
+		if ( window.jQuery ) {
+			var $ = window.jQuery;
+
+			// ووکامرس بعد از هر عملیات ایجکسی این رویدادها را می‌زند.
+			$( document.body ).on(
+				'added_to_cart removed_from_cart updated_cart_totals updated_checkout applied_coupon removed_coupon wc_fragments_refreshed',
+				function () {
+					window.setTimeout( function () {
+						collectWooNotices( document );
+					}, 50 );
+				}
+			);
+
+			$( document.body ).on( 'wc_add_to_cart_message', function () {
+				window.setTimeout( function () {
+					collectWooNotices( document );
+				}, 50 );
+			} );
+		}
+
+		/*
+		 * بعضی افزونه‌ها نوار پیام را مستقیم داخل DOM می‌گذارند بدون هیچ
+		 * رویدادی؛ یک ناظر سبک همان‌ها را هم می‌گیرد.
+		 */
+		if ( window.MutationObserver ) {
+			var pending = null;
+
+			new window.MutationObserver( function () {
+				window.clearTimeout( pending );
+				pending = window.setTimeout( function () {
+					collectWooNotices( document );
+				}, 80 );
+			} ).observe( document.body, { childList: true, subtree: true } );
+		}
+	}
+
+	// در دسترسِ بقیهٔ اسکریپت‌های افزونه (سبد، پنل کاربری) هم باشد.
+	window.ardToast = ardToast;
+
+	/* --------------------------------------------------------
 	   کروسل افقی (اسکرول‌محور)
 	   -------------------------------------------------------- */
 
@@ -1500,6 +1756,59 @@
 		return match;
 	}
 
+	/**
+	 * فیلدهای استاندارد فرم ووکامرس را با انتخاب فعلی پر می‌کند.
+	 *
+	 * افزونه‌های دیگر (و خود ووکامرس، اگر جاوااسکریپت ما غیرفعال شود) همین
+	 * `variation_id` و `attribute_*` را می‌خوانند؛ بدون پر کردنشان، فرم با
+	 * واریاسیون اشتباه یا خالی ارسال می‌شد.
+	 *
+	 * @param {Object|null} match واریاسیون جاری.
+	 */
+	function syncCartForm( match ) {
+		var form = document.querySelector( '.ard-prod-buybox__form' );
+
+		if ( ! form ) {
+			return;
+		}
+
+		var idField = form.querySelector( '[data-ard-variation-id]' );
+
+		if ( idField ) {
+			idField.value = match ? match.id : 0;
+		}
+
+		var chosen = chosenAttributes( null );
+		var key;
+
+		for ( key in chosen ) {
+			if ( ! Object.prototype.hasOwnProperty.call( chosen, key ) ) {
+				continue;
+			}
+
+			var field = form.querySelector( '[data-ard-variation-attr="' + key + '"]' );
+
+			if ( ! field ) {
+				// ویژگی‌ای که سمت سرور پیش‌فرضی نداشت، همین‌جا ساخته می‌شود.
+				field = document.createElement( 'input' );
+				field.type = 'hidden';
+				field.name = key;
+				field.setAttribute( 'data-ard-variation-attr', key );
+				form.appendChild( field );
+			}
+
+			field.value = chosen[ key ];
+		}
+
+		/*
+		 * jQuery ووکامرس روی همین رویداد می‌نشیند؛ بدون آن، افزونه‌هایی که
+		 * قیمت یا موجودی را دنبال می‌کنند از تغییر باخبر نمی‌شوند.
+		 */
+		if ( window.jQuery && match ) {
+			window.jQuery( form ).trigger( 'ardal_variation_changed', [ match ] );
+		}
+	}
+
 	function syncVariationState() {
 		paintVariantTargets();
 		narrowVariantOptions();
@@ -1513,6 +1822,7 @@
 			var match = currentVariation();
 
 			variantState.currentVariation = match;
+			syncCartForm( match );
 
 			var priceMain = buybox.querySelector( '.ard-prod-buybox__price-main' );
 			var oldPriceEl = buybox.querySelector( '.ard-prod-buybox__old' );
@@ -1691,6 +2001,7 @@
 	function initProductQty( root ) {
 		var qtyVal = 1;
 		var display = root.querySelector( '[data-ard-qty-display]' );
+		var input = root.querySelector( '[data-ard-qty-input]' );
 		var btnInc = root.querySelector( '[data-ard-qty-inc]' );
 		var btnDec = root.querySelector( '[data-ard-qty-dec]' );
 		var btnAdd = root.querySelector( '[data-ard-add-to-cart]' );
@@ -1702,8 +2013,18 @@
 		}
 
 		function paint() {
+			// شمارندهٔ دیدنی فارسی می‌ماند؛ ورودیِ ووکامرس لاتین، چون
+			// افزونه‌های دیگر رویش parseInt می‌زنند.
 			if ( display ) {
 				display.textContent = toFa( qtyVal );
+			}
+
+			if ( input && String( qtyVal ) !== input.value ) {
+				input.value = qtyVal;
+
+				if ( window.jQuery ) {
+					window.jQuery( input ).trigger( 'change' );
+				}
 			}
 
 			// تعداد باید به دکمهٔ واقعی هم برسد، وگرنه ووکامرس همیشه یکی
@@ -1725,6 +2046,21 @@
 			}
 		}
 
+		/*
+		 * اگر افزونهٔ دیگری مقدار را مستقیم روی ورودی بنویسد، شمارندهٔ دیدنی
+		 * هم باید جلو برود؛ وگرنه کاربر عددی می‌بیند که با سبد نمی‌خواند.
+		 */
+		if ( input ) {
+			input.addEventListener( 'change', function () {
+				var outside = parseInt( input.value, 10 );
+
+				if ( outside && outside !== qtyVal ) {
+					qtyVal = Math.min( Math.max( 1, outside ), max );
+					paint();
+				}
+			} );
+		}
+
 		if ( btnInc ) {
 			btnInc.addEventListener( 'click', function () {
 				if ( qtyVal < max ) {
@@ -1744,87 +2080,28 @@
 		}
 
 		if ( btnAdd ) {
+			/*
+			 * افزودن به سبد دست خودِ ووکامرس است.
+			 *
+			 * دکمه یک submit استاندارد داخل form.cart است و ایجکس کردنش کار
+			 * افزونهٔ اختصاصیِ سایت است؛ اگر ما هم این وسط فرم را می‌فرستادیم،
+			 * دو درخواست هم‌زمان می‌رفت و کالا دوبار به سبد اضافه می‌شد.
+			 *
+			 * تنها کاری که اینجا می‌کنیم جلوگیری از ارسالِ بی‌معناست: دکمهٔ
+			 * خاموش (ترکیب ناموجود) نباید فرم را بفرستد.
+			 */
 			btnAdd.addEventListener( 'click', function ( e ) {
-				var buybox = root.closest( '[data-ard-buybox]' ) || root;
-				var isVariable = 'true' === buybox.getAttribute( 'data-is-variable' );
-
-				if ( isVariable ) {
-					e.preventDefault();
-					e.stopPropagation();
-
-					if ( btnAdd.classList.contains( 'is-disabled' ) || btnAdd.classList.contains( 'loading' ) ) {
-						return false;
-					}
-
-					var variation = variantState.currentVariation;
-					var productId = buybox.getAttribute( 'data-product-id' );
-
-					if ( ! variation || ! variation.variation_id ) {
-						alert( 'لطفاً رنگ و سایز مورد نظر را انتخاب کنید.' );
-						return false;
-					}
-
-					if ( ! variation.is_in_stock || ! variation.is_purchasable ) {
-						alert( 'این متغیر در حال حاضر موجود نیست.' );
-						return false;
-					}
-
-					var originalText = btnAdd.textContent;
-					btnAdd.classList.add( 'loading' );
-					btnAdd.textContent = 'در حال افزودن...';
-
-					var postData = new FormData();
-					postData.append( 'product_id', variation.variation_id );
-					postData.append( 'variation_id', variation.variation_id );
-					postData.append( 'quantity', qtyVal );
-
-					if ( variantState.colorSlug ) {
-						postData.append( 'attribute_pa_color', variantState.colorSlug );
-					}
-					if ( variantState.sizeSlug ) {
-						postData.append( 'attribute_pa_size', variantState.sizeSlug );
-					}
-
-					var ajaxUrl = ( window.wc_add_to_cart_params && window.wc_add_to_cart_params.wc_ajax_url )
-						? window.wc_add_to_cart_params.wc_ajax_url.replace( '%%endpoint%%', 'add_to_cart' )
-						: ( window.woocommerce_params && window.woocommerce_params.wc_ajax_url )
-							? window.woocommerce_params.wc_ajax_url.replace( '%%endpoint%%', 'add_to_cart' )
-							: '/caspiansport/?wc-ajax=add_to_cart';
-
-					fetch( ajaxUrl, {
-						method: 'POST',
-						body: postData,
-					} )
-					.then( function ( res ) { return res.json(); } )
-					.then( function ( response ) {
-						btnAdd.classList.remove( 'loading' );
-						if ( response && response.error && response.product_url ) {
-							window.location.href = response.product_url;
-							return;
-						}
-						btnAdd.textContent = 'به سبد خرید اضافه شد ✓';
-						if ( window.jQuery && response && response.fragments ) {
-							window.jQuery( document.body ).trigger( 'added_to_cart', [ response.fragments, response.cart_hash, window.jQuery( btnAdd ) ] );
-						}
-						window.setTimeout( function () {
-							btnAdd.textContent = originalText;
-						}, 2000 );
-					} )
-					.catch( function () {
-						btnAdd.classList.remove( 'loading' );
-						btnAdd.textContent = originalText;
-					} );
-
-					return false;
+				if ( ! btnAdd.classList.contains( 'is-disabled' ) ) {
+					return;
 				}
 
-				if ( ! btnAdd.classList.contains( 'ajax_add_to_cart' ) ) {
-					var original = btnAdd.textContent;
+				e.preventDefault();
+				e.stopPropagation();
 
-					btnAdd.textContent = 'به سبد خرید اضافه شد ✓';
-					window.setTimeout( function () {
-						btnAdd.textContent = original;
-					}, 1800 );
+				var buybox = root.closest( '[data-ard-buybox]' ) || root;
+
+				if ( 'true' === buybox.getAttribute( 'data-is-variable' ) ) {
+					ardToast( 'این ترکیب موجود نیست؛ رنگ یا سایز دیگری را انتخاب کنید.', 'error' );
 				}
 			} );
 		}
@@ -2023,6 +2300,12 @@
 
 	function init( scope ) {
 		var root = scope || document;
+
+		// پیام‌های ووکامرس یک بار در هر صفحه به توست تبدیل می‌شوند.
+		if ( ! document.body.ardNoticesReady ) {
+			document.body.ardNoticesReady = true;
+			initWooNotices();
+		}
 
 		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-slider]' ), function ( el ) {
 			if ( ! el.ardReady ) {

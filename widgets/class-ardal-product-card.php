@@ -382,7 +382,8 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'notch'       => $framed && 'yes' === $s['notch'],
 				'title_tag'   => $s['card_title_tag'],
 				// کارت تکی همسایه‌ای ندارد که بخواهد با آن هم‌تراز بماند.
-				'reserve_old' => false,
+				'reserve_old'  => false,
+				'reserve_rate' => false,
 			)
 		);
 

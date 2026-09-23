@@ -392,18 +392,46 @@ class Ardal_Widget_Product_Buybox extends Ardal_Widget_Base {
 				</div>
 			<?php endif; ?>
 
+			<?php $this->open_cart_form( $data ); ?>
+
 			<?php if ( 'yes' === $s['show_qty'] && $data['purchasable'] ) : ?>
-				<div class="ard-prod-qty">
+				<?php do_action( 'woocommerce_before_add_to_cart_quantity' ); ?>
+				<div class="ard-prod-qty quantity">
 					<span class="ard-prod-qty__label"><?php echo esc_html( $s['qty_label'] ); ?></span>
 					<div class="ard-prod-qty__stepper">
 						<button type="button" class="ard-prod-qty__btn" data-ard-qty-dec aria-label="کاهش تعداد">−</button>
-						<span class="ard-prod-qty__val" data-ard-qty-display data-max="<?php echo esc_attr( $data['max_qty'] ); ?>">۱</span>
+						<span class="ard-prod-qty__val" data-ard-qty-display data-max="<?php echo esc_attr( $data['max_qty'] ); ?>" aria-live="polite">۱</span>
+						<?php
+						/*
+						 * ورودی واقعیِ تعداد، مخفی و پشت همان شمارندهٔ فارسی.
+						 *
+						 * افزونه‌های دیگر `.quantity input.qty` را می‌خوانند و
+						 * می‌نویسند، و فرم بدون جاوااسکریپت هم باید عدد درست
+						 * بفرستد؛ ولی یک `input[type=number]` قابل‌دیدن، رقم‌ها
+						 * را لاتین می‌کرد و ظاهر شمارنده عوض می‌شد. خودِ
+						 * ووکامرس هم برای محصول «تک‌فروش» همین الگوی مخفی را
+						 * می‌زند. جاوااسکریپت هر دو طرف را هم‌گام نگه می‌دارد.
+						 */
+						?>
+						<input
+							type="hidden"
+							class="qty"
+							name="quantity"
+							value="1"
+							min="1"
+							max="<?php echo esc_attr( $data['max_qty'] ); ?>"
+							step="1"
+							data-ard-qty-input
+						/>
 						<button type="button" class="ard-prod-qty__btn" data-ard-qty-inc aria-label="افزایش تعداد">+</button>
 					</div>
 				</div>
+				<?php do_action( 'woocommerce_after_add_to_cart_quantity' ); ?>
 			<?php endif; ?>
 
 			<?php $this->render_cart_button( $s, $data ); ?>
+
+			<?php $this->close_cart_form( $data ); ?>
 
 			<?php if ( '' !== trim( (string) $s['wishlist_text'] ) && $data['product_id'] > 0 && Ardal_Product::wishlist_on() ) : ?>
 				<?php $wish_on = '' !== trim( (string) $s['wishlist_text_on'] ) ? $s['wishlist_text_on'] : $s['wishlist_text']; ?>
@@ -447,50 +475,127 @@ class Ardal_Widget_Product_Buybox extends Ardal_Widget_Base {
 	private function render_cart_button( $s, $data ) {
 		if ( ! $data['purchasable'] ) {
 			printf(
-				'<span class="ard-prod-buybox__btn is-disabled" aria-disabled="true">%s</span>',
+				'<span class="ard-prod-buybox__btn button is-disabled" aria-disabled="true">%s</span>',
 				esc_html( $s['out_of_stock_label'] )
 			);
 
 			return;
 		}
 
-		$classes = array( 'ard-prod-buybox__btn' );
-		$attrs   = '';
-
-		if ( $data['product_id'] > 0 ) {
-			$product = wc_get_product( $data['product_id'] );
-
-			if ( $product ) {
-				echo Ardal_Helpers::woocommerce_add_to_cart_link(
-					$product,
-					$classes,
-					$s['cart_label'],
-					array( 'data-ard-add-to-cart' => 'true' )
-				); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce API output.
-
-				return;
-			}
-
-			$classes[] = 'add_to_cart_button';
-
-			if ( $data['ajax_add'] && ! Ardal_Assets::is_woocommerce_asset_disabled( 'disable_wc_add_to_cart_js' ) ) {
-				$classes[] = 'ajax_add_to_cart';
-				wp_enqueue_script( 'wc-add-to-cart' );
-			}
-
-			$attrs = sprintf(
-				' data-product_id="%d" data-quantity="1" rel="nofollow"',
-				$data['product_id']
+		// بدون محصول واقعی (حالت دستی) فرمی هم در کار نیست؛ همان لینک ساده.
+		if ( $data['product_id'] < 1 ) {
+			printf(
+				'<a class="ard-prod-buybox__btn button" href="%s" data-ard-add-to-cart>%s</a>',
+				esc_url( $data['add_url'] ),
+				esc_html( $s['cart_label'] )
 			);
+
+			return;
 		}
 
+		/*
+		 * دکمهٔ استاندارد صفحهٔ محصول.
+		 *
+		 * کلاس‌های `single_add_to_cart_button button alt` و نام `add-to-cart`
+		 * همان چیزی است که افزونه‌های دیگر (خرید سریع، پرداخت مستقیم،
+		 * پیشخوان‌های تحلیل) رویش می‌نشینند. کلاس ظاهریِ خودمان هم کنارشان
+		 * می‌ماند، پس استایل دست‌نخورده است.
+		 */
+		// پوشش استانداردِ محصول متغیر؛ افزونه‌ها همین ظرف را هدف می‌گیرند.
+		if ( ! empty( $data['is_variable'] ) ) {
+			echo '<div class="woocommerce-variation-add-to-cart variations_button woocommerce-variation-add-to-cart-enabled">';
+		}
+
+		do_action( 'woocommerce_before_add_to_cart_button' );
+
 		printf(
-			'<a class="%s" href="%s"%s data-ard-add-to-cart>%s</a>',
-			esc_attr( implode( ' ', $classes ) ),
-			esc_url( $data['add_url'] ),
-			$attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- از sprintf با %d ساخته شده.
+			'<button type="submit" name="add-to-cart" value="%1$d" class="ard-prod-buybox__btn single_add_to_cart_button button alt" data-product_id="%1$d" data-ard-add-to-cart>%2$s</button>',
+			(int) $data['product_id'],
 			esc_html( $s['cart_label'] )
 		);
+
+		do_action( 'woocommerce_after_add_to_cart_button' );
+
+		if ( ! empty( $data['is_variable'] ) ) {
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * فرم استاندارد «افزودن به سبد».
+	 *
+	 * تا امروز دکمه یک `<a href="?add-to-cart=">` به سبک حلقهٔ آرشیو بود. در
+	 * صفحهٔ محصول، افزونه‌ها دنبال `form.cart` و `button.single_add_to_cart_button`
+	 * می‌گردند و به قلاب‌های `woocommerce_before/after_add_to_cart_*` وصل
+	 * می‌شوند؛ با آن لینک، هیچ‌کدام کار نمی‌کرد.
+	 *
+	 * @param array $data
+	 */
+	private function open_cart_form( $data ) {
+		if ( $data['product_id'] < 1 || ! $data['purchasable'] ) {
+			return;
+		}
+
+		$classes = array( 'cart', 'ard-prod-buybox__form' );
+
+		if ( ! empty( $data['is_variable'] ) ) {
+			$classes[] = 'variations_form';
+		}
+
+		do_action( 'woocommerce_before_add_to_cart_form' );
+
+		/*
+		 * data-product_variations روی false: همان حالتی که خودِ ووکامرس برای
+		 * محصول‌های پرواریاسیون می‌سازد (آستانهٔ ajax_variation_threshold).
+		 * اگر اسکریپت واریاسیون ووکامرس جایی لود شود، به‌جای خطا دادن سراغ
+		 * ایجکس می‌رود — و ما هم مجبور نیستیم آن JSON چند صد کیلوبایتی را
+		 * دوباره داخل صفحه بگذاریم.
+		 */
+		printf(
+			'<form class="%s" action="%s" method="post" enctype="multipart/form-data" data-product_id="%d"%s>',
+			esc_attr( implode( ' ', $classes ) ),
+			esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $data['permalink'] ) ),
+			(int) $data['product_id'],
+			empty( $data['is_variable'] ) ? '' : ' data-product_variations="false"'
+		);
+
+		if ( empty( $data['is_variable'] ) ) {
+			return;
+		}
+
+		/*
+		 * محصول متغیر: ووکامرس `variation_id` و `attribute_*` را از همین
+		 * فیلدهای مخفی می‌خواند. جاوااسکریپت ما با هر انتخاب پرشان می‌کند، و
+		 * اگر جاوااسکریپت هم نبود، فرم با واریاسیون پیش‌فرضِ سمت سرور ارسال
+		 * می‌شود نه با دست خالی.
+		 */
+		printf( '<input type="hidden" name="product_id" value="%d" />', (int) $data['product_id'] );
+		printf(
+			'<input type="hidden" name="variation_id" class="variation_id" value="%d" data-ard-variation-id />',
+			(int) $data['default_variation_id']
+		);
+
+		foreach ( (array) $data['default_attributes'] as $key => $value ) {
+			printf(
+				'<input type="hidden" name="%s" value="%s" data-ard-variation-attr="%s" />',
+				esc_attr( $key ),
+				esc_attr( $value ),
+				esc_attr( $key )
+			);
+		}
+	}
+
+	/**
+	 * @param array $data
+	 */
+	private function close_cart_form( $data ) {
+		if ( $data['product_id'] < 1 || ! $data['purchasable'] ) {
+			return;
+		}
+
+		echo '</form>';
+
+		do_action( 'woocommerce_after_add_to_cart_form' );
 	}
 
 	/**
@@ -552,12 +657,15 @@ class Ardal_Widget_Product_Buybox extends Ardal_Widget_Base {
 		 * خط‌خورده داشت و نه نشان تخفیف — و جاوااسکریپت هم جایی برای پر کردن
 		 * پیدا نمی‌کرد چون آن سطر اصلاً رندر نشده بود.
 		 */
+		$default_variation_id = 0;
+
 		if ( $is_variable ) {
 			$deal = Ardal_Product::best_deal( $product );
 
 			if ( $deal ) {
-				$active  = $deal['price'];
-				$regular = $deal['regular'];
+				$active               = $deal['price'];
+				$regular              = $deal['regular'];
+				$default_variation_id = (int) $deal['id'];
 			}
 		}
 		// نقشهٔ سبک، نه خروجی خام؛ خام برای ۱۶ واریاسیون حدود ۱۹۰ کیلوبایت
@@ -583,6 +691,10 @@ class Ardal_Widget_Product_Buybox extends Ardal_Widget_Base {
 				: 99,
 			'is_variable'  => $is_variable,
 			'variations'   => $variations,
+			'permalink'    => $product->get_permalink(),
+			// واریاسیونی که صفحه با آن باز می‌شود؛ فرم هم با همان شروع می‌کند.
+			'default_attributes'   => $is_variable ? Ardal_Product::default_variation( $product ) : array(),
+			'default_variation_id' => $default_variation_id,
 		);
 	}
 

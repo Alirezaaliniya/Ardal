@@ -1335,11 +1335,25 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 		 * اگر هیچ محصولی قیمت قبل ندارد، سطرِ نامرئیِ رزرو هم لازم نیست؛ آن سطر
 		 * فقط برای هم‌تراز ماندن با کارت‌های تخفیف‌دارِ همان ردیف است.
 		 */
-		$reserve_old = false;
+		$reserve_old  = false;
+		$reserve_rate = false;
 
 		foreach ( $items as $item ) {
-			if ( isset( $item['old_price'] ) && '' !== trim( (string) $item['old_price'] ) ) {
+			if ( ! $reserve_old && isset( $item['old_price'] ) && '' !== trim( (string) $item['old_price'] ) ) {
 				$reserve_old = true;
+			}
+
+			$row_rating = isset( $item['rating'] ) ? $item['rating'] : 0;
+
+			if ( is_array( $row_rating ) ) {
+				$row_rating = isset( $row_rating['size'] ) ? $row_rating['size'] : 0;
+			}
+
+			if ( ! $reserve_rate && (float) $row_rating > 0 ) {
+				$reserve_rate = true;
+			}
+
+			if ( $reserve_old && $reserve_rate ) {
 				break;
 			}
 		}
@@ -1402,6 +1416,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 						'notch'         => $framed && 'yes' === $s['notch'],
 						'placeholder'   => '۸۰۰×۸۰۰',
 						'reserve_old'   => $reserve_old,
+						'reserve_rate'  => $reserve_rate,
 						'title_tag'     => $s['card_title_tag'],
 					)
 				);

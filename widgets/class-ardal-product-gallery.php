@@ -480,6 +480,30 @@ class Ardal_Widget_Product_Gallery extends Ardal_Widget_Base {
 			)
 		);
 
+		/*
+		 * پیش‌فرض contain است، نه cover: عکس محصول نباید بریده شود. برای
+		 * گالری‌هایی که تصویر فضاسازی‌شده دارند، cover انتخاب‌شدنی است.
+		 */
+		// سلکتور با نام اسلاید، تا از قانون‌های دوکلاسیِ قالب سنگین‌تر بماند.
+		$this->add_media_fit_control( '.ard-prod-gallery__slide .ard-prod-gallery__active-img', 'contain' );
+
+		$this->add_control(
+			'thumb_fit',
+			array(
+				'label'       => 'نحوه جاگرفتن تصویر بندانگشتی',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'cover',
+				'options'     => array(
+					'cover'   => 'قاب را پر کند (cover)',
+					'contain' => 'کامل دیده شود (contain)',
+				),
+				'label_block' => true,
+				'selectors'   => array(
+					'{{WRAPPER}} .ard-prod-gallery__thumb img' => 'object-fit:{{VALUE}};',
+				),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 

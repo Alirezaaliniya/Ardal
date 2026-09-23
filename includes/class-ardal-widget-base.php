@@ -536,6 +536,12 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				 * محصولی تخفیف ندارد، آن سطرِ نامرئی فقط فضای خالی است.
 				 */
 				'reserve_old' => true,
+				/*
+				 * سطر امتیاز هم مثل «قیمت قبل»: فقط وقتی خالی چاپ می‌شود که
+				 * کارت دیگری در همان شبکه امتیاز داشته باشد و بخواهیم دو کارت
+				 * کنار هم یک‌جور دیده شوند.
+				 */
+				'reserve_rate' => true,
 			)
 		);
 
@@ -628,7 +634,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		 * وگرنه در کارتی که امتیاز ندارد، عنوان و قیمت بالا می‌پرند و کارت‌های
 		 * یک ردیف ناهم‌تراز می‌شوند. ارتفاعِ رزرو در CSS است.
 		 */
-		if ( $opts['show_rating'] ) {
+		if ( $opts['show_rating'] && ( $rating > 0 || $opts['reserve_rate'] ) ) {
 			echo '<div class="ard-pcard__rate">';
 
 			if ( $rating > 0 ) {

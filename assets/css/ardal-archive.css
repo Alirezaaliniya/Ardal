@@ -1464,14 +1464,17 @@ body.ard-arch-sort .ard-sheet {
 }
 
 /*
- * عنوان همیشه به‌اندازهٔ سقفِ خطوطش جا می‌گیرد، حتی اگر یک خط باشد؛ وگرنه
- * کارتِ با عنوان کوتاه، قیمت و دکمه‌اش بالاتر از بغل‌دستی‌اش می‌نشست.
+ * سقف خط دارد، ولی ارتفاع رزرو ندارد.
+ *
+ * قبلاً همیشه به‌اندازهٔ سقفِ خطوطش جا می‌گرفت تا قیمت کارت‌های یک ردیف
+ * هم‌تراز بماند؛ این کار را `margin-top: auto`ِ بلوک قیمت از قبل انجام
+ * می‌دهد (کارت خودش فلکسِ ستونی است). آن رزرو فقط کارت‌های با عنوان کوتاه
+ * را بی‌دلیل بلند می‌کرد.
  */
 .ard-acard__name-fa {
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: var(--ard-acard-lines, 2);
-	min-block-size: calc(var(--ard-acard-lines, 2) * 1.7em);
 	overflow: hidden;
 	overflow-wrap: anywhere;
 }

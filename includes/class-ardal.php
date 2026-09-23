@@ -40,6 +40,32 @@ final class Ardal {
 		Ardal_Archive::init();
 
 		add_action( 'plugins_loaded', array( $this, 'boot_elementor' ) );
+		add_action( 'init', array( $this, 'maybe_flush_elementor_css' ), 20 );
+	}
+
+	/**
+	 * با عوض شدن نسخهٔ افزونه، CSS تولیدشدهٔ المنتور را دور می‌ریزد.
+	 *
+	 * المنتور برای هر صفحه یک فایل CSS می‌سازد و تا وقتی آن صفحه دوباره ذخیره
+	 * نشود همان را سرو می‌کند. یعنی هر کنترل تازه‌ای که به ویجت‌ها اضافه شود
+	 * روی صفحه‌های موجود «کار نمی‌کند» تا کسی دستی ذخیره‌شان کند — و این
+	 * دقیقاً شبیه باگ به نظر می‌رسد. یک بار پاک کردن بعد از به‌روزرسانی،
+	 * مسئله را از بین می‌برد؛ فایل‌ها در اولین بازدید دوباره ساخته می‌شوند.
+	 */
+	public function maybe_flush_elementor_css() {
+		if ( get_option( 'ardal_css_version' ) === ARDAL_VERSION ) {
+			return;
+		}
+
+		update_option( 'ardal_css_version', ARDAL_VERSION );
+
+		if ( did_action( 'elementor/loaded' ) && class_exists( '\Elementor\Plugin' ) ) {
+			$elementor = \Elementor\Plugin::$instance;
+
+			if ( isset( $elementor->files_manager ) ) {
+				$elementor->files_manager->clear_cache();
+			}
+		}
 	}
 
 	/**

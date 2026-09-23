@@ -108,11 +108,33 @@ class Ardal_Assets {
 	 * لود نکند.
 	 */
 	public function maybe_enqueue_for_woo() {
-		if ( ! Ardal_Currency::use_symbol() || '1' !== Ardal_Palette::get( 'toman_woo' ) ) {
+		if ( Ardal_Currency::use_symbol() && '1' === Ardal_Palette::get( 'toman_woo' ) ) {
+			$this->enqueue();
+
 			return;
 		}
 
-		$this->enqueue();
+		/*
+		 * صفحه‌های ووکامرس حتی بدون ویجت اردال هم به این فایل‌ها نیاز دارند:
+		 * پیام‌های ووکامرس آنجا چاپ می‌شوند و توست باید جایشان بنشیند. بدون
+		 * این، در سبد و تسویه و پنل کاربری همان نوارهای پیش‌فرض می‌ماندند.
+		 */
+		if ( $this->is_woo_page() ) {
+			$this->enqueue();
+		}
+	}
+
+	/**
+	 * آیا این صفحه از صفحه‌های ووکامرس است.
+	 *
+	 * @return bool
+	 */
+	private function is_woo_page() {
+		if ( ! function_exists( 'is_woocommerce' ) ) {
+			return false;
+		}
+
+		return is_woocommerce() || is_cart() || is_checkout() || is_account_page();
 	}
 
 	public function enqueue() {
