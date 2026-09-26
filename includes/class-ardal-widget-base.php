@@ -1056,6 +1056,24 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		echo '</div>';
 	}
 
+	/**
+	 * پیام حالت ویرایش وقتی ووکامرس نیست.
+	 *
+	 * روی پایهٔ مشترک است نه فقط ویجت‌های آرشیو: هر ویجتی که به داده‌ی محصول
+	 * دست می‌زند همین بررسی را لازم دارد.
+	 *
+	 * @return bool آیا پیام چاپ شد.
+	 */
+	protected function require_woo() {
+		if ( Ardal_Helpers::has_woo() ) {
+			return false;
+		}
+
+		$this->render_empty( 'این ویجت به ووکامرس نیاز دارد.' );
+
+		return true;
+	}
+
 	protected function render_empty( $message ) {
 		if ( ! \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
 			return true;

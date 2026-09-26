@@ -728,11 +728,22 @@ class Ardal_Archive {
 
 		$out = array();
 
-		if ( 'product_cat' === $taxonomy ) {
-			$out[] = (int) get_option( 'default_product_cat' );
+		// دستهٔ پیش‌فرض هر کدام کلید آپشن خودش را دارد.
+		$default_option = array(
+			'product_cat' => 'default_product_cat',
+			'category'    => 'default_category',
+		);
 
+		if ( isset( $default_option[ $taxonomy ] ) ) {
+			$out[] = (int) get_option( $default_option[ $taxonomy ] );
+
+			/*
+			 * اسلاگ را هم جدا نگاه می‌کنیم چون در سایت‌های مهاجرت‌داده‌شده
+			 * «بدون دسته‌بندی» گاهی دیگر دستهٔ پیش‌فرض نیست ولی همچنان
+			 * محصول‌های قدیمی به آن چسبیده‌اند.
+			 */
 			foreach ( array( 'uncategorized', 'دسته-بندی-نشده', 'دسته‌بندی-نشده' ) as $slug ) {
-				$term = get_term_by( 'slug', $slug, 'product_cat' );
+				$term = get_term_by( 'slug', $slug, $taxonomy );
 
 				if ( $term ) {
 					$out[] = (int) $term->term_id;

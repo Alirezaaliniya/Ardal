@@ -1,0 +1,193 @@
+/**
+ * فهرست ناحیه‌های صفحه (ویجت «فهرست ناحیه‌ها»).
+ *
+ * همهٔ رنگ‌ها و اندازه‌ها متغیر CSS‌اند تا کنترل‌های ظاهر المنتور فقط همان
+ * متغیر را روی ریشه بنویسند و لازم نباشد برای هر گزینه انتخابگر تازه ساخت.
+ * چیدمان افقی و عمودی یک مارک‌آپ دارند؛ فقط جهت فهرست عوض می‌شود.
+ */
+
+.ard-toc {
+	--ard-toc-ink: var(--ard-muted, #5b6472);
+	--ard-toc-ink-hover: var(--ard-ink, #1f2937);
+	--ard-toc-active: var(--ard-primary, #0f766e);
+	--ard-toc-active-bg: var(--ard-soft, #f3f4f6);
+	--ard-toc-bg: transparent;
+	--ard-toc-line: var(--ard-line, #e5e7eb);
+	--ard-toc-marker: var(--ard-primary, #0f766e);
+	--ard-toc-title: var(--ard-ink, #1f2937);
+	--ard-toc-radius: 12px;
+	--ard-toc-gap: 4px;
+	--ard-toc-pad-y: 9px;
+	--ard-toc-pad-x: 12px;
+	--ard-toc-marker-w: 3px;
+
+	display: block;
+	inline-size: 100%;
+	color: var(--ard-toc-ink);
+	font-size: 14px;
+	line-height: 1.9;
+	text-align: start;
+}
+
+.ard-toc__title {
+	margin: 0 0 10px;
+	color: var(--ard-toc-title);
+	font-size: 15px;
+	font-weight: 800;
+	line-height: 1.8;
+}
+
+.ard-toc__list {
+	display: flex;
+	gap: var(--ard-toc-gap);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-toc__item {
+	margin: 0;
+	padding: 0;
+}
+
+/* ---------------------------------------- آیتم */
+
+.ard-toc__link {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: var(--ard-toc-pad-y) var(--ard-toc-pad-x);
+	border-radius: var(--ard-toc-radius);
+	background: var(--ard-toc-bg);
+	color: var(--ard-toc-ink);
+	font: inherit;
+	text-decoration: none;
+	transition: color .18s ease, background-color .18s ease;
+}
+
+.ard-toc__link:hover,
+.ard-toc__link:focus-visible {
+	color: var(--ard-toc-ink-hover);
+	text-decoration: none;
+}
+
+.ard-toc__link:focus-visible {
+	outline: 2px solid var(--ard-toc-active);
+	outline-offset: 2px;
+}
+
+.ard-toc__text {
+	display: block;
+	min-inline-size: 0;
+}
+
+/* شمارهٔ ابتدای آیتم (اختیاری). */
+.ard-toc__num {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	inline-size: 22px;
+	block-size: 22px;
+	border: 1px solid var(--ard-toc-line);
+	border-radius: 50%;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+/* ---------------------------------------- حالت فعال */
+
+.ard-toc__link.is-active {
+	background: var(--ard-toc-active-bg);
+	color: var(--ard-toc-active);
+	font-weight: 700;
+}
+
+.ard-toc__link.is-active .ard-toc__num {
+	border-color: currentColor;
+	color: var(--ard-toc-active);
+}
+
+/*
+ * نوار نشانهٔ آیتم فعال. در حالت عمودی کنارِ آغاز خط (راست در فارسی) و در حالت
+ * افقی زیر آیتم می‌نشیند؛ inset-inline به‌جای right/left تا در هر دو جهت درست
+ * بیفتد.
+ */
+.ard-toc__link::before {
+	content: "";
+	position: absolute;
+	border-radius: 999px;
+	background: var(--ard-toc-marker);
+	opacity: 0;
+	transition: opacity .18s ease;
+	pointer-events: none;
+}
+
+.ard-toc__link.is-active::before {
+	opacity: 1;
+}
+
+.ard-toc--v .ard-toc__link::before {
+	inset-inline-start: 0;
+	inset-block: 20%;
+	inline-size: var(--ard-toc-marker-w);
+}
+
+.ard-toc--h .ard-toc__link::before {
+	inset-inline: 12%;
+	inset-block-end: 0;
+	block-size: var(--ard-toc-marker-w);
+}
+
+/* ---------------------------------------- چیدمان عمودی */
+
+.ard-toc--v .ard-toc__list {
+	flex-direction: column;
+	/* فهرست بلند در حالت چسبان از صفحه بیرون نزند. */
+	max-block-size: var(--ard-toc-max, none);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+/* اسکرول‌بار نازک و کم‌رنگ برای فهرست عمودیِ بلند. */
+.ard-toc--v .ard-toc__list::-webkit-scrollbar {
+	inline-size: 4px;
+}
+
+.ard-toc--v .ard-toc__list::-webkit-scrollbar-thumb {
+	border-radius: 999px;
+	background: var(--ard-toc-line);
+}
+
+/* ---------------------------------------- چیدمان افقی */
+
+.ard-toc--h .ard-toc__list {
+	flex-direction: row;
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+}
+
+.ard-toc--h .ard-toc__list::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-toc--h .ard-toc__item {
+	flex: 0 0 auto;
+}
+
+.ard-toc--h .ard-toc__link {
+	white-space: nowrap;
+}
+
+/* کسی که حرکت کمتر می‌خواهد، پرش نرم هم نبیند. */
+@media (prefers-reduced-motion: reduce) {
+	.ard-toc__link,
+	.ard-toc__link::before {
+		transition: none;
+	}
+}

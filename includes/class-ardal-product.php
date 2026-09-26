@@ -607,4 +607,148 @@ class Ardal_Product {
 			'managing' => $managing,
 		);
 	}
+
+	/**
+	 * محصولی که بیشترین تخفیفِ زمان‌دار را دارد.
+	 *
+	 * «زمان‌دار» یعنی برای تخفیفش تاریخ پایان گذاشته شده باشد؛ بدون آن، شمارش
+	 * معکوس عددی برای شمردن ندارد. واریاسیون‌ها هم دیده می‌شوند ولی محصول مادر
+	 * برگردانده می‌شود، چون کارت و لینک به آن می‌خورد.
+	 *
+	 * نتیجه یک ربع کش می‌شود. کوئری مستقیم است چون WP_Query راهی برای «متای
+	 * تاریخ پایان در آینده، روی محصول یا واریاسیونش» ندارد.
+	 *
+	 * @param string $metric   percent = بیشترین درصد، amount = بیشترین مبلغ.
+	 * @param int    $category فقط این دستهٔ محصول؛ صفر یعنی همه.
+	 * @return array|null
+	 */
+	public static function top_sale_deal( $metric = 'percent', $category = 0 ) {
+		if ( ! function_exists( 'wc_get_product' ) ) {
+			return null;
+		}
+
+		$metric   = 'amount' === $metric ? 'amount' : 'percent';
+		$category = absint( $category );
+		$key      = 'ardal_top_deal_' . $metric . '_' . $category;
+		$cached   = get_transient( $key );
+
+		// کش خالی هم معنادار است: یعنی همین اخیراً گشتیم و چیزی نبود.
+		if ( is_array( $cached ) ) {
+			if ( ! $cached ) {
+				return null;
+			}
+
+			if ( ! empty( $cached['ends'] ) && $cached['ends'] > time() ) {
+				return $cached;
+			}
+		}
+
+		global $wpdb;
+
+		$now = time();
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT p.ID, p.post_type, p.post_parent,
+					m_to.meta_value   AS date_to,
+					m_from.meta_value AS date_from,
+					m_reg.meta_value  AS reg_price,
+					m_sale.meta_value AS sale_price
+				FROM {$wpdb->posts} p
+				INNER JOIN {$wpdb->postmeta} m_to
+					ON p.ID = m_to.post_id AND m_to.meta_key = '_sale_price_dates_to'
+				LEFT JOIN {$wpdb->postmeta} m_from
+					ON p.ID = m_from.post_id AND m_from.meta_key = '_sale_price_dates_from'
+				LEFT JOIN {$wpdb->postmeta} m_reg
+					ON p.ID = m_reg.post_id AND m_reg.meta_key = '_regular_price'
+				LEFT JOIN {$wpdb->postmeta} m_sale
+					ON p.ID = m_sale.post_id AND m_sale.meta_key = '_sale_price'
+				WHERE p.post_status = 'publish'
+					AND p.post_type IN ('product', 'product_variation')
+					AND CAST(m_to.meta_value AS UNSIGNED) > %d",
+				$now
+			)
+		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+
+		$best = null;
+
+		foreach ( (array) $rows as $row ) {
+			$from = (int) $row->date_from;
+
+			// تخفیفی که هنوز شروع نشده، تخفیف نیست.
+			if ( $from > 0 && $from > $now ) {
+				continue;
+			}
+
+			$reg  = (float) $row->reg_price;
+			$sale = (float) $row->sale_price;
+
+			if ( $reg <= 0 || $sale <= 0 || $sale >= $reg ) {
+				continue;
+			}
+
+			$owner = ( 'product_variation' === $row->post_type && $row->post_parent > 0 )
+				? (int) $row->post_parent
+				: (int) $row->ID;
+
+			if ( $category > 0 && ! has_term( $category, 'product_cat', $owner ) ) {
+				continue;
+			}
+
+			$product = wc_get_product( $owner );
+
+			if ( ! $product || ! $product->is_visible() ) {
+				continue;
+			}
+
+			// «بدون دسته‌بندی» از بقیهٔ فهرست‌ها حذف شده؛ اینجا هم نباید سر دربیاورد.
+			$skip = class_exists( 'Ardal_Archive' ) ? Ardal_Archive::excluded_terms( 'product_cat' ) : array();
+			$cats = array_map( 'intval', (array) wp_get_post_terms( $owner, 'product_cat', array( 'fields' => 'ids' ) ) );
+
+			if ( $skip && $cats && ! array_diff( $cats, $skip ) ) {
+				continue;
+			}
+
+			$row_data = array(
+				'id'      => $owner,
+				'ends'    => (int) $row->date_to,
+				'price'   => $sale,
+				'regular' => $reg,
+				'diff'    => $reg - $sale,
+				'off'     => (int) round( ( ( $reg - $sale ) / $reg ) * 100 ),
+			);
+
+			if ( null === $best || self::deal_beats( $row_data, $best, $metric ) ) {
+				$best = $row_data;
+			}
+		}
+
+		if ( null === $best ) {
+			set_transient( $key, array(), 10 * MINUTE_IN_SECONDS );
+
+			return null;
+		}
+
+		set_transient( $key, $best, 15 * MINUTE_IN_SECONDS );
+
+		return $best;
+	}
+
+	/**
+	 * آیا پیشنهاد «الف» از «ب» بهتر است؟ در تساوی، آنکه زودتر تمام می‌شود.
+	 *
+	 * @param array  $a
+	 * @param array  $b
+	 * @param string $metric
+	 * @return bool
+	 */
+	private static function deal_beats( $a, $b, $metric ) {
+		$field = 'amount' === $metric ? 'diff' : 'off';
+
+		if ( abs( $a[ $field ] - $b[ $field ] ) < 0.001 ) {
+			return $a['ends'] < $b['ends'];
+		}
+
+		return $a[ $field ] > $b[ $field ];
+	}
 }

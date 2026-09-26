@@ -295,18 +295,4 @@ abstract class Ardal_Archive_Widget_Base extends Ardal_Widget_Base {
 		return $out;
 	}
 
-	/**
-	 * پیام حالت ویرایش وقتی ووکامرس نیست.
-	 *
-	 * @return bool آیا پیام چاپ شد.
-	 */
-	protected function require_woo() {
-		if ( Ardal_Helpers::has_woo() ) {
-			return false;
-		}
-
-		$this->render_empty( 'این ویجت به ووکامرس نیاز دارد.' );
-
-		return true;
-	}
 }

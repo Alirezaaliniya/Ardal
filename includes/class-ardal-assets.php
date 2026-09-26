@@ -93,6 +93,8 @@ class Ardal_Assets {
 		wp_register_script( 'ardal-account', ARDAL_URL . 'assets/js/ardal-account.js', array(), ARDAL_VERSION, true );
 		wp_register_style( 'ardal-shop', ARDAL_URL . 'assets/css/ardal-shop.css', array( 'ardal' ), ARDAL_VERSION );
 		wp_register_script( 'ardal-shop', ARDAL_URL . 'assets/js/ardal-shop.js', array(), ARDAL_VERSION, true );
+		wp_register_style( 'ardal-toc', ARDAL_URL . 'assets/css/ardal-toc.css', array( 'ardal' ), ARDAL_VERSION );
+		wp_register_script( 'ardal-toc', ARDAL_URL . 'assets/js/ardal-toc.js', array(), ARDAL_VERSION, true );
 		wp_register_style( 'ardal-archive', ARDAL_URL . 'assets/css/ardal-archive.css', array( 'ardal' ), ARDAL_VERSION );
 		wp_register_script( 'ardal-archive', ARDAL_URL . 'assets/js/ardal-archive.js', array(), ARDAL_VERSION, true );
 		wp_register_script( 'ardal-gsap', ARDAL_URL . 'assets/vendor/gsap/gsap.min.js', array(), ARDAL_VERSION, true );

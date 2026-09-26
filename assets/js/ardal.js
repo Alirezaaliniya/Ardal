@@ -143,6 +143,15 @@
 	   شمارش معکوس
 	   -------------------------------------------------------- */
 
+	/*
+	 * تنها پیاده‌سازی شمارنده.
+	 *
+	 * یک نسخهٔ دوم با همین نام پایین‌تر در همین فایل بود که چون اعلان تابع
+	 * دیرتر بر اولی سایه می‌انداخت، عملاً همین یکی هیچ‌وقت اجرا نمی‌شد و
+	 * شمارندهٔ «پیشنهاد ویژه»، «جشنواره حراج» و «باکس خرید» هر سه مرده بودند:
+	 * آن نسخه دنبال data-seconds و data-ard-clock-h می‌گشت که هیچ ویجتی
+	 * نمی‌نویسد، پس همان اول return می‌کرد.
+	 */
 	function initCountdown( root ) {
 		var cells = {};
 
@@ -154,12 +163,51 @@
 		var daily = 'daily' === root.getAttribute( 'data-mode' );
 		var remaining = parseInt( root.getAttribute( 'data-remaining' ), 10 );
 
+		// مدت شروع دوبارهٔ دلخواه (ثانیه)؛ نبودش یعنی شمارنده یک‌بار است.
+		var restart = parseInt( root.getAttribute( 'data-restart' ), 10 );
+		var keepKey = root.getAttribute( 'data-keep' ) || '';
+
 		if ( isNaN( remaining ) ) {
 			return;
 		}
 
+		if ( isNaN( restart ) || restart < 1 ) {
+			restart = 0;
+		}
+
 		// زمان پایان را نسبت به لحظه بارگذاری صفحه می‌سنجیم تا کش صفحه شمارنده را خراب نکند.
 		var endsAt = Date.now() + remaining * 1000;
+
+		/*
+		 * مهلت ماندگار.
+		 *
+		 * «مدت ثابت از لحظهٔ بازدید» بدون این، با هر تازه‌کردن صفحه از اول
+		 * شروع می‌شد و کاربر می‌فهمید که مهلتی در کار نیست. مهلت یک‌بار در
+		 * مرورگر خودِ او نوشته می‌شود و تا سررسید همان می‌ماند.
+		 */
+		if ( keepKey ) {
+			try {
+				var saved = parseInt( window.localStorage.getItem( keepKey ), 10 );
+
+				if ( saved > Date.now() ) {
+					endsAt = saved;
+				} else {
+					window.localStorage.setItem( keepKey, String( endsAt ) );
+				}
+			} catch ( e ) {
+				// حالت ناشناس یا ذخیره‌سازی خاموش: همان مهلتِ این بازدید.
+			}
+		}
+
+		function remember() {
+			if ( ! keepKey ) {
+				return;
+			}
+
+			try {
+				window.localStorage.setItem( keepKey, String( endsAt ) );
+			} catch ( e ) {}
+		}
 
 		function paint() {
 			var left = Math.max( 0, Math.round( ( endsAt - Date.now() ) / 1000 ) );
@@ -168,6 +216,10 @@
 				// شمارنده روزانه: دوباره تا نیمه‌شب بعدی.
 				endsAt = Date.now() + 24 * 3600 * 1000;
 				left = 24 * 3600;
+			} else if ( 0 === left && restart ) {
+				endsAt = Date.now() + restart * 1000;
+				left = restart;
+				remember();
 			}
 
 			var days = withDays ? Math.floor( left / 86400 ) : 0;
@@ -187,6 +239,12 @@
 					cells[ unit ].textContent = text;
 				}
 			} );
+
+			// یک‌بار، همان لحظه‌ای که به صفر رسید. بعدش دیگر خبری نیست.
+			if ( 0 === left && ! root.ardEnded ) {
+				root.ardEnded = true;
+				root.dispatchEvent( new CustomEvent( 'ardal:countdown-end', { bubbles: true } ) );
+			}
 		}
 
 		paint();
@@ -196,6 +254,41 @@
 		root.ardStop = function () {
 			window.clearInterval( id );
 		};
+	}
+
+	/**
+	 * رفتار کادر شمارش معکوس وقتی زمان تمام می‌شود.
+	 *
+	 * خودِ شمارنده فقط عدد می‌شمارد و یک رویداد می‌فرستد؛ اینکه بعدش پیام
+	 * بیاید یا کادر برود، تصمیم ویجت است و همین‌جا اجرا می‌شود.
+	 */
+	function initCountdownBox( root ) {
+		var action = root.getAttribute( 'data-expire' ) || 'keep';
+
+		if ( 'keep' === action ) {
+			return;
+		}
+
+		root.addEventListener( 'ardal:countdown-end', function () {
+			if ( 'hide' === action ) {
+				root.hidden = true;
+
+				return;
+			}
+
+			var body = root.querySelector( '.ard-cdown__body' );
+			var msg = root.querySelector( '.ard-cdown__msg' );
+
+			if ( body ) {
+				body.hidden = true;
+			}
+
+			if ( msg ) {
+				msg.hidden = false;
+			}
+
+			root.classList.add( 'ard-cdown--done' );
+		} );
 	}
 
 	/* --------------------------------------------------------
@@ -864,44 +957,6 @@
 	/* --------------------------------------------------------
 	   تایمر شمارش معکوس
 	   -------------------------------------------------------- */
-
-	function initCountdown( root ) {
-		var sec = parseInt( root.getAttribute( 'data-seconds' ), 10 ) || 0;
-		var hEl = root.querySelector( '[data-ard-clock-h]' );
-		var mEl = root.querySelector( '[data-ard-clock-m]' );
-		var sEl = root.querySelector( '[data-ard-clock-s]' );
-
-		if ( sec <= 0 || ( ! hEl && ! mEl && ! sEl ) ) {
-			return;
-		}
-
-		function render() {
-			var h = Math.floor( sec / 3600 );
-			var m = Math.floor( ( sec % 3600 ) / 60 );
-			var s = sec % 60;
-
-			if ( hEl ) {
-				hEl.textContent = toFa( pad( h ) );
-			}
-			if ( mEl ) {
-				mEl.textContent = toFa( pad( m ) );
-			}
-			if ( sEl ) {
-				sEl.textContent = toFa( pad( s ) );
-			}
-		}
-
-		render();
-
-		var timer = window.setInterval( function () {
-			if ( sec > 0 ) {
-				sec--;
-				render();
-			} else {
-				window.clearInterval( timer );
-			}
-		}, 1000 );
-	}
 
 	/* --------------------------------------------------------
 	   علاقه‌مندی و مقایسه
@@ -2318,6 +2373,15 @@
 			if ( ! el.ardReady ) {
 				el.ardReady = true;
 				initCarousel( el );
+			}
+		} );
+
+		// کادر پیش از خودِ شمارنده راه بیفتد، وگرنه شمارندهٔ از قبل تمام‌شده
+		// رویدادش را می‌فرستد و هنوز کسی گوش نمی‌دهد.
+		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-cdown]' ), function ( el ) {
+			if ( ! el.ardReady ) {
+				el.ardReady = true;
+				initCountdownBox( el );
 			}
 		} );
 

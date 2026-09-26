@@ -5401,3 +5401,342 @@ a.ard-breadcrumb__item:hover {
 		transform: none;
 	}
 }
+
+/* ============================================================
+   جدول واریاسیون‌ها
+   ============================================================ */
+
+.ard-vtable {
+	--ard-vt-head: var(--ard-surface);
+	--ard-vt-head-ink: var(--ard-text);
+	--ard-vt-line: var(--ard-border);
+	--ard-vt-zebra: var(--ard-surface-alt);
+	--ard-vt-price: var(--ard-primary-dark);
+	--ard-vt-radius: var(--ard-radius);
+	--ard-vt-pad: 12px;
+}
+
+.ard-vtable__title {
+	margin-block-end: 12px;
+	font-size: 16px;
+	font-weight: 800;
+	color: var(--ard-text);
+}
+
+/* جدول چندستونه در موبایل جا نمی‌شود؛ خودش اسکرول می‌خورد نه کل صفحه. */
+.ard-vtable__scroll {
+	overflow-x: auto;
+	border: 1px solid var(--ard-vt-line);
+	border-radius: var(--ard-vt-radius);
+	-webkit-overflow-scrolling: touch;
+}
+
+.ard-vtable__table {
+	inline-size: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+	text-align: start;
+}
+
+.ard-vtable__table th,
+.ard-vtable__table td {
+	padding: var(--ard-vt-pad);
+	border-block-end: 1px solid var(--ard-vt-line);
+	text-align: start;
+	white-space: nowrap;
+}
+
+.ard-vtable__table th {
+	background: var(--ard-vt-head);
+	color: var(--ard-vt-head-ink);
+	font-weight: 800;
+}
+
+.ard-vtable__table tbody tr:nth-child(2n) {
+	background: var(--ard-vt-zebra);
+}
+
+.ard-vtable__table tbody tr:last-child td {
+	border-block-end: 0;
+}
+
+.ard-vtable__price {
+	color: var(--ard-vt-price);
+	font-weight: 800;
+}
+
+.ard-vtable__old {
+	margin-inline-end: 6px;
+	color: var(--ard-muted);
+	font-size: 11.5px;
+	font-weight: 500;
+}
+
+.ard-vtable__off {
+	display: inline-block;
+	margin-inline-end: 6px;
+	padding: 1px 6px;
+	border-radius: 20px;
+	background: var(--ard-sale);
+	color: var(--ard-base);
+	font-size: 11px;
+	font-weight: 800;
+}
+
+.ard-vtable__tag {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 20px;
+	background: var(--ard-tint-green);
+	color: var(--ard-accent-deep);
+	font-size: 11.5px;
+	font-weight: 700;
+}
+
+.ard-vtable__tag.is-out {
+	background: var(--ard-sale-soft);
+	color: var(--ard-sale);
+}
+
+/* ردیف ناموجود کم‌رنگ می‌شود، ولی خوانا می‌ماند. */
+.ard-vtable__row.is-out td {
+	color: var(--ard-muted);
+}
+
+.ard-vtable__row.is-out .ard-vtable__now {
+	text-decoration: line-through;
+}
+
+.ard-vtable__empty {
+	padding: 14px;
+	border: 1px dashed var(--ard-border);
+	border-radius: var(--ard-radius);
+	color: var(--ard-text-soft);
+	font-size: 13px;
+	text-align: center;
+}
+
+/*
+ * موبایل: جدول به کارت تبدیل می‌شود.
+ *
+ * حتی با اسکرول افقی، جدول پنج‌ستونه روی ۳۹۰ پیکسل خواندنی نیست؛ هر ردیف
+ * یک کارت می‌شود و نام ستون از data-label کنار مقدار می‌نشیند.
+ */
+@media (max-width: 600px) {
+	.ard-vtable__scroll {
+		overflow-x: visible;
+		border: 0;
+	}
+
+	.ard-vtable__table thead {
+		position: absolute;
+		inline-size: 1px;
+		block-size: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+	}
+
+	.ard-vtable__table tbody tr {
+		display: block;
+		margin-block-end: 10px;
+		border: 1px solid var(--ard-vt-line);
+		border-radius: var(--ard-vt-radius);
+		background: var(--ard-base);
+	}
+
+	.ard-vtable__table tbody tr:nth-child(2n) {
+		background: var(--ard-vt-zebra);
+	}
+
+	.ard-vtable__table td {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		white-space: normal;
+	}
+
+	.ard-vtable__table td::before {
+		content: attr(data-label);
+		color: var(--ard-text-soft);
+		font-size: 12px;
+		font-weight: 700;
+	}
+}
+
+/* ==========================================================================
+   برچسب‌های نوشته (ard-ptags)
+   ========================================================================== */
+
+.ard-ptags {
+	/*
+	 * رنگ‌ها متغیرند تا کنترل‌های المنتور فقط یک متغیر را روی ریشه بنویسند و
+	 * حالت هاور هم بدون نوشتن قانون دوم از آن‌ها بیاید.
+	 */
+	--ard-ptag-bg: var(--ard-soft, #f3f4f6);
+	--ard-ptag-ink: var(--ard-ink, #1f2937);
+	--ard-ptag-line: transparent;
+	--ard-ptag-bg-hover: var(--ard-primary, #0f766e);
+	--ard-ptag-ink-hover: #fff;
+	--ard-ptag-radius: 999px;
+}
+
+.ard-ptags__title {
+	margin: 0 0 10px;
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--ard-ink, #1f2937);
+}
+
+.ard-ptags__list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-ptags__item {
+	display: flex;
+}
+
+.ard-ptags__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 12px;
+	border: 1px solid var(--ard-ptag-line);
+	border-radius: var(--ard-ptag-radius);
+	background: var(--ard-ptag-bg);
+	color: var(--ard-ptag-ink);
+	font-size: 12.5px;
+	line-height: 1.6;
+	text-decoration: none;
+	transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+
+a.ard-ptags__chip:hover,
+a.ard-ptags__chip:focus-visible {
+	border-color: var(--ard-ptag-bg-hover);
+	background: var(--ard-ptag-bg-hover);
+	color: var(--ard-ptag-ink-hover);
+}
+
+/* شمارنده در هاور هم باید خوانا بماند، پس رنگش را از خود چیپ می‌گیرد. */
+.ard-ptags__count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: 18px;
+	padding: 0 5px;
+	border-radius: 999px;
+	background: color-mix(in srgb, currentColor 14%, transparent);
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.ard-ptags__empty {
+	margin: 0;
+	font-size: 12.5px;
+	color: var(--ard-muted, #6b7280);
+}
+
+/* ==========================================================================
+   شمارش معکوس مستقل (ard-cdown)
+   ========================================================================== */
+
+.ard-cdown {
+	--ard-cdown-bg: transparent;
+	--ard-cdown-radius: var(--ard-radius-lg, 16px);
+	--ard-cdown-pad: 0px;
+	--ard-cdown-title: var(--ard-ink, #1f2937);
+	--ard-cdown-sub: var(--ard-muted, #6b7280);
+
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: var(--ard-cdown-pad);
+	border-radius: var(--ard-cdown-radius);
+	background: var(--ard-cdown-bg);
+}
+
+.ard-cdown__head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: var(--ard-cdown-title);
+}
+
+.ard-cdown__icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+}
+
+.ard-cdown__title {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 800;
+	line-height: 1.7;
+	color: inherit;
+}
+
+.ard-cdown__sub {
+	margin: 2px 0 0;
+	font-size: 12.5px;
+	line-height: 1.8;
+	color: var(--ard-cdown-sub);
+}
+
+.ard-cdown__body {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.ard-cdown__clock {
+	display: flex;
+}
+
+/*
+ * خانه‌ها به اندازهٔ محتوایشان‌اند، نه کش‌آمده.
+ *
+ * `.ard-clock__cell` پایه `flex: 1` دارد چون در «پیشنهاد ویژه» عرض باکس را
+ * پر می‌کند؛ اینجا شمارنده وسط‌چین است و کشیدنِ خانه‌ها تراز را خراب می‌کند.
+ */
+.ard-cdown .ard-clock__cell {
+	flex: 0 0 auto;
+}
+
+.ard-cdown__sep {
+	align-self: center;
+	font-size: 18px;
+	font-weight: 800;
+	line-height: 1;
+	color: var(--ard-cdown-title);
+	opacity: .5;
+}
+
+/* برچسب که خاموش است، خانه نباید ارتفاع اضافه بگیرد. */
+.ard-cdown .ard-clock__cell:not(:has(.ard-clock__label)) {
+	padding-block: 10px;
+}
+
+.ard-cdown__product {
+	max-inline-size: 260px;
+}
+
+.ard-cdown__msg {
+	margin: 0;
+	padding: 12px 14px;
+	border-radius: var(--ard-radius-sm, 10px);
+	background: var(--ard-soft, #f3f4f6);
+	font-size: 13px;
+	line-height: 1.9;
+	color: var(--ard-muted, #6b7280);
+	text-align: center;
+}
+
+.ard-cdown--done .ard-cdown__clock {
+	display: none;
+}
