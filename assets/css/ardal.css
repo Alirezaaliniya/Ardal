@@ -1699,8 +1699,20 @@ a.ard-service__inner:hover {
 	overflow-wrap: anywhere;
 }
 
+/*
+ * لینک عنوان رنگ و خطش را از کارت می‌گیرد، نه از پوسته.
+ *
+ * قبلاً روی پوسته‌هایی که a را آبیِ زیرخط‌دار می‌کنند، عنوان کارت هم همان شکل
+ * را می‌گرفت. فقط حالت hover تعریف شده بود، یعنی وضعیت عادی دست پوسته بود.
+ */
+.ard-pcard__title a {
+	color: inherit;
+	text-decoration: none;
+}
+
 .ard-pcard__title a:hover {
 	color: var(--ard-primary);
+	text-decoration: none;
 }
 
 /* «کل کارت لینک»: به‌جای پیچیدن کارت در تگ a (که با دکمهٔ داخلش a تودرتو و
@@ -6002,5 +6014,230 @@ a.ard-ptags__chip:focus-visible {
 		flex-direction: row;
 		align-items: center;
 		gap: 8px;
+	}
+}
+
+/* ==========================================================================
+   کارت محصول — سبک «دکمه آشکارشونده» (ard-pcard--reveal)
+   ========================================================================== */
+
+.ard-pcard--reveal {
+	--ard-reveal-btn-bg: var(--ard-sale, #e0356f);
+	--ard-reveal-btn-ink: #fff;
+	--ard-reveal-pad: 12px;
+	/*
+	 * ارتفاع قاب پایین.
+	 *
+	 * دکمه دقیقاً همین‌قدر است تا وقتی بالا می‌آید، سطر قیمت را کامل بپوشاند.
+	 * اگر از روی محتوا حساب می‌شد، کارتِ بی‌تخفیف قابِ کوتاه‌تری داشت و دکمه
+	 * نصفه می‌ماند.
+	 */
+	--ard-reveal-foot: 42px;
+}
+
+.ard-pcard--reveal .ard-pcard__box {
+	gap: 8px;
+	padding: var(--ard-reveal-pad);
+	border: 1px solid var(--ard-border);
+	border-radius: var(--ard-radius-xl, 18px);
+	background: var(--ard-base);
+}
+
+.ard-pcard--reveal.ard-pcard:hover .ard-pcard__box {
+	border-color: color-mix(in srgb, var(--ard-reveal-btn-bg) 30%, var(--ard-border));
+}
+
+.ard-pcard--reveal .ard-pcard__media {
+	block-size: var(--ard-card-img-h, 175px);
+	border-radius: var(--ard-radius-lg, 14px);
+	background: var(--ard-surface-alt);
+	overflow: hidden;
+}
+
+.ard-pcard--reveal .ard-pcard__title {
+	text-align: center;
+}
+
+/* ---------------------------------------- قاب پایین: قیمت و دکمه */
+
+/*
+ * پیش‌فرض، حالتِ بدون هاور است: دکمه همیشه هست و زیر قیمت می‌نشیند.
+ *
+ * این‌طور مرورگری که (hover: hover) را نمی‌فهمد هم دکمهٔ قابل استفاده دارد؛
+ * اگر برعکس می‌نوشتیم، آنجا دکمه برای همیشه پنهان می‌ماند.
+ */
+.ard-pcard--reveal .ard-pcard__foot {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-block-start: auto;
+}
+
+.ard-pcard--reveal .ard-pcard__prices {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 2px 8px;
+	margin-block-start: 0;
+	padding-block-end: 0;
+	/*
+	 * آیتم‌های فلکس پیش‌فرض min-width: auto دارند و زیر عرضِ محتوایشان کوچک
+	 * نمی‌شوند؛ قیمت هم nowrap است. بدون این، «قیمت + قیمت قبل + درصد» یک
+	 * کفِ عرض می‌ساختند که کارت را از ستونش بیرون می‌زد.
+	 */
+	min-inline-size: 0;
+	/*
+	 * در ستون باریک، سطر قیمت می‌شکند به‌جای اینکه قیمتِ قبل نصفه شود.
+	 * قیمتِ بریده («۳٫۱۹۰٫…») از نبودش بدتر است. در حالت هاور این اجازه پس
+	 * گرفته می‌شود، چون آنجا ارتفاع نوار ثابت است.
+	 */
+	flex-wrap: wrap;
+}
+
+/*
+ * ترتیب دیداری: قیمت در آغاز خط، و گروه «قیمت قبل + درصد» در پایان آن.
+ * مارک‌آپ عمداً عوض نشده تا بقیهٔ سبک‌ها دست‌نخورده بمانند.
+ */
+.ard-pcard--reveal .ard-pcard__price { order: 0; }
+.ard-pcard--reveal .ard-pcard__old   { order: 1; margin-inline-start: auto; }
+.ard-pcard--reveal .ard-pcard__off   { order: 2; }
+
+.ard-pcard--reveal .ard-pcard__price {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	gap: 4px;
+	font-size: 14.5px;
+	color: var(--ard-text);
+}
+
+.ard-pcard--reveal .ard-pcard__old {
+	flex: 0 1 auto;
+	min-inline-size: 0;
+	font-size: 11px;
+	text-decoration: line-through;
+	white-space: nowrap;
+}
+
+.ard-pcard__off {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 7px;
+	border-radius: 999px;
+	background: var(--ard-sale, #e0356f);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 800;
+	line-height: 1.6;
+	white-space: nowrap;
+}
+
+/* ---------------------------------------- دکمه */
+
+.ard-pcard--reveal .ard-pcard__btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	padding: 0;
+	block-size: var(--ard-reveal-foot);
+	border: 0;
+	border-radius: var(--ard-radius-lg, 12px);
+	background: var(--ard-reveal-btn-bg);
+	color: var(--ard-reveal-btn-ink);
+	font-size: 13px;
+	font-weight: 800;
+	/* دکمه است، نه پیوندِ متنی؛ خطِ زیرِ پوسته نباید رویش بیفتد. */
+	text-decoration: none;
+}
+
+/*
+ * آیکون سبد از CSS می‌آید، نه از داخل تگ.
+ *
+ * دکمه در محصول ووکامرس همان دکمهٔ استاندارد لوپ است و متنش را افزونه‌های
+ * دیگر می‌خوانند؛ اگر SVG داخلش می‌گذاشتیم، هم esc_html حذفش می‌کرد و هم متن
+ * دکمه برای آن افزونه‌ها به‌هم می‌ریخت. mask رنگ را از currentColor می‌گیرد،
+ * پس با هر رنگی که کاربر انتخاب کند هماهنگ می‌ماند.
+ */
+.ard-pcard--reveal .ard-pcard__btn::before {
+	content: "";
+	inline-size: 17px;
+	block-size: 17px;
+	background: currentColor;
+	-webkit-mask: var(--ard-reveal-icon) center / contain no-repeat;
+	mask: var(--ard-reveal-icon) center / contain no-repeat;
+}
+
+.ard-pcard--reveal {
+	--ard-reveal-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8h12l-1 12H7z'/%3E%3Cpath d='M9 8V6a3 3 0 0 1 6 0v2'/%3E%3C/svg%3E");
+}
+
+.ard-pcard--reveal .ard-pcard__btn:hover {
+	background: color-mix(in srgb, var(--ard-reveal-btn-bg) 88%, #000);
+	color: var(--ard-reveal-btn-ink);
+	text-decoration: none;
+}
+
+/*
+ * آشکارشدن فقط جایی که هاور واقعاً وجود دارد.
+ *
+ * پیش‌فرضِ خودِ قانون این است که دکمه دیده شود؛ روی لمسی همان می‌ماند. با
+ * (hover: hover) به‌جای یک بریک‌پوینت عرضی، تبلتِ لمسیِ عریض هم دکمهٔ همیشگی
+ * می‌گیرد و پنجرهٔ باریکِ دسکتاپ هاورش را از دست نمی‌دهد.
+ */
+@media (hover: hover) and (pointer: fine) {
+	.ard-pcard--reveal .ard-pcard__foot {
+		display: block;
+		block-size: var(--ard-reveal-foot);
+		/*
+		 * دکمه از بیرونِ همین قاب بالا می‌آید؛ بدون بریدن، پیش از هاور زیر
+		 * کارت دیده می‌شد و ارتفاع کارت را هم زیاد می‌کرد.
+		 */
+		overflow: hidden;
+	}
+
+	.ard-pcard--reveal .ard-pcard__prices {
+		flex-wrap: nowrap;
+		block-size: 100%;
+	}
+
+	/* نوار یک‌خطی است، پس اینجا قیمتِ قبل کوتاه می‌شود نه اینکه بشکند. */
+	.ard-pcard--reveal .ard-pcard__old {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.ard-pcard--reveal .ard-pcard__btn {
+		position: absolute;
+		inset-inline: 0;
+		inset-block-end: 0;
+		transform: translateY(105%);
+		transition: transform .28s cubic-bezier(.2, .8, .3, 1);
+	}
+
+	.ard-pcard--reveal:hover .ard-pcard__btn,
+	.ard-pcard--reveal:focus-within .ard-pcard__btn {
+		transform: none;
+	}
+
+	/* قیمت زیر دکمه محو می‌شود تا لبه‌هایش از پشت پیدا نباشد. */
+	.ard-pcard--reveal .ard-pcard__prices {
+		transition: opacity .2s ease;
+	}
+
+	.ard-pcard--reveal:hover .ard-pcard__prices,
+	.ard-pcard--reveal:focus-within .ard-pcard__prices {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-pcard--reveal .ard-pcard__btn,
+	.ard-pcard--reveal .ard-pcard__prices {
+		transition: none;
 	}
 }

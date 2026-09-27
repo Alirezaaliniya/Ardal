@@ -542,6 +542,13 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				 * کنار هم یک‌جور دیده شوند.
 				 */
 				'reserve_rate' => true,
+				/*
+				 * نشانِ درصد کنار قیمتِ قبل بنشیند، نه گوشهٔ تصویر.
+				 *
+				 * سبک «آشکارشونده» جای خالیِ گوشهٔ تصویر را برای خودِ تصویر
+				 * می‌خواهد و درصد را کنار قیمت خط‌خورده نشان می‌دهد.
+				 */
+				'off_inline' => false,
 			)
 		);
 
@@ -648,6 +655,17 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			echo '</div>';
 		}
 
+		/*
+		 * سبک «آشکارشونده»: قیمت و دکمه داخل یک قاب می‌نشینند تا دکمه بتواند
+		 * از پایین روی قیمت بیاید. بقیهٔ سبک‌ها همان ساختار قبلی را دارند،
+		 * وگرنه CSS همه‌شان باید عوض می‌شد.
+		 */
+		$foot = 'reveal' === $opts['variant'];
+
+		if ( $foot ) {
+			echo '<div class="ard-pcard__foot">';
+		}
+
 		echo '<div class="ard-pcard__prices">';
 
 		if ( '' !== $old ) {
@@ -657,6 +675,10 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			// همان ردیف هم‌تراز بماند. اگر در کل فهرست تخفیفی نباشد، صدازننده
 			// reserve_old را خاموش می‌کند و این سطر اصلاً چاپ نمی‌شود.
 			echo '<del class="ard-pcard__old ard-pcard__old--empty" aria-hidden="true">&nbsp;</del>';
+		}
+
+		if ( $opts['off_inline'] && '' !== $off ) {
+			printf( '<span class="ard-pcard__off">%s</span>', esc_html( $off ) );
 		}
 
 		if ( '' !== $price ) {
@@ -671,6 +693,10 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 
 		if ( $opts['show_button'] ) {
 			$this->render_card_action( $item, $opts, 'ard-pcard__btn', esc_html( $opts['button_text'] ), '' );
+		}
+
+		if ( $foot ) {
+			echo '</div>';
 		}
 
 		echo '</div>';

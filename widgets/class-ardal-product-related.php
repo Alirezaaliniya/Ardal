@@ -102,6 +102,7 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 				'options' => array(
 					'framed' => 'کارت حاشیه‌دار با دکمه گرد سبز',
 					'plain'  => 'بدون حاشیه با دکمه «افزودن به سبد»',
+					'reveal' => 'دکمه آشکارشونده با هاور',
 				),
 			)
 		);
@@ -152,7 +153,7 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 				'label'     => 'متن دکمه',
 				'type'      => Controls_Manager::TEXT,
 				'default'   => 'افزودن به سبد',
-				'condition' => array( 'variant' => 'plain' ),
+				'condition' => array( 'variant' => array( 'plain', 'reveal' ) ),
 			)
 		);
 
@@ -202,6 +203,12 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 
 		$framed = 'framed' === $s['variant'];
 
+		/*
+		 * سبک آشکارشونده دکمهٔ متنی دارد (که با هاور بالا می‌آید)، نه دکمهٔ
+		 * گرد؛ و درصد تخفیفش کنار قیمت می‌نشیند نه گوشهٔ تصویر.
+		 */
+		$reveal = 'reveal' === $s['variant'];
+
 		$this->render_heading();
 
 		echo '<div class="ard-pgrid ard-pgrid--' . esc_attr( $s['variant'] ) . '">';
@@ -232,6 +239,7 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 					'show_rating'   => 'yes' === $s['show_rating'],
 					'show_fab'      => $framed,
 					'show_button'   => ! $framed,
+					'off_inline'    => $reveal,
 					'button_text'   => $s['button_text'],
 					'placeholder'   => '۸۰۰×۸۰۰',
 					'title_tag'     => $s['card_title_tag'],

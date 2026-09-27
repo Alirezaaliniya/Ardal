@@ -266,6 +266,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'options'   => array(
 					'framed' => 'کارت حاشیه‌دار با دکمه گرد سبز (دیزاین ۱a)',
 					'plain'  => 'بدون حاشیه با دکمه «افزودن به سبد» (دیزاین ۱b)',
+					'reveal' => 'دکمه آشکارشونده با هاور (دیزاین ۱c)',
 				),
 				'condition' => array( 'card_style' => 'ardal' ),
 			)
@@ -1195,10 +1196,48 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'selectors' => array(
 					'{{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__btn' => 'border-color:{{VALUE}};',
 				),
-				'condition' => array( 'variant' => 'plain' ),
+				'condition' => array( 'variant' => array( 'plain', 'reveal' ) ),
 			)
 		);
 
+
+		$this->add_control(
+			'reveal_btn_bg',
+			array(
+				'label'     => 'زمینه دکمه آشکارشونده',
+				'type'      => Controls_Manager::COLOR,
+				'condition' => array( 'variant' => 'reveal' ),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-bg:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'reveal_btn_ink',
+			array(
+				'label'     => 'رنگ متن دکمه آشکارشونده',
+				'type'      => Controls_Manager::COLOR,
+				'condition' => array( 'variant' => 'reveal' ),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-ink:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_foot_h',
+			array(
+				'label'      => 'ارتفاع نوار قیمت و دکمه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 32, 'max' => 64 ) ),
+				'condition'  => array( 'variant' => 'reveal' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-foot:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
 		$this->add_control(
 			'btn_bg_hover',
 			array(
@@ -1220,7 +1259,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'selectors'  => array(
 					'{{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__btn' => 'border-radius:{{SIZE}}{{UNIT}};',
 				),
-				'condition'  => array( 'variant' => 'plain' ),
+				'condition'  => array( 'variant' => array( 'plain', 'reveal' ) ),
 			)
 		);
 
@@ -1229,7 +1268,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 			array(
 				'name'      => 'btn_typo',
 				'selector'  => '{{WRAPPER}} .ard-pcard__btn, {{WRAPPER}} .ard-acard__btn',
-				'condition' => array( 'variant' => 'plain' ),
+				'condition' => array( 'variant' => array( 'plain', 'reveal' ) ),
 			)
 		);
 
@@ -1275,6 +1314,12 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 
 		$tabs   = $this->collect_tabs( $s, $items );
 		$framed = 'framed' === $s['variant'];
+
+		/*
+		 * سبک آشکارشونده دکمهٔ متنی دارد (که با هاور بالا می‌آید)، نه دکمهٔ
+		 * گرد؛ و درصد تخفیفش کنار قیمت می‌نشیند نه گوشهٔ تصویر.
+		 */
+		$reveal = 'reveal' === $s['variant'];
 
 		$this->render_heading();
 
@@ -1412,6 +1457,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 						'show_rating'   => 'yes' === $s['show_rating'],
 						'show_fab'      => $framed,
 						'show_button'   => ! $framed,
+						'off_inline'    => $reveal,
 						'button_text'   => $s['button_text'],
 						'notch'         => $framed && 'yes' === $s['notch'],
 						'placeholder'   => '۸۰۰×۸۰۰',

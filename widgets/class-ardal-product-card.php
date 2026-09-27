@@ -248,6 +248,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'options' => array(
 					'framed' => 'کارت حاشیه‌دار با دکمه گرد سبز (دیزاین ۱a)',
 					'plain'  => 'بدون حاشیه با دکمه «افزودن به سبد» (دیزاین ۱b)',
+					'reveal' => 'دکمه آشکارشونده با هاور (دیزاین ۱c)',
 				),
 			)
 		);
@@ -255,12 +256,50 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 		$this->add_media_fit_control( '.ard-pcard__media img' );
 
 		$this->add_control(
+			'reveal_btn_bg',
+			array(
+				'label'     => 'زمینه دکمه آشکارشونده',
+				'type'      => Controls_Manager::COLOR,
+				'condition' => array( 'variant' => 'reveal' ),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-bg:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'reveal_btn_ink',
+			array(
+				'label'     => 'رنگ متن دکمه آشکارشونده',
+				'type'      => Controls_Manager::COLOR,
+				'condition' => array( 'variant' => 'reveal' ),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-ink:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_foot_h',
+			array(
+				'label'      => 'ارتفاع نوار قیمت و دکمه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 32, 'max' => 64 ) ),
+				'condition'  => array( 'variant' => 'reveal' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-foot:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
 			'button_text',
 			array(
 				'label'     => 'متن دکمه',
 				'type'      => Controls_Manager::TEXT,
 				'default'   => 'افزودن به سبد',
-				'condition' => array( 'variant' => 'plain' ),
+				'condition' => array( 'variant' => array( 'plain', 'reveal' ) ),
 			)
 		);
 
@@ -365,6 +404,12 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 
 		$framed = 'framed' === $s['variant'];
 
+		/*
+		 * سبک آشکارشونده دکمهٔ متنی دارد (که با هاور بالا می‌آید)، نه دکمهٔ
+		 * گرد؛ و درصد تخفیفش کنار قیمت می‌نشیند نه گوشهٔ تصویر.
+		 */
+		$reveal = 'reveal' === $s['variant'];
+
 		echo '<div class="ard-pcard-solo">';
 
 		$this->render_product_card(
@@ -377,6 +422,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'show_off'      => 'yes' === $s['show_off'],
 				'show_fab'    => $framed,
 				'show_button' => ! $framed,
+				'off_inline'  => $reveal,
 				'button_text' => $s['button_text'],
 				'placeholder' => $s['placeholder'],
 				'notch'       => $framed && 'yes' === $s['notch'],
