@@ -72,7 +72,7 @@ class Ardal_Widget_Header extends Ardal_Widget_Base {
 			array(
 				'label'   => 'شعار زیر نام',
 				'type'    => Controls_Manager::TEXT,
-				'default' => 'فروشگاه تخصصی لوازم ورزشی',
+				'default' => 'فروشگاه تخصصی آنلاین',
 			)
 		);
 

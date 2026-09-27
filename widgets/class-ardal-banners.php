@@ -147,7 +147,7 @@ class Ardal_Widget_Banners extends Ardal_Widget_Base {
 					),
 					array(
 						'title' => 'دوی حرفه‌ای',
-						'text'  => 'کفش، ساعت ورزشی و پوشاک ریکاوری',
+						'text'  => 'کفش، ساعت هوشمند و پوشاک',
 						'tone'  => 'green',
 					),
 				),

@@ -98,11 +98,11 @@ class Ardal_Widget_Bestsellers extends Ardal_Widget_Base {
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
 					array( 'title' => 'بند مقاومتی پاورلوپ', 'price' => '۲۹۰٫۰۰۰' ),
-					array( 'title' => 'طناب ورزشی سرعتی', 'price' => '۲۱۰٫۰۰۰' ),
+					array( 'title' => 'طناب سرعتی', 'price' => '۲۱۰٫۰۰۰' ),
 					array( 'title' => 'کفش فوتسال گراند', 'price' => '۲٫۴۵۰٫۰۰۰' ),
 					array( 'title' => 'دستکش بدنسازی چرم', 'price' => '۴۸۰٫۰۰۰' ),
-					array( 'title' => 'قمقمه ورزشی ۱ لیتری', 'price' => '۱۸۵٫۰۰۰' ),
-					array( 'title' => 'ساک ورزشی دوکاره', 'price' => '۹۵۰٫۰۰۰' ),
+					array( 'title' => 'قمقمه ۱ لیتری', 'price' => '۱۸۵٫۰۰۰' ),
+					array( 'title' => 'ساک دوکاره', 'price' => '۹۵۰٫۰۰۰' ),
 				),
 			)
 		);

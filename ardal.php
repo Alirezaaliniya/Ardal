@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       اردال — ویجت‌های فروشگاه ورزشی
+ * Plugin Name:       اردال — ویجت‌های فروشگاه
  * Plugin URI:        https://caspiansport.local/
- * Description:       مجموعه ویجت‌های المنتور برای ساخت صفحه اصلی فروشگاه ورزشی، به‌همراه صفحه تنظیمات پالت رنگی سراسری.
+ * Description:       مجموعه ویجت‌های المنتور برای ساخت صفحه اصلی فروشگاه، به‌همراه صفحه تنظیمات پالت رنگی سراسری.
  * Version:           1.1.0
  * Author:            alireza aliniya
  * Text Domain:       ardal

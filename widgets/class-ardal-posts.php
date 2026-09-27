@@ -31,7 +31,7 @@ class Ardal_Widget_Posts extends Ardal_Widget_Base {
 	}
 
 	protected function register_controls() {
-		$this->add_heading_controls( 'از وبلاگ ورزشی', 'accent' );
+		$this->add_heading_controls( 'از وبلاگ', 'accent' );
 
 		$this->start_controls_section(
 			'section_content',

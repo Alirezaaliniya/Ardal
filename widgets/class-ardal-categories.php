@@ -108,7 +108,7 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 			array(
 				'label'       => 'نام دسته',
 				'type'        => Controls_Manager::TEXT,
-				'default'     => 'کفش ورزشی',
+				'default'     => 'کفش',
 				'label_block' => true,
 			)
 		);
@@ -149,12 +149,12 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 				'title_field' => '{{{ title }}}',
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
-					array( 'title' => 'کفش ورزشی', 'count' => '۱٫۲۴۰' ),
+					array( 'title' => 'کفش', 'count' => '۱٫۲۴۰' ),
 					array( 'title' => 'پوشاک', 'count' => '۹۸۶' ),
 					array( 'title' => 'بدنسازی', 'count' => '۷۴۲' ),
 					array( 'title' => 'شنا و آب', 'count' => '۴۱۸' ),
 					array( 'title' => 'دوچرخه', 'count' => '۳۶۵' ),
-					array( 'title' => 'ورزش تیمی', 'count' => '۵۲۰' ),
+					array( 'title' => 'تجهیزات تیمی', 'count' => '۵۲۰' ),
 					array( 'title' => 'کوهنوردی', 'count' => '۴۷۳' ),
 					array( 'title' => 'لوازم جانبی', 'count' => '۱٫۱۰۵' ),
 				),

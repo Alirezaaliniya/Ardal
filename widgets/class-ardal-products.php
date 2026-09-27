@@ -187,7 +187,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 						'tab'       => 'شنا',
 					),
 					array(
-						'title'     => 'ساعت ورزشی هوشمند با GPS و پالس‌متر',
+						'title'     => 'ساعت هوشمند با GPS و پالس‌متر',
 						'price'     => '۷٫۲۰۰٫۰۰۰',
 						'old_price' => '۸٫۴۰۰٫۰۰۰',
 						'count'     => 97,
@@ -198,7 +198,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 						'price'     => '۱٫۱۵۰٫۰۰۰',
 						'old_price' => '۱٫۴۵۰٫۰۰۰',
 						'count'     => 312,
-						'tab'       => 'ورزش تیمی',
+						'tab'       => 'تجهیزات تیمی',
 					),
 				),
 			)

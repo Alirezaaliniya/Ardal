@@ -128,7 +128,7 @@ class Ardal_Settings {
 			),
 			array(
 				'id'     => 'ember',
-				'name'   => 'نارنجی ورزشی',
+				'name'   => 'نارنجی پرانرژی',
 				'swatch' => array( '#1F2A44', '#E8590C', '#FFB020', '#D6336C' ),
 				'values' => array(
 					'primary_dark'      => '#1F2A44',
@@ -222,7 +222,7 @@ class Ardal_Settings {
 				<div class="ardal-panel" data-ardal-panel="palette">
 				<p class="ardal-lede">
 					رنگ‌های زیر روی همه ویجت‌های اردال در المنتور اعمال می‌شوند. مقادیر پیش‌فرض دقیقاً همان پالت
-					دیزاین «فروشگاه ورزشی» است؛ با تغییر هر رنگ، پیش‌نمایش کنار صفحه بلافاصله به‌روز می‌شود.
+					دیزاین پایهٔ اردال است؛ با تغییر هر رنگ، پیش‌نمایش کنار صفحه بلافاصله به‌روز می‌شود.
 				</p>
 
 				<div class="ardal-layout">
@@ -363,7 +363,7 @@ class Ardal_Settings {
 
 						<div class="ardal-card">
 							<h2>ویجت‌های در دسترس</h2>
-							<p class="ardal-hint">در ویرایشگر المنتور، دسته «اردال — فروشگاه ورزشی».</p>
+							<p class="ardal-hint">در ویرایشگر المنتور، دسته «اردال — فروشگاه».</p>
 							<ol class="ardal-widget-list">
 								<?php
 								$titles = class_exists( 'Ardal_Elementor' ) ? Ardal_Elementor::widget_titles() : array();

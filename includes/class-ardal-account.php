@@ -98,9 +98,9 @@ class Ardal_Account {
 					),
 				),
 				'_ardal_sports'        => array(
-					'label'       => 'رشته ورزشی مورد علاقه',
+					'label'       => 'علاقه‌مندی‌ها',
 					'type'        => 'text',
-					'placeholder' => 'مثلاً دویدن، فیتنس',
+					'placeholder' => 'مثلاً دویدن، عکاسی، آشپزی',
 					'wide'        => true,
 				),
 			)

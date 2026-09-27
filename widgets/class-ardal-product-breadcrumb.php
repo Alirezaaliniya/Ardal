@@ -116,7 +116,7 @@ class Ardal_Widget_Product_Breadcrumb extends Ardal_Widget_Base {
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
 					array( 'text' => 'صفحه اصلی' ),
-					array( 'text' => 'کفش ورزشی' ),
+					array( 'text' => 'کفش' ),
 					array( 'text' => 'کفش دویدن پرو-فیت مدل Aero X2', 'is_current' => 'yes' ),
 				),
 			)

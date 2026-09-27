@@ -137,7 +137,7 @@ class Ardal_Widget_Hero extends Ardal_Widget_Base {
 					),
 					array(
 						'tag'      => 'فصل شنا',
-						'title'    => 'لوازم شنا و ورزش‌های آبی',
+						'title'    => 'لوازم شنا و تفریحات آبی',
 						'subtitle' => 'عینک، کلاه، مایو و تجهیزات نجات غریق با تخفیف ویژه شروع فصل.',
 					),
 				),

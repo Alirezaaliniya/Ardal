@@ -150,7 +150,7 @@ class Ardal_Elementor {
 		$manager->add_category(
 			self::CATEGORY,
 			array(
-				'title' => 'اردال — فروشگاه ورزشی',
+				'title' => 'اردال — فروشگاه',
 				'icon'  => 'eicon-woocommerce',
 			)
 		);

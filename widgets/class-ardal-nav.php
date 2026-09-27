@@ -110,12 +110,12 @@ class Ardal_Widget_Nav extends Ardal_Widget_Base {
 				'title_field' => '{{{ text }}}',
 				'default'     => array(
 					array( 'text' => 'صفحه اصلی', 'state' => 'current' ),
-					array( 'text' => 'کفش ورزشی' ),
+					array( 'text' => 'کفش' ),
 					array( 'text' => 'پوشاک' ),
 					array( 'text' => 'بدنسازی' ),
 					array( 'text' => 'شنا و آب' ),
 					array( 'text' => 'دوچرخه' ),
-					array( 'text' => 'ورزش‌های تیمی' ),
+					array( 'text' => 'تجهیزات تیمی' ),
 					array( 'text' => 'حراج ویژه', 'state' => 'sale' ),
 				),
 			)
