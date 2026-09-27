@@ -38,6 +38,7 @@ final class Ardal {
 		Ardal_Account::init();
 		Ardal_Shop::init();
 		Ardal_Archive::init();
+		Ardal_Search::init();
 
 		add_action( 'plugins_loaded', array( $this, 'boot_elementor' ) );
 		add_action( 'init', array( $this, 'maybe_flush_elementor_css' ), 20 );

@@ -3,7 +3,7 @@
  * Plugin Name:       اردال — ویجت‌های فروشگاه ورزشی
  * Plugin URI:        https://caspiansport.local/
  * Description:       مجموعه ویجت‌های المنتور برای ساخت صفحه اصلی فروشگاه ورزشی، به‌همراه صفحه تنظیمات پالت رنگی سراسری.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            alireza aliniya
  * Text Domain:       ardal
  * Domain Path:       /languages
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ARDAL_VERSION', '1.0.0' );
+define( 'ARDAL_VERSION', '1.1.0' );
 define( 'ARDAL_FILE', __FILE__ );
 define( 'ARDAL_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ARDAL_URL', plugin_dir_url( __FILE__ ) );
@@ -37,6 +37,7 @@ require_once ARDAL_PATH . 'includes/class-ardal-account.php';
 require_once ARDAL_PATH . 'includes/class-ardal-account-ajax.php';
 require_once ARDAL_PATH . 'includes/class-ardal-shop.php';
 require_once ARDAL_PATH . 'includes/class-ardal-archive.php';
+require_once ARDAL_PATH . 'includes/class-ardal-search.php';
 require_once ARDAL_PATH . 'includes/class-ardal-assets.php';
 require_once ARDAL_PATH . 'includes/class-ardal.php';
 

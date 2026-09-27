@@ -257,6 +257,56 @@
 	}
 
 	/**
+	 * فیلتر موجودی ماتریس واریاسیون‌ها.
+	 *
+	 * فیلترِ ردیفی است نه خانه‌ای: «فقط موجود» ردیف‌هایی را می‌گذارد که دست‌کم
+	 * یک ترکیب موجود دارند. خانه‌ها سر جایشان می‌مانند، وگرنه ستون‌ها به هم
+	 * می‌ریختند و ماتریس دیگر ماتریس نبود.
+	 */
+	function initMatrix( root ) {
+		var buttons = Array.prototype.slice.call( root.querySelectorAll( '[data-ard-matrix-filter]' ) );
+		var rows = Array.prototype.slice.call( root.querySelectorAll( '.ard-mtx__row' ) );
+		var none = root.querySelector( '[data-ard-matrix-empty]' );
+
+		if ( ! buttons.length || ! rows.length ) {
+			return;
+		}
+
+		function apply( mode ) {
+			var shown = 0;
+
+			rows.forEach( function ( row ) {
+				var keep = 'all' === mode
+					|| ( 'in' === mode && '1' === row.getAttribute( 'data-has-in' ) )
+					|| ( 'out' === mode && '1' === row.getAttribute( 'data-has-out' ) );
+
+				row.hidden = ! keep;
+
+				if ( keep ) {
+					shown++;
+				}
+			} );
+
+			if ( none ) {
+				none.hidden = shown > 0;
+			}
+		}
+
+		buttons.forEach( function ( button ) {
+			button.addEventListener( 'click', function () {
+				buttons.forEach( function ( other ) {
+					var on = other === button;
+
+					other.classList.toggle( 'is-active', on );
+					other.setAttribute( 'aria-pressed', on ? 'true' : 'false' );
+				} );
+
+				apply( button.getAttribute( 'data-ard-matrix-filter' ) || 'all' );
+			} );
+		} );
+	}
+
+	/**
 	 * رفتار کادر شمارش معکوس وقتی زمان تمام می‌شود.
 	 *
 	 * خودِ شمارنده فقط عدد می‌شمارد و یک رویداد می‌فرستد؛ اینکه بعدش پیام
@@ -2373,6 +2423,13 @@
 			if ( ! el.ardReady ) {
 				el.ardReady = true;
 				initCarousel( el );
+			}
+		} );
+
+		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-matrix]' ), function ( el ) {
+			if ( ! el.ardReady ) {
+				el.ardReady = true;
+				initMatrix( el );
 			}
 		} );
 

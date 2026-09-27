@@ -5740,3 +5740,267 @@ a.ard-ptags__chip:focus-visible {
 .ard-cdown--done .ard-cdown__clock {
 	display: none;
 }
+
+/* ==========================================================================
+   ماتریس واریاسیون‌ها (ard-mtx)
+   ========================================================================== */
+
+.ard-mtx {
+	--ard-mtx-head-bg: var(--ard-soft, #f3f4f6);
+	--ard-mtx-head-ink: var(--ard-ink, #1f2937);
+	--ard-mtx-line: var(--ard-border, #e5e7eb);
+	--ard-mtx-in: #16a34a;
+	--ard-mtx-out: #dc2626;
+	--ard-mtx-none: #9ca3af;
+	--ard-mtx-price: var(--ard-ink, #1f2937);
+	--ard-mtx-radius: var(--ard-radius-lg, 14px);
+	--ard-mtx-pad: 10px;
+
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.ard-mtx__title {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 800;
+	color: var(--ard-ink, #1f2937);
+}
+
+.ard-mtx__bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.ard-mtx__legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	font-size: 12px;
+	color: var(--ard-muted, #6b7280);
+}
+
+.ard-mtx__legend-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.ard-mtx__legend-item.is-in    { color: var(--ard-mtx-in); }
+.ard-mtx__legend-item.is-out   { color: var(--ard-mtx-out); }
+.ard-mtx__legend-item.is-none  { color: var(--ard-mtx-none); }
+
+.ard-mtx__filters {
+	display: inline-flex;
+	gap: 4px;
+	padding: 3px;
+	border-radius: 999px;
+	background: var(--ard-soft, #f3f4f6);
+}
+
+.ard-mtx__filter {
+	padding: 5px 12px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--ard-muted, #6b7280);
+	font: inherit;
+	font-size: 12px;
+	cursor: pointer;
+	transition: background-color .18s ease, color .18s ease;
+}
+
+.ard-mtx__filter.is-active {
+	background: var(--ard-base, #fff);
+	color: var(--ard-ink, #1f2937);
+	font-weight: 700;
+}
+
+/* جدول روی موبایل باریک‌تر از ستون‌هایش می‌شود؛ اسکرول افقی جای شکستنش. */
+.ard-mtx__scroll {
+	overflow-x: auto;
+	border: 1px solid var(--ard-mtx-line);
+	border-radius: var(--ard-mtx-radius);
+}
+
+.ard-mtx__table {
+	inline-size: 100%;
+	border-collapse: collapse;
+	font-size: 12.5px;
+	text-align: center;
+}
+
+.ard-mtx__table th,
+.ard-mtx__table td {
+	padding: var(--ard-mtx-pad);
+	border-inline-start: 1px solid var(--ard-mtx-line);
+	border-block-start: 1px solid var(--ard-mtx-line);
+}
+
+.ard-mtx__table thead th,
+.ard-mtx__table tr > *:first-child {
+	border-block-start: 0;
+}
+
+.ard-mtx__table tr > *:last-child {
+	border-inline-start: 0;
+}
+
+.ard-mtx__table thead th {
+	background: var(--ard-mtx-head-bg);
+	color: var(--ard-mtx-head-ink);
+	font-weight: 800;
+	white-space: nowrap;
+}
+
+.ard-mtx__row-head,
+.ard-mtx__name {
+	text-align: start;
+	white-space: nowrap;
+}
+
+.ard-mtx__name {
+	background: color-mix(in srgb, var(--ard-mtx-head-bg) 45%, transparent);
+	font-weight: 700;
+	color: var(--ard-ink, #1f2937);
+}
+
+.ard-mtx__box {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+}
+
+.ard-mtx__icon {
+	flex: 0 0 auto;
+}
+
+.ard-mtx__cell.is-in    { color: var(--ard-mtx-in); }
+.ard-mtx__cell.is-out   { color: var(--ard-mtx-out); }
+.ard-mtx__cell.is-none  { color: var(--ard-mtx-none); }
+
+.ard-mtx__cell.is-none .ard-mtx__box {
+	opacity: .65;
+}
+
+.ard-mtx__text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	line-height: 1.6;
+}
+
+.ard-mtx__state {
+	font-size: 11px;
+}
+
+.ard-mtx__price {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--ard-mtx-price);
+	white-space: nowrap;
+}
+
+.ard-mtx__price .ard-toman {
+	inline-size: 1em;
+	block-size: 1em;
+}
+
+.ard-mtx__none,
+.ard-mtx__empty {
+	margin: 0;
+	padding: 16px;
+	font-size: 12.5px;
+	color: var(--ard-muted, #6b7280);
+	text-align: center;
+}
+
+.ard-mtx__note {
+	margin: 0;
+	font-size: 12px;
+	line-height: 1.9;
+	color: var(--ard-muted, #6b7280);
+}
+
+/* ردیفی که فیلتر کنارش گذاشته. */
+.ard-mtx__row[hidden] {
+	display: none;
+}
+
+/*
+ * موبایل: هر ردیف یک کارت.
+ *
+ * ستون‌های یک ماتریس روی صفحهٔ باریک جا نمی‌شوند و اسکرول افقی هم خواندن
+ * «کدام سایزِ این رنگ» را سخت می‌کند؛ پس هر خانه برچسب ستون خودش را از
+ * data-label می‌گیرد و زیر هم می‌نشیند.
+ */
+@media (max-width: 600px) {
+	.ard-mtx__scroll {
+		overflow-x: visible;
+		border: 0;
+	}
+
+	.ard-mtx__table,
+	.ard-mtx__table tbody,
+	.ard-mtx__row,
+	.ard-mtx__table td,
+	.ard-mtx__table th {
+		display: block;
+		inline-size: auto;
+	}
+
+	.ard-mtx__table thead {
+		display: none;
+	}
+
+	.ard-mtx__row {
+		margin-block-end: 10px;
+		border: 1px solid var(--ard-mtx-line);
+		border-radius: var(--ard-mtx-radius);
+		overflow: hidden;
+	}
+
+	.ard-mtx__table td,
+	.ard-mtx__table th {
+		border-inline-start: 0;
+	}
+
+	.ard-mtx__name {
+		border-block-start: 0;
+		font-size: 13px;
+	}
+
+	.ard-mtx__cell {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		text-align: start;
+	}
+
+	.ard-mtx__cell::before {
+		content: attr(data-label);
+		font-weight: 700;
+		color: var(--ard-ink, #1f2937);
+	}
+
+	.ard-mtx__box {
+		flex-direction: row;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.ard-mtx__text {
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
+	}
+}

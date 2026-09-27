@@ -1,0 +1,574 @@
+/**
+ * دکمهٔ شناور پشتیبانی.
+ *
+ * موقعیت با inset-inline نوشته شده تا «شروع» در فارسی راست و در انگلیسی چپ
+ * بیفتد؛ همه‌ی اندازه‌ها و رنگ‌ها هم متغیرند تا کنترل‌های المنتور فقط همان
+ * متغیر را روی ریشه بنویسند.
+ */
+
+.ard-sp {
+	--ard-sp-z: 9998;
+	--ard-sp-side: 20px;
+	--ard-sp-edge: 20px;
+	--ard-sp-btn: 58px;
+	--ard-sp-btn-bg: var(--ard-primary, #0f766e);
+	--ard-sp-btn-ink: #fff;
+	--ard-sp-panel-w: 310px;
+	--ard-sp-panel-bg: var(--ard-base, #fff);
+	--ard-sp-head-bg: var(--ard-primary, #0f766e);
+	--ard-sp-head-ink: #fff;
+	--ard-sp-item-ink: var(--ard-ink, #1f2937);
+	--ard-sp-radius: 18px;
+
+	position: fixed;
+	z-index: var(--ard-sp-z);
+	display: flex;
+	align-items: flex-end;
+	gap: 10px;
+	/* خودِ ریشه فقط یک لنگر است؛ کلیک باید از رویش رد شود. */
+	pointer-events: none;
+}
+
+.ard-sp > * {
+	pointer-events: auto;
+}
+
+/* ---------------------------------------- گوشه‌ها */
+
+.ard-sp--bottom-start {
+	inset-block-end: var(--ard-sp-edge);
+	inset-inline-start: var(--ard-sp-side);
+}
+
+.ard-sp--bottom-end {
+	inset-block-end: var(--ard-sp-edge);
+	inset-inline-end: var(--ard-sp-side);
+}
+
+.ard-sp--top-start {
+	inset-block-start: var(--ard-sp-edge);
+	inset-inline-start: var(--ard-sp-side);
+	align-items: flex-start;
+}
+
+.ard-sp--top-end {
+	inset-block-start: var(--ard-sp-edge);
+	inset-inline-end: var(--ard-sp-side);
+	align-items: flex-start;
+}
+
+/* ---------------------------------------- دکمه */
+
+.ard-sp__launcher {
+	position: relative;
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--ard-sp-btn);
+	block-size: var(--ard-sp-btn);
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--ard-sp-btn-bg);
+	color: var(--ard-sp-btn-ink);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+	cursor: pointer;
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.ard-sp__launcher:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 28px rgba(0, 0, 0, .22);
+}
+
+.ard-sp__launcher:focus-visible {
+	outline: 3px solid var(--ard-sp-btn-bg);
+	outline-offset: 3px;
+}
+
+.ard-sp__icon {
+	position: absolute;
+	display: inline-flex;
+	transition: transform .25s ease, opacity .25s ease;
+}
+
+.ard-sp__icon .ard-sp-svg {
+	inline-size: calc(var(--ard-sp-btn) * .44);
+	block-size: calc(var(--ard-sp-btn) * .44);
+}
+
+.ard-sp__icon--close {
+	transform: rotate(-90deg) scale(.4);
+	opacity: 0;
+}
+
+.ard-sp.is-open .ard-sp__icon--open {
+	transform: rotate(90deg) scale(.4);
+	opacity: 0;
+}
+
+.ard-sp.is-open .ard-sp__icon--close {
+	transform: none;
+	opacity: 1;
+}
+
+/* حلقهٔ تپنده — فقط وقتی پنل بسته است، وگرنه حواس‌پرت‌کن می‌شود. */
+.ard-sp__ring {
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	background: var(--ard-sp-btn-bg);
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ard-sp--pulse:not(.is-open) .ard-sp__ring {
+	animation: ard-sp-pulse 2.4s ease-out infinite;
+}
+
+@keyframes ard-sp-pulse {
+	0%   { transform: scale(1);   opacity: .45; }
+	70%  { transform: scale(1.7); opacity: 0; }
+	100% { transform: scale(1.7); opacity: 0; }
+}
+
+.ard-sp__badge {
+	position: absolute;
+	inset-block-start: -2px;
+	inset-inline-end: -2px;
+	min-inline-size: 20px;
+	padding: 0 5px;
+	border-radius: 999px;
+	background: var(--ard-danger, #dc2626);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 20px;
+}
+
+/* ---------------------------------------- برچسب کنار دکمه */
+
+/*
+ * برچسب همیشه سمتِ داخلِ صفحه می‌نشیند و دکمه به گوشه می‌چسبد.
+ *
+ * ترتیبِ خودِ HTML (اول دکمه، بعد برچسب) برای گوشه‌های «شروع» درست است؛ در
+ * گوشه‌های «پایان» باید جا عوض شود وگرنه برچسب به لبه می‌چسبد و دکمه تو
+ * می‌افتد.
+ */
+.ard-sp__tip {
+	padding: 7px 12px;
+	border-radius: 999px;
+	background: var(--ard-ink, #1f2937);
+	color: #fff;
+	font-size: 12.5px;
+	white-space: nowrap;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .16);
+	transition: opacity .2s ease, transform .2s ease;
+}
+
+.ard-sp--bottom-end .ard-sp__tip,
+.ard-sp--top-end .ard-sp__tip {
+	order: -1;
+}
+
+.ard-sp--label-hover .ard-sp__tip {
+	opacity: 0;
+	transform: translateX(8px);
+	pointer-events: none;
+}
+
+.ard-sp--bottom-end.ard-sp--label-hover .ard-sp__tip,
+.ard-sp--top-end.ard-sp--label-hover .ard-sp__tip {
+	transform: translateX(-8px);
+}
+
+.ard-sp--label-hover:hover .ard-sp__tip,
+.ard-sp--label-hover:focus-within .ard-sp__tip {
+	opacity: 1;
+	transform: none;
+}
+
+.ard-sp.is-open .ard-sp__tip {
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* ---------------------------------------- پنل */
+
+.ard-sp__panel {
+	position: absolute;
+	inset-inline-start: 0;
+	inline-size: var(--ard-sp-panel-w);
+	max-inline-size: calc(100vw - 32px);
+	border-radius: var(--ard-sp-radius);
+	background: var(--ard-sp-panel-bg);
+	box-shadow: 0 18px 50px rgba(0, 0, 0, .22);
+	overflow: hidden;
+	opacity: 0;
+	visibility: hidden;
+	transform-origin: bottom center;
+	transition: opacity .26s ease, transform .3s cubic-bezier(.2, .8, .3, 1), visibility .26s;
+}
+
+.ard-sp--bottom-start .ard-sp__panel,
+.ard-sp--bottom-end .ard-sp__panel {
+	inset-block-end: calc(var(--ard-sp-btn) + 14px);
+}
+
+.ard-sp--top-start .ard-sp__panel,
+.ard-sp--top-end .ard-sp__panel {
+	inset-block-start: calc(var(--ard-sp-btn) + 14px);
+	transform-origin: top center;
+}
+
+.ard-sp--bottom-end .ard-sp__panel,
+.ard-sp--top-end .ard-sp__panel {
+	inset-inline-start: auto;
+	inset-inline-end: 0;
+}
+
+.ard-sp.is-open .ard-sp__panel {
+	opacity: 1;
+	visibility: visible;
+	transform: none;
+}
+
+/* حالت‌های ورود */
+.ard-sp--anim-flip .ard-sp__panel { transform: perspective(900px) rotateX(-18deg) translateY(12px); }
+.ard-sp--anim-pop  .ard-sp__panel { transform: scale(.88) translateY(10px); }
+.ard-sp--anim-tilt .ard-sp__panel { transform: perspective(900px) rotateY(14deg) translateY(10px); }
+.ard-sp--anim-none .ard-sp__panel { transition: opacity .15s ease, visibility .15s; }
+
+/* ---------------------------------------- سربرگ پنل */
+
+.ard-sp__head {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 14px 16px;
+	background: var(--ard-sp-head-bg);
+	color: var(--ard-sp-head-ink);
+}
+
+.ard-sp__head-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	inline-size: 38px;
+	block-size: 38px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .16);
+}
+
+.ard-sp__head-icon .ard-sp-svg {
+	inline-size: 20px;
+	block-size: 20px;
+}
+
+.ard-sp__head-text {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 2px;
+	min-inline-size: 0;
+}
+
+.ard-sp__title {
+	font-size: 14px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ard-sp__subtitle {
+	font-size: 11.5px;
+	line-height: 1.7;
+	opacity: .85;
+}
+
+.ard-sp__status {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	margin-block-start: 3px;
+	font-size: 11px;
+	opacity: .9;
+}
+
+.ard-sp__status i {
+	inline-size: 7px;
+	block-size: 7px;
+	border-radius: 50%;
+	background: #4ade80;
+	box-shadow: 0 0 0 0 rgba(74, 222, 128, .6);
+	animation: ard-sp-dot 2s ease-out infinite;
+}
+
+@keyframes ard-sp-dot {
+	0%   { box-shadow: 0 0 0 0 rgba(74, 222, 128, .6); }
+	70%  { box-shadow: 0 0 0 7px rgba(74, 222, 128, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+.ard-sp__close {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	inline-size: 28px;
+	block-size: 28px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .14);
+	color: inherit;
+	cursor: pointer;
+	transition: background-color .18s ease;
+}
+
+.ard-sp__close:hover {
+	background: rgba(255, 255, 255, .28);
+}
+
+.ard-sp__close .ard-sp-svg {
+	inline-size: 15px;
+	block-size: 15px;
+}
+
+/* ---------------------------------------- آیتم‌ها */
+
+.ard-sp__items {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	padding: 8px;
+	list-style: none;
+	max-block-size: min(58vh, 420px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+/*
+ * ردیف‌ها یکی‌یکی می‌آیند. تأخیر از --ard-sp-i می‌آید که سرور روی هر ردیف
+ * نوشته، پس بدون جاوااسکریپت هم کار می‌کند.
+ */
+.ard-sp__item-wrap {
+	opacity: 0;
+	transform: translateY(8px);
+	transition: opacity .3s ease, transform .3s ease;
+	transition-delay: calc(var(--ard-sp-i, 0) * 60ms + 80ms);
+}
+
+.ard-sp.is-open .ard-sp__item-wrap {
+	opacity: 1;
+	transform: none;
+}
+
+.ard-sp__item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 9px 10px;
+	border-radius: 12px;
+	color: var(--ard-sp-item-ink);
+	text-decoration: none;
+	transition: background-color .18s ease;
+}
+
+a.ard-sp__item:hover,
+a.ard-sp__item:focus-visible {
+	background: color-mix(in srgb, var(--ard-sp-item, #0f766e) 10%, transparent);
+	text-decoration: none;
+}
+
+.ard-sp__item--static {
+	cursor: default;
+	opacity: .75;
+}
+
+.ard-sp__item-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	inline-size: 38px;
+	block-size: 38px;
+	border-radius: 12px;
+	background: color-mix(in srgb, var(--ard-sp-item, #0f766e) 14%, transparent);
+	color: var(--ard-sp-item, #0f766e);
+}
+
+.ard-sp__item-icon .ard-sp-svg {
+	inline-size: 20px;
+	block-size: 20px;
+}
+
+.ard-sp__item-text {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 1px;
+	min-inline-size: 0;
+}
+
+.ard-sp__item-title {
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.7;
+}
+
+.ard-sp__item-sub {
+	font-size: 11px;
+	line-height: 1.7;
+	color: var(--ard-muted, #6b7280);
+	/* زیرعنوان بلند نباید ردیف را دو خطی کند. */
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ard-sp__item-badge {
+	flex: 0 0 auto;
+	padding: 2px 7px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--ard-sp-item, #0f766e) 16%, transparent);
+	color: var(--ard-sp-item, #0f766e);
+	font-size: 10.5px;
+	font-weight: 700;
+}
+
+.ard-sp__item-arrow {
+	display: inline-flex;
+	flex: 0 0 auto;
+	color: var(--ard-muted, #9ca3af);
+	transition: transform .18s ease;
+}
+
+.ard-sp__item-arrow .ard-sp-svg {
+	inline-size: 16px;
+	block-size: 16px;
+}
+
+/* فلش به سمت پایانِ خط اشاره می‌کند، در هر جهتی. */
+[dir="ltr"] .ard-sp__item-arrow {
+	transform: scaleX(-1);
+}
+
+a.ard-sp__item:hover .ard-sp__item-arrow {
+	transform: translateX(-3px);
+}
+
+[dir="ltr"] a.ard-sp__item:hover .ard-sp__item-arrow {
+	transform: scaleX(-1) translateX(-3px);
+}
+
+.ard-sp__foot {
+	padding: 10px 14px;
+	border-block-start: 1px solid var(--ard-border-soft, #eef0f2);
+	font-size: 11.5px;
+	line-height: 1.9;
+	color: var(--ard-muted, #6b7280);
+}
+
+/* ---------------------------------------- پرده */
+
+.ard-sp__backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, .45);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity .25s ease, visibility .25s;
+	pointer-events: none;
+}
+
+.ard-sp--backdrop.is-open .ard-sp__backdrop {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+/* روی دسکتاپ پنل کوچک است و پرده لازم نیست. */
+@media (min-width: 601px) {
+	.ard-sp__backdrop {
+		display: none;
+	}
+}
+
+/* ---------------------------------------- کادر ویرایشگر */
+
+.ard-sp-notice {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	padding: 14px;
+	border: 1px dashed var(--ard-border, #e5e7eb);
+	border-radius: 14px;
+	background: var(--ard-soft, #f8f9fa);
+	font-size: 12.5px;
+	line-height: 1.9;
+	color: var(--ard-muted, #6b7280);
+}
+
+.ard-sp-notice--warn {
+	border-color: #f0932b;
+	background: #fff7ed;
+	color: #9a5b12;
+}
+
+.ard-sp-notice strong {
+	display: block;
+	margin-block-end: 2px;
+	color: var(--ard-ink, #1f2937);
+}
+
+.ard-sp-notice--warn strong {
+	color: #9a5b12;
+}
+
+.ard-sp-notice p {
+	margin: 0;
+}
+
+.ard-sp-notice__icon .ard-sp-svg {
+	inline-size: 20px;
+	block-size: 20px;
+}
+
+/* ---------------------------------------- موبایل */
+
+@media (max-width: 600px) {
+	.ard-sp__panel {
+		position: fixed;
+		inset-inline: 12px;
+		inset-block-end: calc(var(--ard-sp-edge) + var(--ard-sp-btn) + 14px);
+		inline-size: auto;
+		max-inline-size: none;
+	}
+
+	.ard-sp--top-start .ard-sp__panel,
+	.ard-sp--top-end .ard-sp__panel {
+		inset-block-end: auto;
+		inset-block-start: calc(var(--ard-sp-edge) + var(--ard-sp-btn) + 14px);
+	}
+
+	.ard-sp-locked {
+		overflow: hidden;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-sp__panel,
+	.ard-sp__item-wrap,
+	.ard-sp__icon,
+	.ard-sp__tip,
+	.ard-sp__launcher {
+		transition-duration: .01ms;
+	}
+
+	.ard-sp__ring,
+	.ard-sp__status i {
+		animation: none;
+	}
+}
