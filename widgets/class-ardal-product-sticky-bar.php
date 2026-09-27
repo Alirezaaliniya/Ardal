@@ -58,7 +58,7 @@ class Ardal_Widget_Product_Sticky_Bar extends Ardal_Widget_Base {
 			array(
 				'label'       => 'نام محصول',
 				'type'        => Controls_Manager::TEXT,
-				'default'     => 'کفش دویدن پرو-فیت مدل Aero X2 مردانه',
+				'default'     => 'کفش راحتی پرو-فیت مدل Aero X2 مردانه',
 				'label_block' => true,
 				'condition'   => array( 'source' => 'manual' ),
 			)

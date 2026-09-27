@@ -65,7 +65,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'label'       => 'نام محصول',
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 2,
-				'default'     => 'کفش دویدن ران‌فلکس مدل ایر پرو ۲۰۲۵',
+				'default'     => 'کفش راحتی ران‌فلکس مدل ایر پرو ۲۰۲۵',
 				'label_block' => true,
 				'condition'   => array( 'source' => 'manual' ),
 			)

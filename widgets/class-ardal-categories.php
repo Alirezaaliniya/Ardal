@@ -151,11 +151,11 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 				'default'     => array(
 					array( 'title' => 'کفش', 'count' => '۱٫۲۴۰' ),
 					array( 'title' => 'پوشاک', 'count' => '۹۸۶' ),
-					array( 'title' => 'بدنسازی', 'count' => '۷۴۲' ),
-					array( 'title' => 'شنا و آب', 'count' => '۴۱۸' ),
-					array( 'title' => 'دوچرخه', 'count' => '۳۶۵' ),
-					array( 'title' => 'تجهیزات تیمی', 'count' => '۵۲۰' ),
-					array( 'title' => 'کوهنوردی', 'count' => '۴۷۳' ),
+					array( 'title' => 'دیجیتال', 'count' => '۷۴۲' ),
+					array( 'title' => 'خانه و آشپزخانه', 'count' => '۴۱۸' ),
+					array( 'title' => 'زیبایی و سلامت', 'count' => '۳۶۵' ),
+					array( 'title' => 'اسباب‌بازی', 'count' => '۵۲۰' ),
+					array( 'title' => 'کتاب و لوازم‌التحریر', 'count' => '۴۷۳' ),
 					array( 'title' => 'لوازم جانبی', 'count' => '۱٫۱۰۵' ),
 				),
 			)

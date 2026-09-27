@@ -100,7 +100,7 @@ class Ardal_Account {
 				'_ardal_sports'        => array(
 					'label'       => 'علاقه‌مندی‌ها',
 					'type'        => 'text',
-					'placeholder' => 'مثلاً دویدن، عکاسی، آشپزی',
+					'placeholder' => 'مثلاً موسیقی، عکاسی، آشپزی',
 					'wide'        => true,
 				),
 			)

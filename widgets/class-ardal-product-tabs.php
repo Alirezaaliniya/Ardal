@@ -163,7 +163,7 @@ class Ardal_Widget_Product_Tabs extends Ardal_Widget_Base {
 					array( 'spec_key' => 'برند', 'spec_value' => 'پرو-فیت (Pro-Fit)' ),
 					array( 'spec_key' => 'جنس رویه', 'spec_value' => 'مش مهندسی‌شده' ),
 					array( 'spec_key' => 'جنس زیره', 'spec_value' => 'لاستیک ترموپلاستیک' ),
-					array( 'spec_key' => 'کاربری', 'spec_value' => 'دویدن، تردمیل، تمرین سبک' ),
+					array( 'spec_key' => 'کاربری', 'spec_value' => 'استفاده روزمره و پیاده‌روی' ),
 					array( 'spec_key' => 'گارانتی', 'spec_value' => '۱۸ ماه اصالت و سلامت کالا' ),
 				),
 			)

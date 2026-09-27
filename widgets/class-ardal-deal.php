@@ -103,7 +103,7 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 				'label'       => 'نام محصول',
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 2,
-				'default'     => 'تردمیل خانگی پرو-فیت مدل T۹۰۰ تاشو',
+				'default'     => 'جاروبرقی پرو-فیت مدل T۹۰۰ کیسه‌ای',
 				'label_block' => true,
 			)
 		);
@@ -183,21 +183,21 @@ class Ardal_Widget_Deal extends Ardal_Widget_Base {
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
 					array(
-						'title'     => 'تردمیل خانگی پرو-فیت مدل T۹۰۰ تاشو',
+						'title'     => 'جاروبرقی پرو-فیت مدل T۹۰۰ کیسه‌ای',
 						'price'     => '۱۹٫۶۵۰٫۰۰۰',
 						'old_price' => '۲۸٫۹۰۰٫۰۰۰',
 						'sold'      => 8,
 						'total'     => 25,
 					),
 					array(
-						'title'     => 'دوچرخه ثابت مغناطیسی اسپین بایک',
+						'title'     => 'چرخ خیاطی استارلایت مدل اسپین',
 						'price'     => '۸٫۹۰۰٫۰۰۰',
 						'old_price' => '۱۲٫۴۰۰٫۰۰۰',
 						'sold'      => 14,
 						'total'     => 20,
 					),
 					array(
-						'title'     => 'ست دمبل هالتر ۳۰ کیلوگرمی روکش‌دار',
+						'title'     => 'ست قابلمه ۱۰ پارچه گرانیتی',
 						'price'     => '۳٫۲۵۰٫۰۰۰',
 						'old_price' => '۴٫۶۰۰٫۰۰۰',
 						'sold'      => 5,

@@ -66,7 +66,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'label'       => 'نام محصول',
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 2,
-				'default'     => 'کفش دویدن ران‌فلکس مدل ایر پرو ۲۰۲۵',
+				'default'     => 'کفش راحتی ران‌فلکس مدل ایر پرو ۲۰۲۵',
 				'label_block' => true,
 			)
 		);
@@ -166,25 +166,25 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
 					array(
-						'title'     => 'کفش دویدن ران‌فلکس مدل ایر پرو ۲۰۲۵',
+						'title'     => 'کفش راحتی ران‌فلکس مدل ایر پرو ۲۰۲۵',
 						'price'     => '۴٫۸۵۰٫۰۰۰',
 						'old_price' => '۵٫۹۰۰٫۰۰۰',
 						'count'     => 241,
 						'tab'       => 'کفش',
 					),
 					array(
-						'title'     => 'دمبل هالتر ست ۲۰ کیلوگرمی روکش‌دار',
+						'title'     => 'ست قابلمه ۱۰ پارچه گرانیتی',
 						'price'     => '۲٫۳۹۰٫۰۰۰',
 						'old_price' => '۲٫۹۵۰٫۰۰۰',
 						'count'     => 138,
-						'tab'       => 'بدنسازی',
+						'tab'       => 'خانه و آشپزخانه',
 					),
 					array(
-						'title'     => 'عینک شنا ضدبخار حرفه‌ای آکوا-ویژن',
+						'title'     => 'عینک آفتابی پلاریزه آکوا-ویژن',
 						'price'     => '۶۹۰٫۰۰۰',
 						'old_price' => '۸۹۰٫۰۰۰',
 						'count'     => 503,
-						'tab'       => 'شنا',
+						'tab'       => 'زیبایی و سلامت',
 					),
 					array(
 						'title'     => 'ساعت هوشمند با GPS و پالس‌متر',
@@ -194,11 +194,11 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 						'tab'       => 'لوازم جانبی',
 					),
 					array(
-						'title'     => 'توپ فوتبال سایز ۵ دوخت ماشینی',
+						'title'     => 'کیف دستی چرم مصنوعی',
 						'price'     => '۱٫۱۵۰٫۰۰۰',
 						'old_price' => '۱٫۴۵۰٫۰۰۰',
 						'count'     => 312,
-						'tab'       => 'تجهیزات تیمی',
+						'tab'       => 'اسباب‌بازی',
 					),
 				),
 			)

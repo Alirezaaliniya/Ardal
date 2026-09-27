@@ -114,7 +114,7 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 				'label'       => 'نام محصول',
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 2,
-				'default'     => 'دوچرخه کوهستان ۲۷٫۵ اینچ ۲۱ سرعته',
+				'default'     => 'چرخ خیاطی استارلایت ۲۱ کاره',
 				'label_block' => true,
 			)
 		);
@@ -184,25 +184,25 @@ class Ardal_Widget_Sale_Festival extends Ardal_Widget_Base {
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
 					array(
-						'title'     => 'دوچرخه کوهستان ۲۷٫۵ اینچ ۲۱ سرعته',
+						'title'     => 'چرخ خیاطی استارلایت ۲۱ کاره',
 						'price'     => '۹٫۴۵۰٫۰۰۰',
 						'old_price' => '۱۳٫۵۰۰٫۰۰۰',
 						'bar'       => array( 'unit' => '%', 'size' => 72 ),
 					),
 					array(
-						'title'     => 'کوله کوهنوردی ۴۵ لیتری ضدآب',
+						'title'     => 'کوله‌پشتی ۴۵ لیتری ضدآب',
 						'price'     => '۱٫۸۹۰٫۰۰۰',
 						'old_price' => '۲٫۹۰۰٫۰۰۰',
 						'bar'       => array( 'unit' => '%', 'size' => 45 ),
 					),
 					array(
-						'title'     => 'تشک یوگا TPE دولایه ۸ میلی‌متر',
+						'title'     => 'زیرانداز TPE دولایه ۸ میلی‌متری',
 						'price'     => '۴۹۰٫۰۰۰',
 						'old_price' => '۸۵۰٫۰۰۰',
 						'bar'       => array( 'unit' => '%', 'size' => 88 ),
 					),
 					array(
-						'title'     => 'کش مقاومتی ست ۵ عددی با دستگیره',
+						'title'     => 'ست ۵ عددی ظروف نگهدارنده با درپوش',
 						'price'     => '۳۲۰٫۰۰۰',
 						'old_price' => '۵۹۰٫۰۰۰',
 						'bar'       => array( 'unit' => '%', 'size' => 60 ),

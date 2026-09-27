@@ -53,7 +53,7 @@ class Ardal_Widget_Banners extends Ardal_Widget_Base {
 			array(
 				'label'       => 'عنوان',
 				'type'        => Controls_Manager::TEXT,
-				'default'     => 'تجهیزات شنا و آب',
+				'default'     => 'خانه و آشپزخانه',
 				'label_block' => true,
 			)
 		);
@@ -64,7 +64,7 @@ class Ardal_Widget_Banners extends Ardal_Widget_Base {
 				'label'       => 'توضیح',
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 2,
-				'default'     => 'عینک، کلاه، مایو و لوازم نجات غریق',
+				'default'     => 'قابلمه، سرویس غذاخوری و لوازم برقی',
 				'label_block' => true,
 			)
 		);
@@ -141,12 +141,12 @@ class Ardal_Widget_Banners extends Ardal_Widget_Base {
 				'title_field' => '{{{ title }}}',
 				'default'     => array(
 					array(
-						'title' => 'تجهیزات شنا و آب',
-						'text'  => 'عینک، کلاه، مایو و لوازم نجات غریق',
+						'title' => 'خانه و آشپزخانه',
+						'text'  => 'قابلمه، سرویس غذاخوری و لوازم برقی',
 						'tone'  => 'blue',
 					),
 					array(
-						'title' => 'دوی حرفه‌ای',
+						'title' => 'مد و پوشاک',
 						'text'  => 'کفش، ساعت هوشمند و پوشاک',
 						'tone'  => 'green',
 					),

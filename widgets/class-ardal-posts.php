@@ -84,7 +84,7 @@ class Ardal_Widget_Posts extends Ardal_Widget_Base {
 				'label'       => 'عنوان مطلب',
 				'type'        => Controls_Manager::TEXTAREA,
 				'rows'        => 2,
-				'default'     => 'چطور کفش دویدن مناسب پای خود را انتخاب کنیم؟',
+				'default'     => 'چطور کالای مناسب خود را انتخاب کنیم؟',
 				'label_block' => true,
 			)
 		);
@@ -124,9 +124,9 @@ class Ardal_Widget_Posts extends Ardal_Widget_Base {
 				'title_field' => '{{{ title }}}',
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
-					array( 'title' => 'چطور کفش دویدن مناسب پای خود را انتخاب کنیم؟', 'date' => '۱۲ شهریور' ),
-					array( 'title' => 'برنامه تمرینی ۴ هفته‌ای برای شروع بدنسازی', 'date' => '۸ شهریور' ),
-					array( 'title' => 'نگهداری از لوازم شنا؛ ۶ نکته کاربردی', 'date' => '۲ شهریور' ),
+					array( 'title' => 'چطور کالای مناسب خود را انتخاب کنیم؟', 'date' => '۱۲ شهریور' ),
+					array( 'title' => 'راهنمای خرید آنلاین مطمئن در ۴ گام', 'date' => '۸ شهریور' ),
+					array( 'title' => 'نگهداری از لوازم برقی؛ ۶ نکته کاربردی', 'date' => '۲ شهریور' ),
 				),
 			)
 		);

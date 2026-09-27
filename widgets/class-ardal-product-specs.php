@@ -99,7 +99,7 @@ class Ardal_Widget_Product_Specs extends Ardal_Widget_Base {
 					array( 'spec_key' => 'جنس رویه', 'spec_value' => 'مش مهندسی‌شده' ),
 					array( 'spec_key' => 'زیره', 'spec_value' => 'لاستیک ضدسایش' ),
 					array( 'spec_key' => 'وزن', 'spec_value' => '۲۴۵ گرم (سایز ۴۲)' ),
-					array( 'spec_key' => 'کاربری', 'spec_value' => 'دویدن و تردمیل' ),
+					array( 'spec_key' => 'کاربری', 'spec_value' => 'استفاده روزمره' ),
 					array( 'spec_key' => 'گارانتی', 'spec_value' => '۱۸ ماه اصالت کالا' ),
 				),
 			)

@@ -47,7 +47,7 @@ class Ardal_Widget_Bestsellers extends Ardal_Widget_Base {
 			array(
 				'label'       => 'نام محصول',
 				'type'        => Controls_Manager::TEXT,
-				'default'     => 'بند مقاومتی پاورلوپ',
+				'default'     => 'شارژر سریع پاورلوپ',
 				'label_block' => true,
 			)
 		);
@@ -97,12 +97,12 @@ class Ardal_Widget_Bestsellers extends Ardal_Widget_Base {
 				'title_field' => '{{{ title }}}',
 				'condition'   => array( 'source' => 'manual' ),
 				'default'     => array(
-					array( 'title' => 'بند مقاومتی پاورلوپ', 'price' => '۲۹۰٫۰۰۰' ),
-					array( 'title' => 'طناب سرعتی', 'price' => '۲۱۰٫۰۰۰' ),
-					array( 'title' => 'کفش فوتسال گراند', 'price' => '۲٫۴۵۰٫۰۰۰' ),
-					array( 'title' => 'دستکش بدنسازی چرم', 'price' => '۴۸۰٫۰۰۰' ),
+					array( 'title' => 'شارژر سریع پاورلوپ', 'price' => '۲۹۰٫۰۰۰' ),
+					array( 'title' => 'ماگ سرامیکی', 'price' => '۲۱۰٫۰۰۰' ),
+					array( 'title' => 'کفش راحتی گراند', 'price' => '۲٫۴۵۰٫۰۰۰' ),
+					array( 'title' => 'دستکش چرم طبیعی', 'price' => '۴۸۰٫۰۰۰' ),
 					array( 'title' => 'قمقمه ۱ لیتری', 'price' => '۱۸۵٫۰۰۰' ),
-					array( 'title' => 'ساک دوکاره', 'price' => '۹۵۰٫۰۰۰' ),
+					array( 'title' => 'ساک دستی دوکاره', 'price' => '۹۵۰٫۰۰۰' ),
 				),
 			)
 		);
