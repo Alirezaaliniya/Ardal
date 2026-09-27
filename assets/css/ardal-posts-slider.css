@@ -1,25 +1,38 @@
 /**
  * اسلایدر مطالب بلاگ.
  *
- * چیدمان روی اسکرولِ خود مرورگر سوار است (scroll-snap + overflow)، نه روی
- * transform؛ پس لمس، درگ و صفحه‌کلید بدون کد اضافه کار می‌کنند و اگر
- * جاوااسکریپت هم نرسد، کاربر باز می‌تواند اسلایدر را اسکرول کند.
+ * ساختار کارت عمداً دو تکه است و تصویر «داخل» قاب سفید نیست:
+ *
+ *   [ تصویر — کمی باریک‌تر از قاب، گوشهٔ بالا گرد، پایین صاف ]
+ *   [ قاب سفید با حاشیه — فقط متن، کمی عریض‌تر از تصویر      ]
+ *
+ * پایین تصویر دقیقاً روی لبهٔ بالای قاب می‌نشیند، پس گوشه‌های گردِ بالای قاب
+ * از دو طرفِ تصویر بیرون می‌زنند. همین اختلافِ کوچک عرض، شکل اصلی دیزاین است.
+ *
+ * چیدمان روی اسکرول خود مرورگر سوار است (scroll-snap + overflow)، نه transform؛
+ * پس لمس، درگ و صفحه‌کلید بدون کد اضافه کار می‌کنند.
  */
 
 .ard-pslider {
-	--ard-ps-gap: 16px;
-	--ard-ps-radius: var(--ard-radius-xl, 18px);
-	--ard-ps-pad: 10px;
+	--ard-ps-gap: 20px;
+	--ard-ps-radius: 20px;
+	--ard-ps-pad: 16px;
 	--ard-ps-card-bg: var(--ard-base, #fff);
-	--ard-ps-img-h: 200px;
-	--ard-ps-title: var(--ard-text, #1f2937);
-	--ard-ps-excerpt: var(--ard-muted, #6b7280);
+	--ard-ps-card-line: #e6e9f3;
+	--ard-ps-img-h: 220px;
+	--ard-ps-media-inset: 3.8%;
+	--ard-ps-title: var(--ard-text, #111827);
+	--ard-ps-excerpt: #777779;
 	--ard-ps-title-lines: 1;
 	--ard-ps-excerpt-lines: 2;
 
-	--ard-ps-chip: 36px;
-	--ard-ps-chip-bg: rgba(255, 255, 255, .92);
+	/* یک = همه هم‌اندازه. بیشتر = کارت وسط همان‌قدر برابر بقیه. */
+	--ard-ps-active-ratio: 1;
+
+	--ard-ps-chip: 38px;
+	--ard-ps-chip-bg: rgba(255, 255, 255, .94);
 	--ard-ps-chip-ink: var(--ard-text, #1f2937);
+	--ard-ps-chip-inset: 13px;
 
 	--ard-ps-arrow: 40px;
 	--ard-ps-arrow-icon: 18px;
@@ -41,6 +54,10 @@
 	gap: 12px;
 }
 
+.ard-pslider--featured {
+	--ard-ps-active-ratio: 2;
+}
+
 .ard-pslider__head {
 	display: flex;
 	align-items: center;
@@ -48,7 +65,6 @@
 	gap: 12px;
 }
 
-/* عنوان بخش داخل سربرگ نباید حاشیهٔ پایینی خودش را نگه دارد. */
 .ard-pslider__head > .ard-head {
 	margin-block-end: 0;
 }
@@ -82,20 +98,26 @@
 .ard-pslider__track {
 	--ard-per: 3;
 
-	display: grid;
 	/*
-	 * ستون‌ها به تعدادِ «در هر نما» بریده می‌شوند و بقیه از لبه بیرون می‌مانند.
-	 * grid-auto-flow: column یعنی هرچه کارت بیاید در همان یک ردیف می‌ماند.
+	 * پهنای هر کارت.
+	 *
+	 * وقتی یک کارت «ratio برابر» بقیه است، مجموع عرض‌ها می‌شود
+	 * (per − ۱ + ratio) واحد. پس یک واحد همین کسر است و جمعشان با فاصله‌ها
+	 * دقیقاً ۱۰۰٪ می‌شود — بدون اینکه لازم باشد جاوااسکریپت عرض بدهد.
 	 */
-	grid-auto-flow: column;
-	grid-auto-columns: calc((100% - (var(--ard-per) - 1) * var(--ard-ps-gap)) / var(--ard-per));
+	--ard-ps-unit: calc(
+		(100% - (var(--ard-per) - 1) * var(--ard-ps-gap))
+		/ (var(--ard-per) - 1 + var(--ard-ps-active-ratio))
+	);
+
+	display: flex;
 	gap: var(--ard-ps-gap);
 	overflow-x: auto;
 	overscroll-behavior-x: contain;
 	scroll-snap-type: x mandatory;
 	scrollbar-width: none;
 	-webkit-overflow-scrolling: touch;
-	/* جا برای سایهٔ کارت‌ها، وگرنه اسکرول لبه‌شان را می‌برد. */
+	/* جا برای سایهٔ قاب‌ها، وگرنه اسکرول لبه‌شان را می‌برد. */
 	padding-block: 4px;
 }
 
@@ -104,7 +126,13 @@
 }
 
 .ard-pslider__track > * {
+	flex: 0 0 var(--ard-ps-unit);
 	scroll-snap-align: start;
+	transition: flex-basis .35s cubic-bezier(.2, .8, .3, 1);
+}
+
+.ard-pslider__track > .is-active {
+	flex-basis: calc(var(--ard-ps-unit) * var(--ard-ps-active-ratio));
 }
 
 /* هنگام کشیدن با ماوس، snap باید کنار برود وگرنه به انگشت نمی‌چسبد. */
@@ -114,21 +142,24 @@
 
 /* ---------------------------------------- کارت */
 
+/*
+ * خودِ کارت نه زمینه دارد نه حاشیه؛ فقط دو تکه را روی هم می‌چیند. رنگ و
+ * حاشیه مالِ قاب متن است.
+ */
 .ard-pcardp {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
-	padding: var(--ard-ps-pad);
-	border: 1px solid var(--ard-border-soft, #eef0f2);
-	border-radius: var(--ard-ps-radius);
-	background: var(--ard-ps-card-bg);
+	min-inline-size: 0;
 	block-size: 100%;
 }
 
 .ard-pcardp__media {
 	position: relative;
+	/* تصویر از هر طرف کمی تو می‌رود تا گوشهٔ گرد قاب از کنارش پیدا شود. */
+	margin-inline: var(--ard-ps-media-inset);
 	block-size: var(--ard-ps-img-h);
-	border-radius: calc(var(--ard-ps-radius) - var(--ard-ps-pad) / 2);
+	border-start-start-radius: var(--ard-ps-radius);
+	border-start-end-radius: var(--ard-ps-radius);
 	background: var(--ard-surface-alt, #f3f4f6);
 	overflow: hidden;
 }
@@ -144,16 +175,16 @@
 
 .ard-pcardp__chips {
 	position: absolute;
-	inset-block-start: 10px;
-	inset-inline-end: 10px;
+	inset-block-start: var(--ard-ps-chip-inset);
+	inset-inline-start: var(--ard-ps-chip-inset);
 	display: flex;
-	gap: 6px;
+	gap: 12px;
 }
 
 /* گوشهٔ دیگر، از کنترل «گوشه». */
-.ard-ps-chips-start .ard-pcardp__chips {
-	inset-inline-end: auto;
-	inset-inline-start: 10px;
+.ard-ps-chips-end .ard-pcardp__chips {
+	inset-inline-start: auto;
+	inset-inline-end: var(--ard-ps-chip-inset);
 }
 
 .ard-pcardp__chip {
@@ -186,20 +217,24 @@
 	flex: 0 0 auto;
 }
 
-/* ---------------------------------------- متن */
+/* ---------------------------------------- قاب متن */
 
-.ard-pcardp__body {
+.ard-pcardp__box {
 	display: flex;
+	flex: 1 1 auto;
 	flex-direction: column;
-	gap: 6px;
-	padding: 2px 6px 8px;
+	gap: 8px;
+	padding: var(--ard-ps-pad);
+	border: 1px solid var(--ard-ps-card-line);
+	border-radius: var(--ard-ps-radius);
+	background: var(--ard-ps-card-bg);
 }
 
 .ard-pcardp__title {
 	margin: 0;
 	font-size: 14px;
 	font-weight: 800;
-	line-height: 1.8;
+	line-height: 1.9;
 	color: var(--ard-ps-title);
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
@@ -270,10 +305,8 @@
 }
 
 /*
- * دکمه‌های «روی کارت‌ها».
- *
- * از جریان بیرون می‌روند تا ریل تمام پهنا را بگیرد؛ در حالت «دو طرف» برعکس،
- * داخل جریان می‌مانند و ریل جا باز می‌کند.
+ * دکمه‌های «روی کارت‌ها» از جریان بیرون می‌روند تا ریل تمام پهنا را بگیرد؛
+ * در حالت «دو طرف» برعکس، داخل جریان می‌مانند و ریل جا باز می‌کند.
  */
 .ard-pslider--arrows-inside .ard-pslider__arrow {
 	position: absolute;
@@ -327,9 +360,14 @@
 
 @media (max-width: 600px) {
 	/*
-	 * روی صفحهٔ باریک، «دو طرف» جای ریل را تنگ می‌کند؛ دکمه‌ها می‌روند پایین
-	 * و انگشت هم که از قبل می‌توانست اسلاید کند.
+	 * یک کارت در نما یعنی «بزرگ‌ترِ وسط» معنا ندارد؛ نسبت را برمی‌گردانیم
+	 * به یک تا کارت تمام عرض را بگیرد.
 	 */
+	.ard-pslider--featured {
+		--ard-ps-active-ratio: 1;
+	}
+
+	/* روی صفحهٔ باریک، «دو طرف» جای ریل را تنگ می‌کند. */
 	.ard-pslider--arrows-side .ard-pslider__stage {
 		display: block;
 	}
@@ -345,7 +383,8 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.ard-pslider__dot,
-	.ard-pslider__arrow {
+	.ard-pslider__arrow,
+	.ard-pslider__track > * {
 		transition: none;
 	}
 }

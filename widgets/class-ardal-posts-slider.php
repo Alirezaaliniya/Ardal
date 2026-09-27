@@ -321,6 +321,29 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'featured',
+			array(
+				'label'        => 'کارت وسط عریض‌تر باشد',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'کارتی که وسط نما ایستاده بزرگ‌تر می‌شود و با اسلاید، بزرگی به کارت بعدی می‌رسد.',
+			)
+		);
+
+		$this->add_control(
+			'featured_ratio',
+			array(
+				'label'     => 'چند برابر بقیه',
+				'type'      => Controls_Manager::SLIDER,
+				'range'     => array( 'px' => array( 'min' => 1.1, 'max' => 3, 'step' => 0.05 ) ),
+				'default'   => array( 'size' => 2 ),
+				'condition' => array( 'featured' => 'yes' ),
+				'selectors' => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-active-ratio:{{SIZE}};' ),
+			)
+		);
+
+		$this->add_control(
 			'autoplay',
 			array(
 				'label'       => 'چرخش خودکار',
@@ -421,7 +444,7 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'card_border',
-				'selector' => '{{WRAPPER}} .ard-pcardp',
+				'selector' => '{{WRAPPER}} .ard-pcardp__box',
 			)
 		);
 
@@ -451,7 +474,23 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 			Group_Control_Box_Shadow::get_type(),
 			array(
 				'name'     => 'card_shadow',
-				'selector' => '{{WRAPPER}} .ard-pcardp',
+				'selector' => '{{WRAPPER}} .ard-pcardp__box',
+			)
+		);
+
+		$this->add_responsive_control(
+			'media_inset',
+			array(
+				'label'       => 'تورفتگی تصویر از دو طرف',
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => array( '%', 'px' ),
+				'range'       => array(
+					'%'  => array( 'min' => 0, 'max' => 12, 'step' => 0.5 ),
+					'px' => array( 'min' => 0, 'max' => 40 ),
+				),
+				'default'     => array( 'unit' => '%', 'size' => 3.8 ),
+				'description' => 'تصویر بالای قاب متن می‌نشیند و کمی باریک‌تر از آن است؛ این عدد همان اختلاف است.',
+				'selectors'   => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-media-inset:{{SIZE}}{{UNIT}};' ),
 			)
 		);
 
@@ -574,10 +613,10 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 			array(
 				'label'     => 'گوشه',
 				'type'      => Controls_Manager::SELECT,
-				'default'   => 'end',
+				'default'   => 'start',
 				'options'   => array(
-					'end'   => 'بالا، سمت پایان (چپ)',
 					'start' => 'بالا، سمت شروع (راست)',
+					'end'   => 'بالا، سمت پایان (چپ)',
 				),
 				// کلاس روی ریشه، نه سلکتور؛ دو اعلان inset-inline روی یک قانون
 				// همدیگر را خنثی می‌کردند.
@@ -772,9 +811,14 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 		$dots   = 'yes' === $s['show_dots'] && count( $items ) > 1;
 		$tag    = self::tag( $s['item_tag'], 'h3' );
 
-		$classes = array(
-			'ard-pslider',
-			'ard-pslider--arrows-' . ( $arrows ? $s['arrow_place'] : 'none' ),
+		$featured = 'yes' === $s['featured'];
+
+		$classes = array_filter(
+			array(
+				'ard-pslider',
+				'ard-pslider--arrows-' . ( $arrows ? $s['arrow_place'] : 'none' ),
+				$featured ? 'ard-pslider--featured' : '',
+			)
 		);
 		?>
 		<section class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-ard-slider>
@@ -794,7 +838,7 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				<?php endif; ?>
 
 				<div class="ard-pslider__car" data-ard-carousel data-interval="<?php echo esc_attr( max( 0, (int) $s['autoplay'] ) ); ?>">
-					<div class="ard-pslider__track" data-ard-viewport>
+					<div class="ard-pslider__track" data-ard-viewport<?php echo $featured ? ' data-ard-active-slide' : ''; ?>>
 						<?php foreach ( $items as $item ) : ?>
 							<article class="ard-pcardp">
 								<div class="ard-pcardp__media">
@@ -818,7 +862,7 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 									<?php endif; ?>
 								</div>
 
-								<div class="ard-pcardp__body">
+								<div class="ard-pcardp__box">
 									<<?php echo esc_html( $tag ); ?> class="ard-pcardp__title">
 										<?php if ( ! empty( $item['link']['url'] ) ) : ?>
 											<a<?php echo Ardal_Helpers::link_attrs( $item['link'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $item['title'] ); ?></a>

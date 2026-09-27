@@ -728,6 +728,40 @@
 				dot.classList.toggle( 'is-active', i === active );
 				dot.setAttribute( 'aria-selected', i === active ? 'true' : 'false' );
 			} );
+
+			markActiveSlide();
+		}
+
+		/**
+		 * علامت‌زدن اسلایدی که وسط نما ایستاده.
+		 *
+		 * اختیاری است و فقط وقتی اجرا می‌شود که ریل data-ard-active-slide
+		 * داشته باشد؛ ویجتی که کارت وسط را بزرگ‌تر نشان می‌دهد با همین کلاس
+		 * تصمیم می‌گیرد کدام بزرگ شود.
+		 */
+		function markActiveSlide() {
+			if ( ! viewport.hasAttribute( 'data-ard-active-slide' ) ) {
+				return;
+			}
+
+			var box = viewport.getBoundingClientRect();
+			var mid = box.left + box.width / 2;
+			var best = 0;
+			var bestDist = Infinity;
+
+			slides.forEach( function ( slide, i ) {
+				var r = slide.getBoundingClientRect();
+				var dist = Math.abs( ( r.left + r.width / 2 ) - mid );
+
+				if ( dist < bestDist ) {
+					bestDist = dist;
+					best = i;
+				}
+			} );
+
+			slides.forEach( function ( slide, i ) {
+				slide.classList.toggle( 'is-active', i === best );
+			} );
 		}
 
 		function buildDots() {
@@ -831,6 +865,7 @@
 		} );
 
 		buildDots();
+		markActiveSlide();
 		start();
 	}
 
