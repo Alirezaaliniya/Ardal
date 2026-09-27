@@ -42,6 +42,32 @@
 	--ard-ps-arrow-line: var(--ard-border, #e5e7eb);
 	--ard-ps-arrow-bg-hover: var(--ard-primary, #0f766e);
 	--ard-ps-arrow-ink-hover: #fff;
+	--ard-ps-arrow-inset: 8px;
+
+	/*
+	 * جایگاه آزاد هر دکمه.
+	 *
+	 * «ax/ay» لنگر است (۰٪ شروع، ۵۰٪ وسط، ۱۰۰٪ پایان) و «sx/sy» همان لنگر را
+	 * به اندازهٔ خودِ دکمه عقب می‌کشد تا دکمه واقعاً روی لنگر بنشیند نه اینکه
+	 * از آن آویزان شود. «x/y» هم جابه‌جایی دلخواه کاربر است.
+	 *
+	 * چرا margin و نه translate: جابه‌جایی با margin منطقی است و در راست‌چین
+	 * خودش برعکس می‌شود؛ translateX همیشه به یک سمت می‌برد و در RTL باید
+	 * علامتش را دستی برمی‌گرداندیم.
+	 */
+	--ard-ps-prev-ax: 0%;
+	--ard-ps-prev-sx: 0px;
+	--ard-ps-prev-ay: 50%;
+	--ard-ps-prev-sy: calc(var(--ard-ps-arrow) / -2);
+	--ard-ps-prev-x: 0px;
+	--ard-ps-prev-y: 0px;
+
+	--ard-ps-next-ax: 100%;
+	--ard-ps-next-sx: calc(var(--ard-ps-arrow) * -1);
+	--ard-ps-next-ay: 50%;
+	--ard-ps-next-sy: calc(var(--ard-ps-arrow) / -2);
+	--ard-ps-next-x: 0px;
+	--ard-ps-next-y: 0px;
 
 	--ard-ps-dot: var(--ard-border, #d5d9de);
 	--ard-ps-dot-active: var(--ard-primary, #0f766e);
@@ -315,11 +341,39 @@
 }
 
 .ard-pslider--arrows-inside .ard-pslider__arrow--prev {
-	inset-inline-start: 8px;
+	inset-inline-start: var(--ard-ps-arrow-inset);
 }
 
 .ard-pslider--arrows-inside .ard-pslider__arrow--next {
-	inset-inline-end: 8px;
+	inset-inline-end: var(--ard-ps-arrow-inset);
+}
+
+/* ---------------------------------------- جایگاه آزاد */
+
+/*
+ * صحنه block می‌شود تا ریل تمام پهنا را بگیرد و دکمه‌ها آزادانه رویش بنشینند.
+ */
+.ard-pslider--arrows-free .ard-pslider__stage {
+	display: block;
+}
+
+.ard-pslider--arrows-free .ard-pslider__arrow {
+	position: absolute;
+	z-index: 3;
+}
+
+.ard-pslider--arrows-free .ard-pslider__arrow--prev {
+	inset-inline-start: calc(var(--ard-ps-prev-ax) + var(--ard-ps-prev-x));
+	inset-block-start: calc(var(--ard-ps-prev-ay) + var(--ard-ps-prev-y));
+	margin-inline-start: var(--ard-ps-prev-sx);
+	margin-block-start: var(--ard-ps-prev-sy);
+}
+
+.ard-pslider--arrows-free .ard-pslider__arrow--next {
+	inset-inline-start: calc(var(--ard-ps-next-ax) + var(--ard-ps-next-x));
+	inset-block-start: calc(var(--ard-ps-next-ay) + var(--ard-ps-next-y));
+	margin-inline-start: var(--ard-ps-next-sx);
+	margin-block-start: var(--ard-ps-next-sy);
 }
 
 /* ---------------------------------------- نقطه‌ها */
@@ -367,7 +421,11 @@
 		--ard-ps-active-ratio: 1;
 	}
 
-	/* روی صفحهٔ باریک، «دو طرف» جای ریل را تنگ می‌کند. */
+	/*
+	 * روی صفحهٔ باریک، «دو طرف» جای ریل را تنگ می‌کند؛ دکمه‌ها می‌روند کنار و
+	 * انگشت که از قبل می‌توانست اسلاید کند. حالت «آزاد» استثناست: آنجا کاربر
+	 * خودش جای دکمه‌ها را تعیین کرده و ریسپانسیوش هم دست خودش است.
+	 */
 	.ard-pslider--arrows-side .ard-pslider__stage {
 		display: block;
 	}

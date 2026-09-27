@@ -282,9 +282,10 @@ class Ardal_Helpers {
 	 * @param array      $classes Widget-specific classes.
 	 * @param string     $text Link text.
 	 * @param array      $attributes Widget-specific attributes.
+	 * @param string     $icon نشانِ SVG که پیش از متن می‌نشیند؛ از قبل امن شده.
 	 * @return string
 	 */
-	public static function woocommerce_add_to_cart_link( $product, $classes = array(), $text = '', $attributes = array() ) {
+	public static function woocommerce_add_to_cart_link( $product, $classes = array(), $text = '', $attributes = array(), $icon = '' ) {
 		if ( ! $product || ! is_a( $product, 'WC_Product' ) ) {
 			return '';
 		}
@@ -324,15 +325,60 @@ class Ardal_Helpers {
 			$args['attributes']['data-quantity'] = isset( $args['quantity'] ) ? $args['quantity'] : 1;
 		}
 
+		/*
+		 * آیکون به‌صورت عنصر واقعی داخل دکمه می‌رود، نه با ::before در CSS.
+		 *
+		 * متنِ دکمه دست‌نخورده می‌ماند (textContent یک <svg> خالی است)، پس
+		 * افزونه‌هایی که روی دکمهٔ استاندارد لوپ ووکامرس حساب باز کرده‌اند
+		 * همان چیزی را می‌خوانند که قبلاً می‌خواندند.
+		 */
 		$link = sprintf(
-			'<a href="%1$s" %2$s class="%3$s">%4$s</a>',
+			'<a href="%1$s" %2$s class="%3$s">%4$s%5$s</a>',
 			esc_url( $product->add_to_cart_url() ),
 			wc_implode_html_attributes( isset( $args['attributes'] ) ? $args['attributes'] : array() ),
 			esc_attr( isset( $args['class'] ) ? $args['class'] : '' ),
+			self::svg( $icon ),
 			esc_html( '' !== $text ? $text : $product->add_to_cart_text() )
 		);
 
 		return apply_filters( 'woocommerce_loop_add_to_cart_link', $link, $product, $args );
+	}
+
+	/**
+	 * پاک‌سازی یک قطعه SVG برای چاپ امن.
+	 *
+	 * فهرست مجازِ wp_kses تگ‌های SVG را نمی‌شناسد و همه را دور می‌ریزد؛ پس
+	 * همین‌جا یک فهرست کوچک و بسته تعریف می‌شود. هرچه در آن نباشد حذف است.
+	 *
+	 * @param string $svg
+	 * @return string
+	 */
+	public static function svg( $svg ) {
+		if ( '' === trim( (string) $svg ) ) {
+			return '';
+		}
+
+		$common = array(
+			'class' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true,
+			'stroke-linecap' => true, 'stroke-linejoin' => true, 'opacity' => true,
+			'transform' => true, 'aria-hidden' => true, 'focusable' => true,
+		);
+
+		return wp_kses(
+			$svg,
+			array(
+				'svg'      => array_merge( $common, array( 'viewbox' => true, 'width' => true, 'height' => true, 'xmlns' => true, 'role' => true ) ),
+				'g'        => $common,
+				'path'     => array_merge( $common, array( 'd' => true ) ),
+				'circle'   => array_merge( $common, array( 'cx' => true, 'cy' => true, 'r' => true ) ),
+				'rect'     => array_merge( $common, array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true ) ),
+				'line'     => array_merge( $common, array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true ) ),
+				'polyline' => array_merge( $common, array( 'points' => true ) ),
+				'polygon'  => array_merge( $common, array( 'points' => true ) ),
+				'i'        => array( 'class' => true, 'aria-hidden' => true ),
+				'span'     => array( 'class' => true, 'aria-hidden' => true ),
+			)
+		);
 	}
 
 	/**

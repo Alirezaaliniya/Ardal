@@ -400,6 +400,7 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 					'inside' => 'روی کارت‌ها',
 					'top'    => 'بالا، کنار عنوان',
 					'bottom' => 'پایین، کنار نقطه‌ها',
+					'free'   => 'آزاد — جایگاه دقیق هر دکمه',
 				),
 				'condition' => array( 'show_arrows' => 'yes' ),
 			)
@@ -673,6 +674,242 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 			)
 		);
 
+		/* ------------------------------------------- جایگاه */
+
+		$this->add_control(
+			'arrow_pos_note',
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => 'هر دکمه یک لنگر افقی و یک لنگر عمودی دارد، به‌علاوهٔ عددی برای جابه‌جایی از همان لنگر. لنگرها نسبت به خودِ ناحیهٔ اسلایدر سنجیده می‌شوند.',
+				'content_classes' => 'elementor-descriptor',
+				'condition'       => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_control(
+			'arrow_prev_heading',
+			array(
+				'label'     => 'دکمه قبلی',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+				'condition' => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_prev_hx',
+			array(
+				'label'                => 'لنگر افقی',
+				'type'                 => Controls_Manager::CHOOSE,
+				'default'              => 'start',
+				'options'              => array(
+					'start'  => array( 'title' => 'شروع', 'icon' => 'eicon-h-align-right' ),
+					'center' => array( 'title' => 'وسط', 'icon' => 'eicon-h-align-center' ),
+					'end'    => array( 'title' => 'پایان', 'icon' => 'eicon-h-align-left' ),
+				),
+				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
+				'selectors_dictionary' => array(
+					'start'  => '--ard-ps-prev-ax:0%;--ard-ps-prev-sx:0px;',
+					'center' => '--ard-ps-prev-ax:50%;--ard-ps-prev-sx:calc(var(--ard-ps-arrow) / -2);',
+					'end'    => '--ard-ps-prev-ax:100%;--ard-ps-prev-sx:calc(var(--ard-ps-arrow) * -1);',
+				),
+				'condition'            => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_prev_x',
+			array(
+				'label'      => 'جابه‌جایی افقی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'em', 'rem', 'vw' ),
+				'range'      => array(
+					'px'  => array( 'min' => -500, 'max' => 500 ),
+					'%'   => array( 'min' => -100, 'max' => 100 ),
+					'em'  => array( 'min' => -30, 'max' => 30 ),
+					'rem' => array( 'min' => -30, 'max' => 30 ),
+					'vw'  => array( 'min' => -50, 'max' => 50 ),
+				),
+				'default'    => array( 'unit' => 'px', 'size' => 0 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-prev-x:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_prev_hy',
+			array(
+				'label'                => 'لنگر عمودی',
+				'type'                 => Controls_Manager::CHOOSE,
+				'default'              => 'center',
+				'options'              => array(
+					'start'  => array( 'title' => 'بالا', 'icon' => 'eicon-v-align-top' ),
+					'center' => array( 'title' => 'وسط', 'icon' => 'eicon-v-align-middle' ),
+					'end'    => array( 'title' => 'پایین', 'icon' => 'eicon-v-align-bottom' ),
+				),
+				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
+				'selectors_dictionary' => array(
+					'start'  => '--ard-ps-prev-ay:0%;--ard-ps-prev-sy:0px;',
+					'center' => '--ard-ps-prev-ay:50%;--ard-ps-prev-sy:calc(var(--ard-ps-arrow) / -2);',
+					'end'    => '--ard-ps-prev-ay:100%;--ard-ps-prev-sy:calc(var(--ard-ps-arrow) * -1);',
+				),
+				'condition'            => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_prev_y',
+			array(
+				'label'      => 'جابه‌جایی عمودی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'em', 'rem', 'vh' ),
+				'range'      => array(
+					'px'  => array( 'min' => -500, 'max' => 500 ),
+					'%'   => array( 'min' => -100, 'max' => 100 ),
+					'em'  => array( 'min' => -30, 'max' => 30 ),
+					'rem' => array( 'min' => -30, 'max' => 30 ),
+					'vh'  => array( 'min' => -50, 'max' => 50 ),
+				),
+				'default'    => array( 'unit' => 'px', 'size' => 0 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-prev-y:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_control(
+			'arrow_next_heading',
+			array(
+				'label'     => 'دکمه بعدی',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+				'condition' => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_next_hx',
+			array(
+				'label'                => 'لنگر افقی',
+				'type'                 => Controls_Manager::CHOOSE,
+				'default'              => 'end',
+				'options'              => array(
+					'start'  => array( 'title' => 'شروع', 'icon' => 'eicon-h-align-right' ),
+					'center' => array( 'title' => 'وسط', 'icon' => 'eicon-h-align-center' ),
+					'end'    => array( 'title' => 'پایان', 'icon' => 'eicon-h-align-left' ),
+				),
+				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
+				'selectors_dictionary' => array(
+					'start'  => '--ard-ps-next-ax:0%;--ard-ps-next-sx:0px;',
+					'center' => '--ard-ps-next-ax:50%;--ard-ps-next-sx:calc(var(--ard-ps-arrow) / -2);',
+					'end'    => '--ard-ps-next-ax:100%;--ard-ps-next-sx:calc(var(--ard-ps-arrow) * -1);',
+				),
+				'condition'            => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_next_x',
+			array(
+				'label'      => 'جابه‌جایی افقی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'em', 'rem', 'vw' ),
+				'range'      => array(
+					'px'  => array( 'min' => -500, 'max' => 500 ),
+					'%'   => array( 'min' => -100, 'max' => 100 ),
+					'em'  => array( 'min' => -30, 'max' => 30 ),
+					'rem' => array( 'min' => -30, 'max' => 30 ),
+					'vw'  => array( 'min' => -50, 'max' => 50 ),
+				),
+				'default'    => array( 'unit' => 'px', 'size' => 0 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-next-x:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_next_hy',
+			array(
+				'label'                => 'لنگر عمودی',
+				'type'                 => Controls_Manager::CHOOSE,
+				'default'              => 'center',
+				'options'              => array(
+					'start'  => array( 'title' => 'بالا', 'icon' => 'eicon-v-align-top' ),
+					'center' => array( 'title' => 'وسط', 'icon' => 'eicon-v-align-middle' ),
+					'end'    => array( 'title' => 'پایین', 'icon' => 'eicon-v-align-bottom' ),
+				),
+				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
+				'selectors_dictionary' => array(
+					'start'  => '--ard-ps-next-ay:0%;--ard-ps-next-sy:0px;',
+					'center' => '--ard-ps-next-ay:50%;--ard-ps-next-sy:calc(var(--ard-ps-arrow) / -2);',
+					'end'    => '--ard-ps-next-ay:100%;--ard-ps-next-sy:calc(var(--ard-ps-arrow) * -1);',
+				),
+				'condition'            => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_next_y',
+			array(
+				'label'      => 'جابه‌جایی عمودی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'em', 'rem', 'vh' ),
+				'range'      => array(
+					'px'  => array( 'min' => -500, 'max' => 500 ),
+					'%'   => array( 'min' => -100, 'max' => 100 ),
+					'em'  => array( 'min' => -30, 'max' => 30 ),
+					'rem' => array( 'min' => -30, 'max' => 30 ),
+					'vh'  => array( 'min' => -50, 'max' => 50 ),
+				),
+				'default'    => array( 'unit' => 'px', 'size' => 0 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-next-y:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'arrow_place' => 'free' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_gap',
+			array(
+				'label'      => 'فاصله دو دکمه از هم',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 48 ) ),
+				'separator'  => 'before',
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pslider__nav, {{WRAPPER}} .ard-pslider__foot' => 'gap:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pslider__stage' => 'gap:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array( 'arrow_place' => array( 'side', 'top', 'bottom' ) ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_inset',
+			array(
+				'label'       => 'فاصله از لبه',
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => array( 'px' ),
+				'range'       => array( 'px' => array( 'min' => -60, 'max' => 60 ) ),
+				'description' => 'دکمه‌ها را به داخل یا بیرونِ لبهٔ کارت‌ها می‌برد.',
+				'selectors'   => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow-inset:{{SIZE}}{{UNIT}};' ),
+				'condition'   => array( 'arrow_place' => 'inside' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_align',
+			array(
+				'label'     => 'چیدمان گروه دکمه‌ها',
+				'type'      => Controls_Manager::CHOOSE,
+				'options'   => array(
+					'flex-start' => array( 'title' => 'شروع', 'icon' => 'eicon-h-align-right' ),
+					'center'     => array( 'title' => 'وسط', 'icon' => 'eicon-h-align-center' ),
+					'flex-end'   => array( 'title' => 'پایان', 'icon' => 'eicon-h-align-left' ),
+				),
+				'selectors' => array( '{{WRAPPER}} .ard-pslider__foot' => 'justify-content:{{VALUE}};' ),
+				'condition' => array( 'arrow_place' => 'bottom' ),
+			)
+		);
+
 		$this->start_controls_tabs( 'arrow_tabs' );
 
 		$this->start_controls_tab( 'arrow_normal', array( 'label' => 'عادی' ) );
@@ -833,7 +1070,7 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 			<?php endif; ?>
 
 			<div class="ard-pslider__stage">
-				<?php if ( $arrows && in_array( $s['arrow_place'], array( 'side', 'inside' ), true ) ) : ?>
+				<?php if ( $arrows && in_array( $s['arrow_place'], array( 'side', 'inside', 'free' ), true ) ) : ?>
 					<?php $this->arrows( $s ); ?>
 				<?php endif; ?>
 
@@ -894,7 +1131,7 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 					<?php endif; ?>
 				</div>
 
-				<?php if ( $arrows && in_array( $s['arrow_place'], array( 'side', 'inside' ), true ) ) : ?>
+				<?php if ( $arrows && in_array( $s['arrow_place'], array( 'side', 'inside', 'free' ), true ) ) : ?>
 					<?php $this->arrows( $s, 'next' ); ?>
 				<?php endif; ?>
 			</div>
@@ -913,7 +1150,7 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 	 * @param string $only prev | next | خالی برای هر دو.
 	 */
 	private function arrows( $s, $only = '' ) {
-		$side = in_array( $s['arrow_place'], array( 'side', 'inside' ), true );
+		$side = in_array( $s['arrow_place'], array( 'side', 'inside', 'free' ), true );
 
 		// در حالت کناری، هر دکمه جداگانه و در دو طرف چاپ می‌شود.
 		if ( $side && '' === $only ) {

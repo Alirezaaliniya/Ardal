@@ -255,43 +255,8 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 
 		$this->add_media_fit_control( '.ard-pcard__media img' );
 
-		$this->add_control(
-			'reveal_btn_bg',
-			array(
-				'label'     => 'زمینه دکمه آشکارشونده',
-				'type'      => Controls_Manager::COLOR,
-				'condition' => array( 'variant' => 'reveal' ),
-				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-bg:{{VALUE}};',
-				),
-			)
-		);
 
-		$this->add_control(
-			'reveal_btn_ink',
-			array(
-				'label'     => 'رنگ متن دکمه آشکارشونده',
-				'type'      => Controls_Manager::COLOR,
-				'condition' => array( 'variant' => 'reveal' ),
-				'selectors' => array(
-					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-ink:{{VALUE}};',
-				),
-			)
-		);
 
-		$this->add_responsive_control(
-			'reveal_foot_h',
-			array(
-				'label'      => 'ارتفاع نوار قیمت و دکمه',
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 32, 'max' => 64 ) ),
-				'condition'  => array( 'variant' => 'reveal' ),
-				'selectors'  => array(
-					'{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-foot:{{SIZE}}{{UNIT}};',
-				),
-			)
-		);
 
 		$this->add_control(
 			'button_text',
@@ -378,6 +343,8 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 		);
 
 		$this->end_controls_section();
+
+		$this->add_reveal_controls();
 	}
 
 	protected function render() {
@@ -423,6 +390,8 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'show_fab'    => $framed,
 				'show_button' => ! $framed,
 				'off_inline'  => $reveal,
+				'off_stack'   => $reveal && 'yes' === $s['reveal_off_stack'],
+				'icon_html'   => $reveal ? $this->card_button_icon( $s ) : '',
 				'button_text' => $s['button_text'],
 				'placeholder' => $s['placeholder'],
 				'notch'       => $framed && 'yes' === $s['notch'],

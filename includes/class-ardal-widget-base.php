@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Typography;
 use Elementor\Widget_Base;
 
 abstract class Ardal_Widget_Base extends Widget_Base {
@@ -549,6 +551,14 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				 * می‌خواهد و درصد را کنار قیمت خط‌خورده نشان می‌دهد.
 				 */
 				'off_inline' => false,
+				/*
+				 * نشان درصد و قیمتِ قبل روی هم بنشینند (نشان بالا، قیمت زیرش)
+				 * یا کنار هم. دیزاینِ سبک «آشکارشونده» روی‌همِ آن‌ها را
+				 * می‌خواهد.
+				 */
+				'off_stack'  => false,
+				// نشانِ SVG داخل دکمهٔ متنی؛ خالی یعنی بدون آیکون.
+				'icon_html'  => '',
 			)
 		);
 
@@ -668,6 +678,17 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 
 		echo '<div class="ard-pcard__prices">';
 
+		// در حالت روی‌هم، نشان و قیمتِ قبل یک ستون می‌شوند تا زیر هم بیفتند.
+		$stack = $opts['off_stack'] && ( '' !== $old || ( $opts['off_inline'] && '' !== $off ) );
+
+		if ( $stack ) {
+			echo '<div class="ard-pcard__offbox">';
+
+			if ( $opts['off_inline'] && '' !== $off ) {
+				printf( '<span class="ard-pcard__off">%s</span>', esc_html( $off ) );
+			}
+		}
+
 		if ( '' !== $old ) {
 			printf( '<del class="ard-pcard__old">%s</del>', esc_html( $old ) );
 		} elseif ( '' !== $price && $opts['reserve_old'] ) {
@@ -677,7 +698,9 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			echo '<del class="ard-pcard__old ard-pcard__old--empty" aria-hidden="true">&nbsp;</del>';
 		}
 
-		if ( $opts['off_inline'] && '' !== $off ) {
+		if ( $stack ) {
+			echo '</div>';
+		} elseif ( $opts['off_inline'] && '' !== $off ) {
 			printf( '<span class="ard-pcard__off">%s</span>', esc_html( $off ) );
 		}
 
@@ -692,7 +715,13 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		echo '</div>';
 
 		if ( $opts['show_button'] ) {
-			$this->render_card_action( $item, $opts, 'ard-pcard__btn', esc_html( $opts['button_text'] ), '' );
+			$this->render_card_action(
+				$item,
+				$opts,
+				'ard-pcard__btn',
+				Ardal_Helpers::svg( $opts['icon_html'] ) . '<span class="ard-pcard__btn-text">' . esc_html( $opts['button_text'] ) . '</span>',
+				''
+			);
 		}
 
 		if ( $foot ) {
@@ -744,7 +773,8 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 					$product,
 					$classes,
 					wp_strip_all_tags( $inner ),
-					array( 'data-ard-add-to-cart' => '' !== $label ? $label : 'true' )
+					array( 'data-ard-add-to-cart' => '' !== $label ? $label : 'true' ),
+					isset( $opts['icon_html'] ) ? $opts['icon_html'] : ''
 				); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce API output.
 
 				return;
@@ -1098,6 +1128,417 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		$this->render_empty( 'این ویجت به ووکامرس نیاز دارد.' );
 
 		return true;
+	}
+
+	/**
+	 * آیکون‌های آمادهٔ دکمهٔ کارت.
+	 *
+	 * @return array
+	 */
+	public static function card_icon_options() {
+		return array(
+			'bag-smile' => 'کیف خرید با لبخند',
+			'bag'       => 'کیف خرید ساده',
+			'cart'      => 'چرخ خرید',
+			'plus'      => 'به‌علاوه',
+			'arrow'     => 'فلش',
+			'none'      => 'بدون آیکون',
+		);
+	}
+
+	/**
+	 * نشانِ SVG یکی از آیکون‌های آماده.
+	 *
+	 * @param string $name
+	 * @return string
+	 */
+	public static function card_icon( $name ) {
+		$paths = array(
+			'bag-smile' => '<path d="M5.6 8.4h12.8l-1.1 11.3a2 2 0 0 1-2 1.8H8.7a2 2 0 0 1-2-1.8z"/><path d="M9 8.4V6.5a3 3 0 0 1 6 0v1.9"/><path d="M9.9 13.1a2.7 2.7 0 0 0 4.2 0"/>',
+			'bag'       => '<path d="M5.6 8.4h12.8l-1.1 11.3a2 2 0 0 1-2 1.8H8.7a2 2 0 0 1-2-1.8z"/><path d="M9 8.4V6.5a3 3 0 0 1 6 0v1.9"/>',
+			'cart'      => '<path d="M2.8 4h2.1l2.3 10.6a2 2 0 0 0 2 1.6h7a2 2 0 0 0 2-1.5L20 7H6"/><circle cx="10" cy="19.4" r="1.4"/><circle cx="17" cy="19.4" r="1.4"/>',
+			'plus'      => '<path d="M12 6v12"/><path d="M6 12h12"/>',
+			'arrow'     => '<path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/>',
+		);
+
+		if ( ! isset( $paths[ $name ] ) ) {
+			return '';
+		}
+
+		return sprintf(
+			'<svg class="ard-pcard__btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">%s</svg>',
+			$paths[ $name ]
+		);
+	}
+
+	/**
+	 * نشانِ نهایی دکمه: انتخابِ آیکون‌پیکر المنتور، وگرنه آیکون آمادهٔ اردال.
+	 *
+	 * @param array $s تنظیمات ویجت.
+	 * @return string
+	 */
+	protected function card_button_icon( $s ) {
+		$pick = isset( $s['reveal_icon_custom'] ) ? $s['reveal_icon_custom'] : array();
+
+		if ( ! empty( $pick['value'] ) && class_exists( '\Elementor\Icons_Manager' ) ) {
+			ob_start();
+			\Elementor\Icons_Manager::render_icon( $pick, array( 'aria-hidden' => 'true', 'class' => 'ard-pcard__btn-icon' ) );
+
+			return (string) ob_get_clean();
+		}
+
+		return self::card_icon( isset( $s['reveal_icon'] ) ? $s['reveal_icon'] : 'bag-smile' );
+	}
+
+	/**
+	 * بخش کامل تنظیمات سبک «دکمهٔ آشکارشونده».
+	 *
+	 * یک‌جا نگهداری می‌شود چون هر سه ویجتی که کارت محصول می‌سازند همین سبک را
+	 * دارند؛ اگر هرکدام نسخهٔ خودش را داشت، با اولین تغییر از هم می‌افتادند.
+	 */
+	protected function add_reveal_controls() {
+		$this->start_controls_section(
+			'section_reveal',
+			array(
+				'label'     => 'سبک آشکارشونده',
+				'tab'       => Controls_Manager::TAB_STYLE,
+				'condition' => array( 'variant' => 'reveal' ),
+			)
+		);
+
+		/* ---------------------------------------- دکمه */
+
+		$this->add_control(
+			'reveal_btn_heading',
+			array( 'label' => 'دکمه', 'type' => Controls_Manager::HEADING )
+		);
+
+		$this->add_control(
+			'reveal_icon',
+			array(
+				'label'   => 'آیکون',
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'bag-smile',
+				'options' => self::card_icon_options(),
+			)
+		);
+
+		$this->add_control(
+			'reveal_icon_custom',
+			array(
+				'label'       => 'یا آیکون دلخواه',
+				'type'        => Controls_Manager::ICONS,
+				'skin'        => 'inline',
+				'label_block' => false,
+				'description' => 'اگر چیزی انتخاب کنید، جای آیکون بالا می‌نشیند.',
+			)
+		);
+
+		$this->add_control(
+			'reveal_icon_side',
+			array(
+				'label'        => 'آیکون سمت پایانِ متن',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'description'  => 'پیش‌فرض: آیکون پیش از متن (سمت راست). روشن: بعد از متن.',
+				'prefix_class' => 'ard-reveal-icon-end-',
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_icon_size',
+			array(
+				'label'      => 'اندازه آیکون',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 10, 'max' => 40 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 19 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-icon-size:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_icon_gap',
+			array(
+				'label'      => 'فاصله آیکون از متن',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 24 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 8 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-icon-gap:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_btn_h',
+			array(
+				'label'      => 'ارتفاع دکمه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 30, 'max' => 72 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 48 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-foot:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_btn_radius',
+			array(
+				'label'      => 'گردی دکمه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'range'      => array(
+					'px' => array( 'min' => 0, 'max' => 40 ),
+					'%'  => array( 'min' => 0, 'max' => 50 ),
+				),
+				'default'    => array( 'unit' => 'px', 'size' => 10 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_btn_gap',
+			array(
+				'label'      => 'فاصله دکمه از پایین کارت',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 4 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-gap:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'reveal_btn_typo',
+				'label'    => 'قلم دکمه',
+				'selector' => '{{WRAPPER}} .ard-pcard--reveal .ard-pcard__btn',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'reveal_btn_border',
+				'label'    => 'حاشیه دکمه',
+				'selector' => '{{WRAPPER}} .ard-pcard--reveal .ard-pcard__btn',
+			)
+		);
+
+		$this->start_controls_tabs( 'reveal_btn_tabs' );
+
+		$this->start_controls_tab( 'reveal_btn_normal', array( 'label' => 'عادی' ) );
+
+		$this->add_control(
+			'reveal_btn_bg',
+			array(
+				'label'     => 'زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#F11763',
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-bg:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'reveal_btn_ink',
+			array(
+				'label'     => 'رنگ متن و آیکون',
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#FFFFFF',
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-ink:{{VALUE}};' ),
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab( 'reveal_btn_hover', array( 'label' => 'شناور' ) );
+
+		$this->add_control(
+			'reveal_btn_bg_hover',
+			array(
+				'label'     => 'زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-bg-hover:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'reveal_btn_ink_hover',
+			array(
+				'label'     => 'رنگ متن و آیکون',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-btn-ink-hover:{{VALUE}};' ),
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
+
+		/* ---------------------------------------- نشان درصد */
+
+		$this->add_control(
+			'reveal_off_heading',
+			array( 'label' => 'نشان درصد و قیمت قبل', 'type' => Controls_Manager::HEADING, 'separator' => 'before' )
+		);
+
+		$this->add_control(
+			'reveal_off_stack',
+			array(
+				'label'        => 'نشان بالای قیمتِ قبل بنشیند',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'خاموش: هر دو در یک خط کنار هم.',
+			)
+		);
+
+		$this->add_control(
+			'reveal_price_side',
+			array(
+				'label'        => 'جای قیمت',
+				'type'         => Controls_Manager::SELECT,
+				'default'      => 'end',
+				'options'      => array(
+					'end'   => 'قیمت سمت پایان، نشان سمت شروع (مطابق دیزاین)',
+					'start' => 'قیمت سمت شروع، نشان سمت پایان',
+				),
+				'prefix_class' => 'ard-reveal-price-',
+			)
+		);
+
+		$this->add_control(
+			'reveal_off_bg',
+			array(
+				'label'     => 'زمینه نشان',
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#E31336',
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-off-bg:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'reveal_off_ink',
+			array(
+				'label'     => 'رنگ متن نشان',
+				'type'      => Controls_Manager::COLOR,
+				'default'   => '#FFFFFF',
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-off-ink:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'reveal_off_radius',
+			array(
+				'label'      => 'گردی نشان',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 20 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 8 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-off-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'reveal_off_typo',
+				'label'    => 'قلم نشان',
+				'selector' => '{{WRAPPER}} .ard-pcard--reveal .ard-pcard__off',
+			)
+		);
+
+		$this->add_control(
+			'reveal_old_ink',
+			array(
+				'label'     => 'رنگ قیمت قبل',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-old-ink:{{VALUE}};' ),
+			)
+		);
+
+		/* ---------------------------------------- قیمت و کارت */
+
+		$this->add_control(
+			'reveal_card_heading',
+			array( 'label' => 'قیمت و کارت', 'type' => Controls_Manager::HEADING, 'separator' => 'before' )
+		);
+
+		$this->add_control(
+			'reveal_price_ink',
+			array(
+				'label'     => 'رنگ قیمت',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-price-ink:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'reveal_card_bg',
+			array(
+				'label'     => 'زمینه کارت',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-card-bg:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'reveal_card_border',
+				'label'    => 'حاشیه کارت',
+				'selector' => '{{WRAPPER}} .ard-pcard--reveal .ard-pcard__box',
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_card_radius',
+			array(
+				'label'      => 'گردی کارت',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 18 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-radius-xl:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_card_pad',
+			array(
+				'label'      => 'فاصله داخلی کارت',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 32 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 12 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-pad:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_control(
+			'reveal_media_bg',
+			array(
+				'label'     => 'زمینه پنل تصویر',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-media-bg:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_media_radius',
+			array(
+				'label'      => 'گردی پنل تصویر',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 32 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 14 ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-media-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->end_controls_section();
 	}
 
 	protected function render_empty( $message ) {

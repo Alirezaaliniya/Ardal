@@ -189,6 +189,8 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 		);
 
 		$this->end_controls_section();
+
+		$this->add_reveal_controls();
 	}
 
 	protected function render() {
@@ -240,6 +242,8 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 					'show_fab'      => $framed,
 					'show_button'   => ! $framed,
 					'off_inline'    => $reveal,
+					'off_stack'     => $reveal && 'yes' === $s['reveal_off_stack'],
+					'icon_html'     => $reveal ? $this->card_button_icon( $s ) : '',
 					'button_text'   => $s['button_text'],
 					'placeholder'   => '۸۰۰×۸۰۰',
 					'title_tag'     => $s['card_title_tag'],
