@@ -1,0 +1,351 @@
+/**
+ * اسلایدر مطالب بلاگ.
+ *
+ * چیدمان روی اسکرولِ خود مرورگر سوار است (scroll-snap + overflow)، نه روی
+ * transform؛ پس لمس، درگ و صفحه‌کلید بدون کد اضافه کار می‌کنند و اگر
+ * جاوااسکریپت هم نرسد، کاربر باز می‌تواند اسلایدر را اسکرول کند.
+ */
+
+.ard-pslider {
+	--ard-ps-gap: 16px;
+	--ard-ps-radius: var(--ard-radius-xl, 18px);
+	--ard-ps-pad: 10px;
+	--ard-ps-card-bg: var(--ard-base, #fff);
+	--ard-ps-img-h: 200px;
+	--ard-ps-title: var(--ard-text, #1f2937);
+	--ard-ps-excerpt: var(--ard-muted, #6b7280);
+	--ard-ps-title-lines: 1;
+	--ard-ps-excerpt-lines: 2;
+
+	--ard-ps-chip: 36px;
+	--ard-ps-chip-bg: rgba(255, 255, 255, .92);
+	--ard-ps-chip-ink: var(--ard-text, #1f2937);
+
+	--ard-ps-arrow: 40px;
+	--ard-ps-arrow-icon: 18px;
+	--ard-ps-arrow-radius: 50%;
+	--ard-ps-arrow-bg: var(--ard-base, #fff);
+	--ard-ps-arrow-ink: var(--ard-text, #1f2937);
+	--ard-ps-arrow-line: var(--ard-border, #e5e7eb);
+	--ard-ps-arrow-bg-hover: var(--ard-primary, #0f766e);
+	--ard-ps-arrow-ink-hover: #fff;
+
+	--ard-ps-dot: var(--ard-border, #d5d9de);
+	--ard-ps-dot-active: var(--ard-primary, #0f766e);
+	--ard-ps-dot-size: 8px;
+	--ard-ps-dot-active-w: 22px;
+	--ard-ps-dot-gap: 6px;
+
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.ard-pslider__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+/* عنوان بخش داخل سربرگ نباید حاشیهٔ پایینی خودش را نگه دارد. */
+.ard-pslider__head > .ard-head {
+	margin-block-end: 0;
+}
+
+.ard-pslider__nav,
+.ard-pslider__foot {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ard-pslider__foot {
+	justify-content: center;
+	margin-block-start: 10px;
+}
+
+.ard-pslider__stage {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ard-pslider__car {
+	flex: 1 1 auto;
+	min-inline-size: 0;
+}
+
+/* ---------------------------------------- ریل */
+
+.ard-pslider__track {
+	--ard-per: 3;
+
+	display: grid;
+	/*
+	 * ستون‌ها به تعدادِ «در هر نما» بریده می‌شوند و بقیه از لبه بیرون می‌مانند.
+	 * grid-auto-flow: column یعنی هرچه کارت بیاید در همان یک ردیف می‌ماند.
+	 */
+	grid-auto-flow: column;
+	grid-auto-columns: calc((100% - (var(--ard-per) - 1) * var(--ard-ps-gap)) / var(--ard-per));
+	gap: var(--ard-ps-gap);
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	/* جا برای سایهٔ کارت‌ها، وگرنه اسکرول لبه‌شان را می‌برد. */
+	padding-block: 4px;
+}
+
+.ard-pslider__track::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-pslider__track > * {
+	scroll-snap-align: start;
+}
+
+/* هنگام کشیدن با ماوس، snap باید کنار برود وگرنه به انگشت نمی‌چسبد. */
+.ard-pslider__track.ard-drag {
+	scroll-snap-type: none;
+}
+
+/* ---------------------------------------- کارت */
+
+.ard-pcardp {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: var(--ard-ps-pad);
+	border: 1px solid var(--ard-border-soft, #eef0f2);
+	border-radius: var(--ard-ps-radius);
+	background: var(--ard-ps-card-bg);
+	block-size: 100%;
+}
+
+.ard-pcardp__media {
+	position: relative;
+	block-size: var(--ard-ps-img-h);
+	border-radius: calc(var(--ard-ps-radius) - var(--ard-ps-pad) / 2);
+	background: var(--ard-surface-alt, #f3f4f6);
+	overflow: hidden;
+}
+
+.ard-pcardp__media img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+/* ---------------------------------------- نشان‌های روی تصویر */
+
+.ard-pcardp__chips {
+	position: absolute;
+	inset-block-start: 10px;
+	inset-inline-end: 10px;
+	display: flex;
+	gap: 6px;
+}
+
+/* گوشهٔ دیگر، از کنترل «گوشه». */
+.ard-ps-chips-start .ard-pcardp__chips {
+	inset-inline-end: auto;
+	inset-inline-start: 10px;
+}
+
+.ard-pcardp__chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	min-inline-size: var(--ard-ps-chip);
+	block-size: var(--ard-ps-chip);
+	padding-inline: 9px;
+	border-radius: 999px;
+	background: var(--ard-ps-chip-bg);
+	color: var(--ard-ps-chip-ink);
+	font-size: 11.5px;
+	font-weight: 700;
+	line-height: 1;
+	/* شیشه‌ای، تا روی تصویرِ روشن و تیره هر دو خوانا بماند. */
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+}
+
+/* بدون متن، چیپ دایرهٔ کامل است. */
+.ard-pcardp__chip:not(:has(.ard-pcardp__chip-text)) {
+	inline-size: var(--ard-ps-chip);
+	padding-inline: 0;
+}
+
+.ard-pcardp__chip .ard-i {
+	flex: 0 0 auto;
+}
+
+/* ---------------------------------------- متن */
+
+.ard-pcardp__body {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 2px 6px 8px;
+}
+
+.ard-pcardp__title {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 800;
+	line-height: 1.8;
+	color: var(--ard-ps-title);
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: var(--ard-ps-title-lines, 1);
+	line-clamp: var(--ard-ps-title-lines, 1);
+	overflow: hidden;
+	overflow-wrap: anywhere;
+}
+
+.ard-pcardp__title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.ard-pcardp__title a:hover {
+	color: var(--ard-primary, #0f766e);
+	text-decoration: none;
+}
+
+.ard-pcardp__excerpt {
+	margin: 0;
+	font-size: 12.5px;
+	line-height: 2;
+	color: var(--ard-ps-excerpt);
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: var(--ard-ps-excerpt-lines, 2);
+	line-clamp: var(--ard-ps-excerpt-lines, 2);
+	overflow: hidden;
+	overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------- دکمه‌های ناوبری */
+
+.ard-pslider__arrow {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--ard-ps-arrow);
+	block-size: var(--ard-ps-arrow);
+	padding: 0;
+	border: 1px solid var(--ard-ps-arrow-line);
+	border-radius: var(--ard-ps-arrow-radius);
+	background: var(--ard-ps-arrow-bg);
+	color: var(--ard-ps-arrow-ink);
+	cursor: pointer;
+	transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+
+.ard-pslider__arrow:hover,
+.ard-pslider__arrow:focus-visible {
+	border-color: var(--ard-ps-arrow-bg-hover);
+	background: var(--ard-ps-arrow-bg-hover);
+	color: var(--ard-ps-arrow-ink-hover);
+}
+
+/* آیکون، چه SVG داخلی باشد چه فونت‌آیکونِ انتخابی کاربر. */
+.ard-pslider__arrow .ard-i,
+.ard-pslider__arrow svg {
+	inline-size: var(--ard-ps-arrow-icon);
+	block-size: var(--ard-ps-arrow-icon);
+}
+
+.ard-pslider__arrow i {
+	font-size: var(--ard-ps-arrow-icon);
+	line-height: 1;
+}
+
+/*
+ * دکمه‌های «روی کارت‌ها».
+ *
+ * از جریان بیرون می‌روند تا ریل تمام پهنا را بگیرد؛ در حالت «دو طرف» برعکس،
+ * داخل جریان می‌مانند و ریل جا باز می‌کند.
+ */
+.ard-pslider--arrows-inside .ard-pslider__arrow {
+	position: absolute;
+	z-index: 3;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+}
+
+.ard-pslider--arrows-inside .ard-pslider__arrow--prev {
+	inset-inline-start: 8px;
+}
+
+.ard-pslider--arrows-inside .ard-pslider__arrow--next {
+	inset-inline-end: 8px;
+}
+
+/* ---------------------------------------- نقطه‌ها */
+
+.ard-pslider__dots {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--ard-ps-dot-gap);
+	margin-block-start: 10px;
+}
+
+.ard-pslider__dots:empty {
+	display: none;
+}
+
+.ard-pslider__foot .ard-pslider__dots {
+	margin-block-start: 0;
+}
+
+.ard-pslider__dot {
+	inline-size: var(--ard-ps-dot-size);
+	block-size: var(--ard-ps-dot-size);
+	padding: 0;
+	border: 0;
+	border-radius: 999px;
+	background: var(--ard-ps-dot);
+	cursor: pointer;
+	transition: inline-size .22s ease, background-color .22s ease;
+}
+
+.ard-pslider__dot.is-active {
+	inline-size: var(--ard-ps-dot-active-w);
+	background: var(--ard-ps-dot-active);
+}
+
+/* ---------------------------------------- موبایل */
+
+@media (max-width: 600px) {
+	/*
+	 * روی صفحهٔ باریک، «دو طرف» جای ریل را تنگ می‌کند؛ دکمه‌ها می‌روند پایین
+	 * و انگشت هم که از قبل می‌توانست اسلاید کند.
+	 */
+	.ard-pslider--arrows-side .ard-pslider__stage {
+		display: block;
+	}
+
+	.ard-pslider--arrows-side .ard-pslider__arrow {
+		display: none;
+	}
+
+	.ard-pslider__head {
+		flex-wrap: wrap;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-pslider__dot,
+	.ard-pslider__arrow {
+		transition: none;
+	}
+}

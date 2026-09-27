@@ -622,8 +622,22 @@
 		 * غریبه می‌گرفت.
 		 */
 		var dotClass = ( dotsBox && dotsBox.getAttribute( 'data-ard-dots' ) ) || 'ard-deal__dot';
-		var prev = root.parentNode ? root.parentNode.querySelector( '[data-ard-prev]' ) : null;
-		var next = root.parentNode ? root.parentNode.querySelector( '[data-ard-next]' ) : null;
+		/*
+		 * دکمه‌ها لازم نیست همسایهٔ کروسل باشند.
+		 *
+		 * قبلاً فقط در پدرِ مستقیم دنبالشان می‌گشتیم؛ ویجتی که دکمه‌ها را بالای
+		 * عنوان یا پایین کنار نقطه‌ها می‌گذارد، بیرون از آن پدر می‌افتاد و
+		 * دکمه‌هایش بی‌کار می‌ماندند. حالا اگر ویجت دامنه‌اش را با
+		 * data-ard-slider اعلام کند، همان‌جا جست‌وجو می‌شود.
+		 */
+		var scope = root.closest ? root.closest( '[data-ard-slider]' ) : null;
+
+		if ( ! scope ) {
+			scope = root.parentNode;
+		}
+
+		var prev = scope ? scope.querySelector( '[data-ard-prev]' ) : null;
+		var next = scope ? scope.querySelector( '[data-ard-next]' ) : null;
 		var interval = parseInt( root.getAttribute( 'data-interval' ), 10 ) || 0;
 		var timer = null;
 		var dots = [];
