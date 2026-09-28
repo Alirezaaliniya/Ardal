@@ -75,6 +75,22 @@ class Ardal_Assets {
 	}
 
 	/**
+	 * نسخهٔ هر فایل = زمان آخرین تغییرش.
+	 *
+	 * قبلاً همه با ARDAL_VERSION ثبت می‌شدند و چون آن عدد با هر تغییر بالا
+	 * نمی‌رفت، مرورگر و کش‌ها همان CSS قدیمی را نگه می‌داشتند و تنظیمات تازهٔ
+	 * ویجت‌ها (مثل «برداشتن زمینه حلقه») بی‌اثر به نظر می‌رسید.
+	 *
+	 * @param string $rel مسیر نسبی فایل داخل افزونه.
+	 * @return string
+	 */
+	private static function ver( $rel ) {
+		$time = @filemtime( ARDAL_PATH . $rel ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+		return $time ? ARDAL_VERSION . '.' . $time : ARDAL_VERSION;
+	}
+
+	/**
 	 * ثبت هندل‌ها. چند بار صدا زدنش بی‌ضرر است.
 	 */
 	public function register() {
@@ -84,21 +100,21 @@ class Ardal_Assets {
 
 		$this->registered = true;
 
-		wp_register_style( 'ardal', ARDAL_URL . 'assets/css/ardal.css', array(), ARDAL_VERSION );
-		wp_register_script( 'ardal', ARDAL_URL . 'assets/js/ardal.js', array(), ARDAL_VERSION, true );
-		wp_register_style( 'ardal-monster-rating', ARDAL_URL . 'assets/css/ardal-monster-rating.css', array(), ARDAL_VERSION );
-		wp_register_style( 'ardal-mega-menu', ARDAL_URL . 'assets/css/ardal-mega-menu.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-mega-menu', ARDAL_URL . 'assets/js/ardal-mega-menu.js', array(), ARDAL_VERSION, true );
-		wp_register_style( 'ardal-account', ARDAL_URL . 'assets/css/ardal-account.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-account', ARDAL_URL . 'assets/js/ardal-account.js', array(), ARDAL_VERSION, true );
-		wp_register_style( 'ardal-shop', ARDAL_URL . 'assets/css/ardal-shop.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-shop', ARDAL_URL . 'assets/js/ardal-shop.js', array(), ARDAL_VERSION, true );
-		wp_register_style( 'ardal-posts-slider', ARDAL_URL . 'assets/css/ardal-posts-slider.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_style( 'ardal-brand-rings', ARDAL_URL . 'assets/css/ardal-brand-rings.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-brand-rings', ARDAL_URL . 'assets/js/ardal-brand-rings.js', array(), ARDAL_VERSION, true );
-		wp_register_style( 'ardal-search', ARDAL_URL . 'assets/css/ardal-search.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-search', ARDAL_URL . 'assets/js/ardal-search.js', array(), ARDAL_VERSION, true );
-		wp_register_script( 'ardal-search-results', ARDAL_URL . 'assets/js/ardal-search-results.js', array(), ARDAL_VERSION, true );
+		wp_register_style( 'ardal', ARDAL_URL . 'assets/css/ardal.css', array(), self::ver( 'assets/css/ardal.css' ) );
+		wp_register_script( 'ardal', ARDAL_URL . 'assets/js/ardal.js', array(), self::ver( 'assets/js/ardal.js' ), true );
+		wp_register_style( 'ardal-monster-rating', ARDAL_URL . 'assets/css/ardal-monster-rating.css', array(), self::ver( 'assets/css/ardal-monster-rating.css' ) );
+		wp_register_style( 'ardal-mega-menu', ARDAL_URL . 'assets/css/ardal-mega-menu.css', array( 'ardal' ), self::ver( 'assets/css/ardal-mega-menu.css' ) );
+		wp_register_script( 'ardal-mega-menu', ARDAL_URL . 'assets/js/ardal-mega-menu.js', array(), self::ver( 'assets/js/ardal-mega-menu.js' ), true );
+		wp_register_style( 'ardal-account', ARDAL_URL . 'assets/css/ardal-account.css', array( 'ardal' ), self::ver( 'assets/css/ardal-account.css' ) );
+		wp_register_script( 'ardal-account', ARDAL_URL . 'assets/js/ardal-account.js', array(), self::ver( 'assets/js/ardal-account.js' ), true );
+		wp_register_style( 'ardal-shop', ARDAL_URL . 'assets/css/ardal-shop.css', array( 'ardal' ), self::ver( 'assets/css/ardal-shop.css' ) );
+		wp_register_script( 'ardal-shop', ARDAL_URL . 'assets/js/ardal-shop.js', array(), self::ver( 'assets/js/ardal-shop.js' ), true );
+		wp_register_style( 'ardal-posts-slider', ARDAL_URL . 'assets/css/ardal-posts-slider.css', array( 'ardal' ), self::ver( 'assets/css/ardal-posts-slider.css' ) );
+		wp_register_style( 'ardal-brand-rings', ARDAL_URL . 'assets/css/ardal-brand-rings.css', array( 'ardal' ), self::ver( 'assets/css/ardal-brand-rings.css' ) );
+		wp_register_script( 'ardal-brand-rings', ARDAL_URL . 'assets/js/ardal-brand-rings.js', array(), self::ver( 'assets/js/ardal-brand-rings.js' ), true );
+		wp_register_style( 'ardal-search', ARDAL_URL . 'assets/css/ardal-search.css', array( 'ardal' ), self::ver( 'assets/css/ardal-search.css' ) );
+		wp_register_script( 'ardal-search', ARDAL_URL . 'assets/js/ardal-search.js', array(), self::ver( 'assets/js/ardal-search.js' ), true );
+		wp_register_script( 'ardal-search-results', ARDAL_URL . 'assets/js/ardal-search-results.js', array(), self::ver( 'assets/js/ardal-search-results.js' ), true );
 
 		/*
 		 * نانس و نشانی ایجکس فقط برای جست‌وجوی زنده. روی هندل خودش می‌نشیند تا
@@ -113,15 +129,15 @@ class Ardal_Assets {
 			)
 		);
 
-		wp_register_style( 'ardal-support', ARDAL_URL . 'assets/css/ardal-support.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-support', ARDAL_URL . 'assets/js/ardal-support.js', array(), ARDAL_VERSION, true );
-		wp_register_style( 'ardal-toc', ARDAL_URL . 'assets/css/ardal-toc.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-toc', ARDAL_URL . 'assets/js/ardal-toc.js', array(), ARDAL_VERSION, true );
-		wp_register_style( 'ardal-archive', ARDAL_URL . 'assets/css/ardal-archive.css', array( 'ardal' ), ARDAL_VERSION );
-		wp_register_script( 'ardal-archive', ARDAL_URL . 'assets/js/ardal-archive.js', array(), ARDAL_VERSION, true );
-		wp_register_script( 'ardal-gsap', ARDAL_URL . 'assets/vendor/gsap/gsap.min.js', array(), ARDAL_VERSION, true );
-		wp_register_script( 'ardal-morphsvg', ARDAL_URL . 'assets/vendor/gsap/morphsvg.min.js', array( 'ardal-gsap' ), ARDAL_VERSION, true );
-		wp_register_script( 'ardal-monster-rating', ARDAL_URL . 'assets/js/ardal-monster-rating.js', array( 'ardal-morphsvg' ), ARDAL_VERSION, true );
+		wp_register_style( 'ardal-support', ARDAL_URL . 'assets/css/ardal-support.css', array( 'ardal' ), self::ver( 'assets/css/ardal-support.css' ) );
+		wp_register_script( 'ardal-support', ARDAL_URL . 'assets/js/ardal-support.js', array(), self::ver( 'assets/js/ardal-support.js' ), true );
+		wp_register_style( 'ardal-toc', ARDAL_URL . 'assets/css/ardal-toc.css', array( 'ardal' ), self::ver( 'assets/css/ardal-toc.css' ) );
+		wp_register_script( 'ardal-toc', ARDAL_URL . 'assets/js/ardal-toc.js', array(), self::ver( 'assets/js/ardal-toc.js' ), true );
+		wp_register_style( 'ardal-archive', ARDAL_URL . 'assets/css/ardal-archive.css', array( 'ardal' ), self::ver( 'assets/css/ardal-archive.css' ) );
+		wp_register_script( 'ardal-archive', ARDAL_URL . 'assets/js/ardal-archive.js', array(), self::ver( 'assets/js/ardal-archive.js' ), true );
+		wp_register_script( 'ardal-gsap', ARDAL_URL . 'assets/vendor/gsap/gsap.min.js', array(), self::ver( 'assets/vendor/gsap/gsap.min.js' ), true );
+		wp_register_script( 'ardal-morphsvg', ARDAL_URL . 'assets/vendor/gsap/morphsvg.min.js', array( 'ardal-gsap' ), self::ver( 'assets/vendor/gsap/morphsvg.min.js' ), true );
+		wp_register_script( 'ardal-monster-rating', ARDAL_URL . 'assets/js/ardal-monster-rating.js', array( 'ardal-morphsvg' ), self::ver( 'assets/js/ardal-monster-rating.js' ), true );
 
 		wp_add_inline_style( 'ardal', Ardal_Palette::css_vars() );
 	}

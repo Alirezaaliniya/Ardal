@@ -3252,8 +3252,12 @@ a.ard-brand:hover img {
 		aspect-ratio: 1;
 	}
 
-	.ard-cats--gradient .ard-cat__ring {
-		padding: 4px;
+	/*
+	 * فقط مقدار متغیر؛ padding مستقیم، «برداشتن زمینه و حاشیه» و کنترل
+	 * «فاصله داخلی حلقه» را در موبایل بی‌اثر می‌کرد.
+	 */
+	.ard-cats--gradient {
+		--ard-cat-ring-pad: 4px;
 	}
 
 	.ard-cat__title {
