@@ -5729,9 +5729,25 @@ a.ard-ptags__chip:focus-visible {
 	opacity: .5;
 }
 
-/* برچسب که خاموش است، خانه نباید ارتفاع اضافه بگیرد. */
-.ard-cdown .ard-clock__cell:not(:has(.ard-clock__label)) {
+/*
+ * وقتی هیچ خانه‌ای برچسب ندارد، فاصلهٔ عمودی اضافه هم لازم نیست.
+ *
+ * شرط روی خودِ شمارنده است نه تک‌تک خانه‌ها: حالا که هر برچسب جداگانه
+ * پاک‌شدنی است، اگر قانون روی خانه می‌نشست، خانهٔ بی‌برچسب پدینگ دیگری
+ * می‌گرفت و ردیف ناهموار می‌شد.
+ */
+.ard-cdown .ard-clock:not(:has(.ard-clock__label)) .ard-clock__cell {
 	padding-block: 10px;
+}
+
+/*
+ * خانه‌ای که برچسبش پاک شده، عددش وسط بماند نه چسبیده به بالا — وگرنه کنارِ
+ * خانه‌های برچسب‌دار که هم‌ارتفاع کشیده می‌شوند، بالا می‌ایستد.
+ */
+.ard-cdown .ard-clock__cell {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .ard-cdown__product {
@@ -6074,6 +6090,23 @@ a.ard-ptags__chip:focus-visible {
 	overflow: hidden;
 }
 
+/*
+ * تصویر به نسبت خودش.
+ *
+ * ارتفاع از محتوا می‌آید و object-fit کنار می‌رود، پس عکس تمام پهنای کارت را
+ * می‌گیرد و قدش را نسبت اصلی خودِ فایل تعیین می‌کند — هیچ بخشی بریده نمی‌شود.
+ * در عوض کارت‌هایی که عکس‌شان نسبت‌های متفاوت دارد هم‌قد نمی‌مانند؛ همین است
+ * که این حالت پیش‌فرض نیست.
+ */
+.ard-reveal-media-natural .ard-pcard--reveal .ard-pcard__media {
+	block-size: auto;
+}
+
+.ard-reveal-media-natural .ard-pcard--reveal .ard-pcard__media img {
+	block-size: auto;
+	object-fit: fill;
+}
+
 .ard-pcard--reveal .ard-pcard__title {
 	/* در دیزاین، عنوان راست‌چین است و تا سه خط بالا می‌آید. */
 	text-align: start;
@@ -6135,6 +6168,17 @@ a.ard-ptags__chip:focus-visible {
 	gap: 4px;
 	font-size: 14.5px;
 	color: var(--ard-reveal-price-ink);
+}
+
+/*
+ * نماد باریک تومان.
+ *
+ * ارتفاعش با قد عدد تنظیم می‌شود نه با پهنا؛ viewBox نسبتش را نگه می‌دارد
+ * (۹ در ۲۲) پس پهنا خودش درمی‌آید و خط قیمت باز نمی‌شود.
+ */
+.ard-pcard--reveal .ard-toman--slim {
+	block-size: var(--ard-reveal-toman-h, 1.45em);
+	inline-size: auto;
 }
 
 /*

@@ -543,16 +543,48 @@ class Ardal_Widget_Countdown extends Ardal_Widget_Base {
 			)
 		);
 
-		$this->add_responsive_control(
-			'num_size',
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
 			array(
-				'label'      => 'اندازه عدد',
+				'name'     => 'num_typo',
+				'label'    => 'قلم عددها',
+				'selector' => '{{WRAPPER}} .ard-cdown .ard-clock__num',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'      => 'label_typo',
+				'label'     => 'قلم برچسب‌ها',
+				'selector'  => '{{WRAPPER}} .ard-cdown .ard-clock__label',
+				'condition' => array( 'show_labels' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'cell_pad',
+			array(
+				'label'      => 'فاصله داخلی خانه',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em', '%' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-cdown .ard-clock__cell' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'label_gap',
+			array(
+				'label'      => 'فاصله عدد تا برچسب',
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 12, 'max' => 64 ) ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 20 ) ),
 				'selectors'  => array(
-					'{{WRAPPER}} .ard-cdown .ard-clock__num' => 'font-size:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-cdown .ard-clock__label' => 'margin-block-start:{{SIZE}}{{UNIT}};',
 				),
+				'condition'  => array( 'show_labels' => 'yes' ),
 			)
 		);
 
@@ -685,7 +717,7 @@ class Ardal_Widget_Countdown extends Ardal_Widget_Base {
 							<div class="ard-clock__cell">
 								<span class="ard-clock__num" data-unit="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( Ardal_Helpers::fa_digits( $values[ $key ] ) ); ?></span>
 
-								<?php if ( $labels ) : ?>
+								<?php if ( $labels && '' !== $label ) : ?>
 									<span class="ard-clock__label"><?php echo esc_html( $label ); ?></span>
 								<?php endif; ?>
 							</div>
@@ -886,6 +918,10 @@ class Ardal_Widget_Countdown extends Ardal_Widget_Base {
 	/**
 	 * واحدهای روشن، با برچسب کاربر.
 	 *
+	 * برچسبِ خالی همان‌طور خالی برمی‌گردد و جایگزینِ فارسی نمی‌گیرد: پاک‌کردن
+	 * متن یعنی «این برچسب را نمی‌خواهم»، نه «مقدار پیش‌فرض را بگذار». خودِ
+	 * چاپ‌کننده هم با دیدن رشتهٔ خالی، اصلاً عنصری نمی‌سازد تا جای خالی نماند.
+	 *
 	 * @param array $s
 	 * @return array
 	 */
@@ -897,9 +933,7 @@ class Ardal_Widget_Countdown extends Ardal_Widget_Base {
 				continue;
 			}
 
-			$label = trim( (string) $s[ 'label_' . $key ] );
-
-			$out[ $key ] = '' !== $label ? $label : $fallback;
+			$out[ $key ] = trim( (string) $s[ 'label_' . $key ] );
 		}
 
 		// همه خاموش: دست‌کم ساعت و دقیقه بماند، وگرنه شمارنده‌ای نمی‌ماند.

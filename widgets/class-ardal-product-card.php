@@ -392,6 +392,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'off_inline'  => $reveal,
 				'off_stack'   => $reveal && 'yes' === $s['reveal_off_stack'],
 				'icon_html'   => $reveal ? $this->card_button_icon( $s ) : '',
+				'currency' => $reveal ? $s['reveal_currency'] : 'default',
 				'button_text' => $s['button_text'],
 				'placeholder' => $s['placeholder'],
 				'notch'       => $framed && 'yes' === $s['notch'],

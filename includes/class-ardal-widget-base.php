@@ -559,6 +559,8 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'off_stack'  => false,
 				// نشانِ SVG داخل دکمهٔ متنی؛ خالی یعنی بدون آیکون.
 				'icon_html'  => '',
+				// سبک نماد واحد پول: default | slim | text.
+				'currency'   => 'default',
 			)
 		);
 
@@ -708,7 +710,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			printf(
 				'<div class="ard-pcard__price">%s %s</div>',
 				esc_html( $price ),
-				Ardal_Currency::unit() // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی ثابت و امن.
+				Ardal_Currency::unit( $opts['currency'] ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی ثابت و امن.
 			);
 		}
 
@@ -1467,6 +1469,36 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		);
 
 		$this->add_control(
+			'reveal_currency',
+			array(
+				'label'       => 'نماد واحد پول',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'slim',
+				'options'     => array(
+					'slim'    => 'نماد باریک (مطابق دیزاین)',
+					'default' => 'نماد پیش‌فرض اردال',
+					'text'    => 'واژهٔ «تومان»',
+				),
+				'description' => 'نماد باریک قدش با عدد قیمت می‌خواند و خط قیمت را باز نمی‌کند.',
+			)
+		);
+
+		$this->add_responsive_control(
+			'reveal_currency_size',
+			array(
+				'label'      => 'اندازه نماد',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array( 'min' => 8, 'max' => 40 ),
+					'em' => array( 'min' => 0.5, 'max' => 3, 'step' => 0.05 ),
+				),
+				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-toman-h:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'reveal_currency!' => 'text' ),
+			)
+		);
+
+		$this->add_control(
 			'reveal_price_ink',
 			array(
 				'label'     => 'رنگ قیمت',
@@ -1514,6 +1546,21 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'range'      => array( 'px' => array( 'min' => 0, 'max' => 32 ) ),
 				'default'    => array( 'unit' => 'px', 'size' => 12 ),
 				'selectors'  => array( '{{WRAPPER}} .ard-pcard--reveal' => '--ard-reveal-pad:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_control(
+			'reveal_media_size',
+			array(
+				'label'        => 'اندازه تصویر',
+				'type'         => Controls_Manager::SELECT,
+				'default'      => 'fixed',
+				'options'      => array(
+					'fixed'   => 'ارتفاع ثابت (برش می‌خورد)',
+					'natural' => 'به نسبت خودِ تصویر آپلودشده',
+				),
+				'description'  => '«نسبت خودِ تصویر» یعنی تصویر تمام پهنای کارت را می‌گیرد و قدش را نسبت اصلی عکس تعیین می‌کند؛ هیچ بخشی بریده نمی‌شود، ولی اگر عکس‌ها نسبت‌های متفاوتی داشته باشند کارت‌ها هم‌قد نمی‌مانند.',
+				'prefix_class' => 'ard-reveal-media-',
 			)
 		);
 
