@@ -203,6 +203,121 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'ring_plain',
+			array(
+				'label'        => 'برداشتن زمینه و حاشیه حلقه',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'description'  => 'فقط تصویر می‌ماند، بدون قاب رنگی.',
+				'prefix_class' => 'ard-cats-plain-',
+			)
+		);
+
+		$this->add_control(
+			'ring_alt',
+			array(
+				'label'        => 'رنگ‌بندی یک‌درمیان',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'حلقه‌های زوج رنگ دوم را می‌گیرند.',
+				'condition'    => array( 'variant' => 'tint', 'ring_plain' => '' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'ring_radius',
+			array(
+				'label'      => 'گردی حلقه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( '%', 'px' ),
+				'range'      => array(
+					'%'  => array( 'min' => 0, 'max' => 50 ),
+					'px' => array( 'min' => 0, 'max' => 80 ),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-cats' => '--ard-cat-ring-radius:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-cat__disc' => 'border-radius:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'ring_bw',
+			array(
+				'label'      => 'ضخامت حاشیه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 10 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-cats' => '--ard-cat-ring-bw:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'ring_plain' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'ring_line',
+			array(
+				'label'     => 'رنگ حاشیه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-cats' => '--ard-cat-ring-line:{{VALUE}};' ),
+				'condition' => array( 'ring_plain' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'ring_line_alt',
+			array(
+				'label'     => 'رنگ حاشیه (یک‌درمیان)',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-cat' => '--ard-cat-ring-line-alt:{{VALUE}};' ),
+				'condition' => array( 'variant' => 'tint', 'ring_alt' => 'yes', 'ring_plain' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'ring_line_hover',
+			array(
+				'label'     => 'رنگ حاشیه در هاور',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-cats' => '--ard-cat-ring-line-hover:{{VALUE}};' ),
+				'condition' => array( 'ring_plain' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'ring_bg',
+			array(
+				'label'     => 'رنگ زمینه حلقه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-cats' => '--ard-cat-ring-bg:{{VALUE}};' ),
+				'condition' => array( 'ring_plain' => '' ),
+			)
+		);
+
+		$this->add_control(
+			'ring_bg_alt',
+			array(
+				'label'     => 'رنگ زمینه (یک‌درمیان)',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-cat' => '--ard-cat-ring-bg-alt:{{VALUE}};' ),
+				'condition' => array( 'variant' => 'tint', 'ring_alt' => 'yes', 'ring_plain' => '' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'ring_pad',
+			array(
+				'label'      => 'فاصله داخلی حلقه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 24 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-cats' => '--ard-cat-ring-pad:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'ring_plain' => '' ),
+			)
+		);
+
 		$this->add_responsive_control(
 			'size',
 			array(
@@ -463,6 +578,11 @@ class Ardal_Widget_Categories extends Ardal_Widget_Base {
 
 		$slider  = 'slider' === $s['layout'];
 		$classes = array( 'ard-cats', 'ard-cats--' . $s['variant'] );
+
+		// رنگ‌بندی یک‌درمیان فقط وقتی کلاسش باشد؛ خاموش‌کردنش یعنی همه یک رنگ.
+		if ( 'yes' === $s['ring_alt'] && 'yes' !== $s['ring_plain'] ) {
+			$classes[] = 'ard-cats--alt';
+		}
 
 		if ( $slider ) {
 			$classes[] = 'ard-cats--slider';

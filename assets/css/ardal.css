@@ -1427,6 +1427,29 @@ a.ard-service__inner:hover {
 	text-align: center;
 }
 
+/*
+ * حلقه: همه‌چیزش از متغیر می‌آید.
+ *
+ * قبلاً رنگ و حاشیه مستقیم روی .ard-cat__ring و با nth-child نوشته می‌شد؛
+ * آن قانون‌ها از کنترل‌های المنتور اختصاصی‌ترند و هر تنظیمی را می‌بلعیدند.
+ * حالا سبک‌ها فقط متغیر را مقداردهی می‌کنند و کنترل‌ها همان متغیر را روی
+ * ریشه بازنویسی می‌کنند.
+ */
+/*
+ * پیش‌فرض‌ها روی خودِ فهرست تعریف می‌شوند، نه روی حلقه.
+ *
+ * متغیری که روی همان عنصر تعریف شده باشد بر مقدارِ به‌ارث‌رسیده می‌چربد؛ اگر
+ * این‌ها روی .ard-cat__ring می‌ماندند، سبک‌ها (که روی <ul> می‌نشینند) هیچ‌وقت
+ * به حلقه نمی‌رسیدند و رنگ‌ها اصلاً دیده نمی‌شدند.
+ */
+.ard-cats {
+	--ard-cat-ring-radius: 50%;
+	--ard-cat-ring-bw: 0px;
+	--ard-cat-ring-line: transparent;
+	--ard-cat-ring-bg: transparent;
+	--ard-cat-ring-pad: 0px;
+}
+
 .ard-cat__ring {
 	display: flex;
 	align-items: center;
@@ -1434,36 +1457,60 @@ a.ard-service__inner:hover {
 	inline-size: 126px;
 	block-size: 126px;
 	max-inline-size: 100%;
-	border-radius: 50%;
+	padding: var(--ard-cat-ring-pad);
+	border: var(--ard-cat-ring-bw) solid var(--ard-cat-ring-line);
+	border-radius: var(--ard-cat-ring-radius);
+	background: var(--ard-cat-ring-bg);
 	overflow: hidden;
 	transition: border-color .25s, transform .25s;
 }
 
-.ard-cats--tint .ard-cat__ring {
-	border: 2px solid var(--ard-tint-blue-border);
-	background: var(--ard-tint-blue);
+.ard-cats--tint {
+	--ard-cat-ring-bw: 2px;
+	--ard-cat-ring-line: var(--ard-tint-blue-border);
+	--ard-cat-ring-bg: var(--ard-tint-blue);
+	--ard-cat-ring-line-alt: var(--ard-tint-green-border);
+	--ard-cat-ring-bg-alt: var(--ard-tint-green);
 }
 
-.ard-cats--tint .ard-cat:nth-child(2n) .ard-cat__ring {
-	border-color: var(--ard-tint-green-border);
-	background: var(--ard-tint-green);
+/*
+ * رنگ‌بندی یک‌درمیان.
+ *
+ * روی خودِ .ard-cat می‌نشیند نه روی حلقه، تا فقط «مقدار متغیر» را عوض کند؛
+ * این‌طور کنترلی که رنگِ یک‌درمیان را تغییر می‌دهد هم کار می‌کند.
+ */
+.ard-cats--alt .ard-cat:nth-child(2n) {
+	--ard-cat-ring-line: var(--ard-cat-ring-line-alt, var(--ard-tint-green-border));
+	--ard-cat-ring-bg: var(--ard-cat-ring-bg-alt, var(--ard-tint-green));
 }
 
 .ard-cats--tint .ard-cat__inner:hover .ard-cat__ring {
-	border-color: var(--ard-accent);
+	border-color: var(--ard-cat-ring-line-hover, var(--ard-accent));
 }
 
-.ard-cats--gradient .ard-cat__ring {
-	padding: 5px;
-	background: linear-gradient(140deg, var(--ard-primary), var(--ard-primary-light));
+/* برداشتن زمینه و حاشیه، یک‌جا. */
+.ard-cats-plain-yes .ard-cat__ring {
+	--ard-cat-ring-bw: 0px;
+	--ard-cat-ring-line: transparent;
+	--ard-cat-ring-bg: transparent;
+	--ard-cat-ring-pad: 0px;
 }
 
-.ard-cats--gradient .ard-cat[style*="--ard-cat-i:1"] .ard-cat__ring {
-	background: linear-gradient(140deg, var(--ard-accent), var(--ard-accent-dark));
+.ard-cats-plain-yes .ard-cat__inner:hover .ard-cat__ring {
+	border-color: transparent;
 }
 
-.ard-cats--gradient .ard-cat[style*="--ard-cat-i:2"] .ard-cat__ring {
-	background: linear-gradient(140deg, var(--ard-primary-light), color-mix(in srgb, var(--ard-primary-light) 45%, var(--ard-base)));
+.ard-cats--gradient {
+	--ard-cat-ring-pad: 5px;
+	--ard-cat-ring-bg: linear-gradient(140deg, var(--ard-primary), var(--ard-primary-light));
+}
+
+.ard-cats--gradient .ard-cat[style*="--ard-cat-i:1"] {
+	--ard-cat-ring-bg: linear-gradient(140deg, var(--ard-accent), var(--ard-accent-dark));
+}
+
+.ard-cats--gradient .ard-cat[style*="--ard-cat-i:2"] {
+	--ard-cat-ring-bg: linear-gradient(140deg, var(--ard-primary-light), color-mix(in srgb, var(--ard-primary-light) 45%, var(--ard-base)));
 }
 
 .ard-cats--gradient .ard-cat__inner:hover .ard-cat__ring {
