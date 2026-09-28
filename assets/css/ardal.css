@@ -707,7 +707,7 @@ a.ard-topbar__item:hover {
 	flex-direction: row-reverse;
 }
 
-.ard-hero--media-start .ard-hero__dots {
+.ard-hero--media-start .ard-hero__dots[class] {
 	right: auto;
 	left: 44px;
 }
@@ -813,7 +813,7 @@ a.ard-topbar__item:hover {
 	object-fit: cover;
 }
 
-.ard-hero__dots {
+.ard-hero__dots[class] {
 	position: absolute;
 	bottom: 18px;
 	right: 44px;
@@ -822,29 +822,34 @@ a.ard-topbar__item:hover {
 	z-index: 2;
 }
 
-.ard-hero__dot {
+/* [class] برای بالاتر ماندن از استایل سراسری دکمهٔ قالب — توضیحش پایین‌تر
+   کنار نقطه‌های دسته‌بندی آمده. */
+.ard-hero__dot[class] {
 	inline-size: 8px;
 	block-size: 8px;
+	min-inline-size: 0;
 	padding: 0;
+	border: 0;
 	border-radius: 5px;
 	background: rgba(255, 255, 255, .45);
+	font: inherit;
 	transition: inline-size .3s, background .3s;
 }
 
-.ard-hero__dot.is-active {
+.ard-hero__dot.is-active[class] {
 	inline-size: 28px;
 	background: var(--ard-accent);
 }
 
-.ard-hero--soft .ard-hero__dot {
+.ard-hero--soft .ard-hero__dot[class] {
 	background: color-mix(in srgb, var(--ard-primary) 25%, var(--ard-base));
 }
 
-.ard-hero--soft .ard-hero__dot.is-active {
+.ard-hero--soft .ard-hero__dot.is-active[class] {
 	background: var(--ard-primary);
 }
 
-.ard-hero__arrow {
+.ard-hero__arrow[class] {
 	position: absolute;
 	top: 50%;
 	translate: 0 -50%;
@@ -854,29 +859,32 @@ a.ard-topbar__item:hover {
 	justify-content: center;
 	inline-size: 38px;
 	block-size: 38px;
+	padding: 0;
+	border: 0;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, .22);
 	color: var(--ard-base);
+	font: inherit;
 	line-height: 1;
 	backdrop-filter: blur(4px);
 	transition: background .2s;
 }
 
-.ard-hero__arrow:hover {
+.ard-hero__arrow[class]:hover {
 	background: rgba(255, 255, 255, .38);
 }
 
-.ard-hero--soft .ard-hero__arrow {
+.ard-hero--soft .ard-hero__arrow[class] {
 	background: var(--ard-base);
 	color: var(--ard-primary-dark);
 	box-shadow: 0 4px 14px rgba(var(--ard-primary-dark-rgb), .12);
 }
 
-.ard-hero__arrow--prev {
+.ard-hero__arrow--prev[class] {
 	right: 14px;
 }
 
-.ard-hero__arrow--next {
+.ard-hero__arrow--next[class] {
 	left: 14px;
 }
 
@@ -1125,18 +1133,18 @@ a.ard-topbar__item:hover {
 }
 
 /* نقطه‌های کروسل */
-.ard-deal__dots {
+.ard-deal__dots[class] {
 	display: flex;
 	justify-content: center;
 	gap: 5px;
 	flex: none;
 }
 
-.ard-deal__dots:empty {
+.ard-deal__dots[class]:empty {
 	display: none;
 }
 
-.ard-deal__dot {
+.ard-deal__dot[class] {
 	inline-size: 6px;
 	block-size: 6px;
 	padding: 0;
@@ -1145,7 +1153,7 @@ a.ard-topbar__item:hover {
 	transition: inline-size .25s, background .25s;
 }
 
-.ard-deal__dot.is-active {
+.ard-deal__dot[class].is-active {
 	inline-size: 18px;
 	background: var(--ard-accent-dark);
 }
@@ -1358,27 +1366,42 @@ a.ard-service__inner:hover {
 	scroll-snap-align: start;
 }
 
-.ard-cats__dots {
+.ard-cats__dots[class] {
 	display: flex;
 	justify-content: center;
 	gap: 5px;
 	margin-block-start: 12px;
 }
 
-.ard-cats__dots:empty {
+.ard-cats__dots[class]:empty {
 	display: none;
 }
 
-.ard-cats__dot {
+/*
+ * چرا [class] روی دکمه‌های اردال.
+ *
+ * قالب‌ها و «استایل سراسری» المنتور همهٔ دکمه‌های صفحه را یک‌جا رنگ می‌کنند:
+ *
+ *     .elementor-kit-7 button, … { background-color: …; border: …; padding: … }
+ *
+ * وزن آن (۰,۱,۱) است و از یک کلاسِ تنها (۰,۱,۰) بالاتر؛ پس زمینه و حاشیه و
+ * پدینگِ نقطه‌ها و فلش‌های ما را می‌بلعید. `[class]` روی هر عنصرِ کلاس‌دار
+ * می‌گیرد، پس چیزی از تطبیق کم نمی‌کند و فقط وزن را به (۰,۲,۰) می‌برد.
+ * !important عمداً استفاده نشده تا سفارشی‌سازی کاربر ممکن بماند.
+ */
+.ard-cats__dot[class] {
 	inline-size: 7px;
 	block-size: 7px;
+	min-inline-size: 0;
 	padding: 0;
+	border: 0;
 	border-radius: 4px;
 	background: color-mix(in srgb, var(--ard-primary) 25%, var(--ard-base));
+	font: inherit;
 	transition: inline-size .25s, background .25s;
 }
 
-.ard-cats__dot.is-active {
+.ard-cats__dot.is-active[class] {
 	inline-size: 20px;
 	background: var(--ard-primary);
 }
@@ -1387,7 +1410,7 @@ a.ard-service__inner:hover {
  * فلش‌ها بیرون از خود اسلایدر می‌نشینند چون کروسل مشترک، دکمه‌ها را در والدِ
  * ریشه‌اش می‌گردد؛ اینجا هم همان قرارداد رعایت شده.
  */
-.ard-cats__arrow {
+.ard-cats__arrow[class] {
 	position: absolute;
 	top: calc(var(--ard-cat-ring, 126px) / 2);
 	translate: 0 -50%;
@@ -1402,20 +1425,21 @@ a.ard-service__inner:hover {
 	border-radius: 50%;
 	background: var(--ard-base);
 	color: var(--ard-primary-dark);
+	font: inherit;
 	box-shadow: 0 4px 14px rgba(var(--ard-primary-dark-rgb), .10);
 	transition: background .2s, border-color .2s, color .2s;
 }
 
-.ard-cats__arrow:hover {
+.ard-cats__arrow[class]:hover {
 	background: var(--ard-tint-blue);
 	border-color: var(--ard-tint-blue-border);
 }
 
-.ard-cats__arrow--prev {
+.ard-cats__arrow--prev[class] {
 	right: -6px;
 }
 
-.ard-cats__arrow--next {
+.ard-cats__arrow--next[class] {
 	left: -6px;
 }
 
@@ -1498,6 +1522,25 @@ a.ard-service__inner:hover {
 
 .ard-cats-plain-yes .ard-cat__inner:hover .ard-cat__ring {
 	border-color: transparent;
+}
+
+/*
+ * دیسک داخلی هم باید بی‌زمینه شود.
+ *
+ * در سبک گرادیانی، حلقه فقط قابِ رنگی است و زمینهٔ سفیدِ پشتِ تصویر مال
+ * .ard-cat__disc است. پاک‌کردنِ فقط حلقه، آن دایرهٔ سفید را سر جایش
+ * می‌گذاشت و کاربر همچنان «زمینه» می‌دید.
+ *
+ * تصویر هم دیگر لازم نیست کوچک‌تر از دیسک بماند: آن ۹۲٪ برای این بود که
+ * حلقهٔ گرادیانی از پشتش پیدا باشد.
+ */
+.ard-cats-plain-yes .ard-cat__disc[class] {
+	background: transparent;
+}
+
+.ard-cats-plain-yes .ard-cat__disc[class] img {
+	inline-size: 100%;
+	block-size: 100%;
 }
 
 .ard-cats--gradient {
@@ -3108,16 +3151,16 @@ a.ard-brand:hover img {
 		block-size: 180px;
 	}
 
-	.ard-hero__dots {
+	.ard-hero__dots[class] {
 		right: 18px;
 		bottom: 14px;
 	}
 
-	.ard-hero--media-start .ard-hero__dots {
+	.ard-hero--media-start .ard-hero__dots[class] {
 		left: 18px;
 	}
 
-	.ard-hero__arrow {
+	.ard-hero__arrow[class] {
 		display: none;
 	}
 
@@ -3198,7 +3241,7 @@ a.ard-brand:hover img {
 	}
 
 	/* در موبایل فلش‌ها جا نمی‌شوند؛ کشیدن با انگشت کار خودش را می‌کند. */
-	.ard-cats__arrow {
+	.ard-cats__arrow[class] {
 		display: none;
 	}
 
@@ -3471,7 +3514,7 @@ a.ard-breadcrumb__item:hover {
 }
 
 /* فلش‌های اسلایدر — در RTL «قبلی» سمت راست است. */
-.ard-prod-gallery__arrow {
+.ard-prod-gallery__arrow[class] {
 	position: absolute;
 	top: 50%;
 	translate: 0 -50%;
@@ -3491,20 +3534,20 @@ a.ard-breadcrumb__item:hover {
 	backdrop-filter: blur(4px);
 }
 
-.ard-prod-gallery__arrow:hover {
+.ard-prod-gallery__arrow[class]:hover {
 	background: var(--ard-base);
 	border-color: var(--ard-tint-blue-border);
 }
 
-.ard-prod-gallery__arrow--prev {
+.ard-prod-gallery__arrow--prev[class] {
 	right: 12px;
 }
 
-.ard-prod-gallery__arrow--next {
+.ard-prod-gallery__arrow--next[class] {
 	left: 12px;
 }
 
-.ard-prod-gallery[data-single="yes"] .ard-prod-gallery__arrow {
+.ard-prod-gallery[data-single="yes"] .ard-prod-gallery__arrow[class] {
 	display: none;
 }
 
@@ -3690,7 +3733,7 @@ a.ard-breadcrumb__item:hover {
 		var(--ard-frame-base, var(--ard-base)) var(--ard-frame-size, 10px) calc(var(--ard-frame-size, 10px) * 2)));
 }
 
-.ard-prod-gallery__thumb-arrow {
+.ard-prod-gallery__thumb-arrow[class] {
 	position: absolute;
 	top: 50%;
 	translate: 0 -50%;
@@ -3710,21 +3753,21 @@ a.ard-breadcrumb__item:hover {
 	transition: color .2s, border-color .2s, opacity .2s;
 }
 
-.ard-prod-gallery__thumb-arrow:hover {
+.ard-prod-gallery__thumb-arrow[class]:hover {
 	color: var(--ard-primary);
 	border-color: var(--ard-primary);
 }
 
 /* در RTL «قبلی» سمت راست است. */
-.ard-prod-gallery__thumb-arrow--prev {
+.ard-prod-gallery__thumb-arrow--prev[class] {
 	right: -6px;
 }
 
-.ard-prod-gallery__thumb-arrow--next {
+.ard-prod-gallery__thumb-arrow--next[class] {
 	left: -6px;
 }
 
-.ard-prod-gallery__thumb-arrow[hidden] {
+.ard-prod-gallery__thumb-arrow[class][hidden] {
 	display: none;
 }
 
@@ -5869,7 +5912,7 @@ a.ard-ptags__chip:focus-visible {
 .ard-mtx__legend-item.is-out   { color: var(--ard-mtx-out); }
 .ard-mtx__legend-item.is-none  { color: var(--ard-mtx-none); }
 
-.ard-mtx__filters {
+.ard-mtx__filters[class] {
 	display: inline-flex;
 	gap: 4px;
 	padding: 3px;
@@ -5877,7 +5920,7 @@ a.ard-ptags__chip:focus-visible {
 	background: var(--ard-soft, #f3f4f6);
 }
 
-.ard-mtx__filter {
+.ard-mtx__filter[class] {
 	padding: 5px 12px;
 	border: 0;
 	border-radius: 999px;
@@ -5889,7 +5932,7 @@ a.ard-ptags__chip:focus-visible {
 	transition: background-color .18s ease, color .18s ease;
 }
 
-.ard-mtx__filter.is-active {
+.ard-mtx__filter[class].is-active {
 	background: var(--ard-base, #fff);
 	color: var(--ard-ink, #1f2937);
 	font-weight: 700;

@@ -302,7 +302,22 @@
 
 /* ---------------------------------------- دکمه‌های ناوبری */
 
-.ard-pslider__arrow {
+/*
+ * چرا [class] به انتخابگرها چسبیده.
+ *
+ * قالب‌ها و «استایل سراسری» المنتور همهٔ دکمه‌های صفحه را یک‌جا رنگ می‌کنند:
+ *
+ *     .elementor-kit-7 button, … { background-color: …; border: …; padding: … }
+ *
+ * وزن آن (۰,۱,۱) است و از یک کلاسِ تنها (۰,۱,۰) بالاتر؛ پس رنگ و حاشیه و
+ * پدینگِ این دکمه‌ها را می‌بلعید و تنظیمات ویجت بی‌اثر به نظر می‌رسید.
+ *
+ * `[class]` روی هر عنصری که کلاس دارد می‌گیرد، پس چیزی از تطبیق کم نمی‌کند و
+ * فقط وزن را به (۰,۲,۰) می‌برد. چون همهٔ قانون‌های این دکمه با هم بالا
+ * می‌روند، ترتیب داخلی‌شان دست‌نخورده می‌ماند. !important عمداً استفاده نشده
+ * تا سفارشی‌سازی کاربر همچنان ممکن بماند.
+ */
+.ard-pslider__arrow[class] {
 	display: inline-flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -314,25 +329,26 @@
 	border-radius: var(--ard-ps-arrow-radius);
 	background: var(--ard-ps-arrow-bg);
 	color: var(--ard-ps-arrow-ink);
+	font: inherit;
 	cursor: pointer;
 	transition: background-color .18s ease, color .18s ease, border-color .18s ease;
 }
 
-.ard-pslider__arrow:hover,
-.ard-pslider__arrow:focus-visible {
+.ard-pslider__arrow[class]:hover,
+.ard-pslider__arrow[class]:focus-visible {
 	border-color: var(--ard-ps-arrow-line-hover);
 	background: var(--ard-ps-arrow-bg-hover);
 	color: var(--ard-ps-arrow-ink-hover);
 }
 
 /* آیکون، چه SVG داخلی باشد چه فونت‌آیکونِ انتخابی کاربر. */
-.ard-pslider__arrow .ard-i,
-.ard-pslider__arrow svg {
+.ard-pslider__arrow[class] .ard-i,
+.ard-pslider__arrow[class] svg {
 	inline-size: var(--ard-ps-arrow-icon);
 	block-size: var(--ard-ps-arrow-icon);
 }
 
-.ard-pslider__arrow i {
+.ard-pslider__arrow[class] i {
 	font-size: var(--ard-ps-arrow-icon);
 	line-height: 1;
 }
@@ -350,24 +366,21 @@
  * می‌شود؛ با translateX باید علامتش را دستی برمی‌گرداندیم و «جابه‌جایی مثبت»
  * در فارسی به بیرون صفحه می‌رفت.
  */
-.ard-pslider__arrow {
+.ard-pslider__arrow[class] {
 	position: absolute;
 	z-index: 3;
-}
-
-.ard-pslider__arrow {
 	/* پدینگ نباید دکمه را بزرگ‌تر از اندازه‌ای کند که کاربر داده. */
 	box-sizing: border-box;
 }
 
-.ard-pslider__arrow--prev {
+.ard-pslider__arrow--prev[class] {
 	inset-inline-start: calc(var(--ard-ps-prev-ax) + var(--ard-ps-prev-x));
 	inset-block-start: calc(var(--ard-ps-prev-ay) + var(--ard-ps-prev-y));
 	margin-inline-start: var(--ard-ps-prev-sx);
 	margin-block-start: var(--ard-ps-prev-sy);
 }
 
-.ard-pslider__arrow--next {
+.ard-pslider__arrow--next[class] {
 	inset-inline-start: calc(var(--ard-ps-next-ax) + var(--ard-ps-next-x));
 	inset-block-start: calc(var(--ard-ps-next-ay) + var(--ard-ps-next-y));
 	margin-inline-start: var(--ard-ps-next-sx);
@@ -380,21 +393,21 @@
  * این فاصله متغیر جداگانه‌ای دارد تا با «جابه‌جایی» کاربر قاطی نشود؛ آن یکی
  * دست کاربر است و این یکی مالِ خودِ حالت.
  */
-.ard-pslider--arrows-inside .ard-pslider__arrow {
+.ard-pslider--arrows-inside .ard-pslider__arrow[class] {
 	box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
 }
 
-.ard-pslider--arrows-inside .ard-pslider__arrow--prev {
+.ard-pslider--arrows-inside .ard-pslider__arrow--prev[class] {
 	inset-inline-start: calc(var(--ard-ps-prev-ax) + var(--ard-ps-prev-x) + var(--ard-ps-arrow-inset));
 }
 
-.ard-pslider--arrows-inside .ard-pslider__arrow--next {
+.ard-pslider--arrows-inside .ard-pslider__arrow--next[class] {
 	inset-inline-start: calc(var(--ard-ps-next-ax) + var(--ard-ps-next-x) - var(--ard-ps-arrow-inset));
 }
 
 /* ---------------------------------------- نقطه‌ها */
 
-.ard-pslider__dots {
+.ard-pslider__dots[class] {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -402,22 +415,25 @@
 	margin-block-start: 10px;
 }
 
-.ard-pslider__dots:empty {
+.ard-pslider__dots[class]:empty {
 	display: none;
 }
 
-.ard-pslider__dot {
+/* نقطه‌ها هم <button> هستند، پس همان مشکلِ وزن را دارند. */
+.ard-pslider__dot[class] {
 	inline-size: var(--ard-ps-dot-size);
 	block-size: var(--ard-ps-dot-size);
+	min-inline-size: 0;
 	padding: 0;
 	border: 0;
 	border-radius: 999px;
 	background: var(--ard-ps-dot);
+	font: inherit;
 	cursor: pointer;
 	transition: inline-size .22s ease, background-color .22s ease;
 }
 
-.ard-pslider__dot.is-active {
+.ard-pslider__dot.is-active[class] {
 	inline-size: var(--ard-ps-dot-active-w);
 	background: var(--ard-ps-dot-active);
 }
@@ -444,7 +460,7 @@
 		padding-inline: 0;
 	}
 
-	.ard-pslider--arrows-outside .ard-pslider__arrow {
+	.ard-pslider--arrows-outside .ard-pslider__arrow[class] {
 		display: none;
 	}
 
@@ -454,8 +470,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ard-pslider__dot,
-	.ard-pslider__arrow,
+	.ard-pslider__dot[class],
+	.ard-pslider__arrow[class],
 	.ard-pslider__track > * {
 		transition: none;
 	}

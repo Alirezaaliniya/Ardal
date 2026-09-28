@@ -59,7 +59,7 @@
 
 /* ---------------------------------------- دکمه */
 
-.ard-sp__launcher {
+.ard-sp__launcher[class] {
 	position: relative;
 	display: inline-flex;
 	flex: 0 0 auto;
@@ -77,12 +77,12 @@
 	transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.ard-sp__launcher:hover {
+.ard-sp__launcher[class]:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 12px 28px rgba(0, 0, 0, .22);
 }
 
-.ard-sp__launcher:focus-visible {
+.ard-sp__launcher[class]:focus-visible {
 	outline: 3px solid var(--ard-sp-btn-bg);
 	outline-offset: 3px;
 }
@@ -311,7 +311,7 @@
 	100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
 }
 
-.ard-sp__close {
+.ard-sp__close[class] {
 	display: inline-flex;
 	flex: 0 0 auto;
 	align-items: center;
@@ -327,11 +327,11 @@
 	transition: background-color .18s ease;
 }
 
-.ard-sp__close:hover {
+.ard-sp__close[class]:hover {
 	background: rgba(255, 255, 255, .28);
 }
 
-.ard-sp__close .ard-sp-svg {
+.ard-sp__close[class] .ard-sp-svg {
 	inline-size: 15px;
 	block-size: 15px;
 }
@@ -563,7 +563,7 @@ a.ard-sp__item:hover .ard-sp__item-arrow {
 	.ard-sp__item-wrap,
 	.ard-sp__icon,
 	.ard-sp__tip,
-	.ard-sp__launcher {
+	.ard-sp__launcher[class] {
 		transition-duration: .01ms;
 	}
 
