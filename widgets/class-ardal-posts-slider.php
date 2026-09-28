@@ -392,17 +392,15 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 		$this->add_control(
 			'arrow_place',
 			array(
-				'label'     => 'جای دکمه‌ها',
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'side',
-				'options'   => array(
-					'side'   => 'دو طرف اسلایدر',
-					'inside' => 'روی کارت‌ها',
-					'top'    => 'بالا، کنار عنوان',
-					'bottom' => 'پایین، کنار نقطه‌ها',
-					'free'   => 'آزاد — جایگاه دقیق هر دکمه',
+				'label'       => 'جای دکمه‌ها',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'outside',
+				'options'     => array(
+					'outside' => 'بیرون کارت‌ها',
+					'inside'  => 'روی کارت‌ها',
 				),
-				'condition' => array( 'show_arrows' => 'yes' ),
+				'description' => 'نقطهٔ شروع است؛ جای دقیق هر دکمه را در تب «ظاهر» می‌توانید آزادانه جابه‌جا کنید.',
+				'condition'   => array( 'show_arrows' => 'yes' ),
 			)
 		);
 
@@ -641,11 +639,53 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 		$this->add_responsive_control(
 			'arrow_size',
 			array(
-				'label'      => 'اندازه دکمه',
+				'label'       => 'پهنای دکمه',
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => array( 'px', 'em' ),
+				'range'       => array(
+					'px' => array( 'min' => 20, 'max' => 120 ),
+					'em' => array( 'min' => 1, 'max' => 8, 'step' => 0.1 ),
+				),
+				'description' => 'اگر ارتفاع را خالی بگذارید، دکمه مربع می‌ماند.',
+				'selectors'   => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow:{{SIZE}}{{UNIT}};--ard-ps-arrow-w:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_h',
+			array(
+				'label'      => 'ارتفاع دکمه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em' ),
+				'range'      => array(
+					'px' => array( 'min' => 20, 'max' => 120 ),
+					'em' => array( 'min' => 1, 'max' => 8, 'step' => 0.1 ),
+				),
+				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow-h:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_pad',
+			array(
+				'label'       => 'فاصله داخلی دکمه',
+				'type'        => Controls_Manager::DIMENSIONS,
+				'size_units'  => array( 'px', 'em', '%' ),
+				'description' => 'آیکون را داخل دکمه جابه‌جا می‌کند؛ خودِ دکمه بزرگ‌تر نمی‌شود.',
+				'selectors'   => array(
+					'{{WRAPPER}} .ard-pslider__arrow' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'arrow_bw',
+			array(
+				'label'      => 'ضخامت حاشیه',
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 26, 'max' => 72 ) ),
-				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow:{{SIZE}}{{UNIT}};' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 10 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow-bw:{{SIZE}}{{UNIT}};' ),
 			)
 		);
 
@@ -682,7 +722,6 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'type'            => Controls_Manager::RAW_HTML,
 				'raw'             => 'هر دکمه یک لنگر افقی و یک لنگر عمودی دارد، به‌علاوهٔ عددی برای جابه‌جایی از همان لنگر. لنگرها نسبت به خودِ ناحیهٔ اسلایدر سنجیده می‌شوند.',
 				'content_classes' => 'elementor-descriptor',
-				'condition'       => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -692,7 +731,6 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'label'     => 'دکمه قبلی',
 				'type'      => Controls_Manager::HEADING,
 				'separator' => 'before',
-				'condition' => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -710,10 +748,9 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
 				'selectors_dictionary' => array(
 					'start'  => '--ard-ps-prev-ax:0%;--ard-ps-prev-sx:0px;',
-					'center' => '--ard-ps-prev-ax:50%;--ard-ps-prev-sx:calc(var(--ard-ps-arrow) / -2);',
-					'end'    => '--ard-ps-prev-ax:100%;--ard-ps-prev-sx:calc(var(--ard-ps-arrow) * -1);',
+					'center' => '--ard-ps-prev-ax:50%;--ard-ps-prev-sx:calc(var(--ard-ps-arrow-w) / -2);',
+					'end'    => '--ard-ps-prev-ax:100%;--ard-ps-prev-sx:calc(var(--ard-ps-arrow-w) * -1);',
 				),
-				'condition'            => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -732,7 +769,6 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				),
 				'default'    => array( 'unit' => 'px', 'size' => 0 ),
 				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-prev-x:{{SIZE}}{{UNIT}};' ),
-				'condition'  => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -750,10 +786,9 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
 				'selectors_dictionary' => array(
 					'start'  => '--ard-ps-prev-ay:0%;--ard-ps-prev-sy:0px;',
-					'center' => '--ard-ps-prev-ay:50%;--ard-ps-prev-sy:calc(var(--ard-ps-arrow) / -2);',
-					'end'    => '--ard-ps-prev-ay:100%;--ard-ps-prev-sy:calc(var(--ard-ps-arrow) * -1);',
+					'center' => '--ard-ps-prev-ay:50%;--ard-ps-prev-sy:calc(var(--ard-ps-arrow-h) / -2);',
+					'end'    => '--ard-ps-prev-ay:100%;--ard-ps-prev-sy:calc(var(--ard-ps-arrow-h) * -1);',
 				),
-				'condition'            => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -772,7 +807,6 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				),
 				'default'    => array( 'unit' => 'px', 'size' => 0 ),
 				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-prev-y:{{SIZE}}{{UNIT}};' ),
-				'condition'  => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -782,7 +816,6 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'label'     => 'دکمه بعدی',
 				'type'      => Controls_Manager::HEADING,
 				'separator' => 'before',
-				'condition' => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -800,10 +833,9 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
 				'selectors_dictionary' => array(
 					'start'  => '--ard-ps-next-ax:0%;--ard-ps-next-sx:0px;',
-					'center' => '--ard-ps-next-ax:50%;--ard-ps-next-sx:calc(var(--ard-ps-arrow) / -2);',
-					'end'    => '--ard-ps-next-ax:100%;--ard-ps-next-sx:calc(var(--ard-ps-arrow) * -1);',
+					'center' => '--ard-ps-next-ax:50%;--ard-ps-next-sx:calc(var(--ard-ps-arrow-w) / -2);',
+					'end'    => '--ard-ps-next-ax:100%;--ard-ps-next-sx:calc(var(--ard-ps-arrow-w) * -1);',
 				),
-				'condition'            => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -822,7 +854,6 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				),
 				'default'    => array( 'unit' => 'px', 'size' => 0 ),
 				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-next-x:{{SIZE}}{{UNIT}};' ),
-				'condition'  => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -840,10 +871,9 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'selectors'            => array( '{{WRAPPER}} .ard-pslider' => '{{VALUE}}' ),
 				'selectors_dictionary' => array(
 					'start'  => '--ard-ps-next-ay:0%;--ard-ps-next-sy:0px;',
-					'center' => '--ard-ps-next-ay:50%;--ard-ps-next-sy:calc(var(--ard-ps-arrow) / -2);',
-					'end'    => '--ard-ps-next-ay:100%;--ard-ps-next-sy:calc(var(--ard-ps-arrow) * -1);',
+					'center' => '--ard-ps-next-ay:50%;--ard-ps-next-sy:calc(var(--ard-ps-arrow-h) / -2);',
+					'end'    => '--ard-ps-next-ay:100%;--ard-ps-next-sy:calc(var(--ard-ps-arrow-h) * -1);',
 				),
-				'condition'            => array( 'arrow_place' => 'free' ),
 			)
 		);
 
@@ -862,23 +892,20 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				),
 				'default'    => array( 'unit' => 'px', 'size' => 0 ),
 				'selectors'  => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-next-y:{{SIZE}}{{UNIT}};' ),
-				'condition'  => array( 'arrow_place' => 'free' ),
 			)
 		);
 
 		$this->add_responsive_control(
 			'arrow_gap',
 			array(
-				'label'      => 'فاصله دو دکمه از هم',
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 0, 'max' => 48 ) ),
-				'separator'  => 'before',
-				'selectors'  => array(
-					'{{WRAPPER}} .ard-pslider__nav, {{WRAPPER}} .ard-pslider__foot' => 'gap:{{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .ard-pslider__stage' => 'gap:{{SIZE}}{{UNIT}};',
-				),
-				'condition'  => array( 'arrow_place' => array( 'side', 'top', 'bottom' ) ),
+				'label'       => 'فاصله دکمه از ریل',
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => array( 'px' ),
+				'range'       => array( 'px' => array( 'min' => 0, 'max' => 48 ) ),
+				'separator'   => 'before',
+				'description' => 'جایی که کنار ریل برای دکمه‌ها باز می‌شود.',
+				'selectors'   => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow-gap:{{SIZE}}{{UNIT}};' ),
+				'condition'   => array( 'arrow_place' => 'outside' ),
 			)
 		);
 
@@ -892,21 +919,6 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'description' => 'دکمه‌ها را به داخل یا بیرونِ لبهٔ کارت‌ها می‌برد.',
 				'selectors'   => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow-inset:{{SIZE}}{{UNIT}};' ),
 				'condition'   => array( 'arrow_place' => 'inside' ),
-			)
-		);
-
-		$this->add_responsive_control(
-			'arrow_align',
-			array(
-				'label'     => 'چیدمان گروه دکمه‌ها',
-				'type'      => Controls_Manager::CHOOSE,
-				'options'   => array(
-					'flex-start' => array( 'title' => 'شروع', 'icon' => 'eicon-h-align-right' ),
-					'center'     => array( 'title' => 'وسط', 'icon' => 'eicon-h-align-center' ),
-					'flex-end'   => array( 'title' => 'پایان', 'icon' => 'eicon-h-align-left' ),
-				),
-				'selectors' => array( '{{WRAPPER}} .ard-pslider__foot' => 'justify-content:{{VALUE}};' ),
-				'condition' => array( 'arrow_place' => 'bottom' ),
 			)
 		);
 
@@ -941,6 +953,15 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'arrow_shadow',
+				'label'    => 'سایه',
+				'selector' => '{{WRAPPER}} .ard-pslider__arrow',
+			)
+		);
+
 		$this->end_controls_tab();
 
 		$this->start_controls_tab( 'arrow_hover', array( 'label' => 'شناور' ) );
@@ -960,6 +981,24 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 				'label'     => 'رنگ آیکون',
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow-ink-hover:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'arrow_line_hover',
+			array(
+				'label'     => 'رنگ حاشیه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-pslider' => '--ard-ps-arrow-line-hover:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'arrow_shadow_hover',
+				'label'    => 'سایه',
+				'selector' => '{{WRAPPER}} .ard-pslider__arrow:hover',
 			)
 		);
 
@@ -1060,18 +1099,11 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 		?>
 		<section class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-ard-slider>
 
-			<?php if ( $arrows && 'top' === $s['arrow_place'] ) : ?>
-				<div class="ard-pslider__head">
-					<?php $this->render_heading(); ?>
-					<div class="ard-pslider__nav"><?php $this->arrows( $s ); ?></div>
-				</div>
-			<?php else : ?>
-				<?php $this->render_heading(); ?>
-			<?php endif; ?>
+			<?php $this->render_heading(); ?>
 
 			<div class="ard-pslider__stage">
-				<?php if ( $arrows && in_array( $s['arrow_place'], array( 'side', 'inside', 'free' ), true ) ) : ?>
-					<?php $this->arrows( $s ); ?>
+				<?php if ( $arrows ) : ?>
+					<?php $this->arrows( $s, 'prev' ); ?>
 				<?php endif; ?>
 
 				<div class="ard-pslider__car" data-ard-carousel data-interval="<?php echo esc_attr( max( 0, (int) $s['autoplay'] ) ); ?>">
@@ -1116,22 +1148,12 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 						<?php endforeach; ?>
 					</div>
 
-					<?php if ( $dots && 'bottom' !== $s['arrow_place'] ) : ?>
+					<?php if ( $dots ) : ?>
 						<div class="ard-pslider__dots" data-ard-dots="ard-pslider__dot" role="tablist" aria-label="انتخاب صفحه"></div>
-					<?php endif; ?>
-
-					<?php if ( $arrows && 'bottom' === $s['arrow_place'] ) : ?>
-						<div class="ard-pslider__foot">
-							<?php $this->arrows( $s ); ?>
-
-							<?php if ( $dots ) : ?>
-								<div class="ard-pslider__dots" data-ard-dots="ard-pslider__dot" role="tablist" aria-label="انتخاب صفحه"></div>
-							<?php endif; ?>
-						</div>
 					<?php endif; ?>
 				</div>
 
-				<?php if ( $arrows && in_array( $s['arrow_place'], array( 'side', 'inside', 'free' ), true ) ) : ?>
+				<?php if ( $arrows ) : ?>
 					<?php $this->arrows( $s, 'next' ); ?>
 				<?php endif; ?>
 			</div>
@@ -1140,23 +1162,16 @@ class Ardal_Widget_Posts_Slider extends Ardal_Widget_Base {
 	}
 
 	/**
-	 * دکمه‌های ناوبری.
+	 * یکی از دکمه‌های ناوبری.
 	 *
-	 * کروسل مشترک دکمه‌ها را در «پدرِ» عنصر کروسل می‌جوید، پس هرجا چاپشان
-	 * کنیم باید همسایهٔ .ard-pslider__car بمانند — جز حالت «پایین» که خودش
-	 * داخل همان عنصر است و آنجا جست‌وجو هم به نتیجه می‌رسد.
+	 * هر دو دکمه داخل .ard-pslider__stage چاپ می‌شوند و با position: absolute
+	 * سر جایشان می‌نشینند؛ جایشان را متغیرهای CSS تعیین می‌کنند نه مارک‌آپ،
+	 * تا کنترل‌های تب ظاهر بتوانند آزادانه جابه‌جایشان کنند.
 	 *
 	 * @param array  $s
-	 * @param string $only prev | next | خالی برای هر دو.
+	 * @param string $only prev | next.
 	 */
-	private function arrows( $s, $only = '' ) {
-		$side = in_array( $s['arrow_place'], array( 'side', 'inside', 'free' ), true );
-
-		// در حالت کناری، هر دکمه جداگانه و در دو طرف چاپ می‌شود.
-		if ( $side && '' === $only ) {
-			$only = 'prev';
-		}
-
+	private function arrows( $s, $only = 'prev' ) {
 		$show_prev = 'next' !== $only;
 		$show_next = 'prev' !== $only;
 

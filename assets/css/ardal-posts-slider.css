@@ -35,6 +35,14 @@
 	--ard-ps-chip-inset: 13px;
 
 	--ard-ps-arrow: 40px;
+	/*
+	 * پهنا و ارتفاع جدا، ولی هر دو از همان «اندازه» شروع می‌شوند تا دکمه
+	 * پیش‌فرض مربع بماند و تنظیم یکی، دیگری را خراب نکند.
+	 */
+	--ard-ps-arrow-w: var(--ard-ps-arrow);
+	--ard-ps-arrow-h: var(--ard-ps-arrow);
+	--ard-ps-arrow-pad: 0px;
+	--ard-ps-arrow-bw: 1px;
 	--ard-ps-arrow-icon: 18px;
 	--ard-ps-arrow-radius: 50%;
 	--ard-ps-arrow-bg: var(--ard-base, #fff);
@@ -42,7 +50,9 @@
 	--ard-ps-arrow-line: var(--ard-border, #e5e7eb);
 	--ard-ps-arrow-bg-hover: var(--ard-primary, #0f766e);
 	--ard-ps-arrow-ink-hover: #fff;
+	--ard-ps-arrow-line-hover: var(--ard-ps-arrow-bg-hover);
 	--ard-ps-arrow-inset: 8px;
+	--ard-ps-arrow-gap: 10px;
 
 	/*
 	 * جایگاه آزاد هر دکمه.
@@ -58,14 +68,14 @@
 	--ard-ps-prev-ax: 0%;
 	--ard-ps-prev-sx: 0px;
 	--ard-ps-prev-ay: 50%;
-	--ard-ps-prev-sy: calc(var(--ard-ps-arrow) / -2);
+	--ard-ps-prev-sy: calc(var(--ard-ps-arrow-h) / -2);
 	--ard-ps-prev-x: 0px;
 	--ard-ps-prev-y: 0px;
 
 	--ard-ps-next-ax: 100%;
-	--ard-ps-next-sx: calc(var(--ard-ps-arrow) * -1);
+	--ard-ps-next-sx: calc(var(--ard-ps-arrow-w) * -1);
 	--ard-ps-next-ay: 50%;
-	--ard-ps-next-sy: calc(var(--ard-ps-arrow) / -2);
+	--ard-ps-next-sy: calc(var(--ard-ps-arrow-h) / -2);
 	--ard-ps-next-x: 0px;
 	--ard-ps-next-y: 0px;
 
@@ -95,23 +105,20 @@
 	margin-block-end: 0;
 }
 
-.ard-pslider__nav,
-.ard-pslider__foot {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
-
-.ard-pslider__foot {
-	justify-content: center;
-	margin-block-start: 10px;
-}
-
+/*
+ * صحنه همیشه block است و ریل تمام پهنایش را می‌گیرد؛ دکمه‌ها روی آن شناورند.
+ *
+ * قبلاً در حالت «دو طرف» یک فلکس بود و دکمه‌ها جا می‌گرفتند، ولی آن‌وقت
+ * کنترل‌های جایگاه روی آن دو حالت بی‌اثر می‌ماندند. حالا هر دو حالت یک
+ * ساختار دارند و فرقشان فقط در این است که «بیرون» کنار ریل جا باز می‌کند.
+ */
 .ard-pslider__stage {
 	position: relative;
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	display: block;
+}
+
+.ard-pslider--arrows-outside .ard-pslider__stage {
+	padding-inline: calc(var(--ard-ps-arrow-w) + var(--ard-ps-arrow-gap));
 }
 
 .ard-pslider__car {
@@ -300,10 +307,10 @@
 	flex: 0 0 auto;
 	align-items: center;
 	justify-content: center;
-	inline-size: var(--ard-ps-arrow);
-	block-size: var(--ard-ps-arrow);
-	padding: 0;
-	border: 1px solid var(--ard-ps-arrow-line);
+	inline-size: var(--ard-ps-arrow-w);
+	block-size: var(--ard-ps-arrow-h);
+	padding: var(--ard-ps-arrow-pad);
+	border: var(--ard-ps-arrow-bw) solid var(--ard-ps-arrow-line);
 	border-radius: var(--ard-ps-arrow-radius);
 	background: var(--ard-ps-arrow-bg);
 	color: var(--ard-ps-arrow-ink);
@@ -313,7 +320,7 @@
 
 .ard-pslider__arrow:hover,
 .ard-pslider__arrow:focus-visible {
-	border-color: var(--ard-ps-arrow-bg-hover);
+	border-color: var(--ard-ps-arrow-line-hover);
 	background: var(--ard-ps-arrow-bg-hover);
 	color: var(--ard-ps-arrow-ink-hover);
 }
@@ -330,50 +337,59 @@
 	line-height: 1;
 }
 
-/*
- * دکمه‌های «روی کارت‌ها» از جریان بیرون می‌روند تا ریل تمام پهنا را بگیرد؛
- * در حالت «دو طرف» برعکس، داخل جریان می‌مانند و ریل جا باز می‌کند.
- */
-.ard-pslider--arrows-inside .ard-pslider__arrow {
-	position: absolute;
-	z-index: 3;
-	box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
-}
-
-.ard-pslider--arrows-inside .ard-pslider__arrow--prev {
-	inset-inline-start: var(--ard-ps-arrow-inset);
-}
-
-.ard-pslider--arrows-inside .ard-pslider__arrow--next {
-	inset-inline-end: var(--ard-ps-arrow-inset);
-}
-
-/* ---------------------------------------- جایگاه آزاد */
+/* ---------------------------------------- جایگاه دکمه‌ها */
 
 /*
- * صحنه block می‌شود تا ریل تمام پهنا را بگیرد و دکمه‌ها آزادانه رویش بنشینند.
+ * هر دو دکمه همیشه absolute هستند و جایشان از متغیر می‌آید:
+ *
+ *   ax/ay  لنگر (۰٪ شروع، ۵۰٪ وسط، ۱۰۰٪ پایان)
+ *   sx/sy  عقب‌کشیدن به اندازهٔ خودِ دکمه، تا روی لنگر بنشیند نه آویزان از آن
+ *   x/y    جابه‌جایی دلخواه کاربر
+ *
+ * چرا margin و نه translate: margin منطقی است و در راست‌چین خودش برعکس
+ * می‌شود؛ با translateX باید علامتش را دستی برمی‌گرداندیم و «جابه‌جایی مثبت»
+ * در فارسی به بیرون صفحه می‌رفت.
  */
-.ard-pslider--arrows-free .ard-pslider__stage {
-	display: block;
-}
-
-.ard-pslider--arrows-free .ard-pslider__arrow {
+.ard-pslider__arrow {
 	position: absolute;
 	z-index: 3;
 }
 
-.ard-pslider--arrows-free .ard-pslider__arrow--prev {
+.ard-pslider__arrow {
+	/* پدینگ نباید دکمه را بزرگ‌تر از اندازه‌ای کند که کاربر داده. */
+	box-sizing: border-box;
+}
+
+.ard-pslider__arrow--prev {
 	inset-inline-start: calc(var(--ard-ps-prev-ax) + var(--ard-ps-prev-x));
 	inset-block-start: calc(var(--ard-ps-prev-ay) + var(--ard-ps-prev-y));
 	margin-inline-start: var(--ard-ps-prev-sx);
 	margin-block-start: var(--ard-ps-prev-sy);
 }
 
-.ard-pslider--arrows-free .ard-pslider__arrow--next {
+.ard-pslider__arrow--next {
 	inset-inline-start: calc(var(--ard-ps-next-ax) + var(--ard-ps-next-x));
 	inset-block-start: calc(var(--ard-ps-next-ay) + var(--ard-ps-next-y));
 	margin-inline-start: var(--ard-ps-next-sx);
 	margin-block-start: var(--ard-ps-next-sy);
+}
+
+/*
+ * «روی کارت‌ها»: دکمه‌ها از لبهٔ ریل کمی تو می‌آیند.
+ *
+ * این فاصله متغیر جداگانه‌ای دارد تا با «جابه‌جایی» کاربر قاطی نشود؛ آن یکی
+ * دست کاربر است و این یکی مالِ خودِ حالت.
+ */
+.ard-pslider--arrows-inside .ard-pslider__arrow {
+	box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+}
+
+.ard-pslider--arrows-inside .ard-pslider__arrow--prev {
+	inset-inline-start: calc(var(--ard-ps-prev-ax) + var(--ard-ps-prev-x) + var(--ard-ps-arrow-inset));
+}
+
+.ard-pslider--arrows-inside .ard-pslider__arrow--next {
+	inset-inline-start: calc(var(--ard-ps-next-ax) + var(--ard-ps-next-x) - var(--ard-ps-arrow-inset));
 }
 
 /* ---------------------------------------- نقطه‌ها */
@@ -388,10 +404,6 @@
 
 .ard-pslider__dots:empty {
 	display: none;
-}
-
-.ard-pslider__foot .ard-pslider__dots {
-	margin-block-start: 0;
 }
 
 .ard-pslider__dot {
@@ -422,15 +434,17 @@
 	}
 
 	/*
-	 * روی صفحهٔ باریک، «دو طرف» جای ریل را تنگ می‌کند؛ دکمه‌ها می‌روند کنار و
-	 * انگشت که از قبل می‌توانست اسلاید کند. حالت «آزاد» استثناست: آنجا کاربر
-	 * خودش جای دکمه‌ها را تعیین کرده و ریسپانسیوش هم دست خودش است.
+	 * روی صفحهٔ باریک، گوشهٔ بیرونی جای ریل را تنگ می‌کند؛ دکمه‌ها می‌روند
+	 * کنار و انگشت که از قبل می‌توانست اسلاید کند.
+	 *
+	 * اگر کاربر جای دکمه‌ها را خودش تنظیم کرده باشد، همان تنظیمِ موبایلِ خودش
+	 * (کنترل‌ها ریسپانسیو هستند) بر این می‌چربد.
 	 */
-	.ard-pslider--arrows-side .ard-pslider__stage {
-		display: block;
+	.ard-pslider--arrows-outside .ard-pslider__stage {
+		padding-inline: 0;
 	}
 
-	.ard-pslider--arrows-side .ard-pslider__arrow {
+	.ard-pslider--arrows-outside .ard-pslider__arrow {
 		display: none;
 	}
 
