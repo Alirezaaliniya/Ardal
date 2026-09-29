@@ -528,6 +528,17 @@
 					return;
 				}
 
+				// «کد تخفیف دارید؟» پیام نیست، دکمهٔ باز کردن فرم است؛ کد تخفیف
+				// در مرحلهٔ سبد خرید فیلد خودش را دارد، پس بی‌صدا کنار می‌رود.
+				var couponToggle = el.closest( '.woocommerce-form-coupon-toggle' );
+
+				if ( couponToggle ) {
+					el.ardTaken = true;
+					couponToggle.parentNode.removeChild( couponToggle );
+
+					return;
+				}
+
 				// <li> داخل .woocommerce-error جداگانه خوانده می‌شود؛ خودِ ظرف نه.
 				if ( 'UL' === el.tagName && el.querySelector( 'li' ) ) {
 					return;

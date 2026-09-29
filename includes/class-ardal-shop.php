@@ -37,9 +37,22 @@ class Ardal_Shop {
 		// آدرس تازه شود؛ ووکامرس فقط جدول بازبینی و باکس پرداخت را تازه می‌کند.
 		add_filter( 'woocommerce_update_order_review_fragments', array( __CLASS__, 'shipping_fragment' ) );
 
+		/*
+		 * «کد تخفیف دارید؟» ووکامرس در صفحهٔ تسویه لازم نیست: کد تخفیف در
+		 * مرحلهٔ سبد خرید فیلد خودش را دارد. این نوار .woocommerce-info است و
+		 * جمع‌کنندهٔ پیام‌ها آن را به توستِ بی‌معنی تبدیل می‌کرد (لینکش هم حذف
+		 * می‌شد). روی template_redirect، چون هوک‌های قالب ووکامرس دیرتر از
+		 * plugins_loaded ثبت می‌شوند.
+		 */
+		add_action( 'template_redirect', array( __CLASS__, 'remove_checkout_coupon' ) );
+
 		add_filter( 'woocommerce_checkout_fields', array( __CLASS__, 'invoice_field' ) );
 		add_action( 'woocommerce_checkout_create_order', array( __CLASS__, 'save_invoice_field' ), 10, 2 );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( __CLASS__, 'admin_invoice_note' ) );
+	}
+
+	public static function remove_checkout_coupon() {
+		remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10 );
 	}
 
 	/**
