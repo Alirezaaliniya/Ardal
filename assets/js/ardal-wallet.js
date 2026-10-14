@@ -230,6 +230,200 @@
 		}
 	} );
 
+	/* ---------------- برداشت ---------------- */
+
+	/**
+	 * شبا به شکل استاندارد: حروف بزرگ، ارقام لاتین، بدون فاصله؛ ۲۴ رقم خالی
+	 * یعنی «IR» جا افتاده.
+	 *
+	 * @param {string} value
+	 * @return {string}
+	 */
+	function ibanClean( value ) {
+		var latin = String( value || '' )
+			.replace( /[۰-۹]/g, function ( d ) {
+				return String( d.charCodeAt( 0 ) - 0x06f0 );
+			} )
+			.replace( /[٠-٩]/g, function ( d ) {
+				return String( d.charCodeAt( 0 ) - 0x0660 );
+			} )
+			.toUpperCase()
+			.replace( /[^0-9A-Z]/g, '' );
+
+		return /^\d{24}$/.test( latin ) ? 'IR' + latin : latin;
+	}
+
+	/* همان بررسی رقم کنترل سمت سرور (ISO 13616، مود ۹۷) */
+	function ibanValid( iban ) {
+		if ( ! /^IR\d{24}$/.test( iban ) ) {
+			return false;
+		}
+
+		var moved = iban.slice( 4 ) + '1827' + iban.slice( 2, 4 );
+		var rest = 0;
+
+		for ( var i = 0; i < moved.length; i += 7 ) {
+			rest = Number( String( rest ) + moved.slice( i, i + 7 ) ) % 97;
+		}
+
+		return 1 === rest;
+	}
+
+	function ibanPretty( iban ) {
+		return iban.replace( /(.{4})(?=.)/g, '$1 ' );
+	}
+
+	function post( data ) {
+		var body = new window.FormData();
+
+		Object.keys( data ).forEach( function ( key ) {
+			body.append( key, data[ key ] );
+		} );
+		body.append( 'nonce', CFG.nonce || '' );
+
+		return window.fetch( CFG.ajax, { method: 'POST', credentials: 'same-origin', body: body } )
+			.then( function ( response ) {
+				return response.json();
+			} )
+			.then( function ( payload ) {
+				var result = ( payload && payload.data ) || {};
+
+				if ( ! payload || ! payload.success ) {
+					var error = new Error( result.message || '' );
+
+					error.fromServer = !! result.message;
+					error.code = result.code || '';
+					throw error;
+				}
+
+				return result;
+			} );
+	}
+
+	document.addEventListener( 'input', function ( event ) {
+		var amount = event.target.closest( '[data-ard-withdraw-amount]' );
+		var iban = event.target.closest( '[data-ard-withdraw-iban]' );
+
+		if ( amount ) {
+			var clean = digits( amount.value );
+
+			amount.value = clean ? pretty( clean ) : '';
+			amount.classList.remove( 'is-bad' );
+		}
+
+		if ( iban ) {
+			iban.classList.remove( 'is-bad' );
+		}
+	} );
+
+	// شبا هنگام خروج از فیلد مرتب می‌شود، نه حین تایپ که مکان‌نما نپرد.
+	document.addEventListener( 'focusout', function ( event ) {
+		var iban = event.target.closest( '[data-ard-withdraw-iban]' );
+
+		if ( iban && iban.value ) {
+			iban.value = ibanPretty( ibanClean( iban.value ) );
+		}
+	} );
+
+	function withdraw( button ) {
+		var scope = button.closest( '[data-ard-withdraw]' );
+		var amountBox = scope && scope.querySelector( '[data-ard-withdraw-amount]' );
+		var ibanBox = scope && scope.querySelector( '[data-ard-withdraw-iban]' );
+		var amount = amountBox ? digits( amountBox.value ) : '';
+		var iban = ibanBox ? ibanClean( ibanBox.value ) : '';
+
+		if ( ! amount || ! Number( amount ) ) {
+			fail( amountBox, I18N.wdAmount );
+
+			return;
+		}
+
+		if ( CFG.minWithdraw > 0 && Number( amount ) < CFG.minWithdraw ) {
+			fail( amountBox, String( I18N.wdMin ).replace( '%s', pretty( String( CFG.minWithdraw ) ) ) );
+
+			return;
+		}
+
+		if ( ! ibanValid( iban ) ) {
+			fail( ibanBox, I18N.wdIban );
+
+			return;
+		}
+
+		if ( ! window.confirm( String( I18N.wdConfirm ).replace( '%s', pretty( amount ) ) ) ) {
+			return;
+		}
+
+		button.disabled = true;
+		button.classList.add( 'is-busy' );
+
+		post( { action: 'ardal_wallet_withdraw', amount: amount, iban: iban } )
+			.then( function ( data ) {
+				toast( data.message, 'success' );
+				window.setTimeout( function () {
+					window.location.reload();
+				}, 1200 );
+			} )
+			.catch( function ( error ) {
+				fail( 'iban' === error.code ? ibanBox : amountBox, error.fromServer ? error.message : I18N.wdError );
+				button.disabled = false;
+				button.classList.remove( 'is-busy' );
+			} );
+	}
+
+	document.addEventListener( 'click', function ( event ) {
+		var button = event.target.closest( '[data-ard-withdraw-submit]' );
+
+		if ( button && ! button.disabled ) {
+			event.preventDefault();
+			withdraw( button );
+		}
+
+		var cancel = event.target.closest( '[data-ard-withdraw-cancel]' );
+
+		if ( ! cancel || cancel.disabled ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		if ( ! window.confirm( I18N.wdCancel ) ) {
+			return;
+		}
+
+		cancel.disabled = true;
+
+		post( { action: 'ardal_wallet_withdraw_cancel', id: cancel.getAttribute( 'data-ard-withdraw-cancel' ) } )
+			.then( function ( data ) {
+				toast( data.message, 'success' );
+				window.setTimeout( function () {
+					window.location.reload();
+				}, 1200 );
+			} )
+			.catch( function ( error ) {
+				toast( error.fromServer ? error.message : I18N.wdError, 'error' );
+				cancel.disabled = false;
+			} );
+	} );
+
+	document.addEventListener( 'keydown', function ( event ) {
+		if ( 'Enter' !== event.key ) {
+			return;
+		}
+
+		var box = event.target.closest( '[data-ard-withdraw-amount], [data-ard-withdraw-iban]' );
+		var scope = box && box.closest( '[data-ard-withdraw]' );
+		var button = scope && scope.querySelector( '[data-ard-withdraw-submit]' );
+
+		if ( button ) {
+			event.preventDefault();
+
+			if ( ! button.disabled ) {
+				withdraw( button );
+			}
+		}
+	} );
+
 	/* ---------------- پنل کاربری: باز و بسته کردن فرم شارژ ---------------- */
 
 	document.addEventListener( 'click', function ( event ) {

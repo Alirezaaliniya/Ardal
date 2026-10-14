@@ -27,6 +27,8 @@ class Ardal_Wallet_Sms {
 	const EVENT_TOPUP    = 'topup';
 	const EVENT_ADMIN    = 'admin';
 	const EVENT_CASHBACK = 'cashback';
+	const EVENT_WITHDRAW_PAID     = 'withdraw_paid';
+	const EVENT_WITHDRAW_REJECTED = 'withdraw_rejected';
 
 	/**
 	 * هوک ارسال پس‌زمینه.
@@ -46,6 +48,8 @@ class Ardal_Wallet_Sms {
 			self::EVENT_TOPUP    => 'شارژ کیف پول توسط کاربر',
 			self::EVENT_ADMIN    => 'شارژ دستی یا گروهی توسط مدیر',
 			self::EVENT_CASHBACK => 'واریز کش‌بگ خرید',
+			self::EVENT_WITHDRAW_PAID     => 'واریز درخواست برداشت',
+			self::EVENT_WITHDRAW_REJECTED => 'رد درخواست برداشت',
 		);
 	}
 
@@ -60,6 +64,9 @@ class Ardal_Wallet_Sms {
 			'{balance}'     => 'موجودی با واحد',
 			'{balance_raw}' => 'موجودی فقط با رقم (برای پترن)',
 			'{site}'        => 'نام سایت',
+			'{ref}'         => 'کد پیگیری واریز (فقط برداشت)',
+			'{reason}'      => 'دلیل رد (فقط برداشت)',
+			'{iban}'        => 'شبای نیمه‌پنهان (فقط برداشت)',
 		);
 	}
 
@@ -146,9 +153,10 @@ class Ardal_Wallet_Sms {
 	 * @param int    $user_id
 	 * @param float  $amount
 	 * @param string $event
+	 * @param array  $extra جای‌گذارهای اضافهٔ همین رویداد، مثل {ref}.
 	 * @return bool آیا در صف رفت (یا فرستاده شد)؟
 	 */
-	public static function send( $user_id, $amount, $event = self::EVENT_TOPUP ) {
+	public static function send( $user_id, $amount, $event = self::EVENT_TOPUP, $extra = array() ) {
 		if ( ! self::is_enabled( $event ) || ! get_userdata( (int) $user_id ) || '' === self::phone( $user_id ) ) {
 			return false;
 		}
@@ -158,6 +166,7 @@ class Ardal_Wallet_Sms {
 			'amount'  => (float) $amount,
 			'event'   => (string) $event,
 			'balance' => Ardal_Wallet::balance( (int) $user_id, false ),
+			'extra'   => array_map( 'strval', (array) $extra ),
 		);
 
 		/**
@@ -189,7 +198,7 @@ class Ardal_Wallet_Sms {
 	 * @return true|WP_Error
 	 */
 	public static function deliver( $job ) {
-		$job = wp_parse_args( (array) $job, array( 'user_id' => 0, 'amount' => 0, 'event' => self::EVENT_TOPUP, 'balance' => null ) );
+		$job = wp_parse_args( (array) $job, array( 'user_id' => 0, 'amount' => 0, 'event' => self::EVENT_TOPUP, 'balance' => null, 'extra' => array() ) );
 
 		if ( ! self::is_enabled( $job['event'] ) ) {
 			return new WP_Error( 'ardal_sms_off', 'پیامک این رویداد خاموش است یا نیاس لاگین فعال نیست.' );
@@ -201,7 +210,7 @@ class Ardal_Wallet_Sms {
 			return new WP_Error( 'ardal_sms_user', 'کاربر پیدا نشد.' );
 		}
 
-		$vars = self::vars( $user, (float) $job['amount'], null === $job['balance'] ? null : (float) $job['balance'] );
+		$vars = self::vars( $user, (float) $job['amount'], null === $job['balance'] ? null : (float) $job['balance'] ) + (array) $job['extra'];
 
 		return self::dispatch( self::phone( $user->ID ), $job['event'], $vars, $user->ID );
 	}
@@ -381,7 +390,12 @@ class Ardal_Wallet_Sms {
 		add_filter( 'option_' . Ardal_Wallet::OPTION, $filter );
 
 		$user   = wp_get_current_user();
-		$result = self::dispatch( $phone, $event, self::vars( $user, 100000, 250000 ), $user->ID );
+		$sample = array(
+			'{ref}'    => '123456789',
+			'{reason}' => 'شبا به نام صاحب حساب نیست',
+			'{iban}'   => 'IR06 25••••••••••••••0001',
+		);
+		$result = self::dispatch( $phone, $event, self::vars( $user, 100000, 250000 ) + $sample, $user->ID );
 
 		remove_filter( 'option_' . Ardal_Wallet::OPTION, $filter );
 

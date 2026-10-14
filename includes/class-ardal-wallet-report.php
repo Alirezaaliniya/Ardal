@@ -30,10 +30,18 @@ class Ardal_Wallet_Report {
 			return;
 		}
 
+		// نشان تعداد درخواست‌های برداشت در انتظار، مثل نشان سفارش‌های ووکامرس.
+		$pending = Ardal_Wallet_Withdraw::pending_count();
+		$label   = 'گزارش کیف پول';
+
+		if ( $pending ) {
+			$label .= ' <span class="awaiting-mod count-' . $pending . '"><span class="pending-count">' . esc_html( Ardal_Helpers::fa_digits( $pending ) ) . '</span></span>';
+		}
+
 		add_submenu_page(
 			Ardal_Settings::PAGE,
 			'گزارش کیف پول',
-			'گزارش کیف پول',
+			$label,
 			'manage_woocommerce',
 			self::SLUG,
 			array( __CLASS__, 'render_page' )
@@ -462,6 +470,14 @@ class Ardal_Wallet_Report {
 			</h1>
 
 			<?php Ardal_Wallet_Tools::notice(); ?>
+			<?php
+			// درخواست‌های باز بالای صفحه؛ بدون درخواست و با برداشت خاموش، پایین کنار ابزارها.
+			$withdraw_top = Ardal_Wallet_Withdraw::pending_count() > 0;
+
+			if ( $withdraw_top ) {
+				Ardal_Wallet_Withdraw::render_admin();
+			}
+			?>
 			<?php self::render_filters( $f ); ?>
 			<?php self::render_cards( $summary ); ?>
 			<?php self::render_chart( self::daily( $f ) ); ?>
@@ -474,6 +490,11 @@ class Ardal_Wallet_Report {
 			<?php self::render_table( self::rows( $f ), $f, $total, $pages ); ?>
 
 			<h2 class="ardal-wr__section">ابزارها</h2>
+			<?php
+			if ( ! $withdraw_top ) {
+				Ardal_Wallet_Withdraw::render_admin();
+			}
+			?>
 			<?php self::render_manage( $f ); ?>
 			<?php self::render_bulk(); ?>
 			<?php self::render_grant(); ?>

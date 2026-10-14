@@ -48,6 +48,7 @@ require_once ARDAL_PATH . 'includes/class-ardal-wallet-admin.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wallet-tools.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wallet-report.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wallet-render.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet-withdraw.php';
 require_once ARDAL_PATH . 'includes/class-ardal-features-settings.php';
 require_once ARDAL_PATH . 'includes/class-ardal-assets.php';
 require_once ARDAL_PATH . 'includes/class-ardal.php';

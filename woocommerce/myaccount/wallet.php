@@ -20,6 +20,7 @@ if ( ! class_exists( 'Ardal_Wallet' ) || ! Ardal_Wallet::is_enabled() ) {
 $ard_user    = get_current_user_id();
 $ard_balance = Ardal_Wallet::balance( $ard_user );
 $ard_topup   = Ardal_Wallet::on( 'topup_enabled' );
+$ard_wd      = class_exists( 'Ardal_Wallet_Withdraw' ) && Ardal_Wallet_Withdraw::enabled();
 $ard_active  = Ardal_Wallet::active_cashback( $ard_user );
 $ard_cb_left = 0.0;
 $ard_cb_soon = '';
@@ -56,11 +57,20 @@ $ard_has_cb = Ardal_Wallet::count( $ard_user, array( 'types' => array( Ardal_Wal
 			<?php endif; ?>
 		</div>
 
-		<?php if ( $ard_topup ) : ?>
-			<button type="button" class="ard-ac__btn ard-ac__btn--accent ard-wl-hero__btn" data-ard-wallet-toggle aria-expanded="false" aria-controls="ard-wl-topup">
-				<?php echo Ardal_Account::icon( 'plus', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				افزایش اعتبار
-			</button>
+		<?php if ( $ard_topup || $ard_wd ) : ?>
+			<div class="ard-wl-hero__actions">
+				<?php if ( $ard_topup ) : ?>
+					<button type="button" class="ard-ac__btn ard-ac__btn--accent ard-wl-hero__btn" data-ard-wallet-toggle aria-expanded="false" aria-controls="ard-wl-topup">
+						<?php echo Ardal_Account::icon( 'plus', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						افزایش اعتبار
+					</button>
+				<?php endif; ?>
+				<?php if ( $ard_wd ) : ?>
+					<button type="button" class="ard-ac__btn ard-wl-hero__btn ard-wl-hero__btn--line" data-ard-wallet-toggle aria-expanded="false" aria-controls="ard-wl-withdraw">
+						برداشت
+					</button>
+				<?php endif; ?>
+			</div>
 		<?php endif; ?>
 	</div>
 
@@ -77,6 +87,20 @@ $ard_has_cb = Ardal_Wallet::count( $ard_user, array( 'types' => array( Ardal_Wal
 			);
 			?>
 		</div>
+	<?php endif; ?>
+
+	<?php if ( $ard_wd ) : ?>
+		<div class="ard-ac__card ard-wl-account__withdraw" id="ard-wl-withdraw" hidden>
+			<?php echo Ardal_Wallet_Withdraw::form( array( 'show_balance' => false ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		</div>
+
+		<?php $ard_wd_list = Ardal_Wallet_Withdraw::user_requests(); ?>
+		<?php if ( '' !== $ard_wd_list ) : ?>
+			<div class="ard-ac__card">
+				<h3 class="ard-wl-wd__title">درخواست‌های برداشت</h3>
+				<?php echo $ard_wd_list; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</div>
+		<?php endif; ?>
 	<?php endif; ?>
 
 	<?php if ( $ard_has_cb ) : ?>

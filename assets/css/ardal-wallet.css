@@ -819,3 +819,109 @@ a.ard-wl-balance:hover {
 	background: #fff1d9;
 	color: #8a6c1d;
 }
+
+/* ------------------------------------------------------------------ برداشت */
+
+.ard-wl-hero__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.ard-wl-hero__btn--line[class] {
+	border: 1px solid var(--ard-primary);
+	background: transparent;
+	color: var(--ard-primary);
+}
+
+.ard-wl-wd {
+	display: grid;
+	gap: 14px;
+	max-inline-size: 520px;
+}
+
+.ard-wl-wd__balance {
+	display: grid;
+	gap: 4px;
+}
+
+.ard-wl-wd__balance small,
+.ard-wl-wd__hint {
+	margin: 0;
+	color: var(--ard-muted, #6b7280);
+	font-size: 12.5px;
+}
+
+.ard-wl-wd__field {
+	display: grid;
+	gap: 8px;
+	font-size: 13.5px;
+	font-weight: 600;
+}
+
+.ard-wl-wd__notice {
+	margin: 0;
+	padding: 12px 14px;
+	border-radius: var(--ard-radius-sm, 12px);
+	background: color-mix(in srgb, var(--ard-primary) 8%, transparent);
+	font-size: 13px;
+	line-height: 1.9;
+}
+
+.ard-wl-wd .ard-wl-btn[class] {
+	justify-self: start;
+}
+
+.ard-wl-wd__title {
+	margin: 0 0 12px;
+	font-size: 15px;
+}
+
+.ard-wl-wdl {
+	display: grid;
+	gap: 8px;
+}
+
+.ard-wl-wdl__row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px 14px;
+	padding: 12px 14px;
+	border: 1px solid var(--ard-border, rgba(0, 0, 0, .08));
+	border-radius: var(--ard-radius-sm, 12px);
+}
+
+.ard-wl-wdl__main,
+.ard-wl-wdl__meta {
+	display: grid;
+	gap: 3px;
+	font-size: 13px;
+}
+
+.ard-wl-wdl__meta {
+	justify-items: end;
+}
+
+.ard-wl-wdl small {
+	color: var(--ard-muted, #6b7280);
+	font-size: 12px;
+}
+
+.ard-wl-wdl__cancel[class] {
+	padding: 6px 12px;
+	border: 1px solid #d63638;
+	border-radius: 10px;
+	background: transparent;
+	color: #d63638;
+	font-family: inherit;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+@media (max-width: 600px) {
+	.ard-wl-wdl__meta {
+		justify-items: start;
+	}
+}

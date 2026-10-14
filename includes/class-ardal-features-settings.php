@@ -137,6 +137,18 @@ class Ardal_Features_Settings {
 					'cashback_on_wallet' => array( 'type' => 'checkbox', 'label' => 'به بخشی که با کیف پول پرداخت شده هم کش‌بگ تعلق بگیرد', 'show' => 'cashback' ),
 				),
 			),
+			'withdraw' => array(
+				'title'  => 'برداشت از کیف پول',
+				'hint'   => 'کاربر مبلغ و شمارهٔ شبا را می‌فرستد و مبلغ همان لحظه از موجودی کسر (نگه داشته) می‌شود. درخواست‌ها در «گزارش کیف پول ← درخواست‌های برداشت» بررسی می‌شوند: «پرداخت شد» با کد پیگیری بانک، یا «رد» که مبلغ را به کیف پول برمی‌گرداند. کاربر هم تا پیش از بررسی می‌تواند درخواستش را لغو کند.',
+				'fields' => array(
+					'withdraw_enabled'  => array( 'type' => 'checkbox', 'label' => 'برداشت از کیف پول فعال است', 'desc' => 'دکمهٔ «برداشت» کنار «افزایش موجودی» در صفحهٔ کیف پول.' ),
+					'min_withdraw'      => array( 'type' => 'money', 'label' => 'کمترین مبلغ برداشت (تومان)', 'show' => 'withdraw_enabled' ),
+					'max_withdraw'      => array( 'type' => 'money', 'label' => 'بیشترین مبلغ هر برداشت (تومان)', 'desc' => 'صفر یعنی تا سقف موجودی.', 'show' => 'withdraw_enabled' ),
+					'withdraw_cashback' => array( 'type' => 'checkbox', 'label' => 'کش‌بگ هم قابل برداشت باشد', 'desc' => 'خاموش باشد، کش‌بگ مصرف‌نشده از مبلغ قابل برداشت کم می‌شود و فقط برای خرید قابل استفاده است.', 'show' => 'withdraw_enabled' ),
+					'withdraw_notify'   => array( 'type' => 'checkbox', 'label' => 'ایمیل به مدیر برای هر درخواست تازه', 'show' => 'withdraw_enabled' ),
+					'withdraw_note'     => array( 'type' => 'text', 'label' => 'توضیح زیر فرم برداشت', 'desc' => 'مثلاً زمان بررسی و واریز.', 'show' => 'withdraw_enabled' ),
+				),
+			),
 			'sms'      => array(
 				'title'  => 'پیامک (از درگاه نیاس لاگین)',
 				'nias'   => true,
@@ -155,6 +167,14 @@ class Ardal_Features_Settings {
 					'sms_cashback_pattern'    => array( 'type' => 'text', 'label' => 'کد پترن', 'desc' => 'خالی بماند، متن آزاد زیر فرستاده می‌شود.', 'show' => 'sms_cashback', 'ltr' => true, 'test' => 'cashback' ),
 					'sms_cashback_vars'       => array( 'type' => 'text', 'label' => 'متغیرهای پترن', 'desc' => 'به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_cashback', 'ltr' => true ),
 					'sms_cashback_text'       => array( 'type' => 'textarea', 'label' => 'متن آزاد', 'desc' => 'جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_cashback' ),
+					'sms_withdraw_paid'       => array( 'type' => 'checkbox', 'label' => 'بعد از واریز درخواست برداشت ({ref} = کد پیگیری)', 'show' => 'sms_enabled', 'group' => 'withdraw_paid' ),
+					'sms_withdraw_paid_pattern' => array( 'type' => 'text', 'label' => 'کد پترن', 'desc' => 'خالی بماند، متن آزاد زیر فرستاده می‌شود.', 'show' => 'sms_withdraw_paid', 'ltr' => true, 'test' => 'withdraw_paid' ),
+					'sms_withdraw_paid_vars'  => array( 'type' => 'text', 'label' => 'متغیرهای پترن', 'desc' => 'به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}', 'show' => 'sms_withdraw_paid', 'ltr' => true ),
+					'sms_withdraw_paid_text'  => array( 'type' => 'textarea', 'label' => 'متن آزاد', 'desc' => 'جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}', 'show' => 'sms_withdraw_paid' ),
+					'sms_withdraw_rejected'       => array( 'type' => 'checkbox', 'label' => 'بعد از رد درخواست برداشت ({reason} = دلیل)', 'show' => 'sms_enabled', 'group' => 'withdraw_rejected' ),
+					'sms_withdraw_rejected_pattern' => array( 'type' => 'text', 'label' => 'کد پترن', 'desc' => 'خالی بماند، متن آزاد زیر فرستاده می‌شود.', 'show' => 'sms_withdraw_rejected', 'ltr' => true, 'test' => 'withdraw_rejected' ),
+					'sms_withdraw_rejected_vars'  => array( 'type' => 'text', 'label' => 'متغیرهای پترن', 'desc' => 'به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}', 'show' => 'sms_withdraw_rejected', 'ltr' => true ),
+					'sms_withdraw_rejected_text'  => array( 'type' => 'textarea', 'label' => 'متن آزاد', 'desc' => 'جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}', 'show' => 'sms_withdraw_rejected' ),
 				),
 			),
 		);

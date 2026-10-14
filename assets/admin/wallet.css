@@ -449,3 +449,30 @@
 .ardal-wl-user__log {
 	max-width: 960px;
 }
+
+/* درخواست‌های برداشت */
+.ardal-wr__iban {
+	font-size: 12px;
+	letter-spacing: .02em;
+	white-space: nowrap;
+}
+
+.ardal-wr__wform {
+	display: grid;
+	gap: 6px;
+	min-width: 220px;
+}
+
+.ardal-wr__wform input[type="text"] {
+	width: 100%;
+}
+
+.ardal-wr__wform input.is-bad {
+	border-color: #b32d2e;
+	box-shadow: 0 0 0 1px #b32d2e;
+}
+
+.ardal-wr__wform-actions {
+	display: flex;
+	gap: 6px;
+}

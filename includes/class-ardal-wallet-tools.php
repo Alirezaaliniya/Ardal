@@ -651,6 +651,9 @@ class Ardal_Wallet_Tools {
 			'bulk_none'    => array( 'error', 'هیچ کاربری با این انتخاب پیدا نشد.' ),
 			'bulk_preview' => array( 'warning', sprintf( 'برآورد: %s کاربر، مجموع %s. برای اجرا همان فرم را با تیک «تأیید می‌کنم» دوباره بفرستید.', $fa( $n ), $money ) ),
 			'grant_none'   => array( 'warning', 'هیچ سفارشی انتخاب نشده بود.' ),
+			'withdraw_paid'   => array( 'success', 'درخواست برداشت «پرداخت شد» ثبت شد و به کاربر اطلاع داده شد.' ),
+			'withdraw_reject' => array( 'success', 'درخواست برداشت رد شد و مبلغ به کیف پول کاربر برگشت.' ),
+			'withdraw_fail'   => array( 'error', 'این درخواست پیدا نشد یا پیش‌تر بررسی شده بود.' ),
 		);
 
 		if ( 'bulk_done' === $done ) {

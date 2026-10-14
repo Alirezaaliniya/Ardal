@@ -343,6 +343,11 @@ class Ardal_Account_Elano {
 			return 'افزایش موجودی';
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( 'wallet' === $key && isset( $_GET['ard_el'] ) && 'withdraw' === $_GET['ard_el'] && Ardal_Wallet_Withdraw::enabled() ) {
+			return 'برداشت';
+		}
+
 		$items = wc_get_account_menu_items();
 
 		if ( isset( $items[ $key ] ) ) {
@@ -841,9 +846,17 @@ class Ardal_Account_Elano {
 			return;
 		}
 
-		$user_id = get_current_user_id();
-		$balance = Ardal_Wallet::balance( $user_id );
-		$deposit = add_query_arg( 'ard_el', 'deposit', Ardal_Wallet::account_url() );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['ard_el'] ) && 'withdraw' === $_GET['ard_el'] && Ardal_Wallet_Withdraw::enabled() ) {
+			self::screen_withdraw();
+
+			return;
+		}
+
+		$user_id  = get_current_user_id();
+		$balance  = Ardal_Wallet::balance( $user_id );
+		$deposit  = add_query_arg( 'ard_el', 'deposit', Ardal_Wallet::account_url() );
+		$withdraw = Ardal_Wallet_Withdraw::enabled() ? add_query_arg( 'ard_el', 'withdraw', Ardal_Wallet::account_url() ) : '';
 
 		self::section_head( 'wallet', Ardal_Wallet::option( 'title' ), '', self::cta( 'پرینت', '', 'print', ' data-ard-el-print' ) );
 		?>
@@ -851,9 +864,14 @@ class Ardal_Account_Elano {
 			<div class="ard-el__balance-main">
 				<span class="ard-el__balance-cap">موجودی کیف پول</span>
 				<strong class="ard-el__balance-num" data-ard-wallet-balance><?php echo Ardal_Wallet::money( $balance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></strong>
-				<?php if ( Ardal_Wallet::on( 'topup_enabled' ) ) : ?>
+				<?php if ( Ardal_Wallet::on( 'topup_enabled' ) || '' !== $withdraw ) : ?>
 					<div class="ard-el__balance-actions">
-						<a class="ard-el__btn" href="<?php echo esc_url( $deposit ); ?>">افزایش موجودی</a>
+						<?php if ( Ardal_Wallet::on( 'topup_enabled' ) ) : ?>
+							<a class="ard-el__btn" href="<?php echo esc_url( $deposit ); ?>">افزایش موجودی</a>
+						<?php endif; ?>
+						<?php if ( '' !== $withdraw ) : ?>
+							<a class="ard-el__btn ard-el__btn--line" href="<?php echo esc_url( $withdraw ); ?>">برداشت</a>
+						<?php endif; ?>
 					</div>
 				<?php endif; ?>
 			</div>
@@ -992,7 +1010,8 @@ class Ardal_Account_Elano {
 							<?php foreach ( $rows as $raw ) : ?>
 								<?php
 								$tx     = Ardal_Wallet::normalize( $raw );
-								$status = Ardal_Wallet::status_label( $tx['status'] );
+								$status = Ardal_Wallet_Withdraw::tx_status( $tx );
+								$status = $status ? $status : Ardal_Wallet::status_label( $tx['status'] );
 								?>
 								<tr>
 									<td data-label="شرح تراکنش"><?php echo esc_html( '' !== $tx['note'] ? $tx['note'] : Ardal_Wallet::type_label( $tx ) ); ?></td>
@@ -1024,6 +1043,8 @@ class Ardal_Account_Elano {
 			Ardal_Wallet::TYPE_REFUND   => 'برگشت وجه',
 			Ardal_Wallet::TYPE_CASHBACK => 'کش‌بگ',
 			Ardal_Wallet::TYPE_EXPIRE   => 'انقضای کش‌بگ',
+			Ardal_Wallet::TYPE_WITHDRAW => 'برداشت',
+			Ardal_Wallet::TYPE_WITHDRAW_BACK => 'بازگشت برداشت',
 		);
 
 		if ( isset( $map[ $tx['type'] ] ) ) {
@@ -1085,6 +1106,38 @@ class Ardal_Account_Elano {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * فرم برداشت (دیزاین Wallet 3): موجودی، مبلغ، شبا، دکمهٔ برداشت؛ زیرش
+	 * درخواست‌های اخیر با امکان لغو درخواست در انتظار.
+	 */
+	private static function screen_withdraw() {
+		$back = '<a class="ard-el__back" href="' . esc_url( Ardal_Wallet::account_url() ) . '">بازگشت به کیف پول</a>';
+		?>
+		<div class="ard-el__formbox">
+			<?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo Ardal_Wallet_Withdraw::form(
+				array(
+					'class'         => 'ard-el__wform',
+					'field_class'   => 'ard-el__field',
+					'input_class'   => 'ard-el__input',
+					'balance_class' => 'ard-el__wform-balance',
+					'notice_class'  => 'ard-el__note ard-el__note--box',
+					'hint_class'    => 'ard-el__hint',
+					'cta'           => self::cta( 'برداشت', '', 'chevron', ' data-ard-withdraw-submit' ),
+					'after'         => $back,
+				)
+			);
+			?>
+		</div>
+		<?php
+		$list = Ardal_Wallet_Withdraw::user_requests( 'ard-el__wdl' );
+
+		if ( '' !== $list ) {
+			echo '<section class="ard-el__history"><h3 class="ard-el__h3">درخواست‌های برداشت</h3>' . $list . '</section>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 	}
 
 	/* --------------------------------------------------------------------- */

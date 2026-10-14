@@ -22,7 +22,7 @@ class Ardal_Wallet {
 	/**
 	 * نسخهٔ ساختار جدول؛ با تغییر ستون‌ها باید بالا برود.
 	 */
-	const DB_VERSION = '1.0.0';
+	const DB_VERSION = '1.1.0';
 
 	const DB_OPTION = 'ardal_wallet_db_version';
 
@@ -48,6 +48,8 @@ class Ardal_Wallet {
 	const TYPE_CASHBACK = 'cashback';
 	const TYPE_EXPIRE   = 'cashback_expire';
 	const TYPE_ADMIN    = 'admin';
+	const TYPE_WITHDRAW = 'withdraw';
+	const TYPE_WITHDRAW_BACK = 'withdraw_back';
 
 	/* وضعیت‌ها */
 	const STATUS_SUCCESS = 'success';
@@ -73,6 +75,7 @@ class Ardal_Wallet {
 		Ardal_Wallet_Tools::init();
 		Ardal_Wallet_Render::init();
 		Ardal_Wallet_Sms::init();
+		Ardal_Wallet_Withdraw::init();
 	}
 
 	/**
@@ -136,6 +139,7 @@ class Ardal_Wallet {
 		) {$collate};";
 
 		dbDelta( $sql );
+		dbDelta( Ardal_Wallet_Withdraw::schema() );
 
 		update_option( self::DB_OPTION, self::DB_VERSION );
 	}
@@ -214,6 +218,14 @@ class Ardal_Wallet {
 			'cashback_days'      => '30',
 			'cashback_on_wallet' => '0',
 
+			/* برداشت */
+			'withdraw_enabled'   => '0',
+			'min_withdraw'       => '100000',
+			'max_withdraw'       => '0',
+			'withdraw_cashback'  => '0',
+			'withdraw_notify'    => '1',
+			'withdraw_note'      => 'درخواست برداشت حداکثر تا ۷۲ ساعت کاری بررسی و به حساب بانکی شما واریز می‌شود.',
+
 			/* پیامک */
 			'sms_enabled'        => '0',
 			'sms_topup'          => '1',
@@ -232,6 +244,14 @@ class Ardal_Wallet {
 			'sms_cashback_pattern' => '',
 			'sms_cashback_vars'    => 'amount:{amount_raw},balance:{balance_raw}',
 			'sms_cashback_text'    => "کش‌بگ خرید شما ({amount}) به کیف پول اضافه شد.\nموجودی فعلی: {balance}\n{site}",
+			'sms_withdraw_paid'    => '1',
+			'sms_withdraw_paid_pattern'     => '',
+			'sms_withdraw_paid_vars'        => 'amount:{amount_raw},ref:{ref}',
+			'sms_withdraw_paid_text'        => "برداشت {amount} از کیف پول به حساب شما واریز شد.\nکد پیگیری: {ref}\n{site}",
+			'sms_withdraw_rejected'         => '1',
+			'sms_withdraw_rejected_pattern' => '',
+			'sms_withdraw_rejected_vars'    => 'amount:{amount_raw},reason:{reason}',
+			'sms_withdraw_rejected_text'    => "درخواست برداشت {amount} رد شد و مبلغ به کیف پول برگشت.\n{reason}\n{site}",
 		);
 	}
 
@@ -256,6 +276,11 @@ class Ardal_Wallet {
 			'sms_topup',
 			'sms_admin',
 			'sms_cashback',
+			'sms_withdraw_paid',
+			'sms_withdraw_rejected',
+			'withdraw_enabled',
+			'withdraw_cashback',
+			'withdraw_notify',
 		);
 	}
 
@@ -329,6 +354,8 @@ class Ardal_Wallet {
 		$out['max_topup']          = $number( 'max_topup' );
 		$out['cashback_max']       = $number( 'cashback_max' );
 		$out['cashback_min_total'] = $number( 'cashback_min_total' );
+		$out['min_withdraw']       = $number( 'min_withdraw' );
+		$out['max_withdraw']       = $number( 'max_withdraw' );
 		$out['cashback_percent']   = (string) min( 100, (float) $number( 'cashback_percent' ) );
 		$out['max_percent']        = (string) max( 1, min( 100, absint( $raw['max_percent'] ?? $defaults['max_percent'] ) ) );
 		$out['cashback_days']      = (string) absint( $raw['cashback_days'] ?? $defaults['cashback_days'] );
@@ -337,19 +364,23 @@ class Ardal_Wallet {
 			$out['max_topup'] = $out['min_topup'];
 		}
 
+		if ( (float) $out['max_withdraw'] > 0 && (float) $out['max_withdraw'] < (float) $out['min_withdraw'] ) {
+			$out['max_withdraw'] = $out['min_withdraw'];
+		}
+
 		$status                 = sanitize_key( $raw['cashback_status'] ?? $defaults['cashback_status'] );
 		$out['cashback_status'] = in_array( $status, array( 'processing', 'completed' ), true ) ? $status : 'completed';
 
 		$out['quick_amounts'] = implode( ',', self::parse_amounts( $raw['quick_amounts'] ?? $defaults['quick_amounts'] ) );
 
-		foreach ( array( 'title', 'topup_note', 'checkout_label' ) as $key ) {
+		foreach ( array( 'title', 'topup_note', 'checkout_label', 'withdraw_note' ) as $key ) {
 			$value       = isset( $raw[ $key ] ) ? sanitize_text_field( $raw[ $key ] ) : '';
-			$out[ $key ] = ( '' === $value && 'topup_note' !== $key ) ? $defaults[ $key ] : $value;
+			$out[ $key ] = ( '' === $value && ! in_array( $key, array( 'topup_note', 'withdraw_note' ), true ) ) ? $defaults[ $key ] : $value;
 		}
 
 		$out['hero_image'] = isset( $raw['hero_image'] ) ? esc_url_raw( trim( (string) $raw['hero_image'] ) ) : '';
 
-		foreach ( array( 'topup', 'admin', 'cashback' ) as $event ) {
+		foreach ( array_keys( Ardal_Wallet_Sms::events() ) as $event ) {
 			$key = 'sms_' . $event;
 
 			$out[ $key . '_pattern' ] = isset( $raw[ $key . '_pattern' ] ) ? sanitize_text_field( $raw[ $key . '_pattern' ] ) : '';
@@ -566,6 +597,8 @@ class Ardal_Wallet {
 				'ref_id'     => 0,
 				'note'       => '',
 				'expires_at' => null,
+				// برداشت، دفتر کش‌بگ را دست نمی‌زند؛ کش‌بگ از مبلغ قابل برداشت جداست.
+				'keep_cashback' => false,
 			)
 		);
 
@@ -622,7 +655,7 @@ class Ardal_Wallet {
 			update_user_meta( $user_id, self::META_BALANCE, $balance );
 
 			// خرج کردن اعتبار، کش‌بگ‌های قدیمی‌تر را «مصرف‌شده» علامت می‌زند.
-			if ( $amount < 0 && self::TYPE_EXPIRE !== $args['type'] ) {
+			if ( $amount < 0 && self::TYPE_EXPIRE !== $args['type'] && empty( $args['keep_cashback'] ) ) {
 				self::consume_cashback( $user_id, abs( $amount ) );
 			}
 		}
@@ -1019,6 +1052,8 @@ class Ardal_Wallet {
 			self::TYPE_REFUND   => 'بازگشت وجه',
 			self::TYPE_EXPIRE   => 'انقضای کش‌بگ',
 			self::TYPE_ADMIN    => 'تغییر توسط مدیر',
+			self::TYPE_WITHDRAW => 'برداشت از کیف پول',
+			self::TYPE_WITHDRAW_BACK => 'بازگشت برداشت',
 		);
 	}
 

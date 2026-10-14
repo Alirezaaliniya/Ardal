@@ -39,6 +39,31 @@
 		target.textContent = format( sum );
 	}
 
+	/* دکمه‌های بررسی برداشت: تأیید پیش از ارسال؛ رد بدون دلیل پذیرفته نمی‌شود */
+	document.addEventListener( 'click', function ( event ) {
+		var button = event.target.closest( '[data-ardal-confirm-click]' );
+
+		if ( ! button ) {
+			return;
+		}
+
+		var form = button.closest( 'form' );
+		var note = form && form.querySelector( '[name="note"]' );
+
+		if ( 'reject' === button.value && note && ! note.value.trim() ) {
+			event.preventDefault();
+			note.focus();
+			note.setAttribute( 'placeholder', 'دلیل رد را بنویسید' );
+			note.classList.add( 'is-bad' );
+
+			return;
+		}
+
+		if ( ! window.confirm( button.getAttribute( 'data-ardal-confirm-click' ) ) ) {
+			event.preventDefault();
+		}
+	} );
+
 	document.addEventListener( 'change', function ( event ) {
 		var all = event.target.closest( '[data-ardal-check-all]' );
 		var form = event.target.closest( 'form' );
