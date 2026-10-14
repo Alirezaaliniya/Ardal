@@ -68,10 +68,33 @@ class Ardal_Widget_Post_Categories extends Ardal_Widget_Base {
 			array(
 				'label'       => 'تعداد دسته‌های قابل نمایش',
 				'type'        => Controls_Manager::NUMBER,
-				'default'     => 6,
+			'default'     => 0,
 				'min'         => 0,
-				'max'         => 100,
+				'max'         => 500,
 				'description' => 'صفر یعنی نمایش همه دسته‌ها.',
+			)
+		);
+		$this->add_control(
+			'show_children',
+			array(
+				'label'        => 'نمایش زیر‌دسته‌ها',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'label_on'     => 'بله',
+				'label_off'    => 'خیر',
+			)
+		);
+		$this->add_control(
+			'depth',
+			array(
+				'label'       => 'عمق نمایش دسته‌ها',
+				'type'        => Controls_Manager::NUMBER,
+				'default'     => 3,
+				'min'         => 1,
+				'max'         => 10,
+				'description' => 'سطح ۱ فقط دسته‌های اصلی است؛ سطح ۲ زیر‌دسته‌های آن‌ها را هم اضافه می‌کند.',
+				'condition'   => array( 'show_children' => 'yes' ),
 			)
 		);
 		$this->add_control(
@@ -103,7 +126,7 @@ class Ardal_Widget_Post_Categories extends Ardal_Widget_Base {
 				'type'        => Controls_Manager::SELECT2,
 				'options'     => $this->category_options(),
 				'label_block' => true,
-				'description' => 'خالی = همه دسته‌ها؛ انتخاب یک دسته فقط زیر‌دسته‌های آن را نشان می‌دهد.',
+				'description' => 'خالی = شروع از دسته‌های اصلی؛ با انتخاب یک دسته، فهرست از زیر‌دسته‌های همان دسته شروع می‌شود.',
 			)
 		);
 		$this->add_control(
@@ -111,7 +134,7 @@ class Ardal_Widget_Post_Categories extends Ardal_Widget_Base {
 			array(
 				'label'        => 'پنهان‌کردن دسته‌های بدون نوشته',
 				'type'         => Controls_Manager::SWITCHER,
-				'default'      => 'yes',
+				'default'      => '',
 				'return_value' => 'yes',
 			)
 		);
@@ -180,6 +203,7 @@ class Ardal_Widget_Post_Categories extends Ardal_Widget_Base {
 
 		$this->start_controls_section( 'section_style_rows', array( 'label' => 'ردیف دسته‌ها', 'tab' => Controls_Manager::TAB_STYLE ) );
 		$this->add_responsive_control( 'row_gap', array( 'label' => 'فاصله بین ردیف‌ها', 'type' => Controls_Manager::SLIDER, 'size_units' => array( 'px' ), 'range' => array( 'px' => array( 'min' => 0, 'max' => 32 ) ), 'default' => array( 'unit' => 'px', 'size' => 8 ), 'selectors' => array( '{{WRAPPER}} .ard-pcats__list' => 'gap:{{SIZE}}{{UNIT}};' ) ) );
+		$this->add_responsive_control( 'nested_gap', array( 'label' => 'فاصله بین زیر‌دسته‌ها', 'type' => Controls_Manager::SLIDER, 'size_units' => array( 'px' ), 'range' => array( 'px' => array( 'min' => 0, 'max' => 32 ) ), 'default' => array( 'unit' => 'px', 'size' => 6 ), 'selectors' => array( '{{WRAPPER}} .ard-pcats__children' => 'gap:{{SIZE}}{{UNIT}};' ) ) );
 		$this->add_responsive_control( 'row_padding', array( 'label' => 'فاصله داخلی ردیف', 'type' => Controls_Manager::DIMENSIONS, 'size_units' => array( 'px', 'em' ), 'default' => array( 'top' => 4, 'right' => 0, 'bottom' => 4, 'left' => 0, 'unit' => 'px', 'isLinked' => false ), 'selectors' => array( '{{WRAPPER}} .ard-pcats__link' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ) ) );
 		$this->add_control( 'row_bg_hover', array( 'label' => 'پس‌زمینه ردیف در هاور', 'type' => Controls_Manager::COLOR, 'selectors' => array( '{{WRAPPER}} .ard-pcats__link:hover' => 'background-color:{{VALUE}};' ) ) );
 		$this->add_responsive_control( 'row_radius', array( 'label' => 'گردی ردیف', 'type' => Controls_Manager::SLIDER, 'size_units' => array( 'px' ), 'range' => array( 'px' => array( 'min' => 0, 'max' => 24 ) ), 'default' => array( 'unit' => 'px', 'size' => 8 ), 'selectors' => array( '{{WRAPPER}} .ard-pcats__link' => 'border-radius:{{SIZE}}{{UNIT}};' ) ) );
@@ -201,18 +225,15 @@ class Ardal_Widget_Post_Categories extends Ardal_Widget_Base {
 
 	protected function render() {
 		$settings = $this->get_settings_for_display();
-		$limit    = isset( $settings['limit'] ) ? max( 0, (int) $settings['limit'] ) : 6;
+		$limit    = isset( $settings['limit'] ) ? max( 0, (int) $settings['limit'] ) : 0;
 		$parent   = isset( $settings['parent'] ) ? absint( $settings['parent'] ) : 0;
 		$args     = array(
 			'taxonomy'   => 'category',
-			'hide_empty' => isset( $settings['hide_empty'] ) && 'yes' === $settings['hide_empty'],
+			'hide_empty' => false,
 			'orderby'    => in_array( $settings['orderby'], array( 'name', 'count', 'term_id' ), true ) ? $settings['orderby'] : 'name',
 			'order'      => 'DESC' === $settings['order'] ? 'DESC' : 'ASC',
-			'number'     => $limit,
+			'number'     => 0,
 		);
-		if ( $parent ) {
-			$args['parent'] = $parent;
-		}
 		$terms = get_terms( $args );
 		if ( is_wp_error( $terms ) || ! is_array( $terms ) ) {
 			$terms = array();
@@ -225,6 +246,18 @@ class Ardal_Widget_Post_Categories extends Ardal_Widget_Base {
 		}
 		if ( ! $terms && '' === $empty ) {
 			$this->render_empty( 'هنوز دسته‌ای برای نمایش وجود ندارد.' );
+			return;
+		}
+
+		$show_children = isset( $settings['show_children'] ) && 'yes' === $settings['show_children'];
+		$depth         = $show_children ? max( 1, min( 10, (int) $settings['depth'] ) ) : 1;
+		$terms_by_parent = array();
+		foreach ( $terms as $term ) {
+			$terms_by_parent[ (int) $term->parent ][] = $term;
+		}
+		$tree = $this->category_tree( $parent, $terms_by_parent, $depth, isset( $settings['hide_empty'] ) && 'yes' === $settings['hide_empty'] );
+		if ( ! $tree && '' === $empty ) {
+			$this->render_empty( 'برای این انتخاب دسته‌ای جهت نمایش پیدا نشد.' );
 			return;
 		}
 
@@ -245,30 +278,88 @@ class Ardal_Widget_Post_Categories extends Ardal_Widget_Base {
 				</div>
 				<hr class="ard-pcats__divider" />
 			<?php endif; ?>
-			<?php if ( ! $terms ) : ?>
+			<?php if ( ! $tree ) : ?>
 				<p class="ard-pcats__empty"><?php echo esc_html( $empty ); ?></p>
 			<?php else : ?>
+				<?php $shown = 0; ?>
 				<ul class="ard-pcats__list">
-					<?php foreach ( $terms as $term ) :
-						$url = get_term_link( $term );
-						if ( is_wp_error( $url ) ) {
-							continue;
-						}
-						?>
-						<li class="ard-pcats__item">
-							<a class="ard-pcats__link<?php echo (int) $term->term_id === $current_id ? ' is-current' : ''; ?>" href="<?php echo esc_url( $url ); ?>" aria-current="<?php echo (int) $term->term_id === $current_id ? 'page' : 'false'; ?>">
-								<span class="ard-pcats__label">
-									<?php if ( 'yes' === $settings['show_arrow'] ) : ?><span class="ard-pcats__arrow" aria-hidden="true">‹</span><?php endif; ?>
-									<span class="ard-pcats__name"><?php echo esc_html( $term->name ); ?></span>
-								</span>
-								<?php if ( 'yes' === $settings['show_count'] ) : ?><span class="ard-pcats__count"><?php echo esc_html( Ardal_Helpers::fa_digits( (int) $term->count ) ); ?></span><?php endif; ?>
-							</a>
-						</li>
-					<?php endforeach; ?>
+					<?php echo $this->render_category_tree( $tree, $limit, $shown, $current_id, $settings ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</ul>
 			<?php endif; ?>
 		</section>
 		<?php
+	}
+
+	/**
+	 * Build a category tree up to the requested number of visible levels.
+	 *
+	 * @param int   $parent_id Parent term ID.
+	 * @param array $terms_by_parent Terms indexed by parent ID.
+	 * @param int   $depth Remaining visible levels.
+	 * @param bool  $hide_empty Hide terms without directly assigned posts.
+	 * @return array
+	 */
+	private function category_tree( $parent_id, $terms_by_parent, $depth, $hide_empty ) {
+		if ( $depth < 1 || empty( $terms_by_parent[ $parent_id ] ) ) {
+			return array();
+		}
+
+		$nodes = array();
+		foreach ( $terms_by_parent[ $parent_id ] as $term ) {
+			$children = $this->category_tree( (int) $term->term_id, $terms_by_parent, $depth - 1, $hide_empty );
+			if ( $hide_empty && 0 === (int) $term->count ) {
+				$nodes = array_merge( $nodes, $children );
+				continue;
+			}
+			$nodes[] = array(
+				'term'     => $term,
+				'children' => $children,
+			);
+		}
+		return $nodes;
+	}
+
+	/**
+	 * Render nested category rows while enforcing the total item limit.
+	 *
+	 * @param array $nodes Tree nodes.
+	 * @param int   $limit Maximum total items; zero means unlimited.
+	 * @param int   $shown Number already rendered, passed by reference.
+	 * @param int   $current_id Current category ID.
+	 * @param array $settings Widget settings.
+	 * @return string
+	 */
+	private function render_category_tree( $nodes, $limit, &$shown, $current_id, $settings ) {
+		$html = '';
+		foreach ( $nodes as $node ) {
+			if ( $limit > 0 && $shown >= $limit ) {
+				break;
+			}
+			$term      = $node['term'];
+			$url       = get_term_link( $term );
+			if ( is_wp_error( $url ) ) {
+				continue;
+			}
+			$is_current = (int) $term->term_id === $current_id;
+			$shown++;
+			$html .= '<li class="ard-pcats__item">';
+			$html .= '<a class="ard-pcats__link' . ( $is_current ? ' is-current' : '' ) . '" href="' . esc_url( $url ) . '"' . ( $is_current ? ' aria-current="page"' : '' ) . '>';
+			$html .= '<span class="ard-pcats__label">';
+			if ( 'yes' === $settings['show_arrow'] ) {
+				$html .= '<span class="ard-pcats__arrow" aria-hidden="true">‹</span>';
+			}
+			$html .= '<span class="ard-pcats__name">' . esc_html( $term->name ) . '</span></span>';
+			if ( 'yes' === $settings['show_count'] ) {
+				$html .= '<span class="ard-pcats__count">' . esc_html( Ardal_Helpers::fa_digits( (int) $term->count ) ) . '</span>';
+			}
+			$html .= '</a>';
+			$children = isset( $node['children'] ) ? $node['children'] : array();
+			if ( $children && ( 0 === (int) $limit || $shown < $limit ) ) {
+				$html .= '<ul class="ard-pcats__children">' . $this->render_category_tree( $children, $limit, $shown, $current_id, $settings ) . '</ul>';
+			}
+			$html .= '</li>';
+		}
+		return $html;
 	}
 
 	/**
