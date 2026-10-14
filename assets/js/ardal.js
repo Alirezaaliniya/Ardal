@@ -1593,6 +1593,17 @@
 	function revealThumb( track, thumb ) {
 		var t = track.getBoundingClientRect();
 		var r = thumb.getBoundingClientRect();
+		var gallery = track.closest( '[data-ard-gallery]' );
+		var vertical = gallery && 'vertical' === gallery.getAttribute( 'data-thumbs-position' );
+
+		if ( vertical ) {
+			if ( r.top >= t.top - 1 && r.bottom <= t.bottom + 1 ) {
+				return;
+			}
+
+			track.scrollTop += r.top < t.top ? r.top - t.top : r.bottom - t.bottom;
+			return;
+		}
 
 		if ( r.left >= t.left - 1 && r.right <= t.right + 1 ) {
 			return;
@@ -1616,12 +1627,28 @@
 
 		var prev = root.querySelector( '[data-ard-thumbs-prev]' );
 		var next = root.querySelector( '[data-ard-thumbs-next]' );
+		var vertical = 'vertical' === root.getAttribute( 'data-thumbs-position' );
 
 		function step() {
-			return Math.max( 60, track.clientWidth * 0.8 );
+			return Math.max( 60, ( vertical ? track.clientHeight : track.clientWidth ) * 0.8 );
 		}
 
 		function paintArrows() {
+			if ( vertical ) {
+				var verticalMax = track.scrollHeight - track.clientHeight;
+				var verticalPos = track.scrollTop;
+				var verticalScrollable = verticalMax > 2;
+
+				if ( prev ) {
+					prev.hidden = ! verticalScrollable || verticalPos <= 1;
+				}
+
+				if ( next ) {
+					next.hidden = ! verticalScrollable || verticalPos >= verticalMax - 1;
+				}
+				return;
+			}
+
 			// در RTL کروم scrollLeft منفی است، پس با قدر مطلق کار می‌کنیم.
 			var pos = Math.abs( track.scrollLeft );
 			var max = track.scrollWidth - track.clientWidth;
@@ -1637,6 +1664,11 @@
 		}
 
 		function nudge( dir ) {
+			if ( vertical ) {
+				track.scrollTop += dir * step();
+				return;
+			}
+
 			// در RTL کروم scrollLeft از صفر شروع می‌شود و منفی می‌رود، پس جهت را
 			// از خودِ direction می‌گیریم نه از مقدار فعلی اسکرول (که در ابتدای
 			// مسیر در هر دو جهت صفر است و علامت را اشتباه می‌داد).

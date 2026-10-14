@@ -276,6 +276,37 @@ class Ardal_Widget_Product_Gallery extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'thumbs_position',
+			array(
+				'label'     => 'چیدمان گالری',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'horizontal',
+				'options'   => array(
+					'horizontal' => 'افقی زیر تصویر',
+					'vertical'   => 'عمودی کنار تصویر',
+				),
+				'condition' => array( 'show_thumbs' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'vertical_thumbs_width',
+			array(
+				'label'          => 'عرض نوار عمودی',
+				'type'           => Controls_Manager::SLIDER,
+				'size_units'     => array( 'px', '%' ),
+				'range'          => array( 'px' => array( 'min' => 64, 'max' => 180 ), '%' => array( 'min' => 12, 'max' => 40 ) ),
+				'default'        => array( 'unit' => 'px', 'size' => 112 ),
+				'tablet_default' => array( 'unit' => 'px', 'size' => 94 ),
+				'mobile_default' => array( 'unit' => 'px', 'size' => 76 ),
+				'condition'      => array( 'show_thumbs' => 'yes', 'thumbs_position' => 'vertical' ),
+				'selectors'      => array(
+					'{{WRAPPER}} .ard-prod-gallery' => '--ard-thumb-rail-width:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
 			'thumb_arrows',
 			array(
 				'label'        => 'فلش‌های نوار بندانگشتی',
@@ -456,7 +487,7 @@ class Ardal_Widget_Product_Gallery extends Ardal_Widget_Base {
 				'default'        => array( 'unit' => 'px', 'size' => 88 ),
 				'mobile_default' => array( 'unit' => 'px', 'size' => 62 ),
 				'selectors'      => array(
-					'{{WRAPPER}} .ard-prod-gallery__thumb' => 'height:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-prod-gallery__thumb' => 'height:{{SIZE}}{{UNIT}};--ard-vertical-thumb-height:{{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -511,6 +542,7 @@ class Ardal_Widget_Product_Gallery extends Ardal_Widget_Base {
 		$s      = $this->get_settings_for_display();
 		$images = 'manual' === $s['source'] ? $this->manual_images( $s ) : $this->auto_images();
 		$badge  = $this->discount_badge( $s );
+		$thumbs_position = isset( $s['thumbs_position'] ) ? $s['thumbs_position'] : 'horizontal';
 
 		$product    = Ardal_Product::current();
 		$product_id = $product ? $product->get_id() : 0;
@@ -530,6 +562,7 @@ class Ardal_Widget_Product_Gallery extends Ardal_Widget_Base {
 		<div
 			class="ard-prod-gallery"
 			data-ard-gallery
+			data-thumbs-position="<?php echo esc_attr( $thumbs_position ); ?>"
 			data-zoom="<?php echo esc_attr( 'yes' === $s['zoom'] ? 'yes' : 'no' ); ?>"
 			data-zoom-factor="<?php echo esc_attr( $factor ); ?>"
 			data-lightbox="<?php echo esc_attr( 'yes' === $s['lightbox'] ? 'yes' : 'no' ); ?>"
@@ -597,7 +630,7 @@ class Ardal_Widget_Product_Gallery extends Ardal_Widget_Base {
 				<div class="ard-prod-gallery__thumbs-wrap">
 				<?php if ( 'yes' === $s['thumb_arrows'] ) : ?>
 					<button type="button" class="ard-prod-gallery__thumb-arrow ard-prod-gallery__thumb-arrow--prev" data-ard-thumbs-prev aria-label="بندانگشتی‌های قبلی">
-						<?php echo Ardal_Helpers::icon( 'chevron-right', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo Ardal_Helpers::icon( 'vertical' === $thumbs_position ? 'chevron-up' : 'chevron-right', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</button>
 				<?php endif; ?>
 				<div class="ard-prod-gallery__thumbs" role="tablist" aria-label="انتخاب تصویر" data-ard-gallery-thumbs>
@@ -620,7 +653,7 @@ class Ardal_Widget_Product_Gallery extends Ardal_Widget_Base {
 				</div>
 				<?php if ( 'yes' === $s['thumb_arrows'] ) : ?>
 					<button type="button" class="ard-prod-gallery__thumb-arrow ard-prod-gallery__thumb-arrow--next" data-ard-thumbs-next aria-label="بندانگشتی‌های بعدی">
-						<?php echo Ardal_Helpers::icon( 'chevron-left', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php echo Ardal_Helpers::icon( 'vertical' === $thumbs_position ? 'chevron-down' : 'chevron-left', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</button>
 				<?php endif; ?>
 				</div>

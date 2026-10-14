@@ -214,6 +214,8 @@ class Ardal_Helpers {
 			'chevron'       => '<path d="M14.5 6.5L9 12l5.5 5.5"/>',
 			'chevron-left'  => '<path d="M14.5 6.5L9 12l5.5 5.5"/>',
 			'chevron-right' => '<path d="M9.5 6.5L15 12l-5.5 5.5"/>',
+			'chevron-up'    => '<path d="M6.5 14.5L12 9l5.5 5.5"/>',
+			'chevron-down'  => '<path d="M6.5 9.5L12 15l5.5-5.5"/>',
 			'play'     => '<path d="M9.5 7.5l7 4.5-7 4.5z"/>',
 			'phone'    => '<path d="M6 4h3l1.6 4-2 1.4a11 11 0 0 0 5.6 5.6l1.4-2 4 1.6v3a1.6 1.6 0 0 1-1.8 1.6C11.3 18.6 5.4 12.7 4.4 5.8A1.6 1.6 0 0 1 6 4z"/>',
 			'mail'     => '<rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3.6 7l8.4 6 8.4-6"/>',

@@ -4367,6 +4367,60 @@ a.ard-breadcrumb__item:hover {
 	border-radius: 8px;
 }
 
+/* نوار تصاویر کوچک عمودی، کنار تصویر اصلی و با پیمایش مستقل. */
+.ard-prod-gallery[data-thumbs-position="vertical"] {
+	display: grid;
+	grid-template-columns: var(--ard-thumb-rail-width, 112px) minmax(0, 1fr);
+	grid-template-rows: auto;
+	align-items: stretch;
+	gap: 12px;
+}
+
+.ard-prod-gallery[data-thumbs-position="vertical"] .ard-prod-gallery__main {
+	grid-column: 2;
+	grid-row: 1;
+	min-inline-size: 0;
+}
+
+.ard-prod-gallery[data-thumbs-position="vertical"] .ard-prod-gallery__thumbs-wrap {
+	grid-column: 1;
+	grid-row: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-block-size: 0;
+	margin: 0;
+}
+
+.ard-prod-gallery[data-thumbs-position="vertical"] .ard-prod-gallery__thumbs {
+	flex: 1 1 auto;
+	flex-direction: column;
+	min-block-size: 0;
+	block-size: 100%;
+	max-block-size: calc(var(--ard-thumbs, 3) * var(--ard-vertical-thumb-height, 88px) + (var(--ard-thumbs, 3) - 1) * 8px);
+	overflow-x: hidden;
+	overflow-y: auto;
+	scroll-snap-type: y proximity;
+	overscroll-behavior-y: contain;
+}
+
+.ard-prod-gallery[data-thumbs-position="vertical"] .ard-prod-gallery__thumbs > .ard-prod-gallery__thumb {
+	flex: 0 0 var(--ard-vertical-thumb-height, 88px);
+	inline-size: 100%;
+	max-inline-size: 100%;
+	min-block-size: 0;
+	block-size: var(--ard-vertical-thumb-height, 88px);
+}
+
+.ard-prod-gallery[data-thumbs-position="vertical"] .ard-prod-gallery__thumb-arrow[class] {
+	position: static;
+	translate: none;
+	flex: 0 0 32px;
+	inline-size: 32px;
+	block-size: 32px;
+	align-self: center;
+}
+
 .ard-prod-gallery__thumb--video {
 	background: var(--ard-tint-blue);
 	color: var(--ard-primary, var(--ard-primary));
