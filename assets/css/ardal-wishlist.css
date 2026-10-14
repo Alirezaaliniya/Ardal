@@ -68,7 +68,8 @@
 
 .ard-wish[class]:hover,
 .ard-wish[class]:focus-visible {
-	border-color: var(--ard-wish-hover);
+	border-color: var(--ard-wish-hover-border, var(--ard-wish-hover));
+	background: var(--ard-wish-hover-bg, var(--ard-wish-bg));
 	color: var(--ard-wish-hover);
 }
 

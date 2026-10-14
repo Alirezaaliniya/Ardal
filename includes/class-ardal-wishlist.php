@@ -518,7 +518,7 @@ class Ardal_Wishlist {
 			esc_attr( '' !== $a['label'] ? $a['label'] : 'علاقه‌مندی‌ها' ),
 			'yes' === $a['icon'] ? '<span class="ard-wish-count__icon">' . self::heart( (int) $a['size'] ) . '</span>' : '',
 			'' !== $a['label'] ? '<span class="ard-wish-count__label">' . esc_html( $a['label'] ) . '</span>' : '',
-			'yes' === $a['hide_zero'] ? ' data-hide-zero' : '',
+			'yes' === $a['hide_zero'] ? '' : ' data-show-zero',
 			( 'yes' === $a['hide_zero'] && $count < 1 ) ? ' hidden' : '',
 			esc_html( Ardal_Helpers::fa_digits( $count ) )
 		);
