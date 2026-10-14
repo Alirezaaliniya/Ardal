@@ -262,3 +262,82 @@
 		repaint();
 	} );
 }( window.jQuery ) );
+
+/**
+ * فیلدهای وابسته: فیلدی که data-ardal-show دارد فقط وقتی دیده می‌شود که
+ * چک‌باکسِ هم‌نامش روشن باشد (مثلاً متن پیامک فقط با پیامک روشن).
+ */
+( function () {
+	'use strict';
+
+	var fields = document.querySelectorAll( '[data-ardal-show]' );
+
+	if ( ! fields.length ) {
+		return;
+	}
+
+	function control( name ) {
+		return document.querySelector( 'input[type="checkbox"][name="' + name.replace( /"/g, '' ) + '"]' );
+	}
+
+	function sync() {
+		Array.prototype.forEach.call( fields, function ( field ) {
+			var box = control( field.getAttribute( 'data-ardal-show' ) );
+
+			field.hidden = !! box && ! box.checked;
+		} );
+	}
+
+	document.addEventListener( 'change', function ( event ) {
+		if ( event.target && 'checkbox' === event.target.type ) {
+			sync();
+		}
+	} );
+
+	sync();
+}() );
+
+/**
+ * انتخاب تصویر از کتابخانهٔ رسانه برای فیلدهای تصویر (مثل تصویر کیف پول).
+ */
+( function () {
+	'use strict';
+
+	document.addEventListener( 'click', function ( event ) {
+		var pick = event.target.closest( '[data-ardal-media-pick]' );
+		var clear = event.target.closest( '[data-ardal-media-clear]' );
+		var wrap = ( pick || clear ) && ( pick || clear ).closest( '.ardal-media' );
+		var input = wrap && wrap.querySelector( '[data-ardal-media-input]' );
+
+		if ( ! input ) {
+			return;
+		}
+
+		event.preventDefault();
+
+		if ( clear ) {
+			input.value = '';
+
+			return;
+		}
+
+		if ( ! window.wp || ! window.wp.media ) {
+			return;
+		}
+
+		var frame = window.wp.media( {
+			title: 'انتخاب تصویر',
+			button: { text: 'استفاده از این تصویر' },
+			library: { type: 'image' },
+			multiple: false
+		} );
+
+		frame.on( 'select', function () {
+			var file = frame.state().get( 'selection' ).first().toJSON();
+
+			input.value = file.url || '';
+		} );
+
+		frame.open();
+	} );
+}() );

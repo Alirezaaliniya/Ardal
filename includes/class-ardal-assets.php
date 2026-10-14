@@ -110,6 +110,9 @@ class Ardal_Assets {
 		wp_register_style( 'ardal-shop', ARDAL_URL . 'assets/css/ardal-shop.css', array( 'ardal' ), self::ver( 'assets/css/ardal-shop.css' ) );
 		wp_register_script( 'ardal-shop', ARDAL_URL . 'assets/js/ardal-shop.js', array(), self::ver( 'assets/js/ardal-shop.js' ), true );
 		wp_register_style( 'ardal-posts-slider', ARDAL_URL . 'assets/css/ardal-posts-slider.css', array( 'ardal' ), self::ver( 'assets/css/ardal-posts-slider.css' ) );
+		wp_register_style( 'ardal-wishlist', ARDAL_URL . 'assets/css/ardal-wishlist.css', array( 'ardal' ), self::ver( 'assets/css/ardal-wishlist.css' ) );
+		wp_register_style( 'ardal-wallet', ARDAL_URL . 'assets/css/ardal-wallet.css', array( 'ardal' ), self::ver( 'assets/css/ardal-wallet.css' ) );
+		wp_register_script( 'ardal-wallet', ARDAL_URL . 'assets/js/ardal-wallet.js', array( 'ardal' ), self::ver( 'assets/js/ardal-wallet.js' ), true );
 		wp_register_style( 'ardal-brand-rings', ARDAL_URL . 'assets/css/ardal-brand-rings.css', array( 'ardal' ), self::ver( 'assets/css/ardal-brand-rings.css' ) );
 		wp_register_script( 'ardal-brand-rings', ARDAL_URL . 'assets/js/ardal-brand-rings.js', array(), self::ver( 'assets/js/ardal-brand-rings.js' ), true );
 		wp_register_style( 'ardal-search', ARDAL_URL . 'assets/css/ardal-search.css', array( 'ardal' ), self::ver( 'assets/css/ardal-search.css' ) );
@@ -140,6 +143,12 @@ class Ardal_Assets {
 		wp_register_script( 'ardal-monster-rating', ARDAL_URL . 'assets/js/ardal-monster-rating.js', array( 'ardal-morphsvg' ), self::ver( 'assets/js/ardal-monster-rating.js' ), true );
 
 		wp_add_inline_style( 'ardal', Ardal_Palette::css_vars() );
+
+		// دکمه‌های قلب در همهٔ ویجت‌ها هستند و ardal.js همه‌جا بار می‌شود؛
+		// پس دادهٔ علاقه‌مندی روی همین هندل می‌نشیند.
+		if ( class_exists( 'Ardal_Wishlist' ) ) {
+			wp_localize_script( 'ardal', 'ardalWishlist', Ardal_Wishlist::js_config() );
+		}
 	}
 
 	/**

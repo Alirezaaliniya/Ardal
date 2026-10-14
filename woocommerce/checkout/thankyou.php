@@ -16,6 +16,7 @@ defined( 'ABSPATH' ) || exit;
 
 	<?php if ( $order ) : ?>
 
+		<?php if ( ! ( class_exists( 'Ardal_Wallet_Checkout' ) && Ardal_Wallet_Checkout::is_topup_order( $order ) ) ) : ?>
 		<div class="ard-ck__steps-bar">
 			<ol class="ard-ck__steps">
 				<?php foreach ( Ardal_Shop::steps( 'done' ) as $ard_step ) : ?>
@@ -26,8 +27,20 @@ defined( 'ABSPATH' ) || exit;
 				<?php endforeach; ?>
 			</ol>
 		</div>
+		<?php endif; ?>
 
-		<?php if ( $order->has_status( 'failed' ) ) : ?>
+		<?php if ( class_exists( 'Ardal_Wallet_Checkout' ) && Ardal_Wallet_Checkout::is_topup_order( $order ) && ! $order->has_status( 'failed' ) ) : ?>
+
+			<?php
+			// شارژ کیف پول هم سفارش ووکامرس است ولی «سفارش» نیست؛ شمارهٔ سفارش و
+			// «پیگیری سفارش» برای کسی که فقط اعتبار خریده معنایی ندارد.
+			Ardal_Wallet_Render::topup_done( $order );
+			?>
+
+			<?php do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() ); ?>
+			<?php do_action( 'woocommerce_thankyou', $order->get_id() ); ?>
+
+		<?php elseif ( $order->has_status( 'failed' ) ) : ?>
 
 			<div class="ard-shop__empty ard-shop__empty--failed">
 				<span class="ard-shop__empty-icon ard-shop__empty-icon--red" aria-hidden="true">

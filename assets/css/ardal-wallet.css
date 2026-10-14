@@ -1,0 +1,821 @@
+/*!
+ * Ardal — کیف پول: کارت شارژ، موجودی، تراکنش‌ها، باکس تسویه و صفحهٔ پنل.
+ *
+ * رنگ‌ها از پالت اردال و اندازه‌ها از متغیرهای --ard-wl-* می‌آیند؛
+ * ویجت‌های المنتور همین متغیرها را بازنویسی می‌کنند.
+ */
+
+.ard-wl-sr {
+	position: absolute;
+	inline-size: 1px;
+	block-size: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.ard-wl-money {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 4px;
+	white-space: nowrap;
+	direction: rtl;
+}
+
+.ard-wl-money .ard-currency--icon .ard-toman {
+	block-size: 1em;
+	inline-size: auto;
+}
+
+/* ============================================================
+   دکمه‌ها
+   ============================================================ */
+
+.ard-wl-btn[class] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	flex: none;
+	block-size: var(--ard-wl-btn-h, 48px);
+	padding-inline: 22px;
+	border: 0;
+	border-radius: var(--ard-wl-btn-radius, var(--ard-radius-sm, 12px));
+	font: inherit;
+	font-size: 14px;
+	font-weight: 800;
+	line-height: 1;
+	white-space: nowrap;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color .2s, color .2s, opacity .2s;
+}
+
+.ard-wl-btn--accent[class] {
+	background: var(--ard-wl-btn-bg, var(--ard-accent));
+	color: var(--ard-wl-btn-ink, var(--ard-accent-ink, #12290a));
+}
+
+.ard-wl-btn--accent[class]:hover {
+	background: var(--ard-wl-btn-bg-hover, var(--ard-accent-hover, var(--ard-accent)));
+	color: var(--ard-wl-btn-ink, var(--ard-accent-ink, #12290a));
+}
+
+.ard-wl-btn--primary[class] {
+	background: var(--ard-primary);
+	color: #fff;
+}
+
+.ard-wl-btn--primary[class]:hover {
+	background: var(--ard-primary-dark);
+	color: #fff;
+}
+
+.ard-wl-btn[class]:disabled,
+.ard-wl-btn.is-busy {
+	opacity: .65;
+	cursor: progress;
+}
+
+.ard-wl-btn.is-busy::after {
+	content: "";
+	inline-size: 14px;
+	block-size: 14px;
+	border: 2px solid currentColor;
+	border-inline-end-color: transparent;
+	border-radius: 50%;
+	animation: ard-wl-spin .7s linear infinite;
+}
+
+@keyframes ard-wl-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* ============================================================
+   کارت شارژ کیف پول
+   ============================================================ */
+
+.ard-wl-card {
+	--ard-wl-card-bg: var(--ard-base);
+	--ard-wl-card-border: var(--ard-border);
+	--ard-wl-card-radius: var(--ard-radius-lg, 18px);
+	--ard-wl-card-pad: 24px;
+	--ard-wl-amount: var(--ard-primary-dark);
+	--ard-wl-art: 112px;
+
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: var(--ard-wl-card-pad);
+	border: 1px solid var(--ard-wl-card-border);
+	border-radius: var(--ard-wl-card-radius);
+	background: var(--ard-wl-card-bg);
+	color: var(--ard-text);
+	direction: rtl;
+	text-align: right;
+}
+
+.ard-wl-card--flat {
+	--ard-wl-card-pad: 0;
+	--ard-wl-card-border: transparent;
+	background: transparent;
+}
+
+.ard-wl-card__head {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+}
+
+.ard-wl-card__art {
+	flex: none;
+	inline-size: var(--ard-wl-art);
+	line-height: 0;
+}
+
+.ard-wl-card__art svg,
+.ard-wl-card__art img {
+	inline-size: 100%;
+	block-size: auto;
+	max-block-size: var(--ard-wl-art);
+	object-fit: contain;
+}
+
+.ard-wl-card__balance {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-inline-size: 0;
+}
+
+.ard-wl-card__cap {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--ard-muted);
+}
+
+.ard-wl-card__cap-icon {
+	display: inline-flex;
+	color: var(--ard-primary);
+}
+
+.ard-wl-card__amount {
+	font-size: var(--ard-wl-amount-size, 26px);
+	font-weight: 900;
+	line-height: 1.3;
+	color: var(--ard-wl-amount);
+}
+
+.ard-wl-card__chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.ard-wl-chip[class] {
+	display: inline-flex;
+	align-items: center;
+	block-size: 38px;
+	padding-inline: 16px;
+	border: 1px solid var(--ard-wl-chip-border, var(--ard-tint-blue-border, var(--ard-border)));
+	border-radius: 999px;
+	background: var(--ard-wl-chip-bg, var(--ard-tint-blue, var(--ard-base)));
+	color: var(--ard-wl-chip-ink, var(--ard-primary-dark));
+	font: inherit;
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.ard-wl-chip[class]:hover,
+.ard-wl-chip[class].is-on {
+	border-color: var(--ard-wl-chip-on, var(--ard-primary));
+	background: var(--ard-wl-chip-on, var(--ard-primary));
+	color: #fff;
+}
+
+.ard-wl-card__form {
+	display: flex;
+	gap: 10px;
+}
+
+.ard-wl-card__field {
+	position: relative;
+	display: flex;
+	flex: 1 1 auto;
+	min-inline-size: 0;
+}
+
+.ard-wl-card__input[class] {
+	inline-size: 100%;
+	block-size: var(--ard-wl-btn-h, 48px);
+	margin: 0;
+	padding-block: 0;
+	padding-inline: 16px 64px;
+	border: 1px solid var(--ard-wl-input-border, var(--ard-border));
+	border-radius: var(--ard-wl-input-radius, var(--ard-radius-sm, 12px));
+	background: var(--ard-wl-input-bg, var(--ard-base));
+	color: var(--ard-text);
+	font: inherit;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: .3px;
+	outline: none;
+	transition: border-color .2s, box-shadow .2s;
+}
+
+.ard-wl-card__input[class]::placeholder {
+	color: var(--ard-muted);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0;
+}
+
+.ard-wl-card__input[class]:focus {
+	border-color: var(--ard-primary);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--ard-primary) 18%, transparent);
+}
+
+.ard-wl-card__input[class].is-bad {
+	border-color: var(--ard-sale);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--ard-sale) 16%, transparent);
+}
+
+.ard-wl-card__unit {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-end: 14px;
+	display: flex;
+	align-items: center;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--ard-muted);
+	pointer-events: none;
+}
+
+.ard-wl-card__limits,
+.ard-wl-card__off {
+	margin: 0;
+	font-size: 12px;
+	color: var(--ard-muted);
+}
+
+.ard-wl-card__note {
+	margin: 0;
+	padding: 12px 14px;
+	border-radius: var(--ard-radius-sm, 12px);
+	background: var(--ard-wl-note-bg, var(--ard-tint-green, #f1f8e6));
+	color: var(--ard-wl-note-ink, var(--ard-accent-ink, var(--ard-text)));
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1.9;
+}
+
+.ard-wl-card__login {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	font-size: 13px;
+	color: var(--ard-muted);
+}
+
+@media (max-width: 600px) {
+	.ard-wl-card {
+		--ard-wl-card-pad: 18px;
+		--ard-wl-art: 84px;
+	}
+
+	.ard-wl-card__form {
+		flex-direction: column;
+	}
+
+	.ard-wl-card__submit {
+		inline-size: 100%;
+	}
+}
+
+/* ============================================================
+   موجودی تنها (هدر)
+   ============================================================ */
+
+.ard-wl-balance {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--ard-wl-balance-ink, var(--ard-text));
+	font-size: 13px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+a.ard-wl-balance:hover {
+	color: var(--ard-wl-balance-hover, var(--ard-primary));
+}
+
+.ard-wl-balance__icon {
+	display: inline-flex;
+	color: var(--ard-wl-balance-icon, var(--ard-primary));
+}
+
+.ard-wl-balance__text {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 5px;
+}
+
+.ard-wl-balance__label {
+	font-weight: 600;
+	color: var(--ard-wl-balance-label, var(--ard-muted));
+}
+
+/* ============================================================
+   تراکنش‌ها و کش‌بگ
+   ============================================================ */
+
+.ard-wl-tx {
+	--ard-wl-in: var(--ard-accent-deep, #4d8410);
+	--ard-wl-out: var(--ard-sale);
+
+	direction: rtl;
+	text-align: right;
+}
+
+.ard-wl-tx__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-block-end: 14px;
+}
+
+.ard-wl-tx__title {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 900;
+	color: var(--ard-text);
+}
+
+.ard-wl-tx__count {
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--ard-muted);
+}
+
+.ard-wl-tx__empty {
+	margin: 0;
+	padding: 22px 10px;
+	text-align: center;
+	font-size: 13px;
+	color: var(--ard-muted);
+}
+
+.ard-wl-tx__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-wl-tx__row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding-block: 12px;
+	border-block-end: 1px solid var(--ard-wl-divider, color-mix(in srgb, var(--ard-border) 70%, transparent));
+}
+
+.ard-wl-tx__row:last-child {
+	border-block-end: 0;
+}
+
+.ard-wl-tx__dot {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	inline-size: 40px;
+	block-size: 40px;
+	border-radius: 12px;
+}
+
+.ard-wl-tx__dot--in {
+	background: color-mix(in srgb, var(--ard-wl-in) 12%, var(--ard-base));
+	color: var(--ard-wl-in);
+}
+
+.ard-wl-tx__dot--out {
+	background: color-mix(in srgb, var(--ard-wl-out) 10%, var(--ard-base));
+	color: var(--ard-wl-out);
+}
+
+.ard-wl-tx__text {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 3px;
+	min-inline-size: 0;
+}
+
+.ard-wl-tx__label {
+	font-size: 13px;
+	font-weight: 800;
+	color: var(--ard-text);
+}
+
+.ard-wl-tx__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 10px;
+	font-size: 11.5px;
+	color: var(--ard-muted);
+}
+
+.ard-wl-tx__exp {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.ard-wl-tx__amount {
+	display: inline-flex;
+	flex: none;
+	align-items: baseline;
+	gap: 2px;
+	font-size: 14px;
+	font-weight: 900;
+	white-space: nowrap;
+}
+
+.ard-wl-tx__amount--in {
+	color: var(--ard-wl-in);
+}
+
+.ard-wl-tx__amount--out {
+	color: var(--ard-wl-out);
+}
+
+.ard-wl-tx__sign {
+	font-weight: 900;
+}
+
+/* جدول */
+.ard-wl-tx__scroll {
+	overflow-x: auto;
+	border: 1px solid var(--ard-wl-divider, color-mix(in srgb, var(--ard-border) 70%, transparent));
+	border-radius: var(--ard-radius-sm, 12px);
+}
+
+.ard-wl-tx__table {
+	inline-size: 100%;
+	margin: 0;
+	border: 0;
+	border-collapse: collapse;
+	font-size: 12.5px;
+}
+
+.ard-wl-tx__table th,
+.ard-wl-tx__table td {
+	padding: 12px 14px;
+	border: 0;
+	border-block-end: 1px solid var(--ard-wl-divider, color-mix(in srgb, var(--ard-border) 70%, transparent));
+	text-align: right;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.ard-wl-tx__table th {
+	background: var(--ard-wl-head-bg, var(--ard-surface, #f6f8fb));
+	color: var(--ard-muted);
+	font-size: 11.5px;
+	font-weight: 800;
+}
+
+.ard-wl-tx__table tbody tr:last-child td {
+	border-block-end: 0;
+}
+
+/* در موبایل جدول به کارت تبدیل می‌شود؛ برچسب هر خانه از data-label می‌آید. */
+@media (max-width: 600px) {
+	.ard-wl-tx__scroll {
+		border: 0;
+	}
+
+	.ard-wl-tx__table thead {
+		display: none;
+	}
+
+	.ard-wl-tx__table,
+	.ard-wl-tx__table tbody,
+	.ard-wl-tx__table tr,
+	.ard-wl-tx__table td {
+		display: block;
+		inline-size: 100%;
+	}
+
+	.ard-wl-tx__table tr {
+		margin-block-end: 10px;
+		padding: 6px 12px;
+		border: 1px solid var(--ard-wl-divider, color-mix(in srgb, var(--ard-border) 70%, transparent));
+		border-radius: var(--ard-radius-sm, 12px);
+	}
+
+	.ard-wl-tx__table td {
+		display: flex;
+		justify-content: space-between;
+		gap: 10px;
+		padding: 7px 0;
+	}
+
+	.ard-wl-tx__table td::before {
+		content: attr(data-label);
+		color: var(--ard-muted);
+		font-weight: 700;
+	}
+}
+
+/* وضعیت‌ها */
+.ard-wl-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 9px;
+	border-radius: 7px;
+	background: var(--ard-surface, #eef2f6);
+	color: var(--ard-muted);
+	font-size: 11px;
+	font-weight: 800;
+	line-height: 1.4;
+}
+
+.ard-wl-pill--success,
+.ard-wl-pill--active {
+	background: var(--ard-tint-green, #e9f6d6);
+	color: var(--ard-accent-deep, #4d8410);
+}
+
+.ard-wl-pill--pending {
+	background: #fff1d9;
+	color: #8a6c1d;
+}
+
+.ard-wl-pill--failed {
+	background: var(--ard-sale-soft, #fdecec);
+	color: var(--ard-sale);
+}
+
+.ard-wl-pill--used {
+	background: var(--ard-tint-blue, #eaf0f6);
+	color: var(--ard-primary-dark);
+}
+
+.ard-wl-pill--expired {
+	background: #eef0f3;
+	color: #7a8592;
+}
+
+/* صفحه‌بندی */
+.ard-wl-pager {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	margin-block-start: 16px;
+}
+
+.ard-wl-pager__item {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: 36px;
+	block-size: 36px;
+	padding-inline: 10px;
+	border: 1px solid var(--ard-border);
+	border-radius: 10px;
+	color: var(--ard-text);
+	font-size: 12.5px;
+	font-weight: 800;
+	text-decoration: none;
+}
+
+.ard-wl-pager__item.is-active,
+.ard-wl-pager__item:hover {
+	border-color: var(--ard-primary);
+	background: var(--ard-primary);
+	color: #fff;
+}
+
+.ard-wl-pager__gap {
+	color: var(--ard-muted);
+}
+
+/* ============================================================
+   صفحهٔ کیف پول در پنل کاربری
+   ============================================================ */
+
+.ard-wl-hero {
+	display: flex;
+	align-items: center;
+	gap: 22px;
+	background:
+		radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--ard-accent) 22%, transparent), transparent 55%),
+		linear-gradient(135deg, var(--ard-primary-dark), var(--ard-primary));
+	border: 0;
+	color: #fff;
+}
+
+.ard-wl-hero__art {
+	flex: none;
+	inline-size: 110px;
+	line-height: 0;
+}
+
+.ard-wl-hero__art svg,
+.ard-wl-hero__art img {
+	inline-size: 100%;
+	block-size: auto;
+}
+
+.ard-wl-hero__main {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 6px;
+	min-inline-size: 0;
+}
+
+.ard-wl-hero__cap {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 13px;
+	font-weight: 700;
+	opacity: .85;
+}
+
+.ard-wl-hero__amount {
+	font-size: 28px;
+	font-weight: 900;
+	line-height: 1.3;
+}
+
+.ard-wl-hero__sub {
+	font-size: 12px;
+	font-weight: 600;
+	opacity: .85;
+}
+
+.ard-wl-hero__btn {
+	flex: none;
+}
+
+.ard-wl-account__topup[hidden] {
+	display: none;
+}
+
+@media (max-width: 767px) {
+	.ard-wl-hero {
+		flex-wrap: wrap;
+		gap: 14px;
+	}
+
+	.ard-wl-hero__art {
+		inline-size: 72px;
+	}
+
+	.ard-wl-hero__btn {
+		inline-size: 100%;
+	}
+
+	.ard-wl-hero__amount {
+		font-size: 23px;
+	}
+}
+
+/* ============================================================
+   تسویه حساب
+   ============================================================ */
+
+.ard-wl-pay {
+	margin-block-end: 14px;
+	padding: 14px 16px;
+	border: 1.5px solid var(--ard-border);
+	border-radius: var(--ard-radius, 14px);
+	background: var(--ard-base);
+	transition: border-color .2s, background-color .2s;
+}
+
+.ard-wl-pay.is-on {
+	border-color: var(--ard-accent);
+	background: color-mix(in srgb, var(--ard-accent) 7%, var(--ard-base));
+}
+
+.ard-wl-pay__row {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+	cursor: pointer;
+}
+
+.ard-wl-pay__input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ard-wl-pay__box {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	inline-size: 22px;
+	block-size: 22px;
+	border: 1.5px solid var(--ard-border);
+	border-radius: 7px;
+	background: var(--ard-base);
+	color: transparent;
+	transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.ard-wl-pay__input:checked + .ard-wl-pay__box {
+	border-color: var(--ard-accent);
+	background: var(--ard-accent);
+	color: var(--ard-accent-ink, #12290a);
+}
+
+.ard-wl-pay__input:focus-visible + .ard-wl-pay__box {
+	outline: 2px solid var(--ard-primary);
+	outline-offset: 2px;
+}
+
+.ard-wl-pay__input:disabled ~ * {
+	opacity: .55;
+}
+
+.ard-wl-pay__icon {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	inline-size: 40px;
+	block-size: 40px;
+	border-radius: 12px;
+	background: var(--ard-tint-blue, #eef3f8);
+	color: var(--ard-primary);
+}
+
+.ard-wl-pay__text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-inline-size: 0;
+}
+
+.ard-wl-pay__title {
+	font-size: 13.5px;
+	font-weight: 800;
+	color: var(--ard-text);
+}
+
+.ard-wl-pay__balance {
+	font-size: 12px;
+	color: var(--ard-muted);
+}
+
+.ard-wl-pay__note {
+	margin: 10px 0 0;
+	padding-inline-start: 34px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--ard-accent-deep, var(--ard-text));
+	line-height: 1.9;
+}
+
+.ard-wl-pay__note--off {
+	color: var(--ard-muted);
+}
+
+.ard-shop__row--wallet th {
+	color: var(--ard-accent-deep, var(--ard-text));
+}
+
+/* ============================================================
+   صفحهٔ «شارژ انجام شد»
+   ============================================================ */
+
+.ard-wl-done .ard-wl-done__wait {
+	background: #fff1d9;
+	color: #8a6c1d;
+}

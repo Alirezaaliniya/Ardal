@@ -38,6 +38,15 @@ require_once ARDAL_PATH . 'includes/class-ardal-account-ajax.php';
 require_once ARDAL_PATH . 'includes/class-ardal-shop.php';
 require_once ARDAL_PATH . 'includes/class-ardal-archive.php';
 require_once ARDAL_PATH . 'includes/class-ardal-search.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wishlist.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet-checkout.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet-sms.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet-admin.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet-tools.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet-report.php';
+require_once ARDAL_PATH . 'includes/class-ardal-wallet-render.php';
+require_once ARDAL_PATH . 'includes/class-ardal-features-settings.php';
 require_once ARDAL_PATH . 'includes/class-ardal-assets.php';
 require_once ARDAL_PATH . 'includes/class-ardal.php';
 
@@ -47,5 +56,8 @@ require_once ARDAL_PATH . 'includes/class-ardal.php';
 function ardal() {
 	return Ardal::instance();
 }
+
+// کار روزانهٔ انقضای کش‌بگ با غیرفعال‌سازی افزونه برداشته می‌شود.
+register_deactivation_hook( __FILE__, array( 'Ardal_Wallet', 'deactivate' ) );
 
 ardal();

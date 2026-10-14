@@ -66,6 +66,26 @@ class Ardal_Settings {
 				'default'           => Ardal_Account_Settings::defaults(),
 			)
 		);
+
+		register_setting(
+			self::GROUP,
+			Ardal_Wishlist::OPTION,
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( 'Ardal_Wishlist', 'sanitize' ),
+				'default'           => Ardal_Wishlist::defaults(),
+			)
+		);
+
+		register_setting(
+			self::GROUP,
+			Ardal_Wallet::OPTION,
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( 'Ardal_Wallet', 'sanitize' ),
+				'default'           => Ardal_Wallet::defaults(),
+			)
+		);
 	}
 
 	/**
@@ -78,6 +98,9 @@ class Ardal_Settings {
 
 		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_script( 'wp-color-picker' );
+
+		// انتخاب تصویر کیف پول از کتابخانهٔ رسانه.
+		wp_enqueue_media();
 
 		wp_enqueue_style(
 			'ardal-admin',
@@ -210,6 +233,8 @@ class Ardal_Settings {
 			<nav class="ardal-tabs" role="tablist">
 				<button type="button" class="ardal-tab is-active" data-ardal-tab="palette" role="tab" aria-selected="true">پالت و ظاهر</button>
 				<button type="button" class="ardal-tab" data-ardal-tab="account" role="tab" aria-selected="false">پنل کاربری</button>
+				<button type="button" class="ardal-tab" data-ardal-tab="wishlist" role="tab" aria-selected="false">علاقه‌مندی</button>
+				<button type="button" class="ardal-tab" data-ardal-tab="wallet" role="tab" aria-selected="false">کیف پول</button>
 			</nav>
 
 			<form method="post" action="options.php" id="ardal-form">
@@ -217,6 +242,14 @@ class Ardal_Settings {
 
 				<div class="ardal-panel" data-ardal-panel="account" hidden>
 					<?php $this->render_account_tab(); ?>
+				</div>
+
+				<div class="ardal-panel" data-ardal-panel="wishlist" hidden>
+					<?php Ardal_Features_Settings::render_wishlist_tab(); ?>
+				</div>
+
+				<div class="ardal-panel" data-ardal-panel="wallet" hidden>
+					<?php Ardal_Features_Settings::render_wallet_tab(); ?>
 				</div>
 
 				<div class="ardal-panel" data-ardal-panel="palette">
@@ -554,6 +587,13 @@ class Ardal_Settings {
 				?>
 
 				<?php foreach ( Ardal_Account_Settings::groups() as $group_key => $group_label ) : ?>
+					<?php
+					// تنظیمات صفحهٔ علاقه‌مندی به تب خودش رفته؛ دو فیلد هم‌نام در یک
+					// فرم، مقدار یکی را بی‌صدا می‌بلعید.
+					if ( 'wishlist' === $group_key ) {
+						continue;
+					}
+					?>
 					<div class="ardal-card">
 						<h2><?php echo esc_html( $group_label ); ?></h2>
 						<div class="ardal-fields ardal-fields--stack">

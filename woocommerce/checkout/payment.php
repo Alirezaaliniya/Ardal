@@ -20,6 +20,16 @@ if ( ! wp_doing_ajax() ) {
 }
 ?>
 <div id="payment" class="woocommerce-checkout-payment ard-ck__pay">
+	<?php
+	/*
+	 * داخل #payment، چون ووکامرس همین عنصر را با هر به‌روزرسانی از نو
+	 * می‌سازد؛ هر چیزی اینجا (مثل باکس کیف پول) با سبد فعلی هم‌خوان می‌ماند.
+	 * بیرون از شرط needs_payment است تا وقتی کیف پول کل مبلغ را پوشانده،
+	 * کاربر هنوز بتواند تیکش را بردارد.
+	 */
+	do_action( 'ardal_checkout_payment_top' );
+	?>
+
 	<?php if ( WC()->cart && WC()->cart->needs_payment() ) : ?>
 		<ul class="wc_payment_methods payment_methods methods ard-ck__gateways" aria-label="روش‌های پرداخت">
 			<?php

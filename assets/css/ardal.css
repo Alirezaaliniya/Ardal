@@ -5480,6 +5480,48 @@ a.ard-breadcrumb__item:hover {
 	opacity: 1;
 }
 
+/* دکمهٔ لینک داخل توست، مثل «ورود به حساب» یا «مشاهدهٔ فهرست». */
+.ard-toast__action {
+	flex: 0 0 auto;
+	padding: 5px 11px;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, .18);
+	color: inherit;
+	font-size: 12px;
+	font-weight: 800;
+	line-height: 1.4;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color .2s;
+}
+
+.ard-toast__action:hover {
+	background: rgba(255, 255, 255, .3);
+	color: inherit;
+}
+
+/* تپش قلب وقتی محصول به علاقه‌مندی اضافه می‌شود؛ روی همهٔ دکمه‌های قلب. */
+@keyframes ard-wish-pop {
+	0% { transform: scale(1); }
+	35% { transform: scale(1.28); }
+	70% { transform: scale(.92); }
+	100% { transform: scale(1); }
+}
+
+[data-ard-wishlist].is-pop svg {
+	animation: ard-wish-pop .45s ease;
+}
+
+[data-ard-wishlist].is-busy {
+	cursor: progress;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-ard-wishlist].is-pop svg {
+		animation: none;
+	}
+}
+
 @media (max-width: 600px) {
 	.ard-toasts {
 		inset-block-end: 16px;

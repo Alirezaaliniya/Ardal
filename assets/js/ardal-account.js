@@ -16,7 +16,6 @@
 
 	var CONFIG = window.ardalAccount || {};
 	var STORE = 'ardal_wishlist';
-	var SYNCED = 'ardal_wishlist_synced';
 
 	function reduceMotion() {
 		return window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
@@ -74,47 +73,6 @@
 		} catch ( e ) {}
 	}
 
-	/**
-	 * ویجت‌های محصول علاقه‌مندی را در localStorage نگه می‌دارند. یک بار در هر
-	 * نشست، آن فهرست با حساب کاربر ادغام می‌شود تا صفحه‌ای که سمت سرور رندر
-	 * می‌شود چیزی را جا نیندازد.
-	 */
-	function syncWishlist() {
-		if ( ! CONFIG.loggedIn ) {
-			return;
-		}
-
-		var already = false;
-
-		try {
-			already = '1' === window.sessionStorage.getItem( SYNCED );
-		} catch ( e ) {}
-
-		if ( already ) {
-			return;
-		}
-
-		post( { action: 'ardal_wishlist', op: 'sync', ids: localIds() } )
-			.then( function ( result ) {
-				if ( ! result || ! result.success ) {
-					return;
-				}
-
-				saveLocal( result.data.ids || [] );
-
-				try {
-					window.sessionStorage.setItem( SYNCED, '1' );
-				} catch ( e ) {}
-
-				var page = document.querySelector( '[data-ard-ac-wishlist]' );
-
-				if ( page && ( result.data.ids || [] ).length !== page.querySelectorAll( '[data-ard-ac-fav]' ).length ) {
-					window.location.reload();
-				}
-			} )
-			.catch( function () {} );
-	}
-
 	function removeFavourite( button ) {
 		var id = parseInt( button.getAttribute( 'data-ard-ac-unfav' ), 10 );
 		var card = button.closest( '[data-ard-ac-fav]' );
@@ -130,6 +88,9 @@
 
 		post( { action: 'ardal_wishlist', op: 'remove', product: id } )
 			.then( function () {
+				// قلب‌های همین محصول در جاهای دیگر صفحه (مثلاً هدر) هم خاموش شوند.
+				document.dispatchEvent( new CustomEvent( 'ardal:wishlist-sync', { detail: { removed: String( id ) } } ) );
+
 				if ( card.parentNode ) {
 					card.parentNode.removeChild( card );
 				}
@@ -732,7 +693,6 @@
 		initActions( panel );
 		initNavigation( panel );
 		animateBars( panel );
-		syncWishlist();
 	}
 
 	if ( 'loading' === document.readyState ) {

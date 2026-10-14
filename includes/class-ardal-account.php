@@ -23,7 +23,7 @@ class Ardal_Account {
 	/**
 	 * نسخهٔ اندپوینت‌ها؛ با تغییرش قوانین بازنویسی یک بار تازه می‌شوند.
 	 */
-	const ENDPOINT_VERSION = '1';
+	const ENDPOINT_VERSION = '2';
 
 	/**
 	 * اندپوینت‌های افزوده‌شده به پنل: اسلاگ => عنوان.
@@ -31,10 +31,16 @@ class Ardal_Account {
 	 * @return array
 	 */
 	public static function endpoints() {
-		return array(
+		$out = array(
 			'wishlist' => 'علاقه‌مندی‌ها',
 			'reviews'  => 'نظرات من',
 		);
+
+		// اندپوینت کیف پول همیشه ثبت می‌شود تا روشن/خاموش کردنش قانون‌های
+		// بازنویسی را عوض نکند؛ فقط آیتم منو و محتوا به تنظیم وابسته‌اند.
+		$out['wallet'] = class_exists( 'Ardal_Wallet' ) ? Ardal_Wallet::option( 'title' ) : 'کیف پول';
+
+		return $out;
 	}
 
 	public static function init() {
@@ -53,9 +59,11 @@ class Ardal_Account {
 		add_filter( 'woocommerce_account_menu_items', array( __CLASS__, 'menu_items' ) );
 		add_filter( 'woocommerce_endpoint_wishlist_title', array( __CLASS__, 'wishlist_title' ) );
 		add_filter( 'woocommerce_endpoint_reviews_title', array( __CLASS__, 'reviews_title' ) );
+		add_filter( 'woocommerce_endpoint_wallet_title', array( __CLASS__, 'wallet_title' ) );
 
 		add_action( 'woocommerce_account_wishlist_endpoint', array( __CLASS__, 'render_wishlist' ) );
 		add_action( 'woocommerce_account_reviews_endpoint', array( __CLASS__, 'render_reviews' ) );
+		add_action( 'woocommerce_account_wallet_endpoint', array( __CLASS__, 'render_wallet' ) );
 
 		add_filter( 'woocommerce_locate_template', array( __CLASS__, 'locate_template' ), 10, 3 );
 		add_filter( 'body_class', array( __CLASS__, 'body_class' ) );
@@ -258,6 +266,14 @@ class Ardal_Account {
 			// اندپوینت‌های خود اردال را ووکامرس در $items ندارد.
 			$ours = array_key_exists( $slug, self::endpoints() );
 
+			if ( 'wallet' === $slug && ! ( class_exists( 'Ardal_Wallet' ) && Ardal_Wallet::is_enabled() ) ) {
+				$ours = false;
+			}
+
+			if ( 'wishlist' === $slug && class_exists( 'Ardal_Wishlist' ) && ! Ardal_Wishlist::enabled() ) {
+				$ours = false;
+			}
+
 			if ( $ours || isset( $items[ $slug ] ) ) {
 				$sorted[ $slug ] = $label;
 			}
@@ -288,6 +304,14 @@ class Ardal_Account {
 
 	public static function render_reviews() {
 		wc_get_template( 'myaccount/reviews.php' );
+	}
+
+	public static function wallet_title() {
+		return class_exists( 'Ardal_Wallet' ) ? Ardal_Wallet::option( 'title' ) : 'کیف پول';
+	}
+
+	public static function render_wallet() {
+		wc_get_template( 'myaccount/wallet.php' );
 	}
 
 	/**
@@ -357,6 +381,11 @@ class Ardal_Account {
 		wp_enqueue_script( 'ardal' );
 		wp_enqueue_script( 'ardal-account' );
 
+		// صفحهٔ کیف پول ایجکسی هم باز می‌شود؛ فایل‌هایش از اول در صفحه باشند.
+		if ( class_exists( 'Ardal_Wallet' ) && Ardal_Wallet::is_enabled() ) {
+			Ardal_Wallet_Render::assets();
+		}
+
 		if ( $done ) {
 			return;
 		}
@@ -422,6 +451,7 @@ class Ardal_Account {
 			'work'    => 'M4 20V8l8-4 8 4v12M9 20v-6h6v6',
 			'thumb'   => 'M7 20V9l4-6 1 1v5h6l1 1-2 10z',
 			'down'    => 'M12 4v12m0 0l-4-4m4 4l4-4M5 20h14',
+			'card'    => 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 10h18M7 15h4',
 		);
 	}
 
@@ -469,6 +499,7 @@ class Ardal_Account {
 			'work'    => 'فروشگاه',
 			'thumb'   => 'پسندیدن',
 			'logout'  => 'خروج',
+			'card'    => 'کارت بانکی',
 		);
 	}
 
@@ -487,7 +518,8 @@ class Ardal_Account {
 			'edit-account'    => 'user',
 			'reviews'         => 'review',
 			'downloads'       => 'box',
-			'payment-methods' => 'wallet',
+			'payment-methods' => 'card',
+			'wallet'          => 'wallet',
 			'customer-logout' => 'logout',
 		);
 
@@ -1297,18 +1329,14 @@ class Ardal_Account {
 	 * @return array
 	 */
 	public static function wishlist_ids() {
-		$ids = get_user_meta( get_current_user_id(), self::WISHLIST_META, true );
-
-		return is_array( $ids ) ? array_values( array_unique( array_map( 'absint', $ids ) ) ) : array();
+		return Ardal_Wishlist::ids();
 	}
 
 	/**
 	 * @param array $ids
 	 */
 	public static function save_wishlist( $ids ) {
-		$ids = array_values( array_unique( array_filter( array_map( 'absint', (array) $ids ) ) ) );
-
-		update_user_meta( get_current_user_id(), self::WISHLIST_META, $ids );
+		Ardal_Wishlist::save( $ids );
 	}
 
 	/**
@@ -1317,17 +1345,7 @@ class Ardal_Account {
 	 * @return array
 	 */
 	public static function wishlist_products() {
-		$out = array();
-
-		foreach ( self::wishlist_ids() as $id ) {
-			$product = wc_get_product( $id );
-
-			if ( $product && 'publish' === $product->get_status() ) {
-				$out[] = $product;
-			}
-		}
-
-		return $out;
+		return Ardal_Wishlist::products();
 	}
 
 	/**
@@ -1354,16 +1372,19 @@ class Ardal_Account {
 				wp_send_json_error( array( 'message' => 'شناسهٔ محصول نامعتبر است.' ), 400 );
 			}
 
-			$current = 'add' === $action
-				? array_merge( $current, array( $id ) )
-				: array_diff( $current, array( $id ) );
+			$state = Ardal_Wishlist::set( $id, $action );
+
+			if ( is_wp_error( $state ) ) {
+				wp_send_json_error( array( 'message' => $state->get_error_message() ), 400 );
+			}
 		} else {
+			// فقط برای سازگاری با نسخهٔ قدیمی اسکریپت؛ ادغام تازه با
+			// ardal_wishlist_merge و فقط یک بار بعد از ورود انجام می‌شود.
 			$incoming = isset( $_POST['ids'] ) ? (array) wp_unslash( $_POST['ids'] ) : array();
 			$incoming = array_map( 'absint', $incoming );
-			$current  = array_merge( $current, array_filter( $incoming ) );
-		}
 
-		self::save_wishlist( $current );
+			self::save_wishlist( array_merge( $current, array_filter( $incoming ) ) );
+		}
 
 		$ids = self::wishlist_ids();
 

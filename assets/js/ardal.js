@@ -395,8 +395,9 @@
 	 * @param {string} text متن پیام.
 	 * @param {string} kind success | error | info
 	 * @param {number} [life] مدت ماندن به میلی‌ثانیه.
+	 * @param {Object} [action] دکمهٔ لینک داخل توست: { url, text }.
 	 */
-	function ardToast( text, kind, life ) {
+	function ardToast( text, kind, life, action ) {
 		text = String( text || '' ).trim();
 
 		if ( ! text ) {
@@ -447,6 +448,16 @@
 
 		toast.appendChild( icon );
 		toast.appendChild( body );
+
+		if ( action && action.url && action.text ) {
+			var link = document.createElement( 'a' );
+
+			link.className = 'ard-toast__action';
+			link.href = action.url;
+			link.textContent = action.text;
+			toast.appendChild( link );
+		}
+
 		toast.appendChild( close );
 		host.appendChild( toast );
 
@@ -1077,6 +1088,15 @@
 		compare: 'ardal_compare'
 	};
 
+	// پرچم «این فهرست را مهمان ساخته»؛ فقط چنین فهرستی بعد از ورود ادغام می‌شود.
+	var GUEST_FLAG = 'ardal_wishlist_guest';
+
+	var WISH = window.ardalWishlist || {};
+	var WISH_I18N = WISH.i18n || {};
+
+	// اگر localStorage کار نکند، فهرست دست‌کم تا پایان صفحه در حافظه می‌ماند.
+	var listMemory = {};
+
 	/**
 	 * خواندن فهرست ذخیره‌شده. اگر localStorage در دسترس نباشد (مرورگر خصوصی،
 	 * کوکی خاموش) آرایه خالی برمی‌گردد و دکمه‌ها همچنان بدون خطا کار می‌کنند.
@@ -1088,11 +1108,13 @@
 
 			return Array.isArray( arr ) ? arr.map( String ) : [];
 		} catch ( e ) {
-			return [];
+			return listMemory[ kind ] ? listMemory[ kind ].slice() : [];
 		}
 	}
 
 	function listSet( kind, ids ) {
+		listMemory[ kind ] = ids.slice();
+
 		try {
 			window.localStorage.setItem( STORE[ kind ], JSON.stringify( ids ) );
 		} catch ( e ) {
@@ -1107,12 +1129,18 @@
 		return listGet( kind ).indexOf( String( id ) ) !== -1;
 	}
 
-	function listToggle( kind, id ) {
+	/**
+	 * تغییر محلی؛ برای مقایسه و علاقه‌مندیِ مهمان.
+	 *
+	 * @return {boolean} وضعیت تازه.
+	 */
+	function listToggleLocal( kind, id ) {
 		var ids = listGet( kind );
 		var at = ids.indexOf( String( id ) );
 
 		if ( at === -1 ) {
-			ids.push( String( id ) );
+			// تازه‌ترین اول، مثل فهرست سرور.
+			ids.unshift( String( id ) );
 		} else {
 			ids.splice( at, 1 );
 		}
@@ -1127,10 +1155,227 @@
 			document.querySelectorAll( '[data-ard-' + kind + '-count]' ),
 			function ( el ) {
 				el.textContent = toFa( count );
-				el.hidden = count < 1;
+				el.hidden = count < 1 && ! el.hasAttribute( 'data-show-zero' );
 			}
 		);
 	}
+
+	function wishToast( text, kind, action ) {
+		if ( text && false !== WISH.toast ) {
+			ardToast( text, kind, null, action );
+		}
+	}
+
+	function wishLoginToast( message, url ) {
+		ardToast( message || WISH_I18N.login, 'info', 7000, {
+			url: url || WISH.loginUrl,
+			text: WISH_I18N.loginBtn || 'ورود'
+		} );
+	}
+
+	function wishPost( data ) {
+		var body = new window.FormData();
+
+		body.append( 'nonce', WISH.nonce || '' );
+
+		Object.keys( data ).forEach( function ( key ) {
+			if ( Array.isArray( data[ key ] ) ) {
+				data[ key ].forEach( function ( value ) {
+					body.append( key + '[]', value );
+				} );
+
+				return;
+			}
+
+			body.append( key, data[ key ] );
+		} );
+
+		return window.fetch( WISH.ajax, { method: 'POST', body: body, credentials: 'same-origin' } )
+			.then( function ( response ) {
+				return response.json();
+			} );
+	}
+
+	/**
+	 * کارت‌های فهرست علاقه‌مندی که محصولشان از فهرست بیرون رفته حذف می‌شوند.
+	 */
+	function dropWishlistCards( id ) {
+		Array.prototype.forEach.call(
+			document.querySelectorAll( '[data-ard-wishlist-item="' + id + '"]' ),
+			function ( card ) {
+				var list = card.closest( '[data-ard-wishlist-list]' );
+
+				card.classList.add( 'is-leaving' );
+
+				window.setTimeout( function () {
+					if ( card.parentNode ) {
+						card.parentNode.removeChild( card );
+					}
+
+					if ( list && ! list.querySelector( '[data-ard-wishlist-item]' ) ) {
+						var empty = list.querySelector( '[data-ard-wishlist-empty]' );
+						var grid = list.querySelector( '[data-ard-wishlist-grid]' );
+
+						if ( grid ) {
+							grid.hidden = true;
+						}
+
+						if ( empty ) {
+							empty.hidden = false;
+						}
+					}
+
+					if ( list ) {
+						var counter = list.querySelector( '[data-ard-wishlist-total]' );
+
+						if ( counter ) {
+							counter.textContent = toFa( list.querySelectorAll( '[data-ard-wishlist-item]' ).length );
+						}
+					}
+				}, 280 );
+			}
+		);
+	}
+
+	/**
+	 * کلیک قلب.
+	 *
+	 * کاربر واردشده: همان لحظه به سرور می‌رود و فهرست سرور جای فهرست محلی
+	 * می‌نشیند. مهمان: بسته به تنظیمات، یا محلی ذخیره می‌شود یا پیام ورود.
+	 *
+	 * @param {string}   id
+	 * @param {Function} busy
+	 */
+	function wishlistClick( id, busy ) {
+		if ( ! WISH.loggedIn ) {
+			if ( 'login' === WISH.guest ) {
+				wishLoginToast();
+
+				return;
+			}
+
+			var on = listToggleLocal( 'wishlist', id );
+
+			try {
+				window.localStorage.setItem( GUEST_FLAG, '1' );
+			} catch ( e ) {}
+
+			wishToast( on ? WISH_I18N.added : WISH_I18N.removed, on ? 'success' : 'info' );
+
+			if ( ! on ) {
+				dropWishlistCards( id );
+			}
+
+			return;
+		}
+
+		var was = listHas( 'wishlist', id );
+
+		// رنگ همان لحظه عوض می‌شود؛ اگر سرور نپذیرفت برمی‌گردد.
+		listToggleLocal( 'wishlist', id );
+		busy( true );
+
+		wishPost( { action: 'ardal_wishlist_toggle', product: id, want: was ? 'remove' : 'add' } )
+			.then( function ( result ) {
+				var data = ( result && result.data ) || {};
+
+				if ( ! result || ! result.success ) {
+					if ( 'logged_out' === data.code ) {
+						WISH.loggedIn = false;
+						listToggleLocal( 'wishlist', id );
+						wishLoginToast( data.message, data.login );
+
+						return;
+					}
+
+					var error = new Error( data.message || '' );
+
+					error.fromServer = !! data.message;
+					throw error;
+				}
+
+				listSet( 'wishlist', ( data.ids || [] ).map( String ) );
+
+				wishToast(
+					data.active ? WISH_I18N.added : WISH_I18N.removed,
+					data.active ? 'success' : 'info',
+					data.active && WISH.pageUrl ? { url: WISH.pageUrl, text: WISH_I18N.view } : null
+				);
+
+				if ( ! data.active ) {
+					dropWishlistCards( id );
+				}
+			} )
+			.catch( function ( error ) {
+				// به وضعیت پیش از کلیک برگرد.
+				if ( listHas( 'wishlist', id ) !== was ) {
+					listToggleLocal( 'wishlist', id );
+				}
+
+				ardToast( error && error.fromServer ? error.message : WISH_I18N.error, 'error' );
+			} )
+			.then( function () {
+				busy( false );
+			} );
+	}
+
+	/**
+	 * یک بار در هر صفحه: فهرست محلی با حساب هماهنگ می‌شود.
+	 *
+	 * فهرستی که مهمان ساخته بعد از ورود یک بار ادغام می‌شود؛ در بقیهٔ موارد
+	 * فهرست سرور جای فهرست محلی را می‌گیرد. همین جلوی «برگشتن محصول
+	 * حذف‌شده» را می‌گیرد.
+	 */
+	function syncWishlistOnce() {
+		if ( document.body.ardWishSynced || ! WISH.enabled ) {
+			return;
+		}
+
+		document.body.ardWishSynced = true;
+
+		if ( ! WISH.loggedIn || ! Array.isArray( WISH.ids ) ) {
+			paintListCounts( 'wishlist', listGet( 'wishlist' ).length );
+
+			return;
+		}
+
+		var guest = false;
+
+		try {
+			guest = '1' === window.localStorage.getItem( GUEST_FLAG );
+		} catch ( e ) {}
+
+		var missing = listGet( 'wishlist' ).filter( function ( item ) {
+			return WISH.ids.indexOf( item ) === -1;
+		} );
+
+		listSet( 'wishlist', WISH.ids.slice() );
+
+		if ( guest && WISH.merge && missing.length ) {
+			wishPost( { action: 'ardal_wishlist_merge', ids: missing } )
+				.then( function ( result ) {
+					if ( result && result.success ) {
+						listSet( 'wishlist', ( result.data.ids || [] ).map( String ) );
+					}
+				} )
+				.catch( function () {} );
+		}
+
+		try {
+			window.localStorage.removeItem( GUEST_FLAG );
+		} catch ( e ) {}
+	}
+
+	// پنل کاربری محصولی را خودش حذف کرده؛ فهرست محلی هم به‌روز شود.
+	document.addEventListener( 'ardal:wishlist-sync', function ( event ) {
+		var removed = event.detail && event.detail.removed;
+
+		if ( removed ) {
+			listSet( 'wishlist', listGet( 'wishlist' ).filter( function ( item ) {
+				return item !== removed;
+			} ) );
+		}
+	} );
 
 	function initListButton( btn ) {
 		var kind = btn.hasAttribute( 'data-ard-wishlist' ) ? 'wishlist' : 'compare';
@@ -1145,8 +1390,19 @@
 		}
 
 		function paint( on ) {
+			var was = btn.classList.contains( 'is-active' );
+
 			btn.classList.toggle( 'is-active', on );
 			btn.setAttribute( 'aria-pressed', on ? 'true' : 'false' );
+
+			// تپش کوچک فقط وقتی تازه روشن شده، نه موقع بارگذاری صفحه.
+			if ( on && ! was && btn.ardPainted ) {
+				btn.classList.remove( 'is-pop' );
+				void btn.offsetWidth;
+				btn.classList.add( 'is-pop' );
+			}
+
+			btn.ardPainted = true;
 
 			var label = btn.getAttribute( on ? 'data-label-on' : 'data-label-off' );
 
@@ -1159,6 +1415,12 @@
 				if ( btn.hasAttribute( 'data-ard-list-text' ) ) {
 					btn.textContent = label;
 				}
+
+				var text = btn.querySelector( '[data-ard-wish-text]' );
+
+				if ( text ) {
+					text.textContent = label;
+				}
 			}
 		}
 
@@ -1166,7 +1428,20 @@
 
 		btn.addEventListener( 'click', function ( e ) {
 			e.preventDefault();
-			paint( listToggle( kind, id ) );
+
+			if ( btn.classList.contains( 'is-busy' ) ) {
+				return;
+			}
+
+			if ( 'wishlist' === kind ) {
+				wishlistClick( id, function ( state ) {
+					btn.classList.toggle( 'is-busy', state );
+				} );
+
+				return;
+			}
+
+			paint( listToggleLocal( kind, id ) );
 		} );
 
 		// اگر همین محصول در جای دیگری از صفحه هم دکمه دارد، هماهنگ بماند.
@@ -2472,6 +2747,9 @@
 			initWooNotices();
 		}
 
+		// شمارنده‌های علاقه‌مندی حتی در صفحه‌ای بدون دکمهٔ قلب هم درست شوند.
+		syncWishlistOnce();
+
 		Array.prototype.forEach.call( root.querySelectorAll( '[data-ard-slider]' ), function ( el ) {
 			if ( ! el.ardReady ) {
 				el.ardReady = true;
@@ -2601,7 +2879,11 @@
 			'ardal-header',
 			'ardal-product-hero',
 			'ardal-product-tabs',
-			'ardal-product-sticky-bar'
+			'ardal-product-sticky-bar',
+			'ardal-brand-rings',
+			'ardal-wishlist-button',
+			'ardal-wishlist',
+			'ardal-wishlist-counter'
 		].forEach( function ( name ) {
 			window.elementorFrontend.hooks.addAction(
 				'frontend/element_ready/' + name + '.default',

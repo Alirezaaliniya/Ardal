@@ -1,5 +1,44 @@
 /* Ardal — استایل صفحه تنظیمات پیشخوان */
 
+/* ---------- تب‌های علاقه‌مندی و کیف پول ---------- */
+
+.ardal-field[hidden] {
+	display: none !important;
+}
+
+.ardal-field--select select,
+.ardal-field--textarea textarea {
+	max-width: 520px;
+}
+
+.ardal-media {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.ardal-media input {
+	width: min(420px, 100%);
+}
+
+.ardal-table--codes td:first-child {
+	width: 38%;
+	white-space: nowrap;
+}
+
+.ardal-table--codes code {
+	font-size: 12px;
+	background: #f0f6fc;
+	padding: 3px 7px;
+	border-radius: 5px;
+}
+
+.ardal-lede a {
+	font-weight: 700;
+	text-decoration: none;
+}
+
 .ardal-wrap {
 	--a-fg: #1d2327;
 	--a-muted: #646970;

@@ -1,0 +1,307 @@
+/*!
+ * Ardal — علاقه‌مندی: دکمهٔ قلب، شمارندهٔ هدر و فهرست.
+ *
+ * همهٔ رنگ‌ها و اندازه‌ها متغیرند؛ ویجت‌های المنتور فقط همین متغیرها را
+ * بازنویسی می‌کنند. پیش‌فرض‌ها از پالت اردال می‌آیند.
+ */
+
+/* ============================================================
+   دکمهٔ قلب
+   ============================================================ */
+
+.ard-wish {
+	--ard-wish-size: 40px;
+	--ard-wish-icon: 20px;
+	--ard-wish-color: var(--ard-text-soft, var(--ard-muted));
+	--ard-wish-bg: var(--ard-base);
+	--ard-wish-border: color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted));
+	--ard-wish-on: var(--ard-sale);
+	--ard-wish-on-bg: var(--ard-sale-soft, #fdecec);
+	--ard-wish-on-border: var(--ard-sale);
+	--ard-wish-hover: var(--ard-sale);
+	--ard-wish-radius: 50%;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-inline-size: var(--ard-wish-size);
+	block-size: var(--ard-wish-size);
+	padding: 0;
+	border: 1px solid var(--ard-wish-border);
+	border-radius: var(--ard-wish-radius);
+	background: var(--ard-wish-bg);
+	color: var(--ard-wish-color);
+	font: inherit;
+	line-height: 1;
+	cursor: pointer;
+	transition: color .2s, background-color .2s, border-color .2s, transform .2s;
+}
+
+/*
+ * [class] وزن را بالا می‌برد تا «استایل سراسری» المنتور که همهٔ button ها را
+ * رنگ می‌کند زمینه و حاشیهٔ قلب را نبلعد (همان قرارداد بقیهٔ دکمه‌های اردال).
+ */
+.ard-wish[class] {
+	background: var(--ard-wish-bg);
+	border-color: var(--ard-wish-border);
+	color: var(--ard-wish-color);
+}
+
+.ard-wish--text {
+	padding-inline: 16px;
+	border-radius: var(--ard-wish-radius, 999px);
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.ard-wish--text[class] {
+	--ard-wish-radius: var(--ard-radius-pill, 999px);
+}
+
+.ard-wish__icon {
+	flex: none;
+	inline-size: var(--ard-wish-icon);
+	block-size: var(--ard-wish-icon);
+	transition: fill .2s, transform .2s;
+}
+
+.ard-wish[class]:hover,
+.ard-wish[class]:focus-visible {
+	border-color: var(--ard-wish-hover);
+	color: var(--ard-wish-hover);
+}
+
+.ard-wish[class].is-active {
+	border-color: var(--ard-wish-on-border);
+	background: var(--ard-wish-on-bg);
+	color: var(--ard-wish-on);
+}
+
+.ard-wish.is-active .ard-wish__icon {
+	fill: currentColor;
+}
+
+.ard-wish.is-busy {
+	opacity: .7;
+	cursor: progress;
+}
+
+/* بدون قاب: فقط خود قلب. */
+.ard-wish--plain[class],
+.ard-wish--plain[class].is-active,
+.ard-wish--plain[class]:hover {
+	border-color: transparent;
+	background: transparent;
+}
+
+.ard-wish-wrap {
+	display: flex;
+}
+
+/* ============================================================
+   شمارندهٔ هدر
+   ============================================================ */
+
+.ard-wish-count {
+	--ard-wish-count-color: var(--ard-text);
+	--ard-wish-count-badge: var(--ard-sale);
+	--ard-wish-count-badge-ink: #fff;
+	--ard-wish-count-icon: 24px;
+
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--ard-wish-count-color);
+	text-decoration: none;
+}
+
+.ard-wish-count:hover {
+	color: var(--ard-wish-count-hover, var(--ard-wish-count-color));
+}
+
+.ard-wish-count__icon {
+	position: relative;
+	display: inline-flex;
+}
+
+.ard-wish-count__icon .ard-wish__icon {
+	inline-size: var(--ard-wish-count-icon);
+	block-size: var(--ard-wish-count-icon);
+}
+
+.ard-wish-count__label {
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.ard-wish-count__badge {
+	position: absolute;
+	inset-block-start: -7px;
+	inset-inline-start: calc(var(--ard-wish-count-icon) - 9px);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: 18px;
+	block-size: 18px;
+	padding-inline: 5px;
+	border: 2px solid var(--ard-base);
+	border-radius: 999px;
+	background: var(--ard-wish-count-badge);
+	color: var(--ard-wish-count-badge-ink);
+	font-size: 10.5px;
+	font-weight: 800;
+	line-height: 1;
+}
+
+.ard-wish-count__badge[hidden] {
+	display: none;
+}
+
+/* ============================================================
+   فهرست علاقه‌مندی (ویجت)
+   ============================================================ */
+
+.ard-wish-list {
+	--ard-wish-cols: 4;
+	--ard-wish-gap: 16px;
+}
+
+.ard-wish-list__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-block-end: 16px;
+}
+
+.ard-wish-list__title {
+	margin: 0;
+	font-size: 18px;
+	font-weight: 900;
+	color: var(--ard-text);
+}
+
+.ard-wish-list__count {
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--ard-muted);
+}
+
+.ard-wish-list__grid {
+	display: grid;
+	grid-template-columns: repeat(var(--ard-wish-cols), minmax(0, 1fr));
+	gap: var(--ard-wish-gap);
+}
+
+.ard-wish-list__grid[hidden] {
+	display: none;
+}
+
+.ard-wish-list__cell {
+	position: relative;
+	min-inline-size: 0;
+	transition: opacity .28s, transform .28s;
+}
+
+.ard-wish-list__cell.is-leaving {
+	opacity: 0;
+	transform: scale(.94);
+}
+
+/* قلب روی کارت، گوشهٔ بالا؛ کارت خودش ممکن است قلبی نداشته باشد. */
+.ard-wish-list__cell > .ard-wish {
+	position: absolute;
+	inset-block-start: 10px;
+	inset-inline-end: 10px;
+	z-index: 3;
+	--ard-wish-size: 34px;
+	--ard-wish-icon: 17px;
+}
+
+.ard-wish-list__empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	padding: 40px 20px;
+	border: 1px dashed var(--ard-tint-blue-border, var(--ard-border));
+	border-radius: var(--ard-radius, 16px);
+	background: var(--ard-wish-empty-bg, var(--ard-surface, #f7f9fc));
+	text-align: center;
+}
+
+.ard-wish-list__empty[hidden] {
+	display: none;
+}
+
+.ard-wish-list__empty-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 56px;
+	block-size: 56px;
+	border-radius: 18px;
+	background: var(--ard-sale-soft, #fdecec);
+	color: var(--ard-sale);
+}
+
+.ard-wish-list__empty-icon .ard-wish__icon {
+	inline-size: 26px;
+	block-size: 26px;
+}
+
+.ard-wish-list__empty-title {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 800;
+	color: var(--ard-text);
+}
+
+.ard-wish-list__empty-text {
+	margin: 0;
+	max-inline-size: 44ch;
+	font-size: 13px;
+	color: var(--ard-muted);
+	line-height: 1.9;
+}
+
+.ard-wish-list__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	block-size: 42px;
+	padding-inline: 20px;
+	border-radius: var(--ard-radius-sm, 10px);
+	background: var(--ard-primary);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 800;
+	text-decoration: none;
+	transition: background-color .2s;
+}
+
+.ard-wish-list__btn:hover {
+	background: var(--ard-primary-dark);
+	color: #fff;
+}
+
+.ard-wish-list__more {
+	display: flex;
+	justify-content: center;
+	margin-block-start: 18px;
+}
+
+@media (max-width: 1024px) {
+	.ard-wish-list {
+		--ard-wish-cols: 3;
+	}
+}
+
+@media (max-width: 767px) {
+	.ard-wish-list {
+		--ard-wish-cols: 2;
+		--ard-wish-gap: 10px;
+	}
+}

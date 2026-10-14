@@ -106,9 +106,10 @@ $ard_shipping = (float) WC()->cart->get_shipping_total();
 			<?php endif; ?>
 
 			<?php foreach ( WC()->cart->get_fees() as $ard_fee ) : ?>
-				<tr class="fee">
+				<?php $ard_is_wallet = class_exists( 'Ardal_Wallet_Checkout' ) && Ardal_Wallet_Checkout::FEE_ID === $ard_fee->id; ?>
+				<tr class="fee<?php echo $ard_is_wallet ? ' ard-shop__row--wallet' : ''; ?>">
 					<th><?php echo esc_html( $ard_fee->name ); ?></th>
-					<td><?php wc_cart_totals_fee_html( $ard_fee ); ?></td>
+					<td<?php echo $ard_is_wallet || (float) $ard_fee->total < 0 ? ' class="ard-shop__row-val--off"' : ''; ?>><?php wc_cart_totals_fee_html( $ard_fee ); ?></td>
 				</tr>
 			<?php endforeach; ?>
 

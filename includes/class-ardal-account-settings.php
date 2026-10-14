@@ -40,6 +40,7 @@ class Ardal_Account_Settings {
 			'dashboard'        => array( 'label' => 'پیشخوان', 'order' => 10, 'on' => '1' ),
 			'orders'           => array( 'label' => 'سفارش‌های من', 'order' => 20, 'on' => '1' ),
 			'wishlist'         => array( 'label' => 'علاقه‌مندی‌ها', 'order' => 30, 'on' => '1' ),
+			'wallet'           => array( 'label' => 'کیف پول', 'order' => 35, 'on' => '1' ),
 			'edit-address'     => array( 'label' => 'آدرس‌های من', 'order' => 40, 'on' => '1' ),
 			'edit-account'     => array( 'label' => 'اطلاعات حساب', 'order' => 50, 'on' => '1' ),
 			'reviews'          => array( 'label' => 'نظرات من', 'order' => 60, 'on' => '1' ),
