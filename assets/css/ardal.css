@@ -3020,6 +3020,134 @@ a.ard-brand:hover img {
 }
 
 /* ============================================================
+   فهرست دسته‌بندی نوشته‌ها
+   ============================================================ */
+
+.ard-pcats {
+	padding: 14px 16px;
+	border: 1px solid #e5e5e9;
+	border-radius: 20px;
+	background: #fff;
+	box-shadow: 0 3px 12px rgba(30, 35, 50, .06);
+}
+
+.ard-pcats__heading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ard-pcats__title-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	color: #55555b;
+	line-height: 1;
+}
+
+.ard-pcats__title-icon > svg {
+	width: 20px;
+	height: 20px;
+}
+
+.ard-pcats__title {
+	margin: 0;
+	color: #24242a;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.5;
+}
+
+.ard-pcats__divider {
+	margin-block: 12px;
+	border: 0;
+	border-block-start: 1px solid #d7d7da;
+}
+
+.ard-pcats__list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-pcats__item {
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.ard-pcats__link {
+	display: flex;
+	min-height: 32px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 4px 0;
+	border-radius: 8px;
+	color: #29292f;
+	text-decoration: none;
+	transition: background-color .18s ease, color .18s ease;
+}
+
+.ard-pcats__link:hover,
+.ard-pcats__link:focus-visible {
+	color: #f20d5b;
+	text-decoration: none;
+}
+
+.ard-pcats__link.is-current .ard-pcats__name {
+	color: #f20d5b;
+	font-weight: 700;
+}
+
+.ard-pcats__label {
+	min-width: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ard-pcats__arrow {
+	flex: 0 0 auto;
+	color: #44444a;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.ard-pcats__name {
+	min-width: 0;
+	color: #29292f;
+	line-height: 1.5;
+}
+
+.ard-pcats__count {
+	display: inline-flex;
+	flex: 0 0 auto;
+	min-width: 38px;
+	min-height: 17px;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 8px;
+	border-radius: 20px;
+	background: #f20d5b;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+.ard-pcats__empty {
+	margin: 0;
+	color: #73737a;
+	font-size: 13px;
+}
+
+/* ============================================================
    ریسپانسیو
    ============================================================ */
 
