@@ -38,17 +38,40 @@ class Ardal_Widget_Account extends Ardal_Widget_Base {
 	 * @return array
 	 */
 	public function get_style_depends() {
-		return array( 'ardal', 'ardal-account' );
+		return array( 'ardal', 'ardal-account', 'ardal-elano', 'ardal-wishlist', 'ardal-wallet' );
 	}
 
 	/**
 	 * @return array
 	 */
 	public function get_script_depends() {
-		return array( 'ardal', 'ardal-account' );
+		return array( 'ardal', 'ardal-account', 'ardal-elano', 'ardal-wallet' );
 	}
 
 	protected function register_controls() {
+
+		/* ------------------------------------------------ قالب */
+
+		$this->start_controls_section(
+			'section_skin',
+			array( 'label' => 'قالب پنل' )
+		);
+
+		$this->add_control(
+			'skin',
+			array(
+				'label'       => 'قالب',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'ardal',
+				'options'     => array(
+					'ardal' => 'اردال (پیش‌فرض)',
+					'elano' => 'الانو',
+				),
+				'description' => 'قالب الانو: ستون کناری صورتی با دکمهٔ پیشخوان، تب‌های وضعیت سفارش، کارت‌های ذخیره‌شده و کیف پول. همهٔ صفحه‌های پنل (سفارش‌ها، جزئیات سفارش، علاقه‌مندی، کیف پول، اطلاعات حساب و بقیه) با همین قالب نمایش داده می‌شوند.',
+			)
+		);
+
+		$this->end_controls_section();
 
 		/* ------------------------------------------------ بخش‌ها */
 
@@ -306,6 +329,233 @@ class Ardal_Widget_Account extends Ardal_Widget_Base {
 
 		$this->add_dashboard_controls();
 		$this->add_panel_style_controls();
+
+		/*
+		 * بخش‌های قالب اردال فقط با همان قالب دیده شوند؛ بخش «کاربر مهمان»
+		 * برای هر دو قالب مشترک است.
+		 */
+		foreach ( $this->get_controls() as $id => $control ) {
+			if ( isset( $control['type'] ) && 'section' === $control['type'] && ! in_array( $id, array( 'section_skin', 'section_guest' ), true ) ) {
+				$this->update_control( $id, array( 'condition' => array( 'skin' => 'ardal' ) ) );
+			}
+		}
+
+		$this->add_elano_controls();
+	}
+
+	/**
+	 * کنترل‌های قالب الانو.
+	 */
+	private function add_elano_controls() {
+		$d = Ardal_Account_Elano::defaults();
+
+		$this->start_controls_section(
+			'section_elano_content',
+			array(
+				'label'     => 'الانو — محتوا',
+				'condition' => array( 'skin' => 'elano' ),
+			)
+		);
+
+		$this->add_control(
+			'elano_note',
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => 'آیتم‌ها و ترتیب منوی کناری از «تنظیمات اردال ← پنل کاربری» می‌آیند. «ذخیره‌شده‌ها»ی پیشخوان همان فهرست علاقه‌مندی کاربر است.',
+				'content_classes' => 'elementor-descriptor',
+			)
+		);
+
+		$this->add_control(
+			'elano_preview',
+			array(
+				'label'       => 'پیش‌نمایش در ویرایشگر',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'dashboard',
+				'options'     => array(
+					'dashboard'    => 'پیشخوان',
+					'orders'       => 'سفارش‌ها',
+					'view-order'   => 'جزئیات آخرین سفارش',
+					'wishlist'     => 'علاقه‌مندی‌ها',
+					'wallet'       => 'کیف پول',
+					'edit-account' => 'اطلاعات حساب',
+					'edit-address' => 'آدرس‌ها',
+				),
+				'description' => 'فقط داخل المنتور؛ در سایت هر صفحهٔ پنل نشانی خودش را دارد.',
+			)
+		);
+
+		$texts = array(
+			'dash_title'     => array( 'عنوان پیشخوان', Controls_Manager::TEXT ),
+			'dash_sub'       => array( 'زیرعنوان دکمهٔ پیشخوان', Controls_Manager::TEXT ),
+			'saved_title'    => array( 'عنوان بخش ذخیره‌شده‌ها', Controls_Manager::TEXT ),
+			'saved_all'      => array( 'متن دکمهٔ «همه محصولات»', Controls_Manager::TEXT ),
+			'tab_current'    => array( 'تب سفارش‌های جاری', Controls_Manager::TEXT ),
+			'tab_delivered'  => array( 'تب تحویل‌شده', Controls_Manager::TEXT ),
+			'tab_returned'   => array( 'تب مرجوع‌شده', Controls_Manager::TEXT ),
+			'tab_cancelled'  => array( 'تب لغوشده', Controls_Manager::TEXT ),
+			'empty_orders'   => array( 'متن سفارش خالی', Controls_Manager::TEXTAREA ),
+			'empty_saved'    => array( 'متن ذخیره‌شده خالی', Controls_Manager::TEXTAREA ),
+			'empty_wishlist' => array( 'متن علاقه‌مندی خالی', Controls_Manager::TEXTAREA ),
+			'shop_btn'       => array( 'متن دکمهٔ حالت خالی', Controls_Manager::TEXT ),
+			'logout_label'   => array( 'متن خروج', Controls_Manager::TEXT ),
+		);
+
+		foreach ( $texts as $key => $row ) {
+			$this->add_control(
+				'elano_' . $key,
+				array(
+					'label'       => $row[0],
+					'type'        => $row[1],
+					'default'     => $d[ $key ],
+					'label_block' => true,
+				)
+			);
+		}
+
+		$this->add_control(
+			'elano_show_logout',
+			array(
+				'label'        => 'دکمهٔ خروج در منو',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+			)
+		);
+
+		foreach ( array(
+			'saved_per_page'  => 'تعداد ذخیره‌شده در پیشخوان',
+			'grid_per_page'   => 'تعداد علاقه‌مندی در هر صفحه',
+			'orders_per_page' => 'تعداد سفارش در هر صفحه',
+			'tx_per_page'     => 'تعداد تراکنش در هر صفحه',
+		) as $key => $label ) {
+			$this->add_control(
+				'elano_' . $key,
+				array(
+					'label'   => $label,
+					'type'    => Controls_Manager::NUMBER,
+					'min'     => 1,
+					'max'     => 60,
+					'default' => $d[ $key ],
+				)
+			);
+		}
+
+		foreach ( array(
+			'img_orders'   => 'تصویر سفارش خالی',
+			'img_saved'    => 'تصویر ذخیره‌شده خالی',
+			'img_wishlist' => 'تصویر علاقه‌مندی خالی',
+			'img_wallet'   => 'تصویر کارت کیف پول',
+		) as $key => $label ) {
+			$this->add_control(
+				'elano_' . $key,
+				array(
+					'label'       => $label,
+					'type'        => Controls_Manager::MEDIA,
+					'description' => 'خالی بماند، تصویر دیزاین الانو.',
+				)
+			);
+		}
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_elano_style',
+			array(
+				'label'     => 'الانو — رنگ و فونت',
+				'tab'       => Controls_Manager::TAB_STYLE,
+				'condition' => array( 'skin' => 'elano' ),
+			)
+		);
+
+		$this->add_control(
+			'elano_palette',
+			array(
+				'label'        => 'رنگ اصلی از پالت اردال',
+				'type'         => Controls_Manager::SWITCHER,
+				'return_value' => 'yes',
+				'description'  => 'روشن باشد، به‌جای صورتی الانو رنگ اصلی تنظیمات اردال استفاده می‌شود.',
+				'selectors'    => array(
+					'{{WRAPPER}} .ard-el' => '--el-primary:var(--ard-primary);--el-primary-2:var(--ard-primary-light, var(--ard-primary));--el-tint:color-mix(in srgb, var(--ard-primary) 12%, #fff);--el-glow:color-mix(in srgb, var(--ard-primary) 30%, transparent);',
+				),
+			)
+		);
+
+		$colors = array(
+			'primary'   => 'رنگ اصلی',
+			'primary-2' => 'رنگ دوم گرادیان',
+			'danger'    => 'رنگ هشدار (خروج، تخفیف)',
+			'bg'        => 'زمینهٔ صفحه',
+			'card'      => 'زمینهٔ کارت‌ها',
+			'text'      => 'رنگ متن',
+			'border'    => 'رنگ خطوط',
+			'soft'      => 'زمینهٔ ملایم',
+			'tint'      => 'زمینهٔ آیکون فعال',
+			'tab'       => 'رنگ تب‌های غیرفعال',
+		);
+
+		foreach ( $colors as $var => $label ) {
+			$this->add_control(
+				'elano_c_' . str_replace( '-', '_', $var ),
+				array(
+					'label'     => $label,
+					'type'      => Controls_Manager::COLOR,
+					'selectors' => array( '{{WRAPPER}} .ard-el' => '--el-' . $var . ':{{VALUE}};' ),
+				)
+			);
+		}
+
+		$this->add_control(
+			'elano_font',
+			array(
+				'label'       => 'فونت',
+				'type'        => Controls_Manager::FONT,
+				'description' => 'خالی بماند، فونت سراسری اردال.',
+				'selectors'   => array( '{{WRAPPER}} .ard-el' => '--el-font:"{{VALUE}}", var(--ard-font, sans-serif);' ),
+				'separator'   => 'before',
+			)
+		);
+
+		$this->add_responsive_control(
+			'elano_pad',
+			array(
+				'label'      => 'فاصلهٔ داخلی پنل',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array( '{{WRAPPER}} .ard-el' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'elano_max',
+			array(
+				'label'      => 'حداکثر عرض',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 900, 'max' => 1920 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-el__wrap' => 'max-inline-size:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * تنظیمات ویجت به شکلی که Ardal_Account_Elano انتظار دارد.
+	 *
+	 * @param array $s
+	 * @return array
+	 */
+	private function elano_settings( $s ) {
+		$out = array();
+
+		foreach ( array_keys( Ardal_Account_Elano::defaults() ) as $key ) {
+			if ( isset( $s[ 'elano_' . $key ] ) ) {
+				$out[ $key ] = $s[ 'elano_' . $key ];
+			}
+		}
+
+		return $out;
 	}
 
 	/**
@@ -719,6 +969,12 @@ class Ardal_Widget_Account extends Ardal_Widget_Base {
 		}
 
 		$s = $this->get_settings_for_display();
+
+		if ( 'elano' === ( $s['skin'] ?? 'ardal' ) ) {
+			Ardal_Account_Elano::render( $this->elano_settings( $s ) );
+
+			return;
+		}
 
 		$this->apply_dashboard_overrides( $s );
 
