@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Yekan Bakh FaNum";font-weight:100 900;src:local("Yekan Bakh FaNum"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn[wght].woff2") format("woff2");}
+@font-face{font-family:"HastiFaNum";font-weight:100 900;src:local("HastiFaNum"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn[wght].woff2") format("woff2");}
+body{margin:0;background:rgb(244,245,249);}
+*{box-sizing:border-box;}
+a{color:rgb(241,23,99);text-decoration:none;}a:hover{color:rgb(227,19,54);}
+input{font-family:inherit;}
+input::placeholder{color:rgba(47,47,51,0.35);}
+</style>
+</helmet>
+<div dir="rtl" style="min-height:100vh;background:rgb(244,245,249);font-family:'Yekan Bakh FaNum',Tahoma,sans-serif;color:rgb(47,47,51);padding:16px clamp(12px,4vw,58px) 60px;">
+  <div style="max-width:1322px;margin:0 auto;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;">
+
+    <aside style="flex:0 0 314px;width:314px;max-width:100%;margin-inline:auto;position:relative;">
+      <div style="position:relative;height:171px;">
+        <svg width="314" height="171" viewBox="0 0 314 171" style="position:absolute;left:0;top:0;display:block;max-width:100%;"><defs><linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0.012" stop-color="rgb(241,23,99)"></stop><stop offset="1" stop-color="rgb(251,57,124)"></stop></linearGradient></defs><path fill="url(#sbg)" d="M 0 40 C 0 17.909 17.909 0 40 0 L 274 0 C 296.091 0 314 17.909 314 40 L 314 131 C 314 153.091 296.091 171 274 171 L 236.5 171 C 214.409 171 196.5 153.091 196.5 131 L 196.5 111.5 C 196.5 100.454 187.546 91.5 176.5 91.5 L 157.115 91.5 L 144 91.5 C 132.954 91.5 124 100.454 124 111.5 L 124 131 C 124 153.091 106.091 171 84 171 L 40 171 C 17.909 171 0 153.091 0 131 L 0 40 Z"></path></svg>
+      </div>
+      <div style="position:relative;margin:20px 3px 0;">
+        <svg width="308" height="24" viewBox="0 0 308 24" style="position:absolute;left:0;top:0;display:block;z-index:1;" preserveAspectRatio="none"><path fill="rgb(244,245,249)" d="M 105.473 0 C 114.126 0 121.14 7.014 121.14 15.667 C 121.14 19.993 124.647 23.5 128.973 23.5 L 187.855 23.5 C 192.181 23.5 195.688 19.993 195.688 15.667 C 195.688 7.014 202.702 0 211.355 0 Z"></path><path fill="none" stroke="rgb(244,245,249)" stroke-width="1" d="M 105.473 0.5 C 114.126 0.5 121.14 7.014 121.14 15.667 C 121.14 19.993 124.647 23.5 128.973 23.5 L 187.855 23.5 C 192.181 23.5 195.688 19.993 195.688 15.667 C 195.688 7.014 202.702 0.5 211.355 0.5"></path></svg>
+        <nav style="border-radius:40px;background:linear-gradient(141.756deg,rgb(239,240,244) 5.41%,rgb(255,255,255) 100%);box-shadow:inset 0 0 0 1px rgb(244,245,249),0 0 80px rgba(0,0,0,0.08);padding:56px 42px 20px;display:flex;flex-direction:column;gap:8px;">
+          <sc-for list="{{ menu }}" as="m" hint-placeholder-count="6">
+            <button onClick="{{ m.go }}" style="height:48px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-size:12px;font-weight:600;transition:all .2s;background:{{ m.bg }};color:{{ m.fg }};box-shadow:{{ m.shadow }};" style-hover="transform:translateX(-3px);box-shadow:inset 0 0 0 1px rgb(241,23,99),0 10px 24px rgba(253,86,144,0.18);">
+              <span>{{ m.label }}</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:rgb(41,45,50);"><path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"></path></svg>
+            </button>
+          </sc-for>
+        </nav>
+      </div>
+      <button onClick="{{ goDash }}" style="position:absolute;left:126px;top:98px;width:70px;border:0;background:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;color:rgb(47,47,51);z-index:2;">
+        <span style="width:59.733px;height:56px;border-radius:12px;background:rgb(253,232,240);display:flex;align-items:center;justify-content:center;transition:transform .2s;" style-hover="transform:scale(1.06);">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="rgb(241,23,99)" stroke-width="1.6"><circle cx="13" cy="13" r="5"></circle><circle cx="27" cy="13" r="5"></circle><circle cx="13" cy="27" r="5"></circle><circle cx="27" cy="27" r="5"></circle></svg>
+        </span>
+        <span style="display:flex;flex-direction:column;gap:4px;align-items:center;font-size:14px;font-weight:600;line-height:1;white-space:nowrap;"><span>پیشخوان</span><span>Dashboard</span></span>
+      </button>
+    </aside>
+
+    <main style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px;">
+      <div style="height:63px;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;">
+        <h1 style="margin:0;font-size:20px;font-weight:700;line-height:1;">{{ pageTitle }}</h1>
+      </div>
+      <div id="screens" style="display:flex;flex-direction:column;gap:20px;">
+<sc-if value="{{ is.dash }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Dashboard" style="display:flex;flex-direction:column;gap:20px;">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding-top:20px;">
+      <sc-for list="{{ statusTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.pick }}" style="position:relative;width:202px;height:112px;border:0;background:none;padding:0;cursor:pointer;font-family:inherit;transition:transform .2s;" style-hover="transform:translateY(-4px);">
+          <svg width="202" height="112" viewBox="0 0 202 112" style="position:absolute;inset:0;display:block;transition:fill .2s;" fill="{{ t.fill }}"><path d="M 0 77.781 C 0 48.007 35.391 32.437 57.34 52.554 L 64.284 58.918 C 71.359 65.403 80.608 69 90.205 69 L 111.795 69 C 121.392 69 130.641 65.403 137.716 58.918 C 162.323 36.365 202 53.821 202 87.2 L 202 96.667 C 202 105.135 195.135 112 186.667 112 L 34.219 112 C 15.321 112 0 96.679 0 77.781 Z"></path></svg>
+          <span style="position:absolute;left:35px;top:8px;width:132px;height:92px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;">
+            <span style="width:60px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:{{ t.iconBg }};">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="rgb(241,23,99)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.333 5h1.6c.95 0 1.77.67 1.96 1.6l3.2 15.7c.2.93 1.02 1.6 1.97 1.6h15.73c.86 0 1.62-.55 1.9-1.37l4.17-12.2c.44-1.3-.53-2.66-1.9-2.66H8"></path><circle cx="12.5" cy="32.5" r="2.2"></circle><circle cx="27.5" cy="32.5" r="2.2"></circle><sc-if value="{{ t.isCheck }}"><path d="M18.333 15.8l2.2 2.2 4.467-4.467"></path></sc-if><sc-if value="{{ t.isCross }}"><path d="M19.167 13.333l5 5m0-5l-5 5"></path></sc-if></svg>
+            </span>
+            <span style="font-size:14px;font-weight:600;line-height:1;color:rgb(255,255,255);white-space:nowrap;">{{ t.label }}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="min-height:63px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;padding-left:4px;">
+      <div style="display:flex;align-items:center;gap:2px;">
+        <span style="position:relative;width:78px;height:55px;flex-shrink:0;"><svg width="78" height="55" viewBox="0 0 78 55" fill="rgb(241,23,99)" style="display:block;"><path d="M 49.407 0 C 44.382 0 39.65 2.36 36.627 6.374 L 19.302 29.374 C 11.361 39.917 18.883 55 32.083 55 L 62 55 C 70.837 55 78 47.837 78 39 L 78 16 C 78 7.163 70.837 0 62 0 Z"></path></svg><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="rgb(255,255,255)" stroke-width="1.5" stroke-linejoin="round" style="position:absolute;left:42px;top:17px;"><path d="M4.167 4.167c0-.92.746-1.667 1.666-1.667h8.334c.92 0 1.666.746 1.666 1.667V17.5L10 13.75 4.167 17.5z"></path></svg></span>
+        <h2 style="margin:0;font-size:20px;font-weight:700;line-height:1;">ذخیره شده ها</h2>
+      </div>
+      <button onClick="{{ goSaved }}" style="height:48px;padding:12px 16px;border-radius:12px;border:0;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgb(230,233,243);color:rgb(241,23,99);font-family:inherit;font-size:16px;cursor:pointer;white-space:nowrap;transition:all .2s;" style-hover="background:rgb(241,23,99);color:rgb(255,255,255);box-shadow:0 10px 24px rgba(253,86,144,0.3);">همه محصولات</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px;">
+      <sc-for list="{{ dashProducts }}" as="p" hint-placeholder-count="4">
+        <article style="border-radius:24px;background:rgb(255,255,255);box-shadow:inset 0 0 0 2px rgb(230,233,243);padding:12px 12px 16px;display:flex;flex-direction:column;gap:24px;transition:box-shadow .2s,transform .2s;" style-hover="box-shadow:inset 0 0 0 2px rgb(241,23,99),0 16px 40px rgba(0,0,0,0.06);transform:translateY(-4px);">
+          <div style="display:flex;flex-direction:column;gap:20px;flex:1;">
+            <div style="aspect-ratio:208/200;border-radius:24px;background:rgb(248,248,248);display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;"><div role="img" aria-label="{{ p.name }}" style="width:100%;height:100%;background:url({{ p.img }}) center/contain no-repeat;mix-blend-mode:darken;"></div></div>
+            <h3 style="margin:0;font-size:16px;font-weight:400;line-height:1.5;text-wrap:pretty;">{{ p.name }}</h3>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <button onClick="{{ p.toggle }}" title="ذخیره" style="width:40px;height:40px;flex-shrink:0;border-radius:12px;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;background:{{ p.markBg }};color:{{ p.markFg }};box-shadow:inset 0 0 0 1px rgb(241,23,99);" style-hover="box-shadow:inset 0 0 0 1px rgb(241,23,99),0 8px 20px rgba(253,86,144,0.35);"><svg width="20" height="20" viewBox="0 0 20 20" fill="{{ p.markFill }}" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M4.167 4.167c0-.92.746-1.667 1.666-1.667h8.334c.92 0 1.666.746 1.666 1.667V17.5L10 13.75 4.167 17.5z"></path></svg></button>
+            <button onClick="{{ p.add }}" style="flex:1;min-width:0;height:42px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 8px;white-space:nowrap;transition:all .2s;background:{{ p.cartBg }};color:{{ p.cartFg }};" style-hover="background:rgba(241,23,99,0.1);color:rgb(241,23,99);"><span>{{ p.cart }}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg></button>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+    <div style="display:flex;justify-content:center;align-items:center;gap:8px;" dir="rtl">
+      <sc-for list="{{ pages }}" as="pg" hint-placeholder-count="3">
+        <button onClick="{{ pg.go }}" style="width:32px;height:32px;border-radius:8px;border:0;cursor:pointer;font-family:inherit;font-size:16px;box-shadow:inset 0 0 0 1px rgb(230,233,243);transition:all .2s;background:{{ pg.bg }};color:{{ pg.fg }};" style-hover="box-shadow:inset 0 0 0 1px rgb(241,23,99);">{{ pg.n }}</button>
+      </sc-for>
+      <span style="color:rgb(179,179,181);font-size:16px;">...</span>
+      <button style="width:32px;height:32px;border-radius:8px;border:0;cursor:pointer;font-family:inherit;font-size:16px;background:rgb(255,255,255);color:rgb(47,47,51);box-shadow:inset 0 0 0 1px rgb(230,233,243);" style-hover="box-shadow:inset 0 0 0 1px rgb(241,23,99);">۵۸</button>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ is.grid }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="{{ grid.title }}" style="display:flex;flex-direction:column;gap:20px;">
+    <div style="min-height:63px;display:flex;align-items:center;gap:2px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;">
+      <span style="position:relative;width:78px;height:55px;flex-shrink:0;"><svg width="78" height="55" viewBox="0 0 78 55" fill="rgb(241,23,99)" style="display:block;"><path d="M 49.407 0 C 44.382 0 39.65 2.36 36.627 6.374 L 19.302 29.374 C 11.361 39.917 18.883 55 32.083 55 L 62 55 C 70.837 55 78 47.837 78 39 L 78 16 C 78 7.163 70.837 0 62 0 Z"></path></svg><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="rgb(255,255,255)" stroke-width="1.5" stroke-linejoin="round" style="position:absolute;left:42px;top:17px;"><path d="{{ grid.icon }}"></path></svg></span>
+      <h2 style="margin:0;font-size:20px;font-weight:700;line-height:1;">{{ grid.title }}</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:20px;">
+      <sc-for list="{{ grid.items }}" as="p" hint-placeholder-count="8">
+        <article style="border-radius:24px;background:rgb(255,255,255);box-shadow:inset 0 0 0 2px rgb(230,233,243);padding:12px 12px 16px;display:flex;flex-direction:column;gap:24px;transition:box-shadow .2s,transform .2s;" style-hover="box-shadow:inset 0 0 0 2px rgb(241,23,99),0 16px 40px rgba(0,0,0,0.06);transform:translateY(-4px);">
+          <div style="display:flex;flex-direction:column;gap:20px;flex:1;">
+            <div style="aspect-ratio:208/200;border-radius:24px;background:rgb(248,248,248);display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;"><div role="img" aria-label="{{ p.name }}" style="width:100%;height:100%;background:url({{ p.img }}) center/contain no-repeat;mix-blend-mode:darken;"></div></div>
+            <h3 style="margin:0;font-size:16px;font-weight:400;line-height:1.5;text-wrap:pretty;">{{ p.name }}</h3>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <button onClick="{{ p.toggle }}" style="width:40px;height:40px;flex-shrink:0;border-radius:12px;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;background:{{ p.markBg }};color:{{ p.markFg }};box-shadow:inset 0 0 0 1px rgb(241,23,99);" style-hover="box-shadow:inset 0 0 0 1px rgb(241,23,99),0 8px 20px rgba(253,86,144,0.35);"><svg width="20" height="20" viewBox="0 0 20 20" fill="{{ p.markFill }}" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="{{ grid.icon }}"></path></svg></button>
+            <button onClick="{{ p.add }}" style="flex:1;min-width:0;height:42px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 8px;white-space:nowrap;transition:all .2s;background:{{ p.cartBg }};color:{{ p.cartFg }};" style-hover="background:rgba(241,23,99,0.1);color:rgb(241,23,99);"><span>{{ p.cart }}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v8M8 12h8"></path></svg></button>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ is.empty }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Empty state" style="display:flex;flex-direction:column;gap:20px;">
+    <sc-if value="{{ empty.hasHeader }}">
+      <div style="min-height:63px;display:flex;align-items:center;gap:2px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;">
+        <span style="position:relative;width:78px;height:55px;flex-shrink:0;"><svg width="78" height="55" viewBox="0 0 78 55" fill="rgb(241,23,99)" style="display:block;"><path d="M 49.407 0 C 44.382 0 39.65 2.36 36.627 6.374 L 19.302 29.374 C 11.361 39.917 18.883 55 32.083 55 L 62 55 C 70.837 55 78 47.837 78 39 L 78 16 C 78 7.163 70.837 0 62 0 Z"></path></svg><svg width="20" height="20" viewBox="0 0 40 40" fill="none" stroke="rgb(255,255,255)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:42px;top:17px;"><path d="M3.333 5h1.6c.95 0 1.77.67 1.96 1.6l3.2 15.7c.2.93 1.02 1.6 1.97 1.6h15.73c.86 0 1.62-.55 1.9-1.37l4.17-12.2c.44-1.3-.53-2.66-1.9-2.66H8"></path><circle cx="12.5" cy="32.5" r="2.2"></circle><circle cx="27.5" cy="32.5" r="2.2"></circle></svg></span>
+        <div style="display:flex;flex-direction:column;gap:8px;"><h2 style="margin:0;font-size:20px;font-weight:700;line-height:1;">{{ empty.title }}</h2><span style="font-size:12px;line-height:1;">مرسوله ۰ از ۰</span></div>
+      </div>
+    </sc-if>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:32px 24px;padding-top:24px;">
+      <div style="flex:1 1 340px;max-width:559px;position:relative;aspect-ratio:559/554;">
+        <svg viewBox="0 0 559 554" style="position:absolute;inset:0;width:100%;height:100%;display:block;"><path fill="rgb(241,23,99)" d="M 0 40 C 0 17.909 17.909 0 40 0 L 519 0 C 541.091 0 559 17.909 559 40 L 559 449.684 C 559 477.22 531.826 496.522 505.826 487.453 L 26.826 320.376 C 10.762 314.773 0 299.621 0 282.607 L 0 40 Z"></path><path fill="rgb(0,0,0)" d="M 0 382 C 0 352 28 332 56 342 L 537 515 C 566 526 560 554 530 554 L 40 554 C 17.909 554 0 536.091 0 514 Z"></path></svg>
+        <div style="position:absolute;left:8%;bottom:0;width:84%;height:112%;background:url({{ empty.img }}) bottom center/contain no-repeat;filter:drop-shadow(0 20px 30px rgba(0,0,0,0.15));pointer-events:none;"></div>
+      </div>
+      <div style="flex:1 1 280px;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center;">
+        <p style="margin:0;font-family:HastiFaNum,'Yekan Bakh FaNum',sans-serif;font-weight:900;font-size:clamp(26px,3vw,36px);line-height:1.3;letter-spacing:-0.04em;max-width:414px;text-wrap:balance;">{{ empty.text }}</p>
+        <a href="#" style="width:233px;height:48px;border-radius:12px;background:linear-gradient(90deg,rgb(241,23,99),rgb(251,57,124));box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);display:flex;align-items:center;justify-content:space-between;padding:8px 16px;color:rgb(255,255,255);font-size:12px;font-weight:600;transition:all .2s;" style-hover="transform:translateY(-2px);box-shadow:inset 0 0 0 1px rgb(241,23,99),0 24px 44px rgba(253,86,144,0.45);color:rgb(255,255,255);"><span>رفتن به فروشگاه</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"></path></svg></a>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ is.orders }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Orders" style="display:flex;flex-direction:column;gap:20px;">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding-top:20px;">
+      <sc-for list="{{ statusTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.pick }}" style="position:relative;width:202px;height:112px;border:0;background:none;padding:0;cursor:pointer;font-family:inherit;transition:transform .2s;" style-hover="transform:translateY(-4px);">
+          <svg width="202" height="112" viewBox="0 0 202 112" style="position:absolute;inset:0;display:block;" fill="{{ t.fill }}"><path d="M 0 77.781 C 0 48.007 35.391 32.437 57.34 52.554 L 64.284 58.918 C 71.359 65.403 80.608 69 90.205 69 L 111.795 69 C 121.392 69 130.641 65.403 137.716 58.918 C 162.323 36.365 202 53.821 202 87.2 L 202 96.667 C 202 105.135 195.135 112 186.667 112 L 34.219 112 C 15.321 112 0 96.679 0 77.781 Z"></path></svg>
+          <span style="position:absolute;left:35px;top:8px;width:132px;height:92px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;">
+            <span style="width:60px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:{{ t.iconBg }};">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="rgb(241,23,99)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.333 5h1.6c.95 0 1.77.67 1.96 1.6l3.2 15.7c.2.93 1.020 1.6 1.97 1.6h15.73c.86 0 1.62-.55 1.9-1.37l4.17-12.2c.44-1.3-.53-2.66-1.9-2.66H8"></path><circle cx="12.5" cy="32.5" r="2.2"></circle><circle cx="27.5" cy="32.5" r="2.2"></circle><sc-if value="{{ t.isCheck }}"><path d="M18.333 15.8l2.2 2.2 4.467-4.467"></path></sc-if><sc-if value="{{ t.isCross }}"><path d="M19.167 13.333l5 5m0-5l-5 5"></path></sc-if></svg>
+            </span>
+            <span style="font-size:14px;font-weight:600;line-height:1;color:rgb(255,255,255);white-space:nowrap;">{{ t.label }}</span>
+          </span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="min-height:63px;display:flex;align-items:center;gap:2px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;">
+      <span style="position:relative;width:78px;height:55px;flex-shrink:0;"><svg width="78" height="55" viewBox="0 0 78 55" fill="rgb(241,23,99)" style="display:block;"><path d="M 49.407 0 C 44.382 0 39.65 2.36 36.627 6.374 L 19.302 29.374 C 11.361 39.917 18.883 55 32.083 55 L 62 55 C 70.837 55 78 47.837 78 39 L 78 16 C 78 7.163 70.837 0 62 0 Z"></path></svg><svg width="20" height="20" viewBox="0 0 40 40" fill="none" stroke="rgb(255,255,255)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:42px;top:17px;"><path d="M3.333 5h1.6c.95 0 1.77.67 1.96 1.6l3.2 15.7c.2.93 1.02 1.6 1.97 1.6h15.73c.86 0 1.62-.55 1.9-1.37l4.17-12.2c.44-1.3-.53-2.66-1.9-2.66H8"></path><circle cx="12.5" cy="32.5" r="2.2"></circle><circle cx="27.5" cy="32.5" r="2.2"></circle></svg></span>
+      <h2 style="margin:0;font-size:20px;font-weight:700;line-height:1;">{{ tabTitle }}</h2>
+    </div>
+    <sc-for list="{{ orders }}" as="o" hint-placeholder-count="2">
+      <article onClick="{{ o.open }}" style="cursor:pointer;border-radius:24px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgb(230,233,243);padding:12px;display:flex;flex-wrap:wrap;gap:20px;transition:box-shadow .2s;" style-hover="box-shadow:inset 0 0 0 1.5px rgb(241,23,99),0 16px 40px rgba(0,0,0,0.05);">
+        <div style="width:180px;height:200px;flex-shrink:0;border-radius:24px;background:rgb(248,248,248);display:flex;align-items:center;justify-content:center;padding:20px;"><div style="width:100%;height:100%;background:url({{ o.img }}) center/contain no-repeat;mix-blend-mode:darken;"></div></div>
+        <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:16px;padding-block:4px;">
+          <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;font-size:14px;font-weight:300;line-height:1.6;"><span>{{ o.time }}</span><span>{{ o.ship }}</span><span>{{ o.code }}</span></div>
+          <h3 style="margin:0;font-size:16px;font-weight:400;line-height:1.5;">{{ o.name }}</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="height:48px;border-radius:16px;background:rgba(239,240,244,0.6);padding:10px 12px;display:flex;align-items:center;gap:16px;">
+              <span style="height:16px;padding:0 4px;border-radius:17px;background:rgb(227,19,54);color:rgb(255,255,255);font-size:12px;font-weight:600;display:flex;align-items:center;">{{ o.off }}</span>
+              <span style="font-size:18px;font-weight:600;white-space:nowrap;">{{ o.price }} <span style="font-size:12px;font-weight:400;">تومان</span></span>
+            </div>
+            <button onClick="{{ print }}" title="پرینت" style="width:40px;height:40px;border-radius:12px;border:0;cursor:pointer;background:rgb(241,23,99);display:flex;align-items:center;justify-content:center;transition:all .2s;" style-hover="box-shadow:0 8px 20px rgba(253,86,144,0.4);transform:translateY(-2px);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="rgb(255,255,255)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15H3.333a1.667 1.667 0 0 1-1.666-1.667V6.667A1.667 1.667 0 0 1 3.333 5h13.334a1.667 1.667 0 0 1 1.666 1.667v6.666A1.667 1.667 0 0 1 16.667 15H15M5 5V3.333c0-.92.746-1.666 1.667-1.666h6.666c.92 0 1.667.746 1.667 1.666V5M5 11.667h10v5c0 .92-.746 1.666-1.667 1.666H6.667c-.92 0-1.667-.746-1.667-1.666zM7.5 14.167h5"></path></svg></button>
+          </div>
+        </div>
+      </article>
+    </sc-for>
+  </div>
+</sc-if>
+<sc-if value="{{ is.detail }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Order detail" style="display:flex;flex-direction:column;gap:20px;">
+    <div style="min-height:63px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;padding-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:2px;">
+        <span style="width:78px;height:55px;flex-shrink:0;"><svg width="78" height="55" viewBox="0 0 78 55" fill="rgb(241,23,99)" style="display:block;"><path d="M 49.407 0 C 44.382 0 39.65 2.36 36.627 6.374 L 19.302 29.374 C 11.361 39.917 18.883 55 32.083 55 L 62 55 C 70.837 55 78 47.837 78 39 L 78 16 C 78 7.163 70.837 0 62 0 Z"></path></svg></span>
+        <h2 style="margin:0;font-size:20px;font-weight:700;line-height:1;">جزییات محصول</h2>
+      </div>
+      <button onClick="{{ print }}" style="width:233px;height:48px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;background:linear-gradient(90deg,rgb(241,23,99),rgb(251,57,124));box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);display:flex;align-items:center;justify-content:space-between;padding:8px 16px;color:rgb(255,255,255);font-size:12px;font-weight:600;transition:all .2s;" style-hover="transform:translateY(-2px);"><span>پرینت</span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15H3.333a1.667 1.667 0 0 1-1.666-1.667V6.667A1.667 1.667 0 0 1 3.333 5h13.334a1.667 1.667 0 0 1 1.666 1.667v6.666A1.667 1.667 0 0 1 16.667 15H15M5 5V3.333c0-.92.746-1.666 1.667-1.666h6.666c.92 0 1.667.746 1.667 1.666V5M5 11.667h10v5c0 .92-.746 1.666-1.667 1.666H6.667c-.92 0-1.667-.746-1.667-1.666zM7.5 14.167h5"></path></svg></button>
+    </div>
+    <sc-for list="{{ details }}" as="d" hint-placeholder-count="3">
+      <article style="border-radius:24px;background:rgb(255,255,255);box-shadow:inset 0 0 0 2px rgb(241,23,99);padding:16px 20px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px 24px;font-size:14px;font-weight:300;line-height:1.6;transition:box-shadow .2s;" style-hover="box-shadow:inset 0 0 0 1.5px rgb(241,23,99);">
+        <span>{{ d.time }}</span><span>{{ d.ship }}</span><span>{{ d.code }}</span>
+        <span>فرستنده : الانو شاپ</span><span>شماره الانو شاپ : 021-123456789</span><span>کد ملی : 1743566788</span>
+        <span>مبلغ کل : ۲,۱۶۰,۰۰۰ تومان</span><span>هزینه بسته بندی : ۱۸۰,۰۰۰ تومان</span><span>آدرس : تهران،قیطریه،خیابان بهار</span>
+      </article>
+    </sc-for>
+  </div>
+</sc-if>
+<sc-if value="{{ is.profile }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Profile" style="display:flex;flex-direction:column;gap:20px;">
+    <div style="min-height:63px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;padding:0 12px 4px 0;">
+      <div style="display:flex;align-items:center;gap:8px;"><img src="components/assets/352b67f25f17040b.jpg" alt="الناز حسینی" style="width:60px;height:60px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgb(230,233,243);"><span style="font-size:16px;font-weight:700;letter-spacing:-0.05em;">الناز حسینی</span></div>
+      <button title="ذخیره شده ها" onClick="{{ goSaved }}" style="width:40px;height:40px;border-radius:12px;border:0;cursor:pointer;background:rgb(241,23,99);display:flex;align-items:center;justify-content:center;transition:all .2s;" style-hover="box-shadow:0 8px 20px rgba(253,86,144,0.4);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="rgb(255,255,255)" stroke-width="1.5" stroke-linejoin="round"><path d="M4.167 4.167c0-.92.746-1.667 1.666-1.667h8.334c.92 0 1.666.746 1.666 1.667V17.5L10 13.75 4.167 17.5z"></path></svg></button>
+    </div>
+    <form style="border-radius:40px;background:linear-gradient(117.869deg,rgb(239,240,244) 4.15%,rgb(255,255,255) 100%);box-shadow:inset 0 0 0 1px rgb(244,245,249),0 0 80px rgba(0,0,0,0.08);padding:clamp(24px,5vw,54px) clamp(20px,9vw,95px);display:flex;flex-direction:column;gap:48px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;">
+        <sc-for list="{{ fields }}" as="f" hint-placeholder-count="6">
+          <label style="display:flex;flex-direction:column;gap:20px;font-size:14px;font-weight:600;color:rgb(66,66,66);">{{ f.label }}<input type="{{ f.type }}" placeholder="{{ f.ph }}" style="height:56px;border-radius:12px;border:1px solid rgba(179,179,181,0.4);background:transparent;padding:14px 16px;font-size:12px;color:rgb(47,47,51);outline:none;transition:border-color .2s,box-shadow .2s;" style-hover="border-color:rgba(241,23,99,0.5);" style-focus="border-color:rgb(241,23,99);box-shadow:0 0 0 3px rgba(241,23,99,0.12);"></label>
+        </sc-for>
+      </div>
+      <button type="button" style="width:233px;height:48px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;background:linear-gradient(90deg,rgb(241,23,99),rgb(251,57,124));box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);display:flex;align-items:center;justify-content:space-between;padding:8px 16px;color:rgb(255,255,255);font-size:12px;font-weight:600;transition:all .2s;" style-hover="transform:translateY(-2px);"><span>ذخیره</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"></path></svg></button>
+    </form>
+  </div>
+</sc-if>
+<sc-if value="{{ is.wallet }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Wallet" style="display:flex;flex-direction:column;gap:20px;">
+    <div style="min-height:63px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgb(230,233,243);border-right:1px solid rgb(230,233,243);border-bottom-right-radius:20px;padding-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:2px;"><span style="position:relative;width:78px;height:55px;"><svg width="78" height="55" viewBox="0 0 78 55" fill="rgb(241,23,99)" style="display:block;"><path d="M 49.407 0 C 44.382 0 39.65 2.36 36.627 6.374 L 19.302 29.374 C 11.361 39.917 18.883 55 32.083 55 L 62 55 C 70.837 55 78 47.837 78 39 L 78 16 C 78 7.163 70.837 0 62 0 Z"></path></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgb(255,255,255)" stroke-width="1.5" style="position:absolute;left:42px;top:17px;"><rect x="2.5" y="5" width="19" height="15" rx="3"></rect><path d="M21.5 10h-4a2.5 2.5 0 0 0 0 5h4"></path></svg></span><h2 style="margin:0;font-size:20px;font-weight:700;line-height:1;">کیف پول</h2></div>
+      <button onClick="{{ print }}" style="width:233px;height:48px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;background:linear-gradient(90deg,rgb(241,23,99),rgb(251,57,124));box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);display:flex;align-items:center;justify-content:space-between;padding:8px 16px;color:rgb(255,255,255);font-size:12px;font-weight:600;" style-hover="transform:translateY(-2px);"><span>پرینت</span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15H3.333a1.667 1.667 0 0 1-1.666-1.667V6.667A1.667 1.667 0 0 1 3.333 5h13.334a1.667 1.667 0 0 1 1.666 1.667v6.666A1.667 1.667 0 0 1 16.667 15H15M5 5V3.333c0-.92.746-1.666 1.667-1.666h6.666c.92 0 1.667.746 1.667 1.666V5M5 11.667h10v5c0 .92-.746 1.666-1.667 1.666H6.667c-.92 0-1.667-.746-1.667-1.666z"></path></svg></button>
+    </div>
+    <section style="border-radius:24px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgb(230,233,243);padding:20px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;">
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <span style="font-size:14px;font-weight:300;">موجودی کیف پول</span>
+        <strong style="font-size:20px;font-weight:700;">۲,۴۵۰,۰۰۰ تومان</strong>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;">
+          <button onClick="{{ goDeposit }}" style="height:48px;padding:0 24px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:rgb(255,255,255);background:linear-gradient(90deg,rgb(241,23,99),rgb(251,57,124));box-shadow:0 12px 28px rgba(253,86,144,0.3);transition:transform .2s;" style-hover="transform:translateY(-2px);">افزایش موجودی</button>
+          <button onClick="{{ goWithdraw }}" style="height:48px;padding:0 40px;border-radius:12px;border:1px solid rgb(241,23,99);cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:rgb(241,23,99);background:rgb(255,255,255);transition:all .2s;" style-hover="background:rgba(241,23,99,0.08);">برداشت</button>
+        </div>
+      </div>
+      <img src="components/assets/f42c575205896b59.png" alt="" style="width:clamp(120px,22vw,180px);height:auto;object-fit:contain;">
+    </section>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
+      <sc-for list="{{ stats }}" as="st" hint-placeholder-count="3">
+        <div style="border-radius:24px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgb(230,233,243);padding:20px;display:flex;flex-direction:column;gap:16px;transition:box-shadow .2s;" style-hover="box-shadow:inset 0 0 0 1.5px rgb(241,23,99);">
+          <div style="display:flex;align-items:center;gap:10px;"><span style="width:36px;height:36px;border-radius:50%;background:rgb(239,240,244);display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgb(0,0,0)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{ st.icon }}"></path></svg></span><span style="font-size:16px;font-weight:500;">{{ st.label }}</span></div>
+          <strong style="font-size:16px;font-weight:700;">{{ st.value }}</strong>
+        </div>
+      </sc-for>
+    </div>
+    <section style="border-radius:24px;background:rgb(255,255,255);box-shadow:inset 0 0 0 1px rgb(230,233,243);padding:20px 24px;display:flex;flex-direction:column;gap:20px;">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+        <h3 style="margin:0;font-size:16px;font-weight:600;">تاریخچه تراکنش‌ها</h3>
+        <div style="display:flex;gap:4px;padding:4px;border-radius:12px;background:rgb(244,245,249);">
+          <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="3"><button onClick="{{ r.go }}" style="height:32px;padding:0 14px;border-radius:9px;border:0;cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;transition:all .2s;background:{{ r.bg }};color:{{ r.fg }};" style-hover="box-shadow:inset 0 0 0 1px rgb(241,23,99);">{{ r.label }}</button></sc-for>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;min-width:560px;border-collapse:collapse;font-size:12px;text-align:right;">
+          <thead><tr style="color:rgb(47,47,51);font-weight:600;"><th style="padding:12px 8px;font-weight:600;">شرح تراکنش</th><th style="padding:12px 8px;font-weight:600;">تاریخ</th><th style="padding:12px 8px;font-weight:600;">مبلغ</th><th style="padding:12px 8px;font-weight:600;">نوع تراکنش</th><th style="padding:12px 8px;font-weight:600;">وضعیت</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ tx }}" as="x" hint-placeholder-count="3">
+              <tr style="border-top:1px solid rgb(239,240,244);transition:background .2s;" style-hover="background:rgb(248,248,248);"><td style="padding:14px 8px;">{{ x.d }}</td><td style="padding:14px 8px;">{{ x.t }}</td><td style="padding:14px 8px;">{{ x.a }}</td><td style="padding:14px 8px;color:rgb(241,23,99);">{{ x.k }}</td><td style="padding:14px 8px;"><span style="display:inline-flex;padding:6px 10px;border-radius:8px;background:rgb(241,23,99);color:rgb(255,255,255);font-weight:600;">موفق</span></td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</sc-if>
+<sc-if value="{{ is.walletForm }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Wallet form" style="border-radius:40px;background:linear-gradient(117.869deg,rgb(239,240,244) 4.15%,rgb(255,255,255) 100%);box-shadow:inset 0 0 0 1px rgb(244,245,249),0 0 80px rgba(0,0,0,0.08);padding:clamp(32px,7vw,80px) 20px;display:flex;justify-content:center;">
+    <form style="width:100%;max-width:368px;display:flex;flex-direction:column;gap:20px;">
+      <sc-if value="{{ is.withdraw }}"><div style="display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;"><span style="font-size:14px;font-weight:300;">موجودی کیف پول</span><strong style="font-size:20px;font-weight:700;">۲,۴۵۰,۰۰۰ تومان</strong></div></sc-if>
+      <sc-for list="{{ walletFields }}" as="f" hint-placeholder-count="1">
+        <label style="display:flex;flex-direction:column;gap:20px;font-size:14px;font-weight:600;color:rgb(66,66,66);">{{ f.label }}<input placeholder="{{ f.ph }}" inputmode="numeric" style="height:56px;border-radius:12px;border:1px solid rgba(179,179,181,0.4);background:transparent;padding:14px 16px;font-size:12px;color:rgb(47,47,51);outline:none;transition:border-color .2s,box-shadow .2s;" style-hover="border-color:rgba(241,23,99,0.5);" style-focus="border-color:rgb(241,23,99);box-shadow:0 0 0 3px rgba(241,23,99,0.12);"></label>
+      </sc-for>
+      <button type="button" style="align-self:center;margin-top:28px;width:233px;height:48px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;background:linear-gradient(90deg,rgb(241,23,99),rgb(251,57,124));box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);display:flex;align-items:center;justify-content:space-between;padding:8px 16px;color:rgb(255,255,255);font-size:12px;font-weight:600;transition:all .2s;" style-hover="transform:translateY(-2px);"><span>{{ walletCta }}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"></path></svg></button>
+      <button type="button" onClick="{{ goWallet }}" style="align-self:center;border:0;background:none;cursor:pointer;font-family:inherit;font-size:12px;color:rgb(47,47,51);" style-hover="color:rgb(241,23,99);">بازگشت به کیف پول</button>
+    </form>
+  </div>
+</sc-if>
+</div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;emptyStates&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;حالت‌ها&quot;}}">
+class Component extends DCLogic {
+  state = { s: localStorage.getItem('elano-v2') || 'dash', tab: 0, wl: [], sv: [], range: 0, page: 1 };
+  go(s) { localStorage.setItem('elano-v2', s); this.setState({ s }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  renderVals() {
+    const s = this.state.s;
+    const active = { profile: 'profile', orders: 'orders', detail: 'orders', saved: 'saved', wallet: 'wallet', deposit: 'wallet', withdraw: 'wallet', wishlist: 'wishlist' }[s];
+    const items = [['profile', 'اطلاعات حساب کاربری'], ['orders', 'سفارشات'], ['saved', 'ذخیره شده ها'], ['wallet', 'کیف پول'], ['wishlist', 'علاقمندی ها'], ['logout', 'خروج']];
+    const A = 'components/assets/';
+    const prods = [
+      ['اسپری نرم کننده مو کودک 150 میل بیبی فرست', '2a5963fd2ec46d8c.png'],
+      ['ریمل پیپا مدل Legendary Lashes 503', 'ff69e331165e3819.png'],
+      ['اسپری نرم کننده مو کودک 150 میل بیبی فرست', '38178af60c34ce30.png'],
+      ['ریمل پیپا مدل Legendary Lashes 503', 'a3413780eb2b49c8.png'],
+      ['اسپری نرم کننده مو کودک 150 میل بیبی فرست', '38178af60c34ce30.png'],
+      ['ادو پرفیوم زنانه پینک ویژوال مدل Poison Girl حجم 100 میل', '75c6b8a5990fac57.png'],
+      ['فلوئید ضد آفتاب رنگی آردن با SPF 50 حجم 75 میلی لیتر', '5d69704775688cf8.png'],
+      ['ادوپرفیوم زنانه تیستو مدل Viola حجم 120 میلی لیتر', '2a5963fd2ec46d8c.png']
+    ];
+    const empty = this.props.emptyStates ?? false;
+    const mk = (n, kind) => prods.slice(0, n).map(([name, img], i) => {
+      const key = kind + i; const on = this.state[key];
+      return { name, img: A + img, toggle: () => this.setState({ [key]: !on }),
+        added: on ? 'به سبد اضافه شد' : 'افزودن به سبد خرید',
+        addBg: on ? 'rgba(241,23,99,0.1)' : 'rgba(239,240,244,0.6)', addFg: on ? 'rgb(241,23,99)' : 'rgb(47,47,51)',
+        add: () => this.setState({ ['c' + key]: !this.state['c' + key] }),
+        cart: this.state['c' + key] ? 'به سبد اضافه شد ✓' : 'افزودن به سبد خرید',
+        cartBg: this.state['c' + key] ? 'rgba(241,23,99,0.1)' : 'rgba(239,240,244,0.6)',
+        cartFg: this.state['c' + key] ? 'rgb(241,23,99)' : 'rgb(47,47,51)',
+        markBg: on ? 'rgb(255,255,255)' : 'rgb(241,23,99)', markFg: on ? 'rgb(241,23,99)' : 'rgb(255,255,255)', markFill: on ? 'currentColor' : 'none' };
+    });
+    const tabs = [['محصولات جاری', 'cart'], ['محصولات تحویل شده', 'check'], ['محصولات مرجوع شده', 'cross'], ['محصولات لغو شده', 'cross']];
+    const order = { code: 'KFH-249822 : کد مرسوله', ship: 'نوع ارسال : پست', time: 'زمان تحویل : دوشنبه 7 مهر1405-ساعت13:13', name: 'ادوپرفیوم زنانه تیستو مدل Viola حجم 120 میلی لیتر', price: '۲,۱۶۰,۰۰۰', off: '12%', img: A + '2a5963fd2ec46d8c.png', open: () => this.go('detail') };
+    const ranges = ['شش ماهه', 'سه ماهه', 'ماهانه'];
+    const SAVED = 'M4.167 4.167c0-.92.746-1.667 1.666-1.667h8.334c.92 0 1.666.746 1.666 1.667V17.5L10 13.75 4.167 17.5z';
+    const HEART = 'M10 17.083S1.667 12.6 1.667 7.25C1.667 4.8 3.55 2.737 5.9 2.737c1.75 0 3.25 1 4.1 2.45.85-1.45 2.35-2.45 4.1-2.45 2.35 0 4.233 2.063 4.233 4.513 0 5.35-8.333 9.833-8.333 9.833z';
+    const grid = s === 'wishlist' ? { title: 'علاقمندی ها', icon: HEART, items: mk(8, 'w') } : { title: 'ذخیره شده ها', icon: SAVED, items: mk(8, 's') };
+    const emptyMap = {
+      orders: { hasHeader: true, title: 'سفارشات جاری', text: 'سبد سفارشات شما خالی است', img: 'assets/7bee830843511480.png' },
+      saved: { hasHeader: true, title: 'سفارشات ذخیره شده', text: 'شما هیچ محصولی را ذخیره نکرده اید', img: 'assets/dddbfcaec39e7d44.png' },
+      wishlist: { hasHeader: false, title: '', text: 'شما هیچ محصولی را به علاقه مندی خود اضافه نکرده اید', img: 'assets/47d0b1f2ea25a90c.png' }
+    };
+    const grp = { grid, empty: emptyMap[s] || emptyMap.orders };
+    const wd = s === 'withdraw';
+    return {
+      ...grp,
+      fields: [['نام', 'نام خود را وارد کنید.', 'text'], ['نام خانوادگی', 'نام خانوادگی خود را وارد کنید.', 'text'], ['شماره همراه', 'شماره همراه خود را وارد کنید.', 'tel'], ['ایمیل', 'ایمیل خود را وارد کنید.', 'email'], ['رمز عبور', 'رمز عبور خود را وارد کنید.', 'password'], ['تکرار رمز عبور', 'رمز عبور جدید خود را وارد کنید.', 'password']].map(([label, ph, type]) => ({ label, ph, type })),
+      walletFields: wd ? [{ label: 'مبلغ برداشت (تومان)', ph: 'مثلا 50.000.000 تومان' }, { label: 'شماره شبا', ph: 'مثلا IR 602521500000055588900001' }] : [{ label: 'مبلغ (تومان)', ph: 'مثلا 50.000.000 تومان' }],
+      walletCta: wd ? 'برداشت' : 'رفتن به درگاه',
+      stats: [
+        { label: 'مجموع واریز', value: '۳,۸۰۰,۰۰۰ تومان', icon: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM14.5 9.5c0-1.1-1.12-2-2.5-2s-2.5.9-2.5 2 1.12 1.75 2.5 2 2.5.9 2.5 2-1.12 2-2.5 2-2.5-.9-2.5-2M12 6v1.5M12 16.5V18' },
+        { label: 'مجموع پرداخت', value: '۱,۳۵۰,۰۰۰ تومان', icon: 'M2 8.5h20M6 16.5h2M10.5 16.5h4M6.44 3.5h11.11C21.11 3.5 22 4.38 22 7.89v8.21c0 3.51-.89 4.39-4.44 4.39H6.44C2.89 20.5 2 19.62 2 16.11V7.89C2 4.38 2.89 3.5 6.44 3.5z' }
+      ],
+      is: { grid: (s === 'saved' || s === 'wishlist') && !empty, empty: empty && !!emptyMap[s], dash: s === 'dash', profile: s === 'profile', orders: s === 'orders' && !empty, ordersEmpty: s === 'orders' && empty, detail: s === 'detail', saved: s === 'saved' && !empty, savedEmpty: s === 'saved' && empty, wallet: s === 'wallet', deposit: s === 'deposit', withdraw: s === 'withdraw', walletForm: s === 'deposit' || s === 'withdraw', wishlist: s === 'wishlist' && !empty, wishlistEmpty: s === 'wishlist' && empty },
+      statusTabs: tabs.map(([label, icon], i) => {
+        const on = i === this.state.tab;
+        return { label, isCart: icon === 'cart', isCheck: icon === 'check', isCross: icon === 'cross', fill: on ? 'rgb(241,23,99)' : 'rgb(0,0,0)', iconBg: on ? 'rgb(253,232,240)' : 'rgb(234,234,235)', pick: () => { this.setState({ tab: i }); if (s !== 'dash') this.go('orders'); } };
+      }),
+      tabTitle: tabs[this.state.tab][0].replace('محصولات', 'سفارشات'),
+      dashProducts: mk(4, 's'), savedProducts: mk(8, 's'), wishProducts: mk(8, 'w'),
+      orders: [order, order], details: [0, 1, 2].map(() => ({ ...order, open: undefined })),
+      pages: [1, 2, 3].map(p => ({ n: ['۱', '۲', '۳'][p - 1], go: () => this.setState({ page: p }), bg: this.state.page === p ? 'rgb(241,23,99)' : 'rgb(255,255,255)', fg: this.state.page === p ? 'rgb(255,255,255)' : 'rgb(47,47,51)' })),
+      ranges: ranges.map((label, i) => ({ label, go: () => this.setState({ range: i }), bg: this.state.range === i ? 'rgb(241,23,99)' : 'transparent', fg: this.state.range === i ? 'rgb(255,255,255)' : 'rgb(47,47,51)' })),
+      tx: [0, 1, 2, 3].map(() => ({ d: 'افزایش موجودی کیف پول', t: '۱۴۰۵/۰۷/۱۲', a: '۱,۰۰۰,۰۰۰ تومان', k: 'واریز' })),
+      goOrders: () => this.go('orders'), goSaved: () => this.go('saved'), goDeposit: () => this.go('deposit'), goWithdraw: () => this.go('withdraw'), goWallet: () => this.go('wallet'),
+      print: () => window.print(),
+      goDash: () => this.go('dash'),
+      pageTitle: { deposit: 'افزایش موجودی', withdraw: 'برداشت' }[s] || 'پیشخوان',
+      menu: items.map(([k, label]) => {
+        const on = k === active;
+        return {
+          label, go: () => k !== 'logout' && this.go(k),
+          bg: on ? 'linear-gradient(90deg,rgb(241,23,99),rgb(251,57,124))' : 'transparent',
+          fg: on ? 'rgb(255,255,255)' : (k === 'logout' ? 'rgb(227,19,54)' : 'rgb(47,47,51)'),
+          shadow: on ? 'inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3)' : 'inset 0 0 0 1px rgb(239,240,244)'
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

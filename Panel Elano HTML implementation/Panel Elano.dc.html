@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="components/fig-tokens.css">
+<link rel="stylesheet" href="components/fig-typography.css">
+<link rel="stylesheet" href="components/fig-assets.css">
+<style>
+@font-face{font-family:"Yekan Bakh FaNum";font-weight:100 900;src:local("Yekan Bakh FaNum"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/fonts/webfonts/Vazirmatn-FD[wght].woff2") format("woff2"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn[wght].woff2") format("woff2");}
+@font-face{font-family:"IRANSansXFaNum";font-weight:100 900;src:local("IRANSansXFaNum"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/fonts/webfonts/Vazirmatn-FD[wght].woff2") format("woff2");}
+@font-face{font-family:"HastiFaNum";font-weight:100 900;src:local("HastiFaNum"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/fonts/webfonts/Vazirmatn-FD[wght].woff2") format("woff2");}
+body{margin:0;background:rgb(244,245,249);}
+a{color:rgb(241,23,99);}a:hover{color:rgb(227,19,54);}
+</style>
+</helmet>
+<div style="min-height:100vh;background:rgb(244,245,249);font-family:'Yekan Bakh FaNum',sans-serif;">
+  <nav dir="rtl" style="position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px;background:rgb(255,255,255);box-shadow:inset 0 -1px 0 rgb(230,233,243);">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="13">
+      <button onClick="{{ t.go }}" style="border:0;cursor:pointer;padding:8px 14px;border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;background:{{ t.bg }};color:{{ t.fg }};">{{ t.label }}</button>
+    </sc-for>
+  </nav>
+  <svg width="0" height="0" style="position:absolute;"><defs><linearGradient id="elanoBlobGrad" x1="0.055" y1="0.271" x2="0.945" y2="0.729"><stop offset="0.0122" stop-color="rgb(241,23,99)"></stop><stop offset="1" stop-color="rgb(251,57,124)"></stop></linearGradient></defs></svg>
+  <div style="overflow-x:auto;">
+    <div style="width:1440px;margin:0 auto;">
+      <x-import component-from-global-scope="{{ active }}" from="./components/Components.bundle.js" hint-size="1440px,1216px"></x-import>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { i: Number(localStorage.getItem('elano-screen') || 0) };
+  screens = [
+    ['Dashboard','پیشخوان ۱'],['Dashboard2','پیشخوان ۲'],['Dashboard3','پیشخوان ۳'],['Dashboard4','پیشخوان ۴'],
+    ['Dashboard5','پیشخوان ۵'],['Dashboard6','پیشخوان ۶'],['Dashboard7','پیشخوان ۷'],['Dashboard8','پیشخوان ۸'],
+    ['Wallet','کیف پول ۱'],['Wallet2','کیف پول ۲'],['Wallet3','کیف پول ۳'],['Wishlist','علاقمندی ها ۱'],['Wishlist2','علاقمندی ها ۲']
+  ];
+  go(i) { localStorage.setItem('elano-screen', i); this.setState({ i }); window.scrollTo(0, 0); }
+  renderVals() {
+    const i = Math.min(this.state.i, this.screens.length - 1);
+    return {
+      active: this.screens[i][0],
+      tabs: this.screens.map(([, label], k) => ({
+        label, go: () => this.go(k),
+        bg: k === i ? 'rgb(241,23,99)' : 'rgb(244,245,249)',
+        fg: k === i ? 'rgb(255,255,255)' : 'rgb(47,47,51)'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
