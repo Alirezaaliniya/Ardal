@@ -12,7 +12,7 @@ use Elementor\Group_Control_Typography;
 
 class Ardal_Widget_Post_Comments extends Ardal_Widget_Base {
 	public function get_name() { return 'ardal-post-comments'; }
-	public function get_title() { return 'اردال — نظرات نوشته'; }
+	public function get_title() { return 'اردال — نظرات نوشته/محصول'; }
 	public function get_icon() { return 'eicon-comments'; }
 	public function get_keywords() { return array( 'اردال', 'نظرات', 'دیدگاه', 'کامنت', 'comments' ); }
 	public function get_script_depends() { return array( 'ardal', 'ardal-post-comments' ); }
@@ -39,6 +39,7 @@ class Ardal_Widget_Post_Comments extends Ardal_Widget_Base {
 		$this->add_control( 'submit_text', array( 'label' => 'متن دکمه ارسال', 'type' => Controls_Manager::TEXT, 'default' => 'ارسال' ) );
 		$this->add_control( 'empty_text', array( 'label' => 'متن حالت بدون دیدگاه', 'type' => Controls_Manager::TEXT, 'default' => 'هنوز دیدگاهی ثبت نشده است.' ) );
 		$this->add_control( 'closed_text', array( 'label' => 'متن بسته بودن دیدگاه‌ها', 'type' => Controls_Manager::TEXT, 'default' => 'ثبت دیدگاه برای این نوشته بسته است.' ) );
+		$this->add_control( 'show_verified', array( 'label' => 'نشان خریدار تأییدشده در محصولات', 'type' => Controls_Manager::SWITCHER, 'default' => 'yes', 'return_value' => 'yes' ) );
 		$this->add_control( 'title_tag', array( 'label' => 'تگ عنوان', 'type' => Controls_Manager::SELECT, 'default' => 'h3', 'options' => array( 'h2' => 'H2', 'h3' => 'H3', 'h4' => 'H4', 'div' => 'DIV' ) ) );
 		$this->end_controls_section();
 
@@ -70,7 +71,7 @@ class Ardal_Widget_Post_Comments extends Ardal_Widget_Base {
 		$this->add_control( 'text_color', array( 'label' => 'رنگ متن دیدگاه', 'type' => Controls_Manager::COLOR, 'default' => '#77777e', 'selectors' => array( '{{WRAPPER}} .ard-comments__text' => 'color:{{VALUE}};' ) ) );
 		$this->add_group_control( Group_Control_Typography::get_type(), array( 'name' => 'text_typography', 'selector' => '{{WRAPPER}} .ard-comments__text' ) );
 		$this->add_control( 'meta_color', array( 'label' => 'رنگ تاریخ و پاسخ', 'type' => Controls_Manager::COLOR, 'default' => '#77777e', 'selectors' => array( '{{WRAPPER}} .ard-comments__meta, {{WRAPPER}} .ard-comments__reply' => 'color:{{VALUE}};' ) );
-		$this->add_control( 'accent_color', array( 'label' => 'رنگ اصلی و آیکون فعال', 'type' => Controls_Manager::COLOR, 'default' => '#f20d5b', 'selectors' => array( '{{WRAPPER}} .ard-comments__reaction.is-active, {{WRAPPER}} .ard-comments__submit, {{WRAPPER}} .ard-comments__icon-accent' => 'color:{{VALUE}};' ) ) );
+		$this->add_control( 'accent_color', array( 'label' => 'رنگ اصلی و آیکون فعال', 'type' => Controls_Manager::COLOR, 'default' => '#f20d5b', 'selectors' => array( '{{WRAPPER}} .ard-comments__reaction.is-active, {{WRAPPER}} .ard-comments__submit, {{WRAPPER}} .ard-comments__icon-accent, {{WRAPPER}} .ard-comments__rating-stars span, {{WRAPPER}} .ard-comments__rating-display' => 'color:{{VALUE}};' ) ) );
 		$this->add_responsive_control( 'card_gap', array( 'label' => 'فاصله دیدگاه‌ها', 'type' => Controls_Manager::SLIDER, 'size_units' => array( 'px' ), 'range' => array( 'px' => array( 'min' => 4, 'max' => 60 ) ), 'default' => array( 'unit' => 'px', 'size' => 24 ), 'selectors' => array( '{{WRAPPER}} .ard-comments__list' => 'gap:{{SIZE}}{{UNIT}};' ) ) );
 		$this->add_responsive_control( 'card_radius', array( 'label' => 'گردی کارت', 'type' => Controls_Manager::DIMENSIONS, 'size_units' => array( 'px', '%' ), 'default' => array( 'top' => 24, 'right' => 24, 'bottom' => 24, 'left' => 24, 'unit' => 'px', 'isLinked' => true ), 'selectors' => array( '{{WRAPPER}} .ard-comments__card' => 'border-radius:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ) ) );
 		$this->add_responsive_control( 'avatar_size_style', array( 'label' => 'قطر آواتار', 'type' => Controls_Manager::SLIDER, 'size_units' => array( 'px' ), 'range' => array( 'px' => array( 'min' => 24, 'max' => 160 ) ), 'default' => array( 'unit' => 'px', 'size' => 64 ), 'selectors' => array( '{{WRAPPER}} .ard-comments__avatar, {{WRAPPER}} .ard-comments__avatar img' => 'width:{{SIZE}}{{UNIT}};height:{{SIZE}}{{UNIT}};' ) ) );
@@ -90,43 +91,56 @@ class Ardal_Widget_Post_Comments extends Ardal_Widget_Base {
 
 	protected function render() {
 		$s = $this->get_settings_for_display();
-		$post_id = is_singular( 'post' ) ? (int) get_queried_object_id() : (int) get_the_ID();
-		if ( ! $post_id || 'post' !== get_post_type( $post_id ) ) {
-			$this->render_empty( 'این ویجت را در قالب نوشته تکی قرار دهید.' );
+		$post_id = is_singular( array( 'post', 'product' ) ) ? (int) get_queried_object_id() : (int) get_the_ID();
+		$post_type = $post_id ? get_post_type( $post_id ) : '';
+		if ( ! $post_id || ! in_array( $post_type, array( 'post', 'product' ), true ) ) {
+			$this->render_empty( 'این ویجت را در قالب نوشته یا محصول تکی قرار دهید.' );
 			return;
 		}
+		$is_product = 'product' === $post_type;
 		$limit = max( 1, min( 100, (int) $s['limit'] ) );
 		$order = 'DESC' === $s['order'] ? 'DESC' : 'ASC';
 		$all = get_comments( array( 'post_id' => $post_id, 'status' => 'approve', 'orderby' => 'comment_date_gmt', 'order' => $order, 'number' => 0, 'hierarchical' => false ) );
+		if ( $is_product ) {
+			$all = array_values( array_filter( $all, static function ( $comment ) { return in_array( $comment->comment_type, array( 'review', 'comment', '' ), true ); } ) );
+		}
 		$tree = array();
 		foreach ( $all as $comment ) { $tree[ (int) $comment->comment_parent ][] = $comment; }
 		$roots = isset( $tree[0] ) ? array_slice( $tree[0], 0, $limit ) : array();
-		$total = get_comments_number( $post_id );
+		$product = $is_product && function_exists( 'wc_get_product' ) ? wc_get_product( $post_id ) : false;
+		$total = $product ? $product->get_review_count() : get_comments_number( $post_id );
+		$ratings_enabled = $is_product && function_exists( 'wc_review_ratings_enabled' ) && wc_review_ratings_enabled();
+		$rating_required = $ratings_enabled && function_exists( 'wc_review_ratings_required' ) && wc_review_ratings_required();
+		$verified_only = $is_product && 'yes' === get_option( 'woocommerce_review_rating_verification_required' );
+		$guest_allowed = 'yes' === $s['allow_guest'] && ! get_option( 'comment_registration' ) && ! $verified_only;
+		$can_review_product = ! $verified_only || ( is_user_logged_in() && function_exists( 'wc_customer_bought_product' ) && wc_customer_bought_product( wp_get_current_user()->user_email, get_current_user_id(), $post_id ) );
 		$style = $this->asset_vars( $s );
 		$id = 'ard-comments-' . $this->get_id();
 		$tag = in_array( $s['title_tag'], array( 'h2', 'h3', 'h4', 'div' ), true ) ? $s['title_tag'] : 'h3';
 		?>
-		<section id="<?php echo esc_attr( $id ); ?>" class="ard-comments" data-ard-comments data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( Ardal_Comments::NONCE_ACTION ) ); ?>" data-post-id="<?php echo esc_attr( $post_id ); ?>" style="<?php echo esc_attr( $style ); ?>">
+		<section id="<?php echo esc_attr( $id ); ?>" class="ard-comments<?php echo $is_product ? ' ard-comments--product' : ''; ?>" data-ard-comments data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( Ardal_Comments::NONCE_ACTION ) ); ?>" data-post-id="<?php echo esc_attr( $post_id ); ?>" style="<?php echo esc_attr( $style ); ?>">
 			<header class="ard-comments__header"><span class="ard-comments__header-icon" aria-hidden="true"><?php echo Ardal_Helpers::icon( 'mail', 28 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><<?php echo esc_html( $tag ); ?> class="ard-comments__heading"><?php echo esc_html( $s['heading'] ); ?></<?php echo esc_html( $tag ); ?>><?php if ( 'yes' === $s['show_count'] ) : ?><span class="ard-comments__count"><?php echo esc_html( number_format_i18n( $total ) ); ?></span><?php endif; ?></header>
 			<div class="ard-comments__rule"></div>
 			<?php if ( $roots ) : ?><ol class="ard-comments__list"><?php foreach ( $roots as $comment ) { $this->render_comment( $comment, $tree, 0, (int) $s['reply_depth'], $s ); } ?></ol><?php else : ?><p class="ard-comments__empty"><?php echo esc_html( $s['empty_text'] ); ?></p><?php endif; ?>
-			<?php if ( comments_open( $post_id ) && ( ( 'yes' === $s['allow_guest'] && ! get_option( 'comment_registration' ) ) || is_user_logged_in() ) ) : ?>
+			<?php if ( comments_open( $post_id ) && ( $guest_allowed || ( is_user_logged_in() && $can_review_product ) ) ) : ?>
 				<div class="ard-comments__form-wrap" style="<?php echo esc_attr( $this->asset_vars( $s, 'form' ) ); ?>">
 					<div class="ard-comments__form-heading"><span class="ard-comments__form-icon" aria-hidden="true"><?php echo Ardal_Helpers::icon( 'mail', 26 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><h3 class="ard-comments__form-title"><?php echo esc_html( $s['form_title'] ); ?></h3></div>
 					<div class="ard-comments__replying" data-replying hidden><span></span><button type="button" data-cancel-reply>لغو پاسخ</button></div>
 					<form class="ard-comments__form" data-comment-form>
+						<input type="hidden" name="comment_post_ID" value="<?php echo esc_attr( $post_id ); ?>">
 						<?php if ( ! is_user_logged_in() ) : ?><div class="ard-comments__fields">
 							<label><span>نام</span><input name="first_name" type="text" autocomplete="given-name" placeholder="نام" required></label>
 							<label><span>نام خانوادگی</span><input name="last_name" type="text" autocomplete="family-name" placeholder="نام خانوادگی" required></label>
 							<?php if ( 'yes' === $s['show_phone'] ) : ?><label><span>شماره تماس</span><input name="phone" type="tel" autocomplete="tel" placeholder="شماره تماس"></label><?php endif; ?>
 							<?php if ( 'yes' === $s['show_email'] || get_option( 'require_name_email' ) ) : ?><label><span>ایمیل</span><input name="email" type="email" autocomplete="email" placeholder="ایمیل" <?php echo get_option( 'require_name_email' ) ? 'required' : ''; ?>></label><?php endif; ?>
 						</div><?php endif; ?>
+						<?php if ( $ratings_enabled ) : ?><fieldset class="ard-comments__rating" data-product-rating><legend>امتیاز شما<?php echo $rating_required ? ' <span aria-hidden="true">*</span>' : ''; ?></legend><div class="ard-comments__rating-stars" dir="rtl"><?php for ( $star = 5; $star >= 1; $star-- ) : ?><label><input type="radio" name="rating" value="<?php echo esc_attr( $star ); ?>" <?php echo $rating_required ? 'required' : ''; ?>><span aria-label="<?php echo esc_attr( $star . ' از ۵ ستاره' ); ?>">★</span></label><?php endfor; ?></div></fieldset><?php endif; ?>
 						<label class="ard-comments__message"><span>پیام</span><textarea name="content" rows="5" placeholder="پیام خود را بنویسید..." required></textarea></label>
 						<div class="ard-comments__honeypot" aria-hidden="true"><label>Website<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
 						<div class="ard-comments__form-footer"><button class="ard-comments__submit" type="submit"><?php echo esc_html( $s['submit_text'] ); ?><span aria-hidden="true">←</span></button><span class="ard-comments__status" data-form-status role="status" aria-live="polite"></span></div>
 					</form>
 				</div>
-			<?php elseif ( ! comments_open( $post_id ) ) : ?><p class="ard-comments__closed"><?php echo esc_html( $s['closed_text'] ); ?></p><?php else : ?><p class="ard-comments__closed">برای ثبت دیدگاه وارد حساب کاربری خود شوید.</p><?php endif; ?>
+			<?php elseif ( ! comments_open( $post_id ) ) : ?><p class="ard-comments__closed"><?php echo esc_html( $s['closed_text'] ); ?></p><?php elseif ( $verified_only && ! $can_review_product ) : ?><p class="ard-comments__closed">برای ثبت نظر باید با حساب خریدارِ تأییدشده وارد شوید.</p><?php else : ?><p class="ard-comments__closed">برای ثبت دیدگاه وارد حساب کاربری خود شوید.</p><?php endif; ?>
 		</section>
 		<?php
 	}
@@ -137,10 +151,12 @@ class Ardal_Widget_Post_Comments extends Ardal_Widget_Base {
 		$votes = get_comment_meta( $comment->comment_ID, '_ardal_comment_votes', true ); $votes = is_array( $votes ) ? $votes : array();
 		$likes = count( array_filter( $votes, static function ( $v ) { return 'like' === $v; } ) ); $dislikes = count( array_filter( $votes, static function ( $v ) { return 'dislike' === $v; } ) );
 		$avatar = get_avatar( $comment, max( 24, min( 160, (int) $s['avatar_size'] ) ), '', '', array( 'class' => 'ard-comments__avatar-image' ) );
+		$rating = (int) get_comment_meta( $comment->comment_ID, 'rating', true );
+		$is_product_review = 'product' === get_post_type( $comment->comment_post_ID );
 		?>
 		<li class="ard-comments__item" id="comment-<?php echo esc_attr( $comment->comment_ID ); ?>"><article class="ard-comments__card" data-comment-id="<?php echo esc_attr( $comment->comment_ID ); ?>" style="<?php echo esc_attr( $this->asset_vars( $s, 'comment' ) ); ?>">
-			<div class="ard-comments__identity" style="<?php echo esc_attr( $this->asset_vars( $s, 'author' ) ); ?>"><?php if ( 'yes' === $s['show_avatar'] ) : ?><span class="ard-comments__avatar"><?php echo $avatar; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><?php endif; ?><strong class="ard-comments__author"><?php echo esc_html( get_comment_author( $comment ) ); ?></strong></div>
-			<div class="ard-comments__body"><div class="ard-comments__text"><?php comment_text( $comment ); ?></div><div class="ard-comments__actions">
+			<div class="ard-comments__identity" style="<?php echo esc_attr( $this->asset_vars( $s, 'author' ) ); ?>"><?php if ( 'yes' === $s['show_avatar'] ) : ?><span class="ard-comments__avatar"><?php echo $avatar; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span><?php endif; ?><span class="ard-comments__author-wrap"><strong class="ard-comments__author"><?php echo esc_html( get_comment_author( $comment ) ); ?></strong><?php if ( $is_product_review && 'yes' === $s['show_verified'] && function_exists( 'wc_review_is_from_verified_owner' ) && wc_review_is_from_verified_owner( $comment->comment_ID ) ) : ?><span class="ard-comments__verified">خریدار تأییدشده</span><?php endif; ?></span></div>
+			<div class="ard-comments__body"><?php if ( $is_product_review && $rating > 0 ) : ?><div class="ard-comments__rating-display" aria-label="امتیاز <?php echo esc_attr( $rating ); ?> از ۵"><span><?php echo esc_html( str_repeat( '★', $rating ) . str_repeat( '☆', 5 - $rating ) ); ?></span></div><?php endif; ?><div class="ard-comments__text"><?php comment_text( $comment ); ?></div><div class="ard-comments__actions">
 				<?php if ( 'yes' === $s['show_date'] ) : ?><span class="ard-comments__meta"><span aria-hidden="true">◷</span><?php echo esc_html( $date ); ?></span><?php endif; ?>
 				<?php if ( 'yes' === $s['enable_reply'] && $depth < $max_depth && comments_open( $comment->comment_post_ID ) ) : ?><button class="ard-comments__reply" type="button" data-reply-to="<?php echo esc_attr( $comment->comment_ID ); ?>" data-author="<?php echo esc_attr( get_comment_author( $comment ) ); ?>">پاسخ</button><?php endif; ?>
 				<?php if ( 'yes' === $s['enable_reactions'] ) : ?><div class="ard-comments__reactions"><button class="ard-comments__reaction" type="button" data-reaction="like" aria-label="پسندیدن"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10v11H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3Zm0 0 5-8a3 3 0 0 1 2 3l-1 5h6a3 3 0 0 1 3 3l-2 7a3 3 0 0 1-3 2H7"/></svg><b data-vote-count="likes"><?php echo esc_html( $likes ); ?></b></button><button class="ard-comments__reaction" type="button" data-reaction="dislike" aria-label="نپسندیدن"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14V3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3Zm0 0 5 8a3 3 0 0 0 2-3l-1-5h6a3 3 0 0 0 3-3l-2-7a3 3 0 0 0-3-2H7"/></svg><b data-vote-count="dislikes"><?php echo esc_html( $dislikes ); ?></b></button></div><?php endif; ?>

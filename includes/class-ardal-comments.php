@@ -26,12 +26,13 @@ final class Ardal_Comments {
 		}
 		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 		$post    = get_post( $post_id );
-		if ( ! $post || 'post' !== $post->post_type || ( 'publish' !== $post->post_status && ! current_user_can( 'read_post', $post_id ) ) || ! comments_open( $post_id ) ) {
+		if ( ! $post || ! in_array( $post->post_type, array( 'post', 'product' ), true ) || ( 'publish' !== $post->post_status && ! current_user_can( 'read_post', $post_id ) ) || ! comments_open( $post_id ) ) {
 			wp_send_json_error( array( 'message' => 'ارسال دیدگاه برای این نوشته ممکن نیست.' ), 400 );
 		}
 		if ( ! empty( $_POST['website'] ) ) {
 			wp_send_json_error( array( 'message' => 'درخواست معتبر نیست.' ), 400 );
 		}
+		$is_product = 'product' === $post->post_type;
 
 		$parent_id = isset( $_POST['parent_id'] ) ? absint( $_POST['parent_id'] ) : 0;
 		if ( $parent_id ) {
@@ -59,6 +60,22 @@ final class Ardal_Comments {
 			}
 		}
 
+		$rating = 0;
+		if ( $is_product && function_exists( 'wc_review_ratings_enabled' ) && wc_review_ratings_enabled() ) {
+			$rating = isset( $_POST['rating'] ) ? absint( wp_unslash( $_POST['rating'] ) ) : 0;
+			if ( function_exists( 'wc_review_ratings_required' ) && wc_review_ratings_required() && ( $rating < 1 || $rating > 5 ) ) {
+				wp_send_json_error( array( 'message' => 'برای این محصول یک امتیاز انتخاب کنید.' ), 400 );
+			}
+			if ( $rating && ( $rating < 1 || $rating > 5 ) ) {
+				wp_send_json_error( array( 'message' => 'امتیاز انتخاب‌شده معتبر نیست.' ), 400 );
+			}
+		}
+		if ( $is_product && 'yes' === get_option( 'woocommerce_review_rating_verification_required' ) ) {
+			if ( ! is_user_logged_in() || ! function_exists( 'wc_customer_bought_product' ) || ! wc_customer_bought_product( $email, get_current_user_id(), $post_id ) ) {
+				wp_send_json_error( array( 'message' => 'برای ثبت نظر باید با حساب خریدار تأییدشده وارد شوید.' ), 403 );
+			}
+		}
+
 		$content = isset( $_POST['content'] ) ? trim( wp_kses_post( wp_unslash( $_POST['content'] ) ) ) : '';
 		if ( '' === trim( wp_strip_all_tags( $content ) ) ) {
 			wp_send_json_error( array( 'message' => 'متن دیدگاه را بنویسید.' ), 400 );
@@ -82,6 +99,9 @@ final class Ardal_Comments {
 		}
 		if ( '' !== $phone ) {
 			update_comment_meta( $comment_id, 'ardal_author_phone', $phone );
+		}
+		if ( $is_product && $rating > 0 ) {
+			update_comment_meta( $comment_id, 'rating', $rating );
 		}
 		$comment = get_comment( $comment_id );
 		$message = '1' === $comment->comment_approved ? 'دیدگاه شما ثبت شد.' : 'دیدگاه شما ثبت شد و پس از تأیید نمایش داده می‌شود.';

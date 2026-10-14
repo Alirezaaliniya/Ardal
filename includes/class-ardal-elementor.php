@@ -115,7 +115,7 @@ class Ardal_Elementor {
 			'post-categories'    => 'دسته‌بندی نوشته‌ها',
 			'post-feed-tabs'     => 'تب‌های نوشته‌ها (ترند، تازه، دیدگاه)',
 			'latest-posts'      => 'آخرین مقالات',
-			'post-comments'     => 'نظرات نوشته',
+			'post-comments'     => 'نظرات نوشته/محصول',
 			'toc'                 => 'فهرست ناحیه‌های صفحه',
 			'countdown'           => 'شمارش معکوس',
 			'support'             => 'دکمه شناور پشتیبانی',
