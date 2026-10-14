@@ -32,7 +32,7 @@ class Ardal_Archive {
 	/**
 	 * کلیدهایی که معنای ثابت دارند و نباید با کلید تاکسونومی اشتباه شوند.
 	 */
-	const RESERVED = array( 's', 'stock', 'sale', 'featured', 'rating', 'sort', 'view' );
+	const RESERVED = array( 's', 'stock', 'sale', 'featured', 'quick_term', 'rating', 'sort', 'view' );
 
 	/**
 	 * شناسه‌ای که در فیلد «Query ID» ویجت‌های المنتور نوشته می‌شود تا کوئری
@@ -427,6 +427,22 @@ class Ardal_Archive {
 		}
 
 		foreach ( self::switch_labels() as $key => $label ) {
+			if ( 'quick_term' === $key ) {
+				$value = self::param( self::PREFIX . 'quick_term' );
+				$parts = explode( '|', $value, 2 );
+				if ( 2 === count( $parts ) && taxonomy_exists( $parts[0] ) && is_object_in_taxonomy( 'product', $parts[0] ) ) {
+					$term = get_term_by( 'slug', $parts[1], $parts[0] );
+					if ( $term instanceof WP_Term ) {
+						$taxonomy_object = get_taxonomy( $parts[0] );
+						$out[] = array(
+							'group' => $taxonomy_object && ! empty( $taxonomy_object->labels->singular_name ) ? $taxonomy_object->labels->singular_name : '',
+							'label' => $term->name,
+							'url'   => self::url_with( array( self::PREFIX . 'quick_term' => null ) ),
+						);
+					}
+				}
+				continue;
+			}
 			if ( ! self::is_on( $key ) ) {
 				continue;
 			}
@@ -469,6 +485,7 @@ class Ardal_Archive {
 			'stock'    => 'فقط کالاهای موجود',
 			'sale'     => 'کالاهای تخفیف‌دار',
 			'featured' => 'محصولات ویژه',
+			'quick_term' => 'زود مصرف',
 		);
 	}
 
@@ -612,6 +629,21 @@ class Ardal_Archive {
 				'terms'    => 'featured',
 				'operator' => 'IN',
 			);
+		}
+
+		/* --------------------------------------------- ÙÛŒÙ„ØªØ± Ù…Ø­ØµÙˆÙ„ Ø³ÙØ§Ø±Ø´ÛŒ */
+		$quick_term = self::param( self::PREFIX . 'quick_term' );
+		$quick_parts = explode( '|', $quick_term, 2 );
+		if ( 2 === count( $quick_parts ) && taxonomy_exists( $quick_parts[0] ) && is_object_in_taxonomy( 'product', $quick_parts[0] ) ) {
+			$quick = get_term_by( 'slug', $quick_parts[1], $quick_parts[0] );
+			if ( $quick instanceof WP_Term ) {
+				$tax_query[] = array(
+					'taxonomy'         => $quick_parts[0],
+					'field'            => 'slug',
+					'terms'            => $quick->slug,
+					'include_children' => true,
+				);
+			}
 		}
 
 		/* --------------------------------------------- امتیاز */

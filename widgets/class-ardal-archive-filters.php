@@ -200,7 +200,7 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 				'label'     => 'کدام کلیدها',
 				'type'      => Controls_Manager::SELECT2,
 				'multiple'  => true,
-				'default'   => array( 'stock', 'sale' ),
+				'default'   => array( 'stock', 'sale', 'quick_term' ),
 				'options'   => Ardal_Archive::switch_labels(),
 				'condition' => array( 'type' => 'switch' ),
 			)
@@ -233,6 +233,28 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 				'type'      => Controls_Manager::TEXT,
 				'default'   => 'محصولات ویژه',
 				'condition' => array( 'type' => 'switch' ),
+			)
+		);
+
+		$repeater->add_control(
+			'quick_term_label',
+			array(
+				'label'     => 'عنوان کلید «زود مصرف»',
+				'type'      => Controls_Manager::TEXT,
+				'default'   => 'زود مصرف',
+				'condition' => array( 'type' => 'switch' ),
+			)
+		);
+
+		$repeater->add_control(
+			'quick_term_value',
+			array(
+				'label'       => 'ویژگی/دسته مربوط به «زود مصرف»',
+				'type'        => Controls_Manager::SELECT2,
+				'options'     => $this->quick_term_options(),
+				'label_block' => true,
+				'description' => 'از میان برچسب‌ها، دسته‌ها یا ویژگی‌های تعریف‌شده برای محصولات انتخاب کنید.',
+				'condition'   => array( 'type' => 'switch' ),
 			)
 		);
 
@@ -307,7 +329,7 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 						'type'        => 'switch',
 						'label'       => 'فیلتر سریع',
 						'open'        => 'yes',
-						'switch_keys' => array( 'stock', 'sale' ),
+						'switch_keys' => array( 'stock', 'sale', 'quick_term' ),
 					),
 					array(
 						'type'         => 'price',
@@ -963,13 +985,18 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 			'stock'    => $box['stock_label'],
 			'sale'     => $box['sale_label'],
 			'featured' => $box['featured_label'],
+			'quick_term' => isset( $box['quick_term_label'] ) ? $box['quick_term_label'] : 'زود مصرف',
 		);
+		$values = array( 'quick_term' => isset( $box['quick_term_value'] ) ? $box['quick_term_value'] : '' );
 
 		$title  = '' !== trim( (string) $box['label'] ) ? $box['label'] : 'فیلتر سریع';
 		$chosen = 0;
 
 		foreach ( $keys as $key ) {
-			$chosen += Ardal_Archive::is_on( $key ) ? 1 : 0;
+			if ( 'quick_term' === $key && empty( $values[ $key ] ) ) {
+				continue;
+			}
+			$chosen += ( 'quick_term' === $key ? Ardal_Archive::param( Ardal_Archive::PREFIX . $key ) === $values[ $key ] : Ardal_Archive::is_on( $key ) ) ? 1 : 0;
 		}
 
 		$this->open_section( $box, $title, $chosen );
@@ -977,22 +1004,43 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		echo '<div class="ard-fil__switches">';
 
 		foreach ( $keys as $key ) {
+			if ( 'quick_term' === $key && empty( $values[ $key ] ) ) {
+				continue;
+			}
 			$label = isset( $labels[ $key ] ) && '' !== trim( (string) $labels[ $key ] )
 				? $labels[ $key ]
 				: ( Ardal_Archive::switch_labels()[ $key ] ?? $key );
 
 			printf(
-				'<label class="ard-fil__switch"><span class="ard-fil__switch-label">%s</span><input type="checkbox" name="%s%s" value="1"%s><span class="ard-fil__track" aria-hidden="true"><span class="ard-fil__dot"></span></span></label>',
+				'<label class="ard-fil__switch"><span class="ard-fil__switch-label">%s</span><input type="checkbox" name="%s%s" value="%s"%s><span class="ard-fil__track" aria-hidden="true"><span class="ard-fil__dot"></span></span></label>',
 				esc_html( $label ),
 				esc_attr( Ardal_Archive::PREFIX ),
 				esc_attr( $key ),
-				Ardal_Archive::is_on( $key ) ? ' checked' : ''
+				esc_attr( 'quick_term' === $key ? $values[ $key ] : '1' ),
+				( 'quick_term' === $key ? Ardal_Archive::param( Ardal_Archive::PREFIX . $key ) === $values[ $key ] : Ardal_Archive::is_on( $key ) ) ? ' checked' : ''
 			);
 		}
 
 		echo '</div>';
 
 		$this->close_section();
+	}
+
+	/** Product taxonomies and terms available to the custom quick switch. */
+	protected function quick_term_options() {
+		$options = array();
+		foreach ( array_keys( Ardal_Archive::taxonomy_options() ) as $taxonomy ) {
+			$object = get_taxonomy( $taxonomy );
+			$terms  = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false, 'number' => 500, 'orderby' => 'name', 'order' => 'ASC' ) );
+			if ( is_wp_error( $terms ) || ! is_array( $terms ) ) {
+				continue;
+			}
+			$group = $object && ! empty( $object->labels->singular_name ) ? $object->labels->singular_name : $taxonomy;
+			foreach ( $terms as $term ) {
+				$options[ $taxonomy . '|' . $term->slug ] = $group . ' — ' . $term->name;
+			}
+		}
+		return $options;
 	}
 
 	/**
