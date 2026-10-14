@@ -40,6 +40,7 @@ final class Ardal {
 		Ardal_Archive::init();
 		Ardal_Search::init();
 		Ardal_Wishlist::init();
+		Ardal_Comments::init();
 		Ardal_Wallet::init();
 
 		add_action( 'plugins_loaded', array( $this, 'boot_elementor' ) );

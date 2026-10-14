@@ -39,6 +39,7 @@ require_once ARDAL_PATH . 'includes/class-ardal-shop.php';
 require_once ARDAL_PATH . 'includes/class-ardal-archive.php';
 require_once ARDAL_PATH . 'includes/class-ardal-search.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wishlist.php';
+require_once ARDAL_PATH . 'includes/class-ardal-comments.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wallet.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wallet-checkout.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wallet-sms.php';

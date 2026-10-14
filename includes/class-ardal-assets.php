@@ -119,6 +119,7 @@ class Ardal_Assets {
 		wp_register_script( 'ardal-search', ARDAL_URL . 'assets/js/ardal-search.js', array(), self::ver( 'assets/js/ardal-search.js' ), true );
 		wp_register_script( 'ardal-search-results', ARDAL_URL . 'assets/js/ardal-search-results.js', array(), self::ver( 'assets/js/ardal-search-results.js' ), true );
 		wp_register_script( 'ardal-post-feed-tabs', ARDAL_URL . 'assets/js/ardal-post-feed-tabs.js', array(), self::ver( 'assets/js/ardal-post-feed-tabs.js' ), true );
+		wp_register_script( 'ardal-post-comments', ARDAL_URL . 'assets/js/ardal-post-comments.js', array(), self::ver( 'assets/js/ardal-post-comments.js' ), true );
 
 		/*
 		 * نانس و نشانی ایجکس فقط برای جست‌وجوی زنده. روی هندل خودش می‌نشیند تا
