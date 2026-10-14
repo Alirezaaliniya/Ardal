@@ -98,8 +98,12 @@
 	display: block;
 }
 
-.ard-el__hero path {
-	fill: var(--el-primary);
+.ard-el__g1 {
+	stop-color: var(--el-primary);
+}
+
+.ard-el__g2 {
+	stop-color: var(--el-primary-2);
 }
 
 /* نام کاربر روی سربرگ صورتی؛ دیزاین آن را خالی گذاشته بود. */
@@ -1181,7 +1185,7 @@
 }
 
 .ard-el__kind--out {
-	color: var(--el-text);
+	color: var(--el-primary);
 }
 
 .ard-el__pill {

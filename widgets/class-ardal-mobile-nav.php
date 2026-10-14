@@ -274,7 +274,7 @@ class Ardal_Widget_Mobile_Nav extends Ardal_Widget_Base {
 		$this->add_control( 'label_color', array( 'label' => 'رنگ عنوان عادی', 'type' => Controls_Manager::COLOR, 'selectors' => array( '{{WRAPPER}} .ard-mnav__label' => 'color:{{VALUE}};' ) ) );
 		$this->add_control( 'active_label_color', array( 'label' => 'رنگ عنوان فعال', 'type' => Controls_Manager::COLOR, 'selectors' => array( '{{WRAPPER}} .ard-mnav__item.is-active .ard-mnav__label' => 'color:{{VALUE}};' ) ) );
 		$this->add_control( 'badge_bg', array( 'label' => 'پس‌زمینه نشان عددی', 'type' => Controls_Manager::COLOR, 'default' => '#f20d5b', 'selectors' => array( '{{WRAPPER}} .ard-mnav__badge' => 'background-color:{{VALUE}};' ) ) );
-		$this->add_control( 'badge_color', array( 'label' => 'رنگ عدد نشان', 'type' => Controls_Manager::COLOR, 'default' => '#ffffff', 'selectors' => array( '{{WRAPPER}} .ard-mnav__badge' => 'color:{{VALUE}};' ) );
+		$this->add_control( 'badge_color', array( 'label' => 'رنگ عدد نشان', 'type' => Controls_Manager::COLOR, 'default' => '#ffffff', 'selectors' => array( '{{WRAPPER}} .ard-mnav__badge' => 'color:{{VALUE}};' ) ) );
 		$this->end_controls_section();
 	}
 

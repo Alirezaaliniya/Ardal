@@ -136,7 +136,7 @@ class Ardal_Account_Elano {
 	public static function icon( $name, $size = 20 ) {
 		$paths = array(
 			'chevron' => array( '0 0 24 24', 2, '<path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"/>' ),
-			'grid'    => array( '0 0 40 40', 1.6, '<circle cx="13" cy="13" r="5"/><circle cx="27" cy="13" r="5"/><circle cx="13" cy="27" r="5"/><circle cx="27" cy="27" r="5"/>' ),
+			'grid'    => array( '0 0 40 40', 1.6, '<circle cx="14" cy="14" r="4.2" fill="currentColor"/><circle cx="26" cy="14" r="4.2" fill="currentColor"/><circle cx="14" cy="26" r="4.2" fill="currentColor"/><circle cx="26" cy="26" r="4.2" fill="currentColor"/>' ),
 			'cart'    => array( '0 0 40 40', 2, '<path d="M3.333 5h1.6c.95 0 1.77.67 1.96 1.6l3.2 15.7c.2.93 1.02 1.6 1.97 1.6h15.73c.86 0 1.62-.55 1.9-1.37l4.17-12.2c.44-1.3-.53-2.66-1.9-2.66H8"/><circle cx="12.5" cy="32.5" r="2.2"/><circle cx="27.5" cy="32.5" r="2.2"/>' ),
 			'check'   => array( '0 0 40 40', 2, '<path d="M3.333 5h1.6c.95 0 1.77.67 1.96 1.6l3.2 15.7c.2.93 1.02 1.6 1.97 1.6h15.73c.86 0 1.62-.55 1.9-1.37l4.17-12.2c.44-1.3-.53-2.66-1.9-2.66H8"/><circle cx="12.5" cy="32.5" r="2.2"/><circle cx="27.5" cy="32.5" r="2.2"/><path d="M18.333 15.8l2.2 2.2 4.467-4.467"/>' ),
 			'cross'   => array( '0 0 40 40', 2, '<path d="M3.333 5h1.6c.95 0 1.77.67 1.96 1.6l3.2 15.7c.2.93 1.02 1.6 1.97 1.6h15.73c.86 0 1.62-.55 1.9-1.37l4.17-12.2c.44-1.3-.53-2.66-1.9-2.66H8"/><circle cx="12.5" cy="32.5" r="2.2"/><circle cx="27.5" cy="32.5" r="2.2"/><path d="M19.167 13.333l5 5m0-5l-5 5"/>' ),
@@ -277,7 +277,7 @@ class Ardal_Account_Elano {
 
 				<aside class="ard-el__side">
 					<div class="ard-el__hero" aria-hidden="true">
-						<svg viewBox="0 0 314 171" preserveAspectRatio="none"><path d="M 0 40 C 0 17.909 17.909 0 40 0 L 274 0 C 296.091 0 314 17.909 314 40 L 314 131 C 314 153.091 296.091 171 274 171 L 236.5 171 C 214.409 171 196.5 153.091 196.5 131 L 196.5 111.5 C 196.5 100.454 187.546 91.5 176.5 91.5 L 157.115 91.5 L 144 91.5 C 132.954 91.5 124 100.454 124 111.5 L 124 131 C 124 153.091 106.091 171 84 171 L 40 171 C 17.909 171 0 153.091 0 131 L 0 40 Z"/></svg>
+						<svg viewBox="0 0 314 171" preserveAspectRatio="none"><defs><linearGradient id="ard-el-hero-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0.012" class="ard-el__g1"/><stop offset="1" class="ard-el__g2"/></linearGradient></defs><path fill="url(#ard-el-hero-g)" d="M 0 40 C 0 17.909 17.909 0 40 0 L 274 0 C 296.091 0 314 17.909 314 40 L 314 131 C 314 153.091 296.091 171 274 171 L 236.5 171 C 214.409 171 196.5 153.091 196.5 131 L 196.5 111.5 C 196.5 100.454 187.546 91.5 176.5 91.5 L 157.115 91.5 L 144 91.5 C 132.954 91.5 124 100.454 124 111.5 L 124 131 C 124 153.091 106.091 171 84 171 L 40 171 C 17.909 171 0 153.091 0 131 L 0 40 Z"/></svg>
 						<span class="ard-el__hero-user">
 							<?php echo get_avatar( get_current_user_id(), 44, '', '', array( 'class' => 'ard-el__hero-avatar' ) ); ?>
 							<span class="ard-el__hero-name"><?php echo esc_html( Ardal_Account::name() ); ?></span>
@@ -915,12 +915,17 @@ class Ardal_Account_Elano {
 			array(
 				'label' => 'مجموع واریز',
 				'icon'  => 'coin',
-				'value' => $sum( array( Ardal_Wallet::TYPE_TOPUP, Ardal_Wallet::TYPE_ADMIN, Ardal_Wallet::TYPE_REFUND ), 'cr' ),
+				'value' => $sum( array( Ardal_Wallet::TYPE_TOPUP, Ardal_Wallet::TYPE_ADMIN ), 'cr' ),
 			),
 			array(
 				'label' => 'مجموع پرداخت',
 				'icon'  => 'card',
 				'value' => $sum( array( Ardal_Wallet::TYPE_ORDER ), 'dr' ),
+			),
+			array(
+				'label' => 'برگشت وجه',
+				'icon'  => 'again',
+				'value' => $sum( array( Ardal_Wallet::TYPE_REFUND ), 'cr' ),
 			),
 		);
 
@@ -991,9 +996,9 @@ class Ardal_Account_Elano {
 								?>
 								<tr>
 									<td data-label="شرح تراکنش"><?php echo esc_html( '' !== $tx['note'] ? $tx['note'] : Ardal_Wallet::type_label( $tx ) ); ?></td>
-									<td data-label="تاریخ"><?php echo esc_html( Ardal_Wallet::date( $tx['created_at'] ) ); ?></td>
+									<td data-label="تاریخ"><?php echo esc_html( Ardal_Jalali::format( (int) strtotime( $tx['created_at'] . ' UTC' ), 'numeric' ) ); ?></td>
 									<td data-label="مبلغ"><?php echo Ardal_Wallet::money( $tx['abs'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></td>
-									<td data-label="نوع تراکنش" class="ard-el__kind ard-el__kind--<?php echo $tx['is_credit'] ? 'in' : 'out'; ?>"><?php echo esc_html( $tx['is_credit'] ? 'واریز' : 'برداشت' ); ?></td>
+									<td data-label="نوع تراکنش" class="ard-el__kind ard-el__kind--<?php echo $tx['is_credit'] ? 'in' : 'out'; ?>"><?php echo esc_html( self::tx_kind( $tx ) ); ?></td>
 									<td data-label="وضعیت"><span class="ard-el__pill ard-el__pill--<?php echo esc_attr( $status['key'] ); ?>"><?php echo esc_html( $status['label'] ); ?></span></td>
 								</tr>
 							<?php endforeach; ?>
@@ -1004,6 +1009,28 @@ class Ardal_Account_Elano {
 			<?php endif; ?>
 		</section>
 		<?php
+	}
+
+	/**
+	 * نوع تراکنش به زبان دیزاین: واریز، پرداخت، برگشت وجه.
+	 *
+	 * @param array $tx
+	 * @return string
+	 */
+	private static function tx_kind( $tx ) {
+		$map = array(
+			Ardal_Wallet::TYPE_TOPUP    => 'واریز',
+			Ardal_Wallet::TYPE_ORDER    => 'پرداخت',
+			Ardal_Wallet::TYPE_REFUND   => 'برگشت وجه',
+			Ardal_Wallet::TYPE_CASHBACK => 'کش‌بگ',
+			Ardal_Wallet::TYPE_EXPIRE   => 'انقضای کش‌بگ',
+		);
+
+		if ( isset( $map[ $tx['type'] ] ) ) {
+			return $map[ $tx['type'] ];
+		}
+
+		return $tx['is_credit'] ? 'واریز' : 'برداشت';
 	}
 
 	/**
