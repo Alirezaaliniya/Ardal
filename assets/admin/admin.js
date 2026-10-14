@@ -280,11 +280,28 @@
 		return document.querySelector( 'input[type="checkbox"][name="' + name.replace( /"/g, '' ) + '"]' );
 	}
 
+	/*
+	 * وابستگی زنجیره‌ای است: «کد پترن» به تیک رویداد وابسته است و آن تیک
+	 * به «پیامک فعال است». فیلدی که کنترلش پنهان شده هم پنهان می‌شود، حتی
+	 * اگر تیک خودِ کنترل زده باشد.
+	 */
+	function visible( box ) {
+		var wrap = box && box.closest( '[data-ardal-show]' );
+
+		if ( ! box ) {
+			return true;
+		}
+
+		if ( ! box.checked ) {
+			return false;
+		}
+
+		return wrap ? visible( control( wrap.getAttribute( 'data-ardal-show' ) ) ) : true;
+	}
+
 	function sync() {
 		Array.prototype.forEach.call( fields, function ( field ) {
-			var box = control( field.getAttribute( 'data-ardal-show' ) );
-
-			field.hidden = !! box && ! box.checked;
+			field.hidden = ! visible( control( field.getAttribute( 'data-ardal-show' ) ) );
 		} );
 	}
 
@@ -339,5 +356,71 @@
 		} );
 
 		frame.open();
+	} );
+}() );
+
+/**
+ * پیامک آزمایشی کیف پول از درگاه نیاس، با مقادیری که هنوز در فرم است.
+ */
+( function () {
+	'use strict';
+
+	var cfg = window.ardalSmsTest;
+
+	if ( ! cfg ) {
+		return;
+	}
+
+	function field( event, suffix ) {
+		return document.querySelector( '[name="' + cfg.name + '[sms_' + event + suffix + ']"]' );
+	}
+
+	document.addEventListener( 'click', function ( e ) {
+		var button = e.target.closest( '[data-ardal-sms-send]' );
+		var wrap = button && button.closest( '[data-ardal-sms-test]' );
+
+		if ( ! wrap ) {
+			return;
+		}
+
+		e.preventDefault();
+
+		var event = wrap.getAttribute( 'data-ardal-sms-test' );
+		var out = wrap.querySelector( '[data-ardal-sms-out]' );
+		var phone = wrap.querySelector( '[data-ardal-sms-phone]' ).value;
+		var body = new window.FormData();
+
+		body.append( 'action', 'ardal_wallet_sms_test' );
+		body.append( 'nonce', cfg.nonce );
+		body.append( 'event', event );
+		body.append( 'phone', phone );
+
+		[ '_pattern', '_vars', '_text' ].forEach( function ( suffix ) {
+			var input = field( event, suffix );
+
+			if ( input ) {
+				body.append( suffix, input.value );
+			}
+		} );
+
+		button.disabled = true;
+		out.className = 'ardal-sms-test__out';
+		out.textContent = 'در حال ارسال…';
+
+		window.fetch( cfg.ajax, { method: 'POST', body: body, credentials: 'same-origin' } )
+			.then( function ( response ) {
+				return response.json();
+			} )
+			.then( function ( result ) {
+				out.textContent = ( result && result.data && result.data.message ) || 'پاسخ نامعتبر';
+				out.classList.add( result && result.success ? 'is-ok' : 'is-bad' );
+			} )
+			.catch( function () {
+				out.textContent = 'ارتباط با سرور ممکن نشد.';
+				out.classList.add( 'is-bad' );
+			} )
+			.then( function () {
+				button.disabled = false;
+			} );
 	} );
 }() );

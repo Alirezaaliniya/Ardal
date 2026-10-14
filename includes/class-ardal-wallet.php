@@ -72,6 +72,7 @@ class Ardal_Wallet {
 		Ardal_Wallet_Report::init();
 		Ardal_Wallet_Tools::init();
 		Ardal_Wallet_Render::init();
+		Ardal_Wallet_Sms::init();
 	}
 
 	/**
@@ -218,10 +219,19 @@ class Ardal_Wallet {
 			'sms_topup'          => '1',
 			'sms_admin'          => '1',
 			'sms_cashback'       => '0',
-			'sms_text'           => "کیف پول شما به مبلغ {amount} شارژ شد.\nموجودی فعلی: {balance}\n{site}",
-			'sms_url'            => '',
-			'sms_method'         => 'GET',
-			'sms_body'           => '',
+			/*
+			 * ارسال با درگاه نیاس لاگین است؛ اردال درگاه خودش را ندارد. هر رویداد
+			 * یا با پترن پنل پیامکی می‌رود (کد پترن پر باشد) یا با متن آزاد.
+			 */
+			'sms_topup_pattern'    => '',
+			'sms_topup_vars'       => 'amount:{amount_raw},balance:{balance_raw}',
+			'sms_topup_text'       => "کیف پول شما {amount} شارژ شد.\nموجودی فعلی: {balance}\n{site}",
+			'sms_admin_pattern'    => '',
+			'sms_admin_vars'       => 'amount:{amount_raw},balance:{balance_raw}',
+			'sms_admin_text'       => "{amount} به کیف پول شما اضافه شد.\nموجودی فعلی: {balance}\n{site}",
+			'sms_cashback_pattern' => '',
+			'sms_cashback_vars'    => 'amount:{amount_raw},balance:{balance_raw}',
+			'sms_cashback_text'    => "کش‌بگ خرید شما ({amount}) به کیف پول اضافه شد.\nموجودی فعلی: {balance}\n{site}",
 		);
 	}
 
@@ -339,12 +349,13 @@ class Ardal_Wallet {
 
 		$out['hero_image'] = isset( $raw['hero_image'] ) ? esc_url_raw( trim( (string) $raw['hero_image'] ) ) : '';
 
-		$out['sms_text'] = isset( $raw['sms_text'] ) ? sanitize_textarea_field( $raw['sms_text'] ) : $defaults['sms_text'];
-		$out['sms_url']  = isset( $raw['sms_url'] ) ? esc_url_raw( trim( (string) $raw['sms_url'] ) ) : '';
-		$out['sms_body'] = isset( $raw['sms_body'] ) ? sanitize_textarea_field( $raw['sms_body'] ) : '';
+		foreach ( array( 'topup', 'admin', 'cashback' ) as $event ) {
+			$key = 'sms_' . $event;
 
-		$method            = strtoupper( sanitize_key( $raw['sms_method'] ?? 'GET' ) );
-		$out['sms_method'] = in_array( $method, array( 'GET', 'POST' ), true ) ? $method : 'GET';
+			$out[ $key . '_pattern' ] = isset( $raw[ $key . '_pattern' ] ) ? sanitize_text_field( $raw[ $key . '_pattern' ] ) : '';
+			$out[ $key . '_vars' ]    = isset( $raw[ $key . '_vars' ] ) ? sanitize_text_field( $raw[ $key . '_vars' ] ) : $defaults[ $key . '_vars' ];
+			$out[ $key . '_text' ]    = isset( $raw[ $key . '_text' ] ) ? sanitize_textarea_field( $raw[ $key . '_text' ] ) : $defaults[ $key . '_text' ];
+		}
 
 		return $out;
 	}

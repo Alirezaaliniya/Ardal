@@ -138,25 +138,23 @@ class Ardal_Features_Settings {
 				),
 			),
 			'sms'      => array(
-				'title'  => 'پیامک',
-				'hint'   => 'اردال پنل پیامکی ندارد. یا نشانی وب‌سرویس پنل خود را اینجا بگذارید، یا از راه کد به اکشن ardal_wallet_sms وصل شوید. هیچ‌کدام نباشد، فقط پیامک ارسال نمی‌شود.',
+				'title'  => 'پیامک (از درگاه نیاس لاگین)',
+				'nias'   => true,
+				'hint'   => 'اردال درگاه پیامکی خودش را ندارد؛ پیامک‌ها با همان درگاه و حسابی می‌روند که در تنظیمات نیاس لاگین انتخاب شده و در «گزارش پیام‌ها»ی نیاس هم ثبت می‌شوند. کد پترن پر باشد با پترن ارسال می‌شود، خالی باشد با متن آزاد (بیشتر پنل‌ها متن آزاد را فقط از خط اختصاصی می‌فرستند).',
 				'fields' => array(
-					'sms_enabled'  => array( 'type' => 'checkbox', 'label' => 'پیامک کیف پول فعال است' ),
-					'sms_topup'    => array( 'type' => 'checkbox', 'label' => 'بعد از شارژ موفق توسط خود کاربر', 'show' => 'sms_enabled' ),
-					'sms_admin'    => array( 'type' => 'checkbox', 'label' => 'بعد از شارژ دستی یا گروهی توسط مدیر', 'show' => 'sms_enabled' ),
-					'sms_cashback' => array( 'type' => 'checkbox', 'label' => 'بعد از واریز کش‌بگ خرید', 'show' => 'sms_enabled' ),
-					'sms_text'     => array( 'type' => 'textarea', 'label' => 'متن پیامک', 'desc' => 'جای‌گذارها: {name} {amount} {balance} {site}', 'show' => 'sms_enabled' ),
-					'sms_url'      => array( 'type' => 'text', 'label' => 'نشانی وب‌سرویس پنل پیامک', 'desc' => 'جای‌گذارها: {phone} {text} و همهٔ جای‌گذارهای متن. مثال: https://api.example.com/send?to={phone}&msg={text}', 'show' => 'sms_enabled', 'ltr' => true ),
-					'sms_method'   => array(
-						'type'    => 'select',
-						'label'   => 'روش ارسال',
-						'show'    => 'sms_enabled',
-						'options' => array(
-							'GET'  => 'GET',
-							'POST' => 'POST',
-						),
-					),
-					'sms_body'     => array( 'type' => 'textarea', 'label' => 'بدنهٔ درخواست POST', 'desc' => 'JSON یا فرم؛ مثال: {"receptor":"{phone}","message":"{text}"}', 'show' => 'sms_enabled', 'ltr' => true ),
+					'sms_enabled'          => array( 'type' => 'checkbox', 'label' => 'پیامک کیف پول فعال است', 'desc' => 'ارسال در پس‌زمینه انجام می‌شود تا بازگشت از درگاه پرداخت و شارژ گروهی کند نشود.' ),
+					'sms_topup'               => array( 'type' => 'checkbox', 'label' => 'بعد از شارژ موفق توسط خود کاربر', 'show' => 'sms_enabled', 'group' => 'topup' ),
+					'sms_topup_pattern'       => array( 'type' => 'text', 'label' => 'کد پترن', 'desc' => 'خالی بماند، متن آزاد زیر فرستاده می‌شود.', 'show' => 'sms_topup', 'ltr' => true, 'test' => 'topup' ),
+					'sms_topup_vars'          => array( 'type' => 'text', 'label' => 'متغیرهای پترن', 'desc' => 'به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_topup', 'ltr' => true ),
+					'sms_topup_text'          => array( 'type' => 'textarea', 'label' => 'متن آزاد', 'desc' => 'جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_topup' ),
+					'sms_admin'               => array( 'type' => 'checkbox', 'label' => 'بعد از شارژ دستی یا گروهی توسط مدیر', 'show' => 'sms_enabled', 'group' => 'admin' ),
+					'sms_admin_pattern'       => array( 'type' => 'text', 'label' => 'کد پترن', 'desc' => 'خالی بماند، متن آزاد زیر فرستاده می‌شود.', 'show' => 'sms_admin', 'ltr' => true, 'test' => 'admin' ),
+					'sms_admin_vars'          => array( 'type' => 'text', 'label' => 'متغیرهای پترن', 'desc' => 'به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_admin', 'ltr' => true ),
+					'sms_admin_text'          => array( 'type' => 'textarea', 'label' => 'متن آزاد', 'desc' => 'جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_admin' ),
+					'sms_cashback'            => array( 'type' => 'checkbox', 'label' => 'بعد از واریز کش‌بگ خرید', 'show' => 'sms_enabled', 'group' => 'cashback' ),
+					'sms_cashback_pattern'    => array( 'type' => 'text', 'label' => 'کد پترن', 'desc' => 'خالی بماند، متن آزاد زیر فرستاده می‌شود.', 'show' => 'sms_cashback', 'ltr' => true, 'test' => 'cashback' ),
+					'sms_cashback_vars'       => array( 'type' => 'text', 'label' => 'متغیرهای پترن', 'desc' => 'به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_cashback', 'ltr' => true ),
+					'sms_cashback_text'       => array( 'type' => 'textarea', 'label' => 'متن آزاد', 'desc' => 'جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}', 'show' => 'sms_cashback' ),
 				),
 			),
 		);
@@ -203,6 +201,12 @@ class Ardal_Features_Settings {
 			<?php if ( ! empty( $card['hint'] ) ) : ?>
 				<p class="ardal-hint"><?php echo esc_html( $card['hint'] ); ?></p>
 			<?php endif; ?>
+
+			<?php
+			if ( ! empty( $card['nias'] ) ) {
+				self::render_nias_status();
+			}
+			?>
 
 			<div class="ardal-fields ardal-fields--stack">
 				<?php
@@ -281,9 +285,55 @@ class Ardal_Features_Settings {
 						<?php echo ! empty( $field['ltr'] ) ? 'dir="ltr"' : ''; ?>
 					/>
 				<?php endif; ?>
+
+				<?php if ( ! empty( $field['test'] ) && Ardal_Wallet_Sms::available() ) : ?>
+					<span class="ardal-sms-test" data-ardal-sms-test="<?php echo esc_attr( $field['test'] ); ?>">
+						<input type="tel" class="regular-text" placeholder="شمارهٔ موبایل برای آزمایش" dir="ltr" data-ardal-sms-phone />
+						<button type="button" class="button" data-ardal-sms-send>ارسال پیامک آزمایشی</button>
+						<span class="ardal-sms-test__out" data-ardal-sms-out role="status"></span>
+					</span>
+				<?php endif; ?>
 			<?php endif; ?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * وضعیت اتصال به نیاس لاگین بالای کارت پیامک.
+	 */
+	private static function render_nias_status() {
+		if ( ! Ardal_Wallet_Sms::available() ) {
+			echo '<div class="ardal-nias ardal-nias--bad">نیاس لاگین نسخهٔ ۱.۴ یا بالاتر نصب و فعال نیست؛ تا وقتی فعال نشود پیامک کیف پول فرستاده نمی‌شود. توابع ارسال پیامک برای افزونه‌های دیگر از همین نسخه به نیاس اضافه شده‌اند.</div>';
+
+			return;
+		}
+
+		$gateway = Ardal_Wallet_Sms::gateway();
+
+		if ( ! Ardal_Wallet_Sms::configured() || ! $gateway ) {
+			printf(
+				'<div class="ardal-nias ardal-nias--bad">نیاس لاگین فعال است ولی درگاه پیامکی در تنظیماتش انتخاب نشده. <a href="%s">تنظیمات نیاس لاگین ←</a></div>',
+				esc_url( admin_url( 'admin.php?page=niasloginsignup' ) )
+			);
+
+			return;
+		}
+
+		printf(
+			'<div class="ardal-nias ardal-nias--ok">درگاه فعال در نیاس: <strong>%1$s</strong> — %2$s</div>',
+			esc_html( $gateway['name'] ),
+			esc_html( $gateway['supports_text'] ? 'هم پترن و هم متن آزاد را پشتیبانی می‌کند.' : 'فقط پترن؛ برای هر رویداد کد پترن را وارد کنید.' )
+		);
+
+		wp_localize_script(
+			'ardal-admin',
+			'ardalSmsTest',
+			array(
+				'ajax'  => admin_url( 'admin-ajax.php' ),
+				'nonce' => wp_create_nonce( 'ardal-wallet-sms-test' ),
+				'name'  => Ardal_Wallet::OPTION,
+			)
+		);
 	}
 
 	/**

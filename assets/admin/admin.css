@@ -39,6 +39,49 @@
 	text-decoration: none;
 }
 
+/* وضعیت اتصال به نیاس لاگین در کارت پیامک */
+.ardal-nias {
+	margin: 10px 0 14px;
+	padding: 10px 14px;
+	border-radius: 8px;
+	font-size: 12.5px;
+	line-height: 1.9;
+}
+
+.ardal-nias--ok {
+	background: #e6f4ea;
+	color: #1a5e2c;
+}
+
+.ardal-nias--bad {
+	background: #fcebea;
+	color: #8a1f1f;
+}
+
+.ardal-sms-test {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.ardal-sms-test input {
+	width: 200px;
+}
+
+.ardal-sms-test__out {
+	font-size: 12px;
+}
+
+.ardal-sms-test__out.is-ok {
+	color: #1a7f37;
+}
+
+.ardal-sms-test__out.is-bad {
+	color: #b32d2e;
+}
+
 .ardal-wrap {
 	--a-fg: #1d2327;
 	--a-muted: #646970;

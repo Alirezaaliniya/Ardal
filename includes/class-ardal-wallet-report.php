@@ -884,7 +884,7 @@ class Ardal_Wallet_Report {
 
 				<label class="ardal-wr__check">
 					<input type="checkbox" name="sms" value="1" <?php disabled( ! $sms ); ?> />
-					<span>پیامک اطلاع‌رسانی هم فرستاده شود<?php echo $sms ? '' : ' <em>(پیامکِ «شارژ توسط مدیر» در تنظیمات خاموش است)</em>'; ?></span>
+					<span>پیامک اطلاع‌رسانی هم فرستاده شود<?php echo $sms ? '' : ' <em>(پیامکِ «شارژ توسط مدیر» در تنظیمات خاموش است یا نیاس لاگین فعال نیست)</em>'; ?></span>
 				</label>
 
 				<label class="ardal-wr__check">

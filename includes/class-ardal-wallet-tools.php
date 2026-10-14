@@ -655,7 +655,7 @@ class Ardal_Wallet_Tools {
 
 		if ( 'bulk_done' === $done ) {
 			$text = sprintf( 'کیف پول %s کاربر شارژ شد؛ مجموع %s.', $fa( $n ), $money );
-			$text .= $sms ? sprintf( ' برای %s نفر پیامک رفت.', $fa( $sms ) ) : '';
+			$text .= $sms ? sprintf( ' پیامک %s نفر در صف ارسال نیاس قرار گرفت.', $fa( $sms ) ) : '';
 			$text .= $fail ? sprintf( ' %s مورد ناموفق بود.', $fa( $fail ) ) : '';
 			$map[ $done ] = array( $fail ? 'warning' : 'success', $text );
 		}
