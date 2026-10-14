@@ -3361,6 +3361,193 @@ a.ard-brand:hover img {
 }
 
 /* ============================================================
+   فهرست آخرین مقالات
+   ============================================================ */
+
+.ard-latest-posts {
+	padding: 20px;
+	border: 1px solid #e0e2eb;
+	border-radius: 30px;
+	background: #fff;
+	box-shadow: 0 4px 16px rgba(30, 35, 50, .05);
+}
+
+.ard-latest-posts__heading {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: #34343a;
+}
+
+.ard-latest-posts__heading-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	color: #34343a;
+	line-height: 1;
+}
+
+.ard-latest-posts__heading-icon > svg {
+	width: 24px;
+	height: 24px;
+}
+
+.ard-latest-posts__heading-text {
+	margin: 0;
+	color: inherit;
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.5;
+}
+
+.ard-latest-posts__divider {
+	position: relative;
+	margin-block: 18px;
+	border: 0;
+	border-block-start: 1px solid #d4d4d8;
+}
+
+.ard-latest-posts__divider::after {
+	position: absolute;
+	inset-inline-end: 0;
+	inset-block-start: -1px;
+	width: 100px;
+	height: 2px;
+	border-radius: 2px;
+	background: #55555b;
+	content: "";
+}
+
+.ard-latest-posts__list {
+	display: flex;
+	flex-direction: column;
+	gap: 32px;
+}
+
+.ard-latest-posts__item {
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.ard-latest-posts__link {
+	display: flex;
+	min-width: 0;
+	align-items: stretch;
+	gap: 16px;
+	color: #34343a;
+	text-decoration: none;
+}
+
+.ard-latest-posts__link:hover,
+.ard-latest-posts__link:focus-visible {
+	color: #f20d5b;
+	text-decoration: none;
+}
+
+.ard-latest-posts__media {
+	position: relative;
+	display: block;
+	flex: 0 0 auto;
+	width: 160px;
+	height: 180px;
+	overflow: hidden;
+	border-radius: 28px;
+	background: #f5eef1;
+}
+
+.ard-latest-posts__media img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.ard-latest-posts__media .ard-ph {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+	color: #8d8186;
+	font-size: 12px;
+}
+
+.ard-latest-posts__body {
+	min-width: 0;
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 12px;
+	padding-block: 8px;
+}
+
+.ard-latest-posts__title {
+	display: -webkit-box;
+	max-height: 4.8em;
+	overflow: hidden;
+	color: #34343a;
+	font-size: 24px;
+	font-weight: 500;
+	line-height: 1.6;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+}
+
+.ard-latest-posts__date {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	color: #34343a;
+	font-size: 18px;
+	line-height: 1.4;
+}
+
+.ard-latest-posts__date-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	color: #34343a;
+}
+
+.ard-latest-posts__date-icon .ard-i {
+	width: 100%;
+	height: 100%;
+}
+
+.ard-latest-posts__empty {
+	margin: 0;
+	padding-block: 16px;
+	color: #73737a;
+	font-size: 14px;
+}
+
+@media (max-width: 540px) {
+	.ard-latest-posts {
+		padding: 14px;
+	}
+
+	.ard-latest-posts__heading-text {
+		font-size: 20px;
+	}
+
+	.ard-latest-posts__link {
+		gap: 12px;
+	}
+
+	.ard-latest-posts__title {
+		font-size: 18px;
+	}
+
+	.ard-latest-posts__date {
+		font-size: 14px;
+	}
+}
+
+/* ============================================================
    ریسپانسیو
    ============================================================ */
 
