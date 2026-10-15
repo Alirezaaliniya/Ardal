@@ -152,6 +152,7 @@ class Ardal_Account_Elano {
 			'again'   => array( '0 0 24 24', 1.6, '<path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/>' ),
 			'pay'     => array( '0 0 24 24', 1.6, '<path d="M2 8.5h20M6.44 3.5h11.11C21.11 3.5 22 4.38 22 7.89v8.21c0 3.51-.89 4.39-4.44 4.39H6.44C2.89 20.5 2 19.62 2 16.11V7.89C2 4.38 2.89 3.5 6.44 3.5zM6 16.5h4"/>' ),
 			'menu'    => array( '0 0 24 24', 1.8, '<path d="M4 7h16M4 12h16M4 17h10"/>' ),
+			'close'   => array( '0 0 24 24', 1.8, '<path d="M6 6l12 12M18 6L6 18"/>' ),
 		);
 
 		$p = isset( $paths[ $name ] ) ? $paths[ $name ] : $paths['chevron'];
@@ -167,6 +168,13 @@ class Ardal_Account_Elano {
 	}
 
 	/**
+	 * صفحهٔ جاری سربرگ بخش با عنوان خودش دارد؛ آن‌وقت عنوان بالای صفحه تکراری است.
+	 *
+	 * @var bool
+	 */
+	private static $headed = false;
+
+	/**
 	 * نشان صورتی کنار عنوان هر بخش (همان شکل قطره‌ای دیزاین).
 	 *
 	 * @param string $icon
@@ -175,6 +183,7 @@ class Ardal_Account_Elano {
 	 * @param string $actions HTML آماده.
 	 */
 	private static function section_head( $icon, $title, $sub = '', $actions = '' ) {
+		self::$headed = true;
 		?>
 		<div class="ard-el__shead">
 			<div class="ard-el__shead-main">
@@ -300,21 +309,48 @@ class Ardal_Account_Elano {
 							<span>منوی حساب کاربری</span>
 						</button>
 
-						<nav class="ard-el__nav" id="ard-el-nav" aria-label="منوی حساب کاربری">
+						<nav class="ard-el__nav" id="ard-el-nav" aria-label="منوی حساب کاربری" data-ard-el-nav>
+							<?php // سربرگ پنل کشویی؛ فقط در موبایل دیده می‌شود. ?>
+							<div class="ard-el__oc-head">
+								<span class="ard-el__oc-user">
+									<?php echo get_avatar( get_current_user_id(), 40, '', '', array( 'class' => 'ard-el__oc-avatar' ) ); ?>
+									<span><?php echo esc_html( Ardal_Account::name() ); ?></span>
+								</span>
+								<button type="button" class="ard-el__oc-close" data-ard-el-close aria-label="بستن منو">
+									<?php echo self::icon( 'close', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								</button>
+							</div>
+
+							<a class="ard-el__item ard-el__oc-dash<?php echo '' === $active ? ' is-active' : ''; ?>" href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>"><span><?php echo esc_html( self::opt( 'dash_title' ) ); ?></span><?php echo self::icon( 'chevron', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+
 							<?php self::render_menu( $active ); ?>
 						</nav>
+						<div class="ard-el__backdrop" data-ard-el-close aria-hidden="true"></div>
 					</div>
 				</aside>
 
 				<main class="ard-el__main">
-					<div class="ard-el__titlebar">
-						<h1 class="ard-el__h1"><?php echo esc_html( $title ); ?></h1>
-					</div>
+					<?php
+					/*
+					 * صفحه اول ساخته می‌شود تا معلوم شود سربرگ بخش دارد یا نه؛ اگر
+					 * دارد، عنوان بالای صفحه حذف می‌شود تا تیتر دو بار نیاید. پیشخوان
+					 * استثناست: سربرگش «ذخیره‌شده‌ها»ست، نه خود پیشخوان.
+					 */
+					self::$headed = false;
+					ob_start();
+					self::render_screen( $route );
+					$screen = (string) ob_get_clean();
+					?>
+					<?php if ( ! self::$headed || '' === $route['key'] ) : ?>
+						<div class="ard-el__titlebar">
+							<h1 class="ard-el__h1"><?php echo esc_html( $title ); ?></h1>
+						</div>
+					<?php endif; ?>
 
 					<div class="ard-el__notices"><?php wc_print_notices(); ?></div>
 
 					<div class="ard-el__screen">
-						<?php self::render_screen( $route ); ?>
+						<?php echo $screen; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی خود صفحه‌ها. ?>
 					</div>
 				</main>
 			</div>

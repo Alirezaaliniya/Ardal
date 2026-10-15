@@ -246,8 +246,11 @@
 	color: var(--el-danger);
 }
 
-/* دکمهٔ منو فقط در موبایل؛ در دسکتاپ منو همیشه باز است. */
-.ard-el__menu-toggle[class] {
+/* دکمهٔ منو و اجزای پنل کشویی فقط در موبایل؛ در دسکتاپ منو همیشه باز است. */
+.ard-el__menu-toggle[class],
+.ard-el__oc-head,
+.ard-el__oc-dash[class],
+.ard-el__backdrop {
 	display: none;
 }
 
@@ -1494,15 +1497,127 @@
 		display: none;
 	}
 
+	/*
+	 * منوی کشویی (offcanvas) از سمت راست؛ همان آیتم‌ها و رنگ‌های دسکتاپ، روی
+	 * یک پس‌زمینهٔ تیره که با لمس بسته می‌شود.
+	 */
 	.ard-el__nav {
-		display: none;
-		margin-block-start: 10px;
-		padding: 16px;
-		border-radius: 24px;
+		position: fixed;
+		inset-block: 0;
+		inset-inline-start: 0;
+		z-index: 100001;
+		gap: 8px;
+		inline-size: min(320px, 86vw);
+		margin: 0;
+		padding: 16px 16px max(16px, env(safe-area-inset-bottom));
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		border-radius: 0;
+		border-start-end-radius: 28px;
+		border-end-end-radius: 28px;
+		background-color: var(--el-card);
+		box-shadow: 0 0 60px rgba(0, 0, 0, .18);
+		visibility: hidden;
+		transform: translateX(100%);
+		transition: transform .32s cubic-bezier(.22, .8, .24, 1), visibility 0s linear .32s;
 	}
 
-	.ard-el__nav.is-open {
+	.ard-el[dir="ltr"] .ard-el__nav {
+		transform: translateX(-100%);
+	}
+
+	.ard-el__nav.is-open[class] {
+		visibility: visible;
+		transform: none;
+		transition: transform .32s cubic-bezier(.22, .8, .24, 1), visibility 0s;
+	}
+
+	.ard-el__backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 100000;
+		display: block;
+		background: rgba(17, 17, 24, .45);
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity .32s, visibility 0s linear .32s;
+		-webkit-backdrop-filter: blur(2px);
+		backdrop-filter: blur(2px);
+	}
+
+	.ard-el.is-menu-open .ard-el__backdrop {
+		opacity: 1;
+		visibility: visible;
+		transition: opacity .32s, visibility 0s;
+	}
+
+	.ard-el__oc-head {
 		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		margin: -16px -16px 8px;
+		padding: 20px 16px;
+		border-start-end-radius: 28px;
+		background: linear-gradient(90deg, var(--el-primary), var(--el-primary-2));
+		color: #fff;
+	}
+
+	.ard-el__oc-user {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-inline-size: 0;
+		font-size: 14px;
+		font-weight: 700;
+	}
+
+	.ard-el__oc-user span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.ard-el__oc-avatar[class] {
+		flex: none;
+		inline-size: 40px;
+		block-size: 40px;
+		border: 2px solid rgba(255, 255, 255, .7);
+		border-radius: 50%;
+	}
+
+	.ard-el__oc-close[class] {
+		display: inline-flex;
+		flex: none;
+		align-items: center;
+		justify-content: center;
+		inline-size: 40px;
+		block-size: 40px;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, .18);
+		color: #fff;
+		cursor: pointer;
+	}
+
+	.ard-el__oc-close[class]:hover,
+	.ard-el__oc-close[class]:focus-visible {
+		background: rgba(255, 255, 255, .3);
+	}
+
+	.ard-el__oc-dash[class] {
+		display: flex;
+	}
+
+	.ard-el__nav .ard-el__item {
+		flex: none;
+	}
+
+	html.ard-el-lock,
+	html.ard-el-lock body {
+		overflow: hidden;
 	}
 
 	.ard-el__tabs {
@@ -1596,6 +1711,15 @@
 /* ============================================================
    چاپ: فقط محتوای اصلی
    ============================================================ */
+
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+	.ard-el__nav,
+	.ard-el__nav.is-open[class],
+	.ard-el__backdrop,
+	.ard-el.is-menu-open .ard-el__backdrop {
+		transition: none;
+	}
+}
 
 @media print {
 	.ard-el {
