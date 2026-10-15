@@ -125,7 +125,7 @@ $ard_free = 'yes' === Ardal_Shop_Elano::opt( 'show_free' ) && class_exists( 'Ard
 									<?php if ( $ard_prices['off'] > 0 && 'yes' === Ardal_Shop_Elano::opt( 'show_off_badge' ) ) : ?>
 										<span class="ard-elc__off"><?php echo esc_html( Ardal_Helpers::fa_digits( $ard_prices['off'] ) ); ?>٪</span>
 									<?php endif; ?>
-									<span class="ard-elc__price-num"><?php echo Ardal_Shop_Elano::money( $ard_prices['price'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+									<span class="ard-elc__price-num"><?php echo Ardal_Shop_Elano::money( $ard_prices['price'], 'vertical' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 								</div>
 							</div>
 						</div>

@@ -24,7 +24,8 @@
 	--el-line: rgba(179, 179, 181, .5);
 	--el-glow: rgba(253, 86, 144, .3);
 	--el-font: var(--ard-font, inherit);
-	--elc-max: 1322px;
+	/* بدون سقف: عرض را کانتینر المنتور تعیین می‌کند؛ از ویجت می‌شود سقف گذاشت. */
+	--elc-max: none;
 	--elc-side: 314px;
 	--elc-grad: linear-gradient(90deg, var(--el-primary) 0%, var(--el-primary-2) 100%);
 
@@ -600,9 +601,17 @@
 	white-space: nowrap;
 }
 
-.ard-elc__price .ard-currency--icon svg {
-	inline-size: 16px;
-	block-size: auto;
+.ard-elc__vtoman {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+}
+
+.ard-elc__vtoman svg {
+	display: block;
+	inline-size: 9px;
+	block-size: 22px;
 }
 
 /* نوار ارسال رایگان */
@@ -1262,8 +1271,9 @@
 	font-weight: 400;
 }
 
-.ard-elc__price--sm .ard-currency--icon svg {
-	inline-size: 12px;
+.ard-elc__price--sm .ard-elc__vtoman svg {
+	inline-size: 9px;
+	block-size: 22px;
 }
 
 /* شرایط و حریم خصوصی */
@@ -1549,6 +1559,11 @@
 
 	.ard-elc__off {
 		font-size: 10px;
+	}
+
+	.ard-elc__price:not(.ard-elc__price--sm) .ard-elc__vtoman svg {
+		inline-size: 7px;
+		block-size: 17px;
 	}
 
 	.ard-elc__coupon-field {

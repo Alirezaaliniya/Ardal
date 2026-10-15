@@ -259,7 +259,7 @@ class Ardal_Shop_Elano {
 	 * مبلغ با واحد پول اردال.
 	 *
 	 * @param float  $amount
-	 * @param string $unit icon | text | none
+	 * @param string $unit icon | text | none | vertical
 	 * @return string
 	 */
 	public static function money( $amount, $unit = 'icon' ) {
@@ -267,6 +267,11 @@ class Ardal_Shop_Elano {
 
 		if ( 'none' === $unit ) {
 			return $num;
+		}
+
+		// «تومان» عمودی کنار قیمت کالا، همان‌طور که در دیزاین است (مستقل از تنظیم نماد پالت).
+		if ( 'vertical' === $unit ) {
+			return $num . '<span class="ard-elc__vtoman">' . Ardal_Currency::symbol( 'slim' ) . '</span>';
 		}
 
 		return $num . ' ' . ( 'text' === $unit ? '<span class="ard-elc__unit">تومان</span>' : Ardal_Currency::unit() );

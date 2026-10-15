@@ -141,8 +141,9 @@ trait Ardal_Elano_Shop_Widget {
 				'label'      => 'حداکثر عرض',
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 600, 'max' => 1920 ) ),
-				'selectors'  => array( '{{WRAPPER}} .ard-elc' => '--elc-max:{{SIZE}}{{UNIT}};' ),
+				'range'       => array( 'px' => array( 'min' => 600, 'max' => 1920 ) ),
+				'description' => 'خالی بماند، تمام عرض کانتینر.',
+				'selectors'   => array( '{{WRAPPER}} .ard-elc' => '--elc-max:{{SIZE}}{{UNIT}};' ),
 			)
 		);
 
