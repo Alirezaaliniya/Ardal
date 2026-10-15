@@ -111,6 +111,7 @@ class Ardal_Assets {
 		wp_register_script( 'ardal-shop', ARDAL_URL . 'assets/js/ardal-shop.js', array(), self::ver( 'assets/js/ardal-shop.js' ), true );
 		wp_register_style( 'ardal-posts-slider', ARDAL_URL . 'assets/css/ardal-posts-slider.css', array( 'ardal' ), self::ver( 'assets/css/ardal-posts-slider.css' ) );
 		wp_register_style( 'ardal-elano', ARDAL_URL . 'assets/css/ardal-elano.css', array( 'ardal' ), self::ver( 'assets/css/ardal-elano.css' ) );
+		wp_register_style( 'ardal-elano-shop', ARDAL_URL . 'assets/css/ardal-elano-shop.css', array( 'ardal' ), self::ver( 'assets/css/ardal-elano-shop.css' ) );
 		wp_register_script( 'ardal-elano', ARDAL_URL . 'assets/js/ardal-elano.js', array(), self::ver( 'assets/js/ardal-elano.js' ), true );
 		wp_register_style( 'ardal-wishlist', ARDAL_URL . 'assets/css/ardal-wishlist.css', array( 'ardal' ), self::ver( 'assets/css/ardal-wishlist.css' ) );
 		wp_register_style( 'ardal-wallet', ARDAL_URL . 'assets/css/ardal-wallet.css', array( 'ardal' ), self::ver( 'assets/css/ardal-wallet.css' ) );

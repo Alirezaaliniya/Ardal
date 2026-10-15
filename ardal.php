@@ -37,6 +37,7 @@ require_once ARDAL_PATH . 'includes/class-ardal-account.php';
 require_once ARDAL_PATH . 'includes/class-ardal-account-elano.php';
 require_once ARDAL_PATH . 'includes/class-ardal-account-ajax.php';
 require_once ARDAL_PATH . 'includes/class-ardal-shop.php';
+require_once ARDAL_PATH . 'includes/class-ardal-shop-elano.php';
 require_once ARDAL_PATH . 'includes/class-ardal-archive.php';
 require_once ARDAL_PATH . 'includes/class-ardal-search.php';
 require_once ARDAL_PATH . 'includes/class-ardal-wishlist.php';

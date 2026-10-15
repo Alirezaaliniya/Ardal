@@ -84,6 +84,10 @@ class Ardal_Elementor {
 			'archive-description' => 'Ardal_Widget_Archive_Description',
 			// پنل کاربری
 			'account'             => 'Ardal_Widget_Account',
+			// سبد، تسویه و تشکر با قالب الانو
+			'elano-cart'          => 'Ardal_Widget_Elano_Cart',
+			'elano-checkout'      => 'Ardal_Widget_Elano_Checkout',
+			'elano-thankyou'      => 'Ardal_Widget_Elano_Thankyou',
 		);
 	}
 
@@ -157,6 +161,9 @@ class Ardal_Elementor {
 			'archive-toolbar'     => 'نوار مرتب‌سازی آرشیو',
 			'archive-description' => 'توضیحات دسته',
 			'account'             => 'پنل کاربری',
+			'elano-cart'          => 'سبد خرید (قالب الانو)',
+			'elano-checkout'      => 'تسویه حساب (قالب الانو)',
+			'elano-thankyou'      => 'تشکر از خرید (قالب الانو)',
 		);
 	}
 

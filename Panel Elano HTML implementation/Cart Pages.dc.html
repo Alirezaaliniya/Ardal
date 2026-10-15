@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Yekan Bakh FaNum";font-weight:100 900;src:local("Yekan Bakh FaNum"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/misc/Farsi-Digits/fonts/webfonts/Vazirmatn-FD[wght].woff2") format("woff2"),url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn[wght].woff2") format("woff2");}
+body{margin:0;background:rgb(244,245,249);}
+*{box-sizing:border-box;}
+a{color:rgb(241,23,99);text-decoration:none;}a:hover{color:rgb(227,19,54);}
+input,textarea,button{font-family:inherit;}
+input::placeholder,textarea::placeholder{color:rgba(47,47,51,0.4);}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" dir="rtl" style="min-height:100vh;background:rgb(244,245,249);font-family:'Yekan Bakh FaNum',Tahoma,sans-serif;color:rgb(47,47,51);padding:16px clamp(16px,4vw,58px) 96px;">
+
+  <sc-if value="{{ isShop }}" hint-placeholder-val="{{ true }}">
+  <div style="max-width:1322px;margin:0 auto;display:flex;flex-direction:{{ ui.layoutDir }};gap:20px;align-items:{{ ui.align }};">
+
+    <main style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:20px;">
+
+      <sc-if value="{{ isCart }}" hint-placeholder-val="{{ true }}">
+        <sc-for list="{{ items }}" as="it" hint-placeholder-count="2">
+          <div style="min-height:{{ ui.itemH }};border-radius:24px;background:#fff;box-shadow:inset 0 0 0 2px rgb(230,233,243);padding:12px;display:flex;gap:{{ ui.itemGap }};transition:box-shadow .2s;" style-hover="box-shadow:inset 0 0 0 2px rgb(241,23,99);">
+            <div style="flex:0 0 {{ ui.imgW }};border-radius:24px;background:rgb(248,248,248);padding:{{ ui.imgPad }};display:flex;align-items:center;justify-content:center;">
+              <div role="img" aria-label="{{ it.name }}" style="width:100%;height:100%;min-height:80px;max-height:160px;background:{{ it.bgImg }};mix-blend-mode:darken;"></div>
+            </div>
+            <div style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:12px;">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+                <span style="font-size:{{ ui.titleSize }};font-weight:400;line-height:1.5;text-wrap:pretty;padding-top:4px;">{{ it.name }}</span>
+                <button onClick="{{ it.remove }}" aria-label="حذف" style="flex:0 0 {{ ui.trashSize }};width:{{ ui.trashSize }};height:{{ ui.trashSize }};border-radius:{{ ui.trashR }};border:0;background:#fff;box-shadow:inset 0 0 0 1px rgb(241,23,99);color:rgb(241,23,99);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;" style-hover="background:rgb(241,23,99);color:#fff;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.5 6h-17"></path><path d="M18.833 8.5l-.46 6.9c-.177 2.654-.265 3.981-1.13 4.79c-.865.81-2.196.81-4.856.81h-.774c-2.66 0-3.991 0-4.856-.81c-.865-.809-.954-2.136-1.13-4.79l-.46-6.9"></path><path d="M9.5 11l.5 5M14.5 11l-.5 5"></path><path d="M6.5 6h.11a2 2 0 0 0 1.83-1.32l.13-.39c.08-.25.13-.37.18-.48a1.5 1.5 0 0 1 1.1-.79c.11-.02.24-.02.5-.02h3.3c.26 0 .39 0 .5.02a1.5 1.5 0 0 1 1.1.79c.05.11.1.23.18.48l.13.39A2 2 0 0 0 17.39 6h.11"></path></svg>
+                </button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <button onClick="{{ it.inc }}" aria-label="افزایش" style="width:{{ ui.qtyBtn }};height:{{ ui.qtyBtn }};border-radius:{{ ui.qtyBtnR }};border:0;background:rgba(241,23,99,0.8);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;" style-hover="background:rgb(241,23,99);">
+                    <svg width="{{ ui.qtyIcon }}" height="{{ ui.qtyIcon }}" viewBox="0 0 20 20" fill="currentColor"><rect x="5" y="9.25" width="10" height="1.5" rx=".75"></rect><rect x="9.25" y="5" width="1.5" height="10" rx=".75"></rect></svg>
+                  </button>
+                  <span style="width:{{ ui.qtyBox }};height:{{ ui.qtyBox }};border-radius:12px;box-shadow:inset 0 0 0 1px rgb(241,23,99);display:flex;align-items:center;justify-content:center;font-size:{{ ui.qtyFont }};font-weight:600;color:rgb(241,23,99);">{{ it.qty }}</span>
+                  <button onClick="{{ it.dec }}" aria-label="کاهش" style="width:{{ ui.qtyBtn }};height:{{ ui.qtyBtn }};border-radius:{{ ui.qtyBtnR }};border:0;background:rgba(241,23,99,0.8);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;" style-hover="background:rgb(241,23,99);">
+                    <svg width="{{ ui.qtyIcon }}" height="{{ ui.qtyIcon }}" viewBox="0 0 20 20" fill="currentColor"><rect x="5" y="9.25" width="10" height="1.5" rx=".75"></rect></svg>
+                  </button>
+                </div>
+                <div style="height:{{ ui.pillH }};border-radius:16px;background:rgba(239,240,244,0.6);padding:10px 8px;display:flex;align-items:center;gap:{{ ui.pillGap }};">
+                  <span style="height:16px;border-radius:17px;background:rgb(227,19,54);padding:0 4px;display:flex;align-items:center;font-size:{{ ui.badgeFont }};font-weight:600;color:#fff;">{{ it.off }}</span>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <span style="font-size:{{ ui.priceFont }};font-weight:600;white-space:nowrap;">{{ it.priceText }}</span>
+                    <span style="width:{{ ui.tomanH }};height:{{ ui.tomanW }};display:flex;align-items:center;justify-content:center;"><img src="./assets/cart/toman.svg" alt="تومان" style="width:{{ ui.tomanW }};height:{{ ui.tomanH }};flex-shrink:0;transform:rotate(-90deg);"></img></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="border-radius:24px;background:#fff;box-shadow:inset 0 0 0 2px rgb(230,233,243);padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <span style="font-size:16px;font-weight:600;">سبد خرید شما خالی است</span>
+            <button onClick="{{ resetItems }}" style="height:44px;padding:0 20px;border-radius:12px;border:0;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">بازگرداندن کالاها</button>
+          </div>
+        </sc-if>
+        <div style="border-radius:24px;background:#fff;box-shadow:inset 0 0 0 2px rgb(230,233,243);padding:12px;display:flex;gap:10px;">
+          <label style="flex:{{ ui.couponFlex }};min-width:0;height:48px;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(179,179,181,0.5);padding:0 16px;display:flex;align-items:center;gap:10px;cursor:text;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgb(47,47,51)" stroke-width="1.5" stroke-linecap="round" style="flex-shrink:0;opacity:.6;"><path d="M14.005 4h-4.01c-3.78 0-5.67 0-6.845 1.172c-.81.806-1.061 1.951-1.14 3.817c-.015.37-.023.556.046.679c.07.123.345.278.897.586a1.999 1.999 0 0 1 0 3.492c-.552.309-.828.463-.897.586s-.061.308-.045.678c.078 1.867.33 3.012 1.139 3.818C4.324 20 6.214 20 9.995 20h4.01c3.78 0 5.67 0 6.845-1.172c.81-.806 1.061-1.951 1.14-3.817c.015-.37.023-.556-.046-.679c-.07-.123-.345-.277-.897-.586a1.999 1.999 0 0 1 0-3.492c.552-.308.828-.463.897-.586s.061-.308.045-.679c-.078-1.866-.33-3.01-1.139-3.817C19.676 4 17.786 4 14.005 4Z"></path><path d="M9 15l6-6"></path><circle cx="14.5" cy="14.5" r=".6" fill="rgb(47,47,51)"></circle><circle cx="9.5" cy="9.5" r=".6" fill="rgb(47,47,51)"></circle></svg>
+            <input placeholder="کد تخفیف" style="flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:12px;color:rgb(47,47,51);"></input>
+          </label>
+          <button style="flex:0 0 auto;min-width:min(170px,45%);height:48px;border-radius:12px;border:0;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:transform .2s;" style-hover="transform:translateY(-2px);">
+            <span>اعمال تخفیف</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgb(47,47,51)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"></path></svg>
+          </button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+        <div style="min-height:63px;border:solid rgb(230,233,243);border-width:0 1px 1px 0;border-bottom-right-radius:40px;padding:12px 13px;">
+          <h2 style="margin:0;font-size:20px;font-weight:700;line-height:1.2;">جزییات صورت حساب</h2>
+        </div>
+        <div style="border-radius:40px;background:linear-gradient(105.881deg,rgb(239,240,244) 3.68%,rgb(255,255,255) 100%);box-shadow:inset 0 0 0 1px rgb(244,245,249),0 0 80px rgba(0,0,0,0.08);padding:36px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px;">
+          <sc-for list="{{ fields }}" as="f" hint-placeholder-count="4">
+            <label style="grid-column:{{ f.span }};min-width:0;display:flex;flex-direction:column;gap:16px;">
+              <span style="font-size:14px;font-weight:600;line-height:1.4;">{{ f.label }}</span>
+              <sc-if value="{{ f.area }}" hint-placeholder-val="{{ false }}">
+                <textarea placeholder="{{ f.ph }}" style="height:138px;resize:vertical;border:0;outline:none;border-radius:12px;background:transparent;box-shadow:inset 0 0 0 1px rgba(179,179,181,0.5);padding:16px;font-size:12px;color:rgb(47,47,51);transition:box-shadow .2s;" style-focus="box-shadow:inset 0 0 0 1px rgb(241,23,99);"></textarea>
+              </sc-if>
+              <sc-if value="{{ f.input }}" hint-placeholder-val="{{ true }}">
+                <input placeholder="{{ f.ph }}" type="{{ f.type }}" style="height:56px;border:0;outline:none;border-radius:12px;background:transparent;box-shadow:inset 0 0 0 1px rgba(179,179,181,0.5);padding:0 16px;font-size:12px;color:rgb(47,47,51);transition:box-shadow .2s;" style-focus="box-shadow:inset 0 0 0 1px rgb(241,23,99);"></input>
+              </sc-if>
+            </label>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPayment }}" hint-placeholder-val="{{ false }}">
+        <div style="min-height:63px;border:solid rgb(230,233,243);border-width:0 1px 1px 0;border-bottom-right-radius:40px;padding:12px 13px;">
+          <h2 style="margin:0;font-size:20px;font-weight:700;line-height:1.2;">درگاه پرداختی</h2>
+        </div>
+        <div style="border-radius:40px;background:linear-gradient(104.045deg,rgb(239,240,244) 3.63%,rgb(255,255,255) 100%);box-shadow:inset 0 0 0 1px rgb(244,245,249),0 0 80px rgba(0,0,0,0.08);padding:36px 20px;display:flex;flex-wrap:wrap;gap:24px 20px;">
+          <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:20px;">
+            <span style="font-size:18px;font-weight:600;line-height:1.4;">نکاتی که قبل از پرداخت باید رعلیت کنید</span>
+            <p style="margin:0;font-size:14px;font-weight:600;line-height:1.9;color:rgb(66,66,66);text-wrap:pretty;">پیش از نهایی کردن پرداخت، اطلاعات سفارش، تعداد محصولات، مبلغ نهایی، آدرس و شماره تماس خود را با دقت بررسی کنید. پس از اطمینان از صحت اطلاعات، پرداخت را انجام دهید تا فرایند ثبت و پردازش سفارش بدون مشکل انجام شود</p>
+          </div>
+          <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ gateways }}" as="g" hint-placeholder-count="4">
+              <button onClick="{{ g.pick }}" style="height:40px;border-radius:12px;border:0;background:transparent;box-shadow:{{ g.ring }};padding:0 12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:rgb(47,47,51);transition:box-shadow .2s;" style-hover="box-shadow:inset 0 0 0 1px rgb(241,23,99);">
+                <span style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;">
+                  <sc-if value="{{ g.selected }}" hint-placeholder-val="{{ false }}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(241,23,99)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8.5 12.5l2 2l5-5"></path></svg>
+                  </sc-if>
+                  <sc-if value="{{ g.unselected }}" hint-placeholder-val="{{ true }}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgb(179,179,181)" stroke-width="1"><circle cx="8" cy="8" r="6.17"></circle></svg>
+                  </sc-if>
+                  {{ g.name }}
+                </span>
+                <span role="img" aria-label="{{ g.name }}" style="width:24px;height:24px;border-radius:8px;background:{{ g.logoBg }};"></span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isShipping }}" hint-placeholder-val="{{ false }}">
+        <div style="min-height:63px;border:solid rgb(230,233,243);border-width:0 1px 1px 0;border-bottom-right-radius:40px;padding:12px 13px;">
+          <h2 style="margin:0;font-size:20px;font-weight:700;line-height:1.2;">زمان تحویل</h2>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:20px;">
+          <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+            <button onClick="{{ d.pick }}" style="flex:1 1 104px;height:72px;border-radius:12px;border:0;background:{{ d.bg }};box-shadow:{{ d.ring }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-size:14px;font-weight:600;color:{{ d.fg }};transition:transform .2s;" style-hover="transform:translateY(-2px);">
+              <span style="opacity:.8;">{{ d.day }}</span>
+              <span style="color:{{ d.dateFg }};">{{ d.date }}</span>
+            </button>
+          </sc-for>
+        </div>
+        <button onClick="{{ toggleAgree }}" style="align-self:flex-start;border:0;background:none;padding:0;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;line-height:1.5;color:rgb(47,47,51);text-align:right;">
+          <sc-if value="{{ agree }}" hint-placeholder-val="{{ false }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(241,23,99)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"></circle><path d="M8.5 12.5l2 2l5-5"></path></svg>
+          </sc-if>
+          <sc-if value="{{ notAgree }}" hint-placeholder-val="{{ true }}">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgb(47,47,51)" stroke-width="1" style="flex-shrink:0;opacity:.6;"><circle cx="8" cy="8" r="6.17"></circle></svg>
+          </sc-if>
+          <span>با ادامه خرید با شرایط و ضوابط سیاست حریم حریم خصوصی ما رعایت کنید.</span>
+        </button>
+      </sc-if>
+    </main>
+
+    <aside style="flex:0 0 {{ ui.sideW }};width:{{ ui.sideW }};position:relative;display:flex;flex-direction:column;gap:20px;">
+      <div style="position:relative;">
+        <div style="position:relative;height:171px;">
+          <div style="position:absolute;inset:0;border-radius:40px;background:linear-gradient(117.218deg,rgb(241,23,99) 1.22%,rgb(251,57,124) 100%);-webkit-mask:url(./assets/cart/notch-head.svg) center bottom/152.5px 171px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 76px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 76px) 100% no-repeat;mask:url(./assets/cart/notch-head.svg) center bottom/152.5px 171px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 76px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 76px) 100% no-repeat;"></div>
+        </div>
+        <div style="margin:20px 3px 0;filter:drop-shadow(0 0 40px rgba(0,0,0,0.08));">
+          <div style="border-radius:40px;background:linear-gradient(141.756deg,rgb(239,240,244) 5.05%,rgb(255,255,255) 100%);padding:56px clamp(16px,12%,37px) 24px;display:flex;flex-direction:column;gap:8px;-webkit-mask:url(./assets/cart/notch-card.svg) center top/102px 21px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) center bottom/102px calc(100% - 20px) no-repeat;mask:url(./assets/cart/notch-card.svg) center top/102px 21px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) center bottom/102px calc(100% - 20px) no-repeat;">
+            <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ items }}" as="it" hint-placeholder-count="1">
+                <div style="border-radius:24px;background:#fff;box-shadow:inset 0 0 0 2px rgb(230,233,243);padding:12px 12px 16px;display:flex;align-items:center;gap:20px;">
+                  <div style="flex:0 0 53px;height:86px;border-radius:12px;background:rgb(248,248,248);padding:8px;display:flex;align-items:center;justify-content:center;">
+                    <div role="img" aria-label="{{ it.name }}" style="width:100%;height:100%;background:{{ it.bgImg }};mix-blend-mode:darken;"></div>
+                  </div>
+                  <div style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:12px;">
+                    <span style="font-size:12px;font-weight:600;line-height:1.6;text-wrap:pretty;">{{ it.name }}</span>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+                      <span style="flex:0 0 24px;height:24px;border-radius:8px;box-shadow:inset 0 0 0 1px rgb(241,23,99);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:rgb(241,23,99);">{{ it.qty }}</span>
+                      <div style="height:42px;border-radius:16px;background:rgba(239,240,244,0.6);padding:10px 8px;display:flex;align-items:center;gap:4px;">
+                        <span style="height:16px;border-radius:17px;background:rgb(227,19,54);padding:0 4px;display:flex;align-items:center;font-size:12px;color:#fff;">{{ it.off }}</span>
+                        <span style="font-size:12px;white-space:nowrap;">{{ it.priceText }}</span>
+                        <span style="width:9px;height:22px;display:flex;align-items:center;justify-content:center;"><img src="./assets/cart/toman.svg" alt="تومان" style="width:22px;height:9px;flex-shrink:0;transform:rotate(-90deg);"></img></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-for list="{{ summary }}" as="s" hint-placeholder-count="3">
+              <div style="height:56px;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(179,179,181,0.4);padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;">
+                <span style="opacity:{{ s.labelOp }};white-space:nowrap;">{{ s.label }}</span>
+                <span style="display:flex;align-items:center;gap:8px;white-space:nowrap;">
+                  <span style="color:{{ s.color }};">{{ s.value }}</span>
+                  <span style="opacity:.5;">تومان</span>
+                </span>
+              </div>
+            </sc-for>
+            <div style="position:relative;height:48px;">
+              <div style="position:absolute;top:0;bottom:0;left:0;right:0;opacity:.1;border-radius:12px;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:inset 0 0 0 1px rgb(241,23,99);"></div>
+              <div style="position:absolute;top:0;bottom:0;left:12px;right:0;opacity:.1;border-radius:12px;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:inset 0 0 0 1px rgb(241,23,99);"></div>
+              <div style="position:absolute;top:0;bottom:0;left:24px;right:0;opacity:.1;border-radius:12px;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:inset 0 0 0 1px rgb(241,23,99);"></div>
+              <div style="position:absolute;top:0;bottom:0;left:36px;right:0;opacity:.1;border-radius:12px;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:inset 0 0 0 1px rgb(241,23,99);"></div>
+              <button onClick="{{ next }}" style="position:absolute;top:0;bottom:0;left:48px;right:0;border-radius:12px;border:0;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:left .25s;" style-hover="left:0;">
+                <span style="flex:1;text-align:center;">اقدام به پرداخت</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgb(47,47,51)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;top:98px;left:50%;transform:translateX(-50%);width:70px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <span style="width:59.733px;height:56px;border-radius:12px;background:rgba(241,23,99,0.1);display:flex;align-items:center;justify-content:center;">
+            <span style="width:34.167px;height:32.5px;background:rgb(241,23,99);-webkit-mask:url(./assets/cart/cart-large.svg) center/contain no-repeat;mask:url(./assets/cart/cart-large.svg) center/contain no-repeat;"></span>
+          </span>
+          <span style="height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;font-size:14px;font-weight:600;line-height:1;white-space:nowrap;">
+            <span>سبد خرید</span>
+            <span>Cart</span>
+          </span>
+        </div>
+      </div>
+      <button onClick="{{ goCart }}" style="height:48px;border-radius:12px;border:0;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:transform .2s;" style-hover="transform:translateY(-2px);">
+        <span>بازگشت به فروشگاه</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgb(47,47,51)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg);"><path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08"></path></svg>
+      </button>
+    </aside>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isThanks }}" hint-placeholder-val="{{ false }}">
+    <div style="max-width:698px;margin:0 auto;padding-top:20px;position:relative;">
+      <div style="position:relative;height:171px;margin-inline-start:14px;">
+        <div style="position:absolute;inset:0;border-radius:40px;background:linear-gradient(103.285deg,rgb(241,23,99) 0.31%,rgb(251,57,124) 100%);-webkit-mask:url(./assets/cart/notch-head.svg) center bottom/152.5px 171px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 76px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 76px) 100% no-repeat;mask:url(./assets/cart/notch-head.svg) center bottom/152.5px 171px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 76px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 76px) 100% no-repeat;"></div>
+        <div style="position:absolute;left:{{ ui.lipLeft }};top:{{ ui.lipTop }};width:{{ ui.lipW }};height:{{ ui.lipH }};background:url(./assets/cart/f81d897566808c1b.png) 8.575% 40.578%/245.767% 130.978% no-repeat;"></div>
+        <div style="position:absolute;right:{{ ui.infoRight }};top:16px;width:{{ ui.infoW }};height:139px;display:flex;flex-direction:column;justify-content:center;gap:12px;color:#fff;text-align:center;">
+          <span style="opacity:.8;font-size:16px;font-weight:600;line-height:1.3;">رژگونه مایع شیگلم مات</span>
+          <span style="opacity:.8;font-size:12px;font-weight:400;">سایز: 5 میلی‌لیتر</span>
+          <span style="display:flex;justify-content:center;align-items:center;gap:8px;font-size:14px;font-weight:600;">
+            <span>324،000</span>
+            <span style="opacity:.8;">تومان</span>
+          </span>
+        </div>
+      </div>
+      <div style="margin-top:12px;filter:drop-shadow(0 0 40px rgba(0,0,0,0.08));">
+        <div style="border-radius:40px;background:linear-gradient(122.854deg,rgb(239,240,244) 4.39%,rgb(255,255,255) 100%);padding:{{ ui.thanksPad }};display:flex;flex-direction:column;align-items:center;gap:{{ ui.thanksGap }};-webkit-mask:url(./assets/cart/notch-card.svg) center top/102px 21px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) center bottom/102px calc(100% - 20px) no-repeat;mask:url(./assets/cart/notch-card.svg) center top/102px 21px no-repeat,linear-gradient(#000,#000) left top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) right top/calc(50% - 50px) 100% no-repeat,linear-gradient(#000,#000) center bottom/102px calc(100% - 20px) no-repeat;">
+          <sc-for list="{{ order }}" as="o" hint-placeholder-count="4">
+            <div style="align-self:stretch;height:56px;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(179,179,181,0.4);padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:600;">
+              <span style="opacity:.8;white-space:nowrap;">{{ o.label }}</span>
+              <span style="display:flex;align-items:center;gap:8px;white-space:nowrap;">
+                <span>{{ o.value }}</span>
+                <span style="color:rgb(241,23,99);">{{ o.unit }}</span>
+              </span>
+            </div>
+          </sc-for>
+          <button onClick="{{ goCart }}" style="width:100%;max-width:368px;height:48px;border-radius:12px;border:0;background:linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%);box-shadow:0 20px 36px rgba(253,86,144,0.3);color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:transform .2s;" style-hover="transform:translateY(-2px);">بازگشت</button>
+        </div>
+      </div>
+      <div style="position:absolute;top:119px;left:50%;transform:translateX(calc(-50% + 7px));display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <span style="position:relative;width:59.733px;height:56px;border-radius:12px;background:rgba(241,23,99,0.1);">
+          <span style="position:absolute;left:15.008px;top:12.641px;width:30.718px;height:30.718px;background:rgb(241,23,99);-webkit-mask:url(./assets/cart/verified-badge.svg) center/contain no-repeat;mask:url(./assets/cart/verified-badge.svg) center/contain no-repeat;"></span>
+          <span style="position:absolute;left:24.534px;top:23.833px;width:11.667px;height:8.333px;background:rgb(241,23,99);-webkit-mask:url(./assets/cart/verified-tick.svg) center/contain no-repeat;mask:url(./assets/cart/verified-tick.svg) center/contain no-repeat;"></span>
+        </span>
+        <span style="height:52px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;font-weight:600;line-height:1;white-space:nowrap;">
+          <span style="font-size:16px;">تشکر</span>
+          <span style="font-size:14px;">Thank you</span>
+        </span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showSwitcher }}" hint-placeholder-val="{{ true }}">
+    <nav style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:4px;padding:4px;border-radius:14px;background:rgba(255,255,255,0.92);box-shadow:0 8px 30px rgba(0,0,0,0.12);max-width:calc(100% - 24px);overflow-x:auto;">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.go }}" style="height:36px;padding:0 14px;border-radius:10px;border:0;background:{{ t.bg }};color:{{ t.fg }};font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;">{{ t.label }}</button>
+      </sc-for>
+    </nav>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;page&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cart&quot;,&quot;shipping&quot;,&quot;payment&quot;,&quot;thanks&quot;],&quot;default&quot;:&quot;cart&quot;,&quot;tsType&quot;:&quot;'cart'|'shipping'|'payment'|'thanks'&quot;},&quot;showSwitcher&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  state = { page: this.props.page ?? 'cart', w: 1200, items: this.initItems(), gateway: 0, day: 1, agree: false };
+  initItems() {
+    return [
+      { id: 1, name: 'ریمل پیپا مدل Legendary Lashes 503', price: 1160000, qty: 3, img: './assets/cart/a3413780eb2b49c8.png' },
+      { id: 2, name: 'ادوپرفیوم زنانه تیستو مدل Viola حجم 120 میلی لیتر', price: 2160000, qty: 1, img: './assets/cart/2a5963fd2ec46d8c.png' },
+    ];
+  }
+  componentDidMount() {
+    const el = this.rootRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    this.ro = new ResizeObserver(e => { const w = e[0].contentRect.width; if (Math.abs(w - this.state.w) > 1) this.setState({ w }); });
+    this.ro.observe(el);
+  }
+  componentWillUnmount() { this.ro && this.ro.disconnect(); }
+  componentDidUpdate(pp) { if (this.props.page && pp.page !== this.props.page) this.setState({ page: this.props.page }); }
+  go(page) { this.setState({ page }); try { window.scrollTo(0, 0); } catch (e) {} }
+  fmt(n, sep) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, sep); }
+  renderVals() {
+    const { page, w, items, gateway, day, agree } = this.state;
+    const stack = w < 900, compact = w < 600;
+    const isCheckout = page === 'shipping' || page === 'payment';
+    const pink = 'rgb(241,23,99)', ink = 'rgb(47,47,51)';
+    const setItems = fn => this.setState(s => ({ items: fn(s.items) }));
+    const subtotal = items.reduce((a, i) => a + i.price * i.qty, 0);
+    const discount = Math.round(subtotal * 0.12);
+    const ui = {
+      layoutDir: stack ? (isCheckout ? 'column-reverse' : 'column') : 'row',
+      align: stack ? 'stretch' : 'flex-start',
+      sideW: stack ? 'auto' : '314px',
+      itemH: compact ? '144px' : '224px', itemGap: compact ? '12px' : '20px',
+      imgW: compact ? '98px' : '180px', imgPad: compact ? '10px' : '20px',
+      titleSize: compact ? '14px' : '16px',
+      trashSize: compact ? '34px' : '48px', trashR: compact ? '50%' : '12px',
+      qtyBtn: compact ? '24px' : '40px', qtyBtnR: compact ? '8px' : '12px', qtyIcon: compact ? '16' : '20',
+      qtyBox: compact ? '32px' : '48px', qtyFont: compact ? '14px' : '16px',
+      priceFont: compact ? '14px' : '18px', pillH: compact ? '42px' : '48px', pillGap: compact ? '12px' : '30px',
+      badgeFont: compact ? '10px' : '12px', tomanW: compact ? '17px' : '22px', tomanH: compact ? '7px' : '9px',
+      couponFlex: compact ? '1 1 0' : '0 1 415px',
+      thanksPad: compact ? '56px 15px 20px' : '82px 33px 32px', thanksGap: compact ? '8px' : '20px',
+      lipLeft: compact ? '24px' : '95px', lipTop: compact ? '-14px' : '-35px', lipW: compact ? '80px' : '88px', lipH: compact ? '186px' : '206px',
+      infoRight: compact ? '4px' : '24px', infoW: compact ? '160px' : '196px',
+    };
+    const F = (label, ph, o = {}) => ({ label, ph, span: o.full ? '1 / -1' : 'auto', area: !!o.area, input: !o.area, type: o.type || 'text' });
+    const baseFields = [
+      F('نام و نام خانوادگی', 'نام و نام خانوادگی خود را وارد کنید.'),
+      F('شماره همراه', 'شماره همراه خود را وارد کنید.', { type: 'tel' }),
+      F('ایمیل', 'ایمیل خود را وارد کنید.', { type: 'email' }),
+      F('رمز عبور', 'رمز عبور خود را وارد کنید.', { type: 'password' }),
+    ];
+    const shipFields = baseFields.concat([
+      F('آدرس', 'آدرس خود را وارد کنید.', { full: true }),
+      F('استان', 'استان خود را وارد کنید.'),
+      F('شهر', 'شهر خود را وارد کنید.'),
+      F('کد پستی', 'کد پستی خود را وارد کنید.'),
+      F('شماره منزل', 'شهر خود را وارد کنید.'),
+      F('توضیحات', 'توضیحات خود را وارد کنید.', { full: true, area: true }),
+    ]);
+    const gws = [['پاسارگاد', '52ece9a5b7c722d6.png'], ['سامان', '60f357b37a133520.png'], ['ملت', 'd497dcf4f1e62eab.jpg'], ['زرین پال', '5bc5e11be3574ebe.png']];
+    const dayList = [['شنبه', '1405/06/10'], ['یکشنبه', '1405/06/11'], ['دوشنبه', '1405/06/12'], ['سه شنبه', '1405/06/13'], ['چهارشنبه', '1405/06/14'], ['پنجشنبه', '1405/06/15'], ['جمعه', '1405/06/16']];
+    const tabDefs = [['cart', 'سبد خرید'], ['shipping', 'اطلاعات و ارسال'], ['payment', 'درگاه پرداخت'], ['thanks', 'تشکر']];
+    const nextMap = { cart: 'shipping', shipping: 'payment', payment: 'thanks' };
+    return {
+      rootRef: this.rootRef, ui,
+      isShop: page !== 'thanks', isThanks: page === 'thanks', isCart: page === 'cart',
+      isCheckout, isPayment: page === 'payment', isShipping: page === 'shipping',
+      isEmpty: items.length === 0,
+      showSwitcher: this.props.showSwitcher ?? true,
+      items: items.map(it => ({
+        ...it, bgImg: 'url(' + it.img + ') center/contain no-repeat', priceText: this.fmt(it.price, ','), off: '12%',
+        inc: () => setItems(a => a.map(x => x.id === it.id ? { ...x, qty: x.qty + 1 } : x)),
+        dec: () => setItems(a => a.map(x => x.id === it.id ? { ...x, qty: Math.max(1, x.qty - 1) } : x)),
+        remove: () => setItems(a => a.filter(x => x.id !== it.id)),
+      })),
+      resetItems: () => this.setState({ items: this.initItems() }),
+      summary: [
+        { label: 'مبلغ جز', value: this.fmt(subtotal, '،'), labelOp: 0.4, color: ink },
+        { label: 'تخفیف', value: this.fmt(discount, '،'), labelOp: 0.4, color: pink },
+        { label: 'جمع کل', value: this.fmt(subtotal - discount, '،'), labelOp: 1, color: pink },
+      ],
+      fields: page === 'shipping' ? shipFields : baseFields,
+      gateways: gws.map(([name, logo], i) => ({ name, logoBg: 'url(./assets/cart/' + logo + ') center/cover no-repeat', selected: i === gateway, unselected: i !== gateway,
+        ring: i === gateway ? 'inset 0 0 0 1px ' + pink : 'inset 0 0 0 1px rgba(179,179,181,0.6)', pick: () => this.setState({ gateway: i }) })),
+      days: dayList.map(([d, date], i) => {
+        const on = i === day;
+        return { day: d, date, pick: () => this.setState({ day: i }),
+          bg: on ? 'linear-gradient(90deg,rgb(241,23,99) 0%,rgb(251,57,124) 100%)' : 'transparent',
+          ring: on ? 'inset 0 0 0 1px rgb(241,23,99),0 20px 36px rgba(253,86,144,0.3)' : 'inset 0 0 0 1px rgba(179,179,181,0.5)',
+          fg: on ? '#fff' : ink, dateFg: on ? 'rgba(255,255,255,0.6)' : ink };
+      }),
+      agree, notAgree: !agree, toggleAgree: () => this.setState(s => ({ agree: !s.agree })),
+      order: [
+        { label: 'مبلغ کل سفارش', value: '324،000', unit: 'تومان' },
+        { label: 'روش پرداخت', value: 'انتقال مسقیم بانکی', unit: '' },
+        { label: 'تاریخ سفارش', value: '1405/06/12', unit: '' },
+        { label: 'وضعیت', value: 'پرداخت شده', unit: '' },
+      ],
+      next: () => this.go(nextMap[page] || 'thanks'),
+      goCart: () => this.go('cart'),
+      tabs: tabDefs.map(([id, label]) => ({ label, go: () => this.go(id), bg: id === page ? pink : 'transparent', fg: id === page ? '#fff' : ink })),
+    };
+  }
+}
+</script>
+</body>
+</html>

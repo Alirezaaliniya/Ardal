@@ -122,7 +122,7 @@
 		var group = document.querySelectorAll( 'input[name="' + input.name.replace( /"/g, '' ) + '"]' );
 
 		Array.prototype.forEach.call( group, function ( radio ) {
-			var row = radio.closest( '.ard-ck__opt' );
+			var row = radio.closest( '.ard-ck__opt, [data-ard-opt]' );
 
 			if ( row ) {
 				row.classList.toggle( 'is-on', radio.checked );
@@ -132,9 +132,9 @@
 
 	function syncAll( root ) {
 		Array.prototype.forEach.call(
-			root.querySelectorAll( '.ard-ck__opt input[type="radio"]' ),
+			root.querySelectorAll( '.ard-ck__opt input[type="radio"], [data-ard-opt] input[type="radio"]' ),
 			function ( radio ) {
-				var row = radio.closest( '.ard-ck__opt' );
+				var row = radio.closest( '.ard-ck__opt, [data-ard-opt]' );
 
 				if ( row ) {
 					row.classList.toggle( 'is-on', radio.checked );
@@ -187,7 +187,7 @@
 
 		// تغییر دستی عدد تعداد هم سبد را به‌روز می‌کند.
 		root.addEventListener( 'change', function ( event ) {
-			if ( event.target.matches && event.target.matches( '.ard-cart__qty input.qty' ) ) {
+			if ( event.target.matches && event.target.matches( '.ard-cart__qty input.qty, [data-ard-qty] input.qty' ) ) {
 				submitCart( event.target );
 			}
 		} );
@@ -197,7 +197,7 @@
 		// ردیف‌های ارسال و پرداخت روی کل صفحه شنیده می‌شوند، چون ووکامرس بعد
 		// از هر به‌روزرسانی ایجکسی، این بخش‌ها را دوباره می‌سازد.
 		document.addEventListener( 'change', function ( event ) {
-			if ( event.target.matches && event.target.matches( 'input[name^="shipping_method"], input[name="payment_method"]' ) ) {
+			if ( event.target.matches && event.target.matches( 'input[name^="shipping_method"], input[name="payment_method"], input[name="ardal_delivery"]' ) ) {
 				syncOptions( event.target );
 			}
 		} );
