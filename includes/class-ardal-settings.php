@@ -103,7 +103,6 @@ class Ardal_Settings {
 		// انتخاب تصویر کیف پول از کتابخانهٔ رسانه.
 		wp_enqueue_media();
 
-		wp_enqueue_style( 'ardal-admin-font', 'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap', array(), null ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 		wp_enqueue_style( 'ardal-admin', ARDAL_URL . 'assets/admin/admin.css', array(), $ver( 'assets/admin/admin.css' ) );
 
 		// همان متغیرهای سمت کاربر، تا پیش‌نمایش پیش از اجرای جاوااسکریپت هم درست باشد.

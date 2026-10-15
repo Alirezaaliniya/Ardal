@@ -4,6 +4,15 @@
  * همه‌چیز زیر .ards است تا با استایل‌های پیشخوان وردپرس قاطی نشود.
  */
 
+/* فونت داخل خود افزونه (نسخهٔ متغیر وزیرمتن، مجوز OFL)؛ بدون درخواست به سرور بیرونی. */
+@font-face {
+	font-family: "Ardal Vazirmatn";
+	src: url("../fonts/Vazirmatn-wght.woff2") format("woff2");
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
 .ards {
 	--s-bg: #f1f3f6;
 	--s-card: #fff;
@@ -39,7 +48,7 @@
 	min-height: calc(100vh - 32px);
 	background: var(--s-bg);
 	color: var(--s-ink);
-	font-family: Vazirmatn, Tahoma, sans-serif;
+	font-family: "Ardal Vazirmatn", Vazirmatn, Tahoma, sans-serif;
 	font-size: 14px;
 	line-height: 1.6;
 	-webkit-font-smoothing: antialiased;
@@ -1871,7 +1880,7 @@ body:has(.ards) #wpfooter {
 	border-radius: 5px;
 	background: var(--ard-sale);
 	color: #fff;
-	font-family: Vazirmatn, Tahoma, sans-serif;
+	font-family: inherit;
 	font-size: 10px;
 }
 
