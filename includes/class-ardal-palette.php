@@ -182,6 +182,7 @@ class Ardal_Palette {
 	 */
 	public static function extras_groups() {
 		return array(
+			'brand'   => 'نام و برند افزونه',
 			'type'    => 'تایپوگرافی و ابعاد',
 			'money'   => 'واحد پول و اعداد',
 			'product' => 'صفحه محصول',
@@ -198,6 +199,27 @@ class Ardal_Palette {
 	 */
 	public static function extras_schema() {
 		return array(
+			'brand_name'       => array(
+				'label'   => 'نام نمایشی افزونه',
+				'default' => 'اردال',
+				'type'    => 'text',
+				'desc'    => 'در منوی پیشخوان، صفحهٔ تنظیمات، فهرست افزونه‌ها، دسته‌ها و ویجت‌های المنتور و پیام‌ها همین نام دیده می‌شود. مثلاً نام فروشگاه.',
+				'group'   => 'brand',
+			),
+			'brand_desc'       => array(
+				'label'   => 'توضیح در فهرست افزونه‌ها',
+				'default' => '',
+				'type'    => 'text',
+				'desc'    => 'خالی بماند، همان توضیح پیش‌فرض.',
+				'group'   => 'brand',
+			),
+			'brand_author'     => array(
+				'label'   => 'نام سازنده در فهرست افزونه‌ها',
+				'default' => '',
+				'type'    => 'text',
+				'desc'    => 'خالی بماند، سازندهٔ اصلی. پر باشد، لینک سازنده و صفحهٔ افزونه هم برداشته می‌شود.',
+				'group'   => 'brand',
+			),
 			'radius'           => array(
 				'label'   => 'گردی گوشه‌ها',
 				'default' => '16',
@@ -531,6 +553,11 @@ class Ardal_Palette {
 					$clean[ $key ] = isset( $input[ $key ] )
 						? sanitize_text_field( $input[ $key ] )
 						: $field['default'];
+
+					// نام خالی یعنی همان نام اصلی.
+					if ( 'brand_name' === $key && '' === trim( $clean[ $key ] ) ) {
+						$clean[ $key ] = $field['default'];
+					}
 			}
 		}
 

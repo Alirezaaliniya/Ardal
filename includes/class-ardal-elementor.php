@@ -179,7 +179,7 @@ class Ardal_Elementor {
 		$manager->add_category(
 			self::CATEGORY,
 			array(
-				'title' => 'اردال — فروشگاه',
+				'title' => Ardal_Brand::text( 'اردال — فروشگاه' ),
 				'icon'  => 'eicon-woocommerce',
 			)
 		);
@@ -187,7 +187,7 @@ class Ardal_Elementor {
 		$manager->add_category(
 			self::CATEGORY_PRODUCT,
 			array(
-				'title' => 'اردال — صفحه محصول',
+				'title' => Ardal_Brand::text( 'اردال — صفحه محصول' ),
 				'icon'  => 'eicon-single-product',
 			)
 		);
@@ -195,7 +195,7 @@ class Ardal_Elementor {
 		$manager->add_category(
 			self::CATEGORY_ARCHIVE,
 			array(
-				'title' => 'اردال — آرشیو فروشگاه',
+				'title' => Ardal_Brand::text( 'اردال — آرشیو فروشگاه' ),
 				'icon'  => 'eicon-product-categories',
 			)
 		);

@@ -30,6 +30,7 @@ final class Ardal {
 	private function __construct() {
 		new Ardal_Settings();
 		new Ardal_Assets();
+		Ardal_Brand::init();
 		add_filter( 'preprocess_comment', array( $this, 'allow_ardal_unrated_reviews' ), -1 );
 
 		Ardal_Currency::init();
@@ -127,7 +128,7 @@ final class Ardal {
 		}
 
 		echo '<div class="notice notice-warning"><p>'
-			. 'افزونه <strong>اردال</strong> برای کار کردن به <strong>المنتور</strong> نیاز دارد. لطفاً المنتور را نصب و فعال کنید.'
+			. 'افزونه <strong>' . esc_html( Ardal_Brand::name() ) . '</strong> برای کار کردن به <strong>المنتور</strong> نیاز دارد. لطفاً المنتور را نصب و فعال کنید.'
 			. '</p></div>';
 	}
 
@@ -137,7 +138,8 @@ final class Ardal {
 		}
 
 		printf(
-			'<div class="notice notice-warning"><p>افزونه <strong>اردال</strong> به المنتور نسخه %s یا بالاتر نیاز دارد.</p></div>',
+			'<div class="notice notice-warning"><p>افزونه <strong>%s</strong> به المنتور نسخه %s یا بالاتر نیاز دارد.</p></div>',
+			esc_html( Ardal_Brand::name() ),
 			esc_html( ARDAL_MIN_ELEMENTOR )
 		);
 	}

@@ -268,7 +268,7 @@ class Ardal_Wallet_Sms {
 		$key     = 'sms_' . $event;
 		$pattern = trim( Ardal_Wallet::option( $key . '_pattern' ) );
 		$args    = array(
-			'label'   => 'کیف پول اردال — ' . ( self::events()[ $event ] ?? $event ),
+			'label'   => Ardal_Brand::text( 'کیف پول اردال — ' ) . ( self::events()[ $event ] ?? $event ),
 			'user_id' => (int) $user_id,
 		);
 

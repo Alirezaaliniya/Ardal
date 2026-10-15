@@ -34,6 +34,58 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 	}
 
 	/**
+	 * عنوان ویجت در پنل المنتور با نام برند، و نام برند در کلیدواژه‌های
+	 * جست‌وجو.
+	 *
+	 * @return array
+	 */
+	protected function get_initial_config() {
+		$config = parent::get_initial_config();
+
+		if ( Ardal_Brand::custom() ) {
+			if ( isset( $config['title'] ) ) {
+				$config['title'] = Ardal_Brand::text( $config['title'] );
+			}
+
+			$config['keywords'] = array_values(
+				array_unique(
+					array_map(
+						array( 'Ardal_Brand', 'text' ),
+						isset( $config['keywords'] ) ? (array) $config['keywords'] : array()
+					)
+				)
+			);
+
+			if ( ! in_array( Ardal_Brand::name(), $config['keywords'], true ) ) {
+				$config['keywords'][] = Ardal_Brand::name();
+			}
+		}
+
+		return $config;
+	}
+
+	/**
+	 * برچسب و توضیح هر کنترل با نام برند (کنترل‌های واکنش‌گرا و گروهی هم
+	 * از همین مسیر رد می‌شوند).
+	 *
+	 * @param string $id
+	 * @param array  $args
+	 * @param array  $options
+	 * @return bool
+	 */
+	public function add_control( $id, array $args, $options = array() ) {
+		return parent::add_control( $id, Ardal_Brand::control_args( $args ), $options );
+	}
+
+	/**
+	 * @param string $section_id
+	 * @param array  $args
+	 */
+	public function start_controls_section( $section_id, array $args = array() ) {
+		parent::start_controls_section( $section_id, Ardal_Brand::control_args( $args ) );
+	}
+
+	/**
 	 * @return array
 	 */
 	public function get_style_depends() {
@@ -1593,7 +1645,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			return true;
 		}
 
-		printf( '<div class="ard-empty">%s</div>', esc_html( $message ) );
+		printf( '<div class="ard-empty">%s</div>', esc_html( Ardal_Brand::text( $message ) ) );
 
 		return true;
 	}

@@ -79,6 +79,10 @@ class Ardal_Settings_UI {
 			)
 		);
 
+		// متن‌های نمایشی با نام برند؛ مقدار فیلد دست نمی‌خورد.
+		$f['label'] = Ardal_Brand::text( $f['label'] );
+		$f['help']  = Ardal_Brand::text( (string) $f['help'] );
+
 		if ( ! empty( $f['show_when'] ) && false === strpos( $f['show_when'], '[' ) ) {
 			$f['show_when'] = $option . '[' . $f['show_when'] . ']';
 		}
@@ -159,7 +163,7 @@ class Ardal_Settings_UI {
 	 * @return array
 	 */
 	public static function tabs() {
-		return array(
+		$tabs = array(
 			array(
 				'id'    => 'palette',
 				'title' => 'پالت و ظاهر',
@@ -185,6 +189,25 @@ class Ardal_Settings_UI {
 				'cards' => Ardal_Helpers::has_woo() ? self::wallet_cards() : array(),
 			),
 		);
+
+		// عنوان‌ها و توضیح‌های کارت‌ها هم با نام برند.
+		foreach ( $tabs as &$tab ) {
+			$tab['lede'] = Ardal_Brand::text( $tab['lede'] );
+
+			foreach ( $tab['cards'] as &$card ) {
+				foreach ( array( 'title', 'short', 'sub', 'info', 'off' ) as $k ) {
+					if ( isset( $card[ $k ] ) ) {
+						$card[ $k ] = Ardal_Brand::text( $card[ $k ] );
+					}
+				}
+			}
+
+			unset( $card );
+		}
+
+		unset( $tab );
+
+		return $tabs;
 	}
 
 	/**
@@ -193,7 +216,22 @@ class Ardal_Settings_UI {
 	private static function palette_cards() {
 		$opt    = Ardal_Palette::OPTION;
 		$values = Ardal_Palette::get_all();
-		$cards  = array(
+		$brand  = array();
+
+		foreach ( Ardal_Palette::extras_schema() as $key => $s ) {
+			if ( isset( $s['group'] ) && 'brand' === $s['group'] ) {
+				$brand[] = self::field( $opt, $key, 'text', $s['label'], $values[ $key ], array( 'help' => $s['desc'], 'ph' => $s['default'] ) );
+			}
+		}
+
+		$cards = array(
+			array(
+				'id'     => 'brand',
+				'title'  => 'نام و برند افزونه',
+				'short'  => 'نام و برند',
+				'info'   => 'افزونه را با نام خودتان نشان دهید تا برای همین سایت ساخته‌شده به نظر برسد. نام‌های فنی (پوشه، شورت‌کدها، کلاس‌ها) عوض نمی‌شوند تا صفحه‌های ساخته‌شده سالم بمانند.',
+				'fields' => $brand,
+			),
 			array(
 				'id'   => 'presets',
 				'title' => 'پالت‌های آماده',
@@ -217,8 +255,8 @@ class Ardal_Settings_UI {
 		$extras = Ardal_Palette::extras_schema();
 
 		foreach ( Ardal_Palette::extras_groups() as $group => $title ) {
-			// پشتیبانی پنل در تب پنل کاربری است؛ هر name فقط یک جا.
-			if ( 'account' === $group ) {
+			// پشتیبانی پنل در تب پنل کاربری است و برند بالای همین تب؛ هر name فقط یک جا.
+			if ( 'account' === $group || 'brand' === $group ) {
 				continue;
 			}
 
@@ -546,9 +584,9 @@ class Ardal_Settings_UI {
 			<header class="ards-head">
 				<div class="ards-head__top">
 					<div class="ards-brand">
-						<span class="ards-brand__mark" aria-hidden="true">ا</span>
+						<span class="ards-brand__mark" aria-hidden="true"><?php echo esc_html( Ardal_Brand::mark() ); ?></span>
 						<span>
-							<h1 class="ards-brand__title">تنظیمات اردال</h1>
+							<h1 class="ards-brand__title"><?php echo esc_html( 'تنظیمات ' . Ardal_Brand::name() ); ?></h1>
 							<span class="ards-brand__sub">نسخهٔ <?php echo esc_html( Ardal_Helpers::fa_digits( ARDAL_VERSION, true ) ); ?> · ویجت‌های المنتور و ابزارهای فروشگاه</span>
 						</span>
 					</div>
@@ -1229,7 +1267,7 @@ class Ardal_Settings_UI {
 			</div>
 
 			<div class="ards-box ards-box--pad">
-				<div class="ards-box__row"><strong>ویجت‌های اردال در المنتور</strong><span data-ards-wcount><?php echo esc_html( Ardal_Helpers::fa_digits( count( $widgets ), true ) ); ?> ویجت</span></div>
+				<div class="ards-box__row"><strong><?php echo esc_html( 'ویجت‌های ' . Ardal_Brand::name() . ' در المنتور' ); ?></strong><span data-ards-wcount><?php echo esc_html( Ardal_Helpers::fa_digits( count( $widgets ), true ) ); ?> ویجت</span></div>
 				<input type="search" class="ards-in ards-in--sm" aria-label="فیلتر ویجت‌ها" placeholder="فیلتر ویجت‌ها…" data-ards-wfilter />
 				<div class="ards-wlist" data-ards-wlist>
 					<?php foreach ( $widgets as $title ) : ?>

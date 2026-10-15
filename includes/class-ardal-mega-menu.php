@@ -130,7 +130,7 @@ class Ardal_Mega_Menu {
 				'nonce'        => wp_create_nonce( 'ardal-menu-admin-nonce' ),
 				'maxInputVars' => $max_vars,
 				'i18n'         => array(
-					'bulkToolbarTitle' => 'ابزارهای سازمان‌دهی دسته‌جمعی فهرست (اردال)',
+					'bulkToolbarTitle' => Ardal_Brand::text( 'ابزارهای سازمان‌دهی دسته‌جمعی فهرست (اردال)' ),
 					'selectedCount'    => 'مورد انتخاب شده',
 					'selectAll'        => 'انتخاب همه',
 					'deselectAll'      => 'لغو انتخاب',
@@ -773,7 +773,7 @@ class Ardal_Mega_Menu {
 	public static function add_nav_menu_meta_boxes() {
 		add_meta_box(
 			'ardal-taxonomy-tree-importer',
-			'افزودن هوشمند دسته‌بندی‌ها (اردال)',
+			Ardal_Brand::text( 'افزودن هوشمند دسته‌بندی‌ها (اردال)' ),
 			array( __CLASS__, 'render_taxonomy_importer_metabox' ),
 			'nav-menus',
 			'side',

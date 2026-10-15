@@ -35,8 +35,8 @@ class Ardal_Settings {
 
 	public function add_menu() {
 		add_menu_page(
-			'تنظیمات اردال',
-			'اردال',
+			'تنظیمات ' . Ardal_Brand::name(),
+			Ardal_Brand::name(),
 			'manage_options',
 			self::PAGE,
 			array( $this, 'render_page' ),

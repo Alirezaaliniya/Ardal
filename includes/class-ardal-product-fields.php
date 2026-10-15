@@ -58,12 +58,12 @@ class Ardal_Product_Fields {
 				'id'                => 'ardal_product_subtitle',
 				'name'              => 'ardal_product_subtitle',
 				'value'             => (string) get_post_meta( $post->ID, $key, true ),
-				'label'             => 'عنوان انگلیسی (اردال)',
+				'label'             => Ardal_Brand::text( 'عنوان انگلیسی (اردال)' ),
 				'placeholder'       => 'Pro-Fit Aero X2 Running Shoes — Men',
 				'desc_tip'          => false,
 				'description'       => $enabled
 					? sprintf( 'زیر نام محصول نمایش داده می‌شود. در متای «%s» ذخیره می‌شود.', esc_html( $key ) )
-					: 'برای دیده‌شدن، گزینهٔ «نمایش عنوان انگلیسی محصول» را در تنظیمات اردال روشن کنید.',
+					: Ardal_Brand::text( 'برای دیده‌شدن، گزینهٔ «نمایش عنوان انگلیسی محصول» را در تنظیمات اردال روشن کنید.' ),
 				'custom_attributes' => array( 'dir' => 'ltr' ),
 			)
 		);
