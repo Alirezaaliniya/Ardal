@@ -31,7 +31,6 @@
 
 	container-type: inline-size;
 	direction: rtl;
-	padding: 16px clamp(12px, 4vw, 58px) 60px;
 	background: var(--el-bg);
 	color: var(--el-text);
 	font-family: var(--el-font);
