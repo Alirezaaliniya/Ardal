@@ -385,7 +385,8 @@ class Ardal_Wallet {
 
 			$out[ $key . '_pattern' ] = isset( $raw[ $key . '_pattern' ] ) ? sanitize_text_field( $raw[ $key . '_pattern' ] ) : '';
 			$out[ $key . '_vars' ]    = isset( $raw[ $key . '_vars' ] ) ? sanitize_text_field( $raw[ $key . '_vars' ] ) : $defaults[ $key . '_vars' ];
-			$out[ $key . '_text' ]    = isset( $raw[ $key . '_text' ] ) ? sanitize_textarea_field( $raw[ $key . '_text' ] ) : $defaults[ $key . '_text' ];
+			// مرورگر خط‌شکن textarea را CRLF می‌فرستد؛ متن پیامک یکدست با LF بماند.
+			$out[ $key . '_text' ]    = isset( $raw[ $key . '_text' ] ) ? str_replace( "\r\n", "\n", sanitize_textarea_field( $raw[ $key . '_text' ] ) ) : $defaults[ $key . '_text' ];
 		}
 
 		return $out;

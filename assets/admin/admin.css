@@ -1,695 +1,2255 @@
-/* Ardal — استایل صفحه تنظیمات پیشخوان */
+/*!
+ * Ardal — صفحهٔ تنظیمات (طبق دیزاین docs/Ardal Settings).
+ *
+ * همه‌چیز زیر .ards است تا با استایل‌های پیشخوان وردپرس قاطی نشود.
+ */
 
-/* ---------- تب‌های علاقه‌مندی و کیف پول ---------- */
+.ards {
+	--s-bg: #f1f3f6;
+	--s-card: #fff;
+	--s-ink: #18212c;
+	--s-ink-2: #3a4655;
+	--s-ink-3: #586474;
+	--s-mute: #6b7685;
+	--s-mute-2: #8792a1;
+	--s-line: #e2e7ee;
+	--s-line-2: #eef1f5;
+	--s-input: #d5dce5;
+	--s-soft: #f7f9fb;
+	--s-soft-2: #f4f6f9;
+	--s-blue: #0b62ce;
+	--s-navy: #0b3c8c;
+	--s-ring: #d6e6fb;
+	--s-tint: #f2f7fd;
+	--s-tint-line: #cfe2f8;
+	--s-off: #c3cbd6;
+	--s-dirty: #e8890c;
+	--s-warn-bg: #fff1dc;
+	--s-warn-ink: #9a5b00;
+	--s-risk: #b3261e;
+	--s-risk-bg: #fdeeec;
+	--s-risk-line: #f2c9c3;
+	--s-ok: #2f8f46;
+	--s-ok-bg: #eef7ef;
+	--s-ok-line: #cfe6d3;
+	--s-ok-ink: #1e5a2c;
+	--s-mono: ui-monospace, Menlo, Consolas, monospace;
 
-.ardal-field[hidden] {
+	margin-inline-start: -20px;
+	min-height: calc(100vh - 32px);
+	background: var(--s-bg);
+	color: var(--s-ink);
+	font-family: Vazirmatn, Tahoma, sans-serif;
+	font-size: 14px;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+#wpbody-content:has(> .ards) {
+	padding-bottom: 0;
+}
+
+#wpfooter:has(~ * .ards),
+body:has(.ards) #wpfooter {
+	display: none;
+}
+
+.ards *,
+.ards *::before,
+.ards *::after {
+	box-sizing: border-box;
+}
+
+.ards :where(input, textarea, select, button) {
+	font-family: inherit;
+}
+
+.ards :focus-visible {
+	outline: 2px solid var(--s-blue);
+	outline-offset: 2px;
+}
+
+.ards a {
+	color: var(--s-blue);
+	text-decoration: none;
+}
+
+.ards a:hover {
+	color: var(--s-navy);
+	text-decoration: underline;
+}
+
+.ards [hidden] {
 	display: none !important;
 }
 
-.ardal-field--select select,
-.ardal-field--textarea textarea {
-	max-width: 520px;
+.ards-sr {
+	position: absolute;
+	inline-size: 1px;
+	block-size: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
 }
 
-.ardal-media {
+/* ---------------------------------------------------------------- سربرگ */
+
+.ards-head {
+	position: sticky;
+	top: 32px;
+	z-index: 30;
+	background: var(--s-card);
+	border-bottom: 1px solid var(--s-line);
+}
+
+.ards-head__top {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 14px 20px;
+	padding: 16px 28px 0;
+}
+
+.ards-brand {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.ards-brand__mark {
+	display: grid;
+	place-items: center;
+	inline-size: 40px;
+	block-size: 40px;
+	border-radius: 11px;
+	background: var(--s-navy);
+	color: #fff;
+	font-size: 20px;
+	font-weight: 700;
+}
+
+.ards .ards-brand__title {
+	margin: 0;
+	padding: 0;
+	color: var(--s-ink);
+	font-size: 18px;
+	font-weight: 700;
+	line-height: 1.4;
+}
+
+.ards-brand__sub {
+	display: block;
+	color: var(--s-mute);
+	font-size: 12.5px;
+}
+
+.ards-search {
+	position: relative;
+	flex: 1 1 260px;
+	max-inline-size: 440px;
+	margin-inline-start: auto;
+}
+
+.ards .ards-search input {
+	inline-size: 100%;
+	block-size: 40px;
+	margin: 0;
+	padding: 0 14px;
+	border: 1px solid var(--s-input);
+	border-radius: 10px;
+	background: var(--s-soft);
+	box-shadow: none;
+	color: var(--s-ink);
+	font-size: 14px;
+	outline: none;
+}
+
+.ards .ards-search input:focus {
+	border-color: var(--s-blue);
+	background: #fff;
+	box-shadow: 0 0 0 3px var(--s-ring);
+}
+
+.ards-search__list {
+	position: absolute;
+	inset-block-start: 46px;
+	inset-inline: 0;
+	z-index: 40;
+	max-block-size: 380px;
+	overflow: auto;
+	padding: 6px;
+	border: 1px solid var(--s-line);
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 12px 32px rgba(16, 24, 40, .14);
+}
+
+.ards-search__item {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	inline-size: 100%;
+	padding: 9px 12px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	text-align: right;
+	cursor: pointer;
+}
+
+.ards-search__item:hover,
+.ards-search__item.is-on {
+	background: #f1f5fb;
+}
+
+.ards-search__item b {
+	color: var(--s-ink);
+	font-size: 13.5px;
+	font-weight: 500;
+}
+
+.ards-search__item span {
+	color: var(--s-mute);
+	font-size: 12px;
+}
+
+.ards-search__none {
+	padding: 14px 12px;
+	color: var(--s-mute);
+	font-size: 13px;
+}
+
+.ards-status {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: #4e6b57;
+	font-size: 12.5px;
+}
+
+.ards-status__dot {
+	inline-size: 8px;
+	block-size: 8px;
+	border-radius: 50%;
+	background: var(--s-ok);
+}
+
+.ards-status.is-dirty {
+	color: var(--s-warn-ink);
+}
+
+.ards-status.is-dirty .ards-status__dot {
+	background: var(--s-dirty);
+}
+
+.ards-tabs {
+	display: flex;
+	gap: 4px;
+	overflow-x: auto;
+	padding: 12px 22px 0;
+}
+
+.ards-tab {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px 12px;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	background: transparent;
+	color: var(--s-ink-3);
+	font-size: 14.5px;
+	font-weight: 500;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.ards-tab:hover {
+	color: var(--s-navy);
+}
+
+.ards-tab[aria-selected="true"] {
+	border-bottom-color: var(--s-blue);
+	color: var(--s-navy);
+	font-weight: 600;
+}
+
+.ards-tab__count {
+	display: grid;
+	place-items: center;
+	min-inline-size: 18px;
+	block-size: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: var(--s-warn-bg);
+	color: var(--s-warn-ink);
+	font-size: 11.5px;
+	font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- بدنه */
+
+.ards-form {
+	margin: 0;
+	padding: 24px 28px 140px;
+	max-inline-size: 1440px;
+}
+
+.ards-intro {
+	max-inline-size: 760px;
+	margin-bottom: 20px;
+}
+
+.ards .ards-intro__title {
+	margin: 0 0 6px;
+	padding: 0;
+	color: var(--s-ink);
+	font-size: 21px;
+	font-weight: 700;
+}
+
+.ards-intro__lede {
+	margin: 0;
+	color: var(--s-ink-3);
+	line-height: 1.9;
+	font-size: 14px;
+}
+
+.ards-warn {
+	max-inline-size: 720px;
+	padding: 28px;
+	border: 1px solid #f3d9a6;
+	border-radius: 14px;
+	background: #fff4e0;
+	color: #6b4300;
+	line-height: 1.9;
+}
+
+.ards-warn strong {
+	display: block;
+	margin-bottom: 4px;
+	font-size: 15px;
+}
+
+.ards-layout {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 24px;
+}
+
+.ards-subnav {
+	position: sticky;
+	top: 168px;
+	display: flex;
+	flex: 0 0 210px;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.ards-subnav__div {
+	margin: 12px 10px 4px;
+	color: var(--s-warn-ink);
+	font-size: 11.5px;
+	font-weight: 600;
+}
+
+.ards-subnav__item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	inline-size: 100%;
+	padding: 8px 10px;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--s-ink-2);
+	font-size: 13.5px;
+	text-align: right;
+	cursor: pointer;
+}
+
+.ards-subnav__item:hover {
+	background: #e8eef6;
+}
+
+.ards-subnav__item.is-on {
+	background: #e3ecf8;
+	color: var(--s-navy);
+	font-weight: 600;
+}
+
+.ards-subnav__label {
+	flex: 1;
+	min-inline-size: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ards-subnav__state {
+	flex: none;
+	inline-size: 7px;
+	block-size: 7px;
+	border: 1.5px solid #a9b3bf;
+	border-radius: 50%;
+}
+
+.ards-subnav__state.is-on {
+	border-color: var(--s-ok);
+	background: var(--s-ok);
+}
+
+.ards-dot {
+	flex: none;
+	inline-size: 7px;
+	block-size: 7px;
+	border-radius: 50%;
+	background: var(--s-dirty);
+}
+
+.ards-jump {
+	display: none;
+	flex: 1 1 100%;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.ards-jump label {
+	color: var(--s-ink-3);
+	font-size: 12.5px;
+}
+
+.ards .ards-jump select {
+	max-inline-size: none;
+	block-size: 42px;
+	padding: 0 10px;
+	border: 1px solid var(--s-input);
+	border-radius: 10px;
+	background-color: #fff;
+	font-size: 14px;
+}
+
+.ards-cards {
+	display: flex;
+	flex: 1 1 520px;
+	flex-direction: column;
+	gap: 16px;
+	min-inline-size: 0;
+}
+
+/* ---------------------------------------------------------------- کارت */
+
+.ards-card {
+	border: 1px solid var(--s-line);
+	border-radius: 14px;
+	background: var(--s-card);
+	scroll-margin-top: 180px;
+}
+
+.ards-card--adv {
+	border-color: #f0ddb8;
+}
+
+.ards-card__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px 16px;
+	padding: 18px 22px;
+}
+
+.ards-card__titles {
+	flex: 1 1 260px;
+	min-inline-size: 0;
+}
+
+.ards-card__tl {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 8px;
 }
 
-.ardal-media input {
-	width: min(420px, 100%);
+.ards .ards-card__tl h3 {
+	margin: 0;
+	color: var(--s-ink);
+	font-size: 15.5px;
+	font-weight: 600;
 }
 
-.ardal-table--codes td:first-child {
-	width: 38%;
+.ards-card__sub {
+	margin: 4px 0 0;
+	color: var(--s-mute);
+	font-size: 13px;
+	line-height: 1.8;
+}
+
+.ards-card__off {
+	display: none;
+	margin: 0 22px 18px;
+	padding: 12px 14px;
+	border: 1px dashed var(--s-input);
+	border-radius: 10px;
+	background: var(--s-soft);
+	color: var(--s-mute);
+	font-size: 13px;
+}
+
+.ards-card.is-off .ards-card__off {
+	display: block;
+}
+
+.ards-card.is-off .ards-card__body {
+	display: none;
+}
+
+.ards-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 0 22px 22px;
+}
+
+.ards-master {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 12px 6px 6px;
+	border-radius: 999px;
+	background: var(--s-soft-2);
+	color: var(--s-ink-2);
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.ards-badge {
+	padding: 2px 8px;
+	border-radius: 6px;
+	font-size: 11.5px;
+	font-weight: 600;
 	white-space: nowrap;
 }
 
-.ardal-table--codes code {
-	font-size: 12px;
-	background: #f0f6fc;
-	padding: 3px 7px;
-	border-radius: 5px;
+.ards-badge--warn {
+	background: var(--s-warn-bg);
+	color: var(--s-warn-ink);
 }
 
-.ardal-lede a {
-	font-weight: 700;
-	text-decoration: none;
+.ards-badge--risk {
+	background: var(--s-risk-bg);
+	color: var(--s-risk);
 }
 
-/* وضعیت اتصال به نیاس لاگین در کارت پیامک */
-.ardal-nias {
-	margin: 10px 0 14px;
-	padding: 10px 14px;
-	border-radius: 8px;
-	font-size: 12.5px;
-	line-height: 1.9;
+.ards-badge--muted {
+	margin-inline-start: auto;
+	padding: 1px 7px;
+	background: #f1f4f8;
+	color: var(--s-ink-3);
+	font-size: 11px;
+	font-weight: 400;
 }
 
-.ardal-nias--ok {
+.ards-badge--ok {
+	padding: 1px 7px;
 	background: #e6f4ea;
-	color: #1a5e2c;
+	color: #1e6b34;
+	font-size: 11px;
+	font-weight: 500;
 }
 
-.ardal-nias--bad {
-	background: #fcebea;
-	color: #8a1f1f;
+.ards-advsep {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 16px;
+	color: var(--s-warn-ink);
+	font-size: 13px;
+	font-weight: 600;
 }
 
-.ardal-sms-test {
+.ards-advsep::after {
+	content: "";
+	flex: 1;
+	block-size: 1px;
+	background: #f0ddb8;
+}
+
+.ards-advbtn {
+	block-size: 34px;
+	padding: 0 14px;
+	border: 1px solid #e7c98f;
+	border-radius: 8px;
+	background: #fff8ec;
+	color: #7a4800;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.ards-info {
+	display: flex;
+	gap: 10px;
+	padding: 11px 14px;
+	border-radius: 10px;
+	background: var(--s-tint);
+	color: #2b4766;
+	font-size: 13px;
+	line-height: 1.85;
+}
+
+.ards-info__i {
+	display: grid;
+	flex: none;
+	place-items: center;
+	inline-size: 18px;
+	block-size: 18px;
+	margin-top: 3px;
+	border-radius: 50%;
+	background: var(--s-blue);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- سوییچ */
+
+.ards-sw {
+	position: relative;
+	display: inline-flex;
+	flex: none;
+	inline-size: 40px;
+	block-size: 24px;
+}
+
+.ards .ards-sw__in {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	inline-size: 100%;
+	block-size: 100%;
+	margin: 0;
+	border: 0;
+	border-radius: 12px;
+	background: var(--s-off);
+	box-shadow: none;
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	transition: background .15s;
+}
+
+/* تیک پیش‌فرض چک‌باکس‌های پیشخوان وردپرس روی سوییچ نیاید. */
+.ards .ards-sw__in::before,
+.ards .ards-sw__in:checked::before {
+	content: none !important;
+	display: none !important;
+}
+
+.ards .ards-sw__in:checked {
+	background: var(--s-blue);
+}
+
+.ards .ards-sw--risk .ards-sw__in:checked {
+	background: var(--s-risk);
+}
+
+.ards-sw__knob {
+	position: absolute;
+	inset-block-start: 3px;
+	inset-inline-start: 3px;
+	z-index: 2;
+	inline-size: 18px;
+	block-size: 18px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+	pointer-events: none;
+	transition: inset-inline-start .15s;
+}
+
+.ards-sw__in:checked + .ards-sw__knob {
+	inset-inline-start: 19px;
+}
+
+/* ---------------------------------------------------------------- فیلدها */
+
+.ards-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: 16px 18px;
+}
+
+.ards-f {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-inline-size: 0;
+	border-radius: 8px;
+	scroll-margin-top: 190px;
+	transition: box-shadow .2s;
+}
+
+.ards-f.is-hl {
+	box-shadow: 0 0 0 3px #f5c451;
+}
+
+.ards-f.is-hidden {
+	display: none;
+}
+
+.ards-f--toggle,
+.ards-f--area,
+.ards-f--select,
+.ards-f--image {
+	grid-column: 1 / -1;
+}
+
+.ards-f__lr {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-block-size: 20px;
+}
+
+.ards-f__label {
+	color: var(--s-ink);
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.ards-f__main {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+.ards-help {
+	margin: 0;
+	overflow: hidden;
+	color: var(--s-mute);
+	font-size: 12px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ards-f:focus-within .ards-help,
+.ards-help--full {
+	overflow: visible;
+	color: #465161;
+	line-height: 1.8;
+	white-space: normal;
+}
+
+.ards-err {
+	margin: 0;
+	color: var(--s-risk);
+	font-size: 12px;
+}
+
+/* سوییچ‌دار */
+.ards-f--toggle {
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 16px;
+	padding: 13px 16px;
+	border: 1px solid transparent;
+	border-radius: 10px;
+	background: var(--s-soft);
+}
+
+.ards-f--toggle .ards-f__label {
+	font-size: 14px;
+}
+
+.ards-f--toggle .ards-help {
+	margin-top: 3px;
+	font-size: 12.5px;
+}
+
+.ards-f--risk:has(.ards-sw__in:checked) {
+	border-color: var(--s-risk-line);
+	background: #fdf1ef;
+}
+
+/* متن، ناحیهٔ متن، سلکت */
+.ards .ards-in {
+	inline-size: 100%;
+	max-inline-size: none;
+	block-size: 40px;
+	margin: 0;
+	padding: 0 12px;
+	border: 1px solid var(--s-input);
+	border-radius: 8px;
+	background: #fff;
+	box-shadow: none;
+	color: var(--s-ink);
+	font-size: 14px;
+	line-height: normal;
+	outline: none;
+}
+
+.ards .ards-in:focus {
+	border-color: var(--s-blue);
+	box-shadow: 0 0 0 3px var(--s-ring);
+}
+
+.ards .ards-in[dir="ltr"] {
+	text-align: left;
+}
+
+.ards .ards-in--area {
+	block-size: auto;
+	min-block-size: 64px;
+	padding: 10px 12px;
+	line-height: 1.8;
+	resize: vertical;
+}
+
+.ards .ards-in--sm {
+	block-size: 34px;
+	font-size: 13px;
+}
+
+.ards .ards-in--mono {
+	font-family: var(--s-mono);
+	font-size: 13px;
+}
+
+.ards .ards-in.is-bad {
+	border-color: var(--s-risk);
+}
+
+/* عدد با + و − */
+.ards-step,
+.ards-money {
+	display: flex;
+	align-items: stretch;
+	block-size: 40px;
+	overflow: hidden;
+	border: 1px solid var(--s-input);
+	border-radius: 8px;
+	background: #fff;
+}
+
+.ards-step:focus-within,
+.ards-money:focus-within {
+	border-color: var(--s-blue);
+	box-shadow: 0 0 0 3px var(--s-ring);
+}
+
+.ards-step.is-bad {
+	border-color: var(--s-risk);
+	box-shadow: 0 0 0 3px #f8d7d3;
+}
+
+.ards-step__btn {
+	flex: none;
+	inline-size: 36px;
+	border: 0;
+	background: var(--s-soft-2);
+	color: var(--s-ink-2);
+	font-size: 17px;
+	cursor: pointer;
+}
+
+.ards-step__btn:hover {
+	background: #e8eef6;
+}
+
+.ards .ards-step input,
+.ards .ards-money input {
+	flex: 1;
+	min-inline-size: 0;
+	block-size: auto;
+	margin: 0;
+	padding: 0 12px;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: var(--s-ink);
+	font-size: 14px;
+	text-align: center;
+	outline: none;
+}
+
+.ards .ards-money input {
+	text-align: left;
+}
+
+.ards-step__unit,
+.ards-money__unit {
+	display: flex;
+	align-items: center;
+	padding: 0 10px;
+	border-inline-start: 1px solid var(--s-line);
+	background: var(--s-soft);
+	color: var(--s-mute);
+	font-size: 12px;
+}
+
+.ards-money__unit {
+	padding: 0 12px;
+	border-inline-start: 0;
+	border-inline-end: 1px solid var(--s-line);
+}
+
+.ards-words {
+	color: var(--s-mute-2);
+	font-size: 12px;
+}
+
+.ards-words:empty {
+	display: none;
+}
+
+/* گزینه‌های رادیویی کارتی */
+.ards-radios {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.ards-radio {
+	position: relative;
+	display: flex;
+	flex: 1 1 220px;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	border: 1.5px solid var(--s-line);
+	border-radius: 10px;
+	background: #fff;
+	color: var(--s-ink);
+	font-size: 13.5px;
+	cursor: pointer;
+}
+
+.ards .ards-radio input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ards-radio__dot {
+	display: grid;
+	flex: none;
+	place-items: center;
+	inline-size: 16px;
+	block-size: 16px;
+	border: 2px solid #b7c1cd;
+	border-radius: 50%;
+}
+
+.ards-radio__dot::after {
+	content: "";
+	inline-size: 6px;
+	block-size: 6px;
+	border-radius: 50%;
+}
+
+.ards-radio:has(input:checked) {
+	border-color: var(--s-blue);
+	background: var(--s-tint);
+}
+
+.ards-radio:has(input:checked) .ards-radio__dot {
+	border-color: var(--s-blue);
+}
+
+.ards-radio:has(input:checked) .ards-radio__dot::after {
+	background: var(--s-blue);
+}
+
+.ards-radio:has(input:focus-visible) {
+	outline: 2px solid var(--s-blue);
+	outline-offset: 2px;
+}
+
+/* آیکون */
+.ards-iconsel {
+	display: flex;
+	gap: 8px;
+}
+
+.ards-iconsel__pv {
+	display: grid;
+	flex: none;
+	place-items: center;
+	inline-size: 40px;
+	block-size: 40px;
+	border: 1px solid var(--s-tint-line);
+	border-radius: 8px;
+	background: #eaf2fd;
+	color: var(--s-blue);
+}
+
+.ards .ards-iconsel select {
+	flex: 1;
+	min-inline-size: 0;
+	padding: 0 10px;
+}
+
+/* رنگ */
+.ards-f--color {
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	padding: 10px;
+	border: 1px solid var(--s-line);
+	border-radius: 10px;
+}
+
+.ards-f--color:focus-within {
+	border-color: var(--s-blue);
+}
+
+.ards-f--color.is-bad {
+	border-color: var(--s-risk);
+}
+
+.ards-f--color .ards-f__label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ards-help--line {
+	overflow: hidden;
+	color: var(--s-mute-2);
+	font-size: 11.5px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ards-swatch {
+	position: relative;
+	flex: none;
+	inline-size: 38px;
+	block-size: 38px;
+	overflow: hidden;
+	border-radius: 8px;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
+}
+
+.ards .ards-swatch input {
+	position: absolute;
+	inset: 0;
+	inline-size: 100%;
+	block-size: 100%;
+	padding: 0;
+	border: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.ards .ards-hex {
+	flex: none;
+	inline-size: 76px;
+	block-size: 30px;
+	margin: 0;
+	padding: 0 6px;
+	border: 1px solid var(--s-input);
+	border-radius: 6px;
+	box-shadow: none;
+	color: var(--s-ink-2);
+	font-family: var(--s-mono);
+	font-size: 12px;
+	text-align: center;
+	text-transform: uppercase;
+	outline: none;
+}
+
+.ards .ards-hex:focus {
+	border-color: var(--s-blue);
+}
+
+.ards-reset {
+	flex: none;
+	inline-size: 26px;
+	block-size: 26px;
+	border: 0;
+	border-radius: 6px;
+	background: #f1f4f8;
+	color: var(--s-ink-3);
+	font-size: 13px;
+	cursor: pointer;
+}
+
+/* تصویر */
+.ards-media__empty {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 14px;
+	border: 1.5px dashed #c9d2dd;
+	border-radius: 10px;
+	background: #fafbfd;
+	text-align: right;
+	cursor: pointer;
+}
+
+.ards-media__empty:hover {
+	border-color: var(--s-blue);
+	background: var(--s-tint);
+}
+
+.ards-media__empty > span:last-child {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.ards-media__empty strong {
+	color: var(--s-blue);
+	font-size: 13.5px;
+}
+
+.ards-media__empty > span:last-child span {
+	color: var(--s-mute);
+	font-size: 12px;
+}
+
+.ards-media__ph {
+	flex: none;
+	inline-size: 72px;
+	block-size: 52px;
+	border-radius: 8px;
+	background: repeating-linear-gradient(45deg, #eef1f5 0 6px, var(--s-soft) 6px 12px);
+}
+
+.ards-media__has {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
+	gap: 14px;
+	padding: 12px;
+	border: 1px solid var(--s-line);
+	border-radius: 10px;
+}
+
+.ards-media__img {
+	flex: none;
+	inline-size: 96px;
+	block-size: 64px;
+	border-radius: 8px;
+	background: repeating-linear-gradient(45deg, #e3eaf3 0 6px, #eef3f9 6px 12px);
+	object-fit: contain;
+}
+
+.ards-media__url {
+	flex: 1;
+	min-inline-size: 0;
+	overflow: hidden;
+	color: var(--s-ink-3);
+	font-family: var(--s-mono);
+	font-size: 12px;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* جای‌گذارها */
+.ards-tokens {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.ards-tokens__cap {
+	color: var(--s-mute);
+	font-size: 12px;
+}
+
+.ards-token {
+	block-size: 24px;
+	padding: 0 8px;
+	border: 1px solid var(--s-tint-line);
+	border-radius: 6px;
+	background: var(--s-tint);
+	color: var(--s-navy);
+	font-family: var(--s-mono);
+	font-size: 11.5px;
+	cursor: pointer;
+}
+
+.ards-token:hover {
+	background: #e2eefc;
+}
+
+/* دکمه‌ها */
+.ards-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	block-size: 34px;
+	padding: 0 14px;
+	border: 1px solid var(--s-input);
+	border-radius: 8px;
+	background: #fff;
+	color: var(--s-ink-2);
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.ards-btn:disabled {
+	opacity: .6;
+	cursor: progress;
+}
+
+.ards-btn--sm {
+	block-size: 30px;
+	padding: 0 12px;
+	font-size: 12.5px;
+}
+
+.ards-btn--soft-danger:hover {
+	border-color: var(--s-risk);
+	color: var(--s-risk);
+}
+
+.ards-btn--dangerline {
+	border-color: var(--s-risk-line);
+	color: var(--s-risk);
+}
+
+.ards-btn--danger {
+	block-size: 38px;
+	border: 0;
+	background: var(--s-risk);
+	color: #fff;
+	font-weight: 600;
+}
+
+.ards-btn--outline {
+	block-size: 36px;
+	border-color: var(--s-blue);
+	color: var(--s-blue);
+	font-weight: 500;
+}
+
+.ards-btn.is-copied {
+	background: var(--s-ok-bg);
+	color: #1e6b34;
+}
+
+/* ---------------------------------------------------------------- پالت‌های آماده */
+
+.ards-presets {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+	gap: 12px;
+}
+
+.ards-preset {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 10px;
+	border: 1.5px solid var(--s-line);
+	border-radius: 12px;
+	background: #fff;
+	text-align: right;
+	cursor: pointer;
+}
+
+.ards-preset:hover {
+	border-color: #8db5e8;
+}
+
+.ards-preset.is-active {
+	border-color: var(--s-blue);
+	background: var(--s-tint);
+}
+
+.ards-preset__sw {
+	display: flex;
+	block-size: 34px;
+	overflow: hidden;
+	border-radius: 8px;
+}
+
+.ards-preset__sw span {
+	flex: 1;
+}
+
+.ards-preset__name {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	color: var(--s-ink);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.ards-preset__on {
+	display: none;
+	padding: 1px 7px;
+	border-radius: 5px;
+	background: var(--s-blue);
+	color: #fff;
+	font-size: 11px;
+}
+
+.ards-preset.is-active .ards-preset__on {
+	display: inline;
+}
+
+.ards-presets__foot {
+	display: flex;
+	justify-content: flex-end;
+}
+
+/* ---------------------------------------------------------------- منوی پنل */
+
+.ards-menu {
+	overflow: hidden;
+	border: 1px solid var(--s-line);
+	border-radius: 12px;
+}
+
+.ards-menu__head,
+.ards-menu__row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 14px;
+}
+
+.ards-menu__head {
+	background: var(--s-soft);
+	color: var(--s-mute);
+	font-size: 12px;
+}
+
+.ards-menu__head span:nth-child(1) { inline-size: 16px; }
+.ards-menu__head span:nth-child(2) { inline-size: 40px; }
+.ards-menu__head span:nth-child(3) { flex: 1; }
+
+.ards-menu__row {
+	border-top: 1px solid var(--s-line-2);
+	background: #fff;
+}
+
+.ards-menu__row.is-drag {
+	background: var(--s-tint);
+	opacity: .7;
+}
+
+.ards-menu__row.is-over {
+	border-top-color: var(--s-blue);
+	box-shadow: inset 0 2px 0 var(--s-blue);
+}
+
+.ards-menu__grip {
+	inline-size: 16px;
+	color: #9aa5b3;
+	font-size: 15px;
+	letter-spacing: -3px;
+	cursor: grab;
+	user-select: none;
+}
+
+.ards-menu__label {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 2px;
+	min-inline-size: 0;
+}
+
+.ards-menu__row:not(:has(.ards-sw__in:checked)) .ards-menu__label {
+	opacity: .5;
+}
+
+.ards-menu__def {
+	color: var(--s-mute-2);
+	font-size: 11.5px;
+}
+
+.ards-menu__ord {
+	min-inline-size: 26px;
+	padding: 3px 8px;
+	border-radius: 6px;
+	background: #f1f4f8;
+	color: var(--s-ink-3);
+	font-size: 12px;
+	text-align: center;
+}
+
+.ards-menu__mv {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.ards-menu__mv button {
+	inline-size: 26px;
+	block-size: 16px;
+	padding: 0;
+	border: 0;
+	border-radius: 4px;
+	background: #f1f4f8;
+	color: var(--s-ink-2);
+	font-size: 10px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.ards-menu__mv button:disabled {
+	opacity: .35;
+	cursor: default;
+}
+
+/* ---------------------------------------------------------------- پیامک */
+
+.ards-nias {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 14px;
+	border: 1px solid;
+	border-radius: 10px;
+	font-size: 13px;
+}
+
+.ards-nias > span:nth-child(2) {
+	flex: 1 1 240px;
+}
+
+.ards-nias__dot {
+	inline-size: 8px;
+	block-size: 8px;
+	border-radius: 50%;
+}
+
+.ards-nias a {
+	font-size: 12.5px;
+	font-weight: 600;
+}
+
+.ards-nias--ok { border-color: var(--s-ok-line); background: var(--s-ok-bg); color: var(--s-ok-ink); }
+.ards-nias--ok .ards-nias__dot { background: var(--s-ok); }
+.ards-nias--warn { border-color: #f3d9a6; background: #fff4e0; color: #6b4300; }
+.ards-nias--warn .ards-nias__dot { background: var(--s-dirty); }
+.ards-nias--bad { border-color: var(--s-risk-line); background: var(--s-risk-bg); color: #8a1c15; }
+.ards-nias--bad .ards-nias__dot { background: var(--s-risk); }
+
+.ards-sms {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.ards-ev {
+	overflow: hidden;
+	border: 1px solid var(--s-line);
+	border-radius: 12px;
+}
+
+.ards-ev.is-open {
+	border-color: #cfddee;
+}
+
+.ards-ev__head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 14px 10px 12px;
+	background: #fff;
+}
+
+.ards-ev.is-open .ards-ev__head {
+	background: #f7fafe;
+}
+
+.ards-ev__open {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 10px;
+	min-inline-size: 0;
+	padding: 4px 0;
+	border: 0;
+	background: transparent;
+	text-align: right;
+	cursor: pointer;
+}
+
+.ards-ev__chev {
+	inline-size: 14px;
+	color: var(--s-mute);
+	font-size: 11px;
+}
+
+.ards-ev__chev::before {
+	content: "◂";
+}
+
+.ards-ev.is-open .ards-ev__chev::before {
+	content: "▾";
+}
+
+.ards-ev__label {
+	flex: 1;
+	min-inline-size: 0;
+	color: var(--s-ink);
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.ards-ev__mode {
+	flex: none;
+	padding: 2px 8px;
+	border-radius: 6px;
+	background: #f1f4f8;
+	color: var(--s-mute);
+	font-size: 11.5px;
+}
+
+.ards-ev__mode.is-pattern { background: #eaf2fd; color: var(--s-navy); }
+.ards-ev__mode.is-text { background: #f1f8e6; color: #3f7a0c; }
+
+.ards-ev__body {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 16px;
+	padding: 14px;
+	border-top: 1px solid var(--s-line-2);
+}
+
+.ards-ev:not(:has(.ards-ev__head .ards-sw__in:checked)) .ards-ev__body {
+	opacity: .55;
+}
+
+.ards-ev__body .ards-f--area,
+.ards-smstest {
+	grid-column: 1 / -1;
+}
+
+.ards-ev__count {
+	margin-inline-start: auto;
+	color: var(--s-mute-2);
+	font-size: 11.5px;
+}
+
+.ards-smstest {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	padding: 12px;
+	border-radius: 10px;
+	background: var(--s-soft);
+	color: var(--s-ink-2);
+	font-size: 13px;
+}
+
+.ards .ards-smstest input {
+	inline-size: 150px;
+	text-align: left;
+}
+
+.ards-smstest__out {
+	font-size: 12.5px;
+}
+
+.ards-smstest__out.is-ok { color: #1e6b34; }
+.ards-smstest__out.is-bad { color: var(--s-risk); }
+
+.ards-spin {
+	inline-size: 14px;
+	block-size: 14px;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: ardsSpin .7s linear infinite;
+}
+
+@keyframes ardsSpin {
+	to { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------------- شورت‌کدها */
+
+.ards-refs {
+	overflow: hidden;
+	border: 1px solid var(--s-line);
+	border-radius: 12px;
+}
+
+.ards-ref {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px 14px;
+	padding: 12px 14px;
+}
+
+.ards-ref + .ards-ref {
+	border-top: 1px solid var(--s-line-2);
+}
+
+.ards-ref code {
+	padding: 4px 8px;
+	border-radius: 6px;
+	background: #f1f4f8;
+	color: var(--s-navy);
+	font-family: var(--s-mono);
+	font-size: 12.5px;
+}
+
+.ards-ref > span {
+	flex: 1 1 240px;
+	color: #465161;
+	font-size: 13px;
+	line-height: 1.8;
+}
+
+/* ---------------------------------------------------------------- کیف پول: نوار امکانات */
+
+.ards-strip {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.ards-strip__pills {
+	display: flex;
+	flex: 1 1 520px;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 14px;
+	border: 1px solid var(--s-line);
+	border-radius: 12px;
+	background: #fff;
+}
+
+.ards-strip__cap {
+	margin-inline-end: 4px;
+	color: var(--s-mute);
+	font-size: 12.5px;
+}
+
+.ards-pill {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 5px 10px;
+	border: 1px solid var(--s-line);
+	border-radius: 999px;
+	background: var(--s-soft-2);
+	color: var(--s-mute);
+	font-size: 12.5px;
+	cursor: pointer;
+}
+
+.ards-pill__dot {
+	inline-size: 7px;
+	block-size: 7px;
+	border-radius: 50%;
+	background: #a9b3bf;
+}
+
+.ards-pill.is-on {
+	border-color: var(--s-ok-line);
+	background: var(--s-ok-bg);
+	color: var(--s-ok-ink);
+}
+
+.ards-pill.is-on .ards-pill__dot {
+	background: var(--s-ok);
+}
+
+.ards .ards-strip__link {
+	display: flex;
+	flex: 0 1 320px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 16px;
+	border: 1px solid var(--s-tint-line);
+	border-radius: 12px;
+	background: #eaf2fd;
+	color: var(--s-navy);
+	text-decoration: none;
+}
+
+.ards .ards-strip__link:hover {
+	background: #dfebfb;
+	text-decoration: none;
+}
+
+.ards-strip__link > span:first-child {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.ards-strip__link strong {
+	font-size: 13.5px;
+}
+
+.ards-strip__link > span:first-child span {
+	color: #3d4a58;
+	font-size: 12px;
+}
+
+.ards-strip__link > span:last-child {
+	font-size: 18px;
+}
+
+/* ---------------------------------------------------------------- ستون پیش‌نمایش */
+
+.ards-aside {
+	position: sticky;
+	top: 168px;
+	display: grid;
+	flex: 1 1 330px;
+	align-content: start;
+	gap: 16px;
+	min-inline-size: 0;
+	max-inline-size: 400px;
+	max-block-size: calc(100vh - 190px);
+	overflow: auto;
+}
+
+.ards-box {
+	overflow: hidden;
+	border: 1px solid var(--s-line);
+	border-radius: 14px;
+	background: #fff;
+}
+
+.ards-box--pad {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 14px;
+}
+
+.ards-box__head,
+.ards-box__row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 13.5px;
+}
+
+.ards-box__head {
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--s-line-2);
+}
+
+.ards-box__head span,
+.ards-box__row span {
+	color: var(--s-mute-2);
+	font-size: 12px;
+}
+
+.ards-wlist {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	max-block-size: 220px;
+	overflow: auto;
+}
+
+.ards-wlist span {
+	padding: 4px 9px;
+	border-radius: 6px;
+	background: var(--s-soft-2);
+	color: var(--s-ink-2);
+	font-size: 12px;
+}
+
+.ards-wlist em {
+	color: var(--s-mute);
+	font-size: 12px;
+}
+
+/* پیش‌نمایش با متغیرهای پالت (--ard-*) که admin.js زنده عوضشان می‌کند */
+.ards-pv {
+	--pv-r: calc(var(--ard-radius, 16px));
+	--pv-rs: calc(var(--ard-radius, 16px) * .6);
+
+	background: var(--ard-surface);
+	color: var(--ard-text);
+	font-size: 12px;
+}
+
+.ards-pv__top {
+	padding: 7px;
+	background: var(--ard-primary-dark);
+	color: var(--ard-on-dark);
+	font-size: 11.5px;
+	text-align: center;
+}
+
+.ards-pv__hero {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	margin: 12px;
+	padding: 18px;
+	border-radius: var(--pv-r);
+	background: linear-gradient(135deg, var(--ard-primary-dark), var(--ard-primary) 60%, var(--ard-primary-light));
+	color: #fff;
+}
+
+.ards-pv__hero strong {
+	font-size: 16px;
+}
+
+.ards-pv__hero > span:not(.ards-pv__cta) {
+	color: var(--ard-on-dark);
+	font-size: 11.5px;
+}
+
+.ards-pv__cta {
+	margin-top: 6px;
+	padding: 6px 14px;
+	border-radius: var(--pv-rs);
+	background: var(--ard-accent);
+	color: #fff;
+	font-weight: 600;
+}
+
+.ards-pv__grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	padding: 0 12px 12px;
+}
+
+.ards-pv__card,
+.ards-pv__deal {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 8px;
+	border: 1px solid var(--ard-border);
+	border-radius: var(--pv-r);
+	background: var(--ard-base);
+}
+
+.ards-pv__deal {
+	gap: 8px;
+	padding: 10px;
+	border-color: var(--ard-tint-green-border);
+	background: var(--ard-tint-green);
+}
+
+.ards-pv__deal strong {
+	color: var(--ard-accent-deep);
+	font-size: 12.5px;
+}
+
+.ards-pv__shot {
+	position: relative;
+	display: grid;
+	place-items: center;
+	block-size: 74px;
+	border-radius: var(--pv-rs);
+	background: var(--ard-surface-alt);
+	color: var(--ard-muted);
+	font-family: var(--s-mono);
+	font-size: 9px;
+}
+
+.ards-pv__off {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	padding: 1px 6px;
+	border-radius: 5px;
+	background: var(--ard-sale);
+	color: #fff;
+	font-family: Vazirmatn, Tahoma, sans-serif;
+	font-size: 10px;
+}
+
+.ards-pv__stars {
+	color: var(--ard-star);
+	font-size: 11px;
+	letter-spacing: 1px;
+}
+
+.ards-pv__name {
+	color: var(--ard-text);
+	font-weight: 600;
+	line-height: 1.5;
+}
+
+.ards-pv__old {
+	color: var(--ard-muted);
+	font-size: 11px;
+	text-decoration: line-through;
+}
+
+.ards-pv__row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.ards-pv__price {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	color: var(--ard-primary-dark);
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.ards-pv__word {
+	color: var(--ard-text-soft);
+	font-size: 10px;
+	font-weight: 400;
+}
+
+.ards-pv__sym {
+	display: inline-flex;
+	color: var(--ard-toman, #003061);
+}
+
+.ards-pv__sym svg {
+	inline-size: auto;
+	block-size: calc(13px * var(--pv-sym, 1.7));
+}
+
+.ards-pv__fab {
+	display: grid;
+	place-items: center;
+	inline-size: 24px;
+	block-size: 24px;
+	border-radius: var(--pv-rs);
+	background: var(--ard-accent);
+	color: #fff;
+	font-size: 15px;
+}
+
+.ards-pv__clock {
+	display: flex;
+	justify-content: flex-end;
+	gap: 4px;
+	direction: ltr;
+}
+
+.ards-pv__clock span {
+	padding: 4px 6px;
+	border-radius: 6px;
+	background: var(--ard-primary-dark);
+	color: #fff;
+	font-weight: 600;
+}
+
+.ards-pv__soft {
+	color: var(--ard-text-soft);
+	font-size: 11px;
+}
+
+.ards-pv__bar {
+	block-size: 6px;
+	overflow: hidden;
+	border-radius: 3px;
+	background: var(--ard-border);
+}
+
+.ards-pv__bar span {
+	display: block;
+	inline-size: 64%;
+	block-size: 100%;
+	background: var(--ard-accent);
+}
+
+.ards-pv__see {
+	margin-top: auto;
+	padding: 5px 8px;
+	border-radius: var(--pv-rs);
+	background: var(--ard-primary);
+	color: #fff;
+	font-weight: 600;
+	text-align: center;
+}
+
+.ards-pv__chips {
+	display: flex;
+	gap: 8px;
+	padding: 0 12px 12px;
+}
+
+.ards-pv__chips span {
+	padding: 6px 10px;
+	border: 1px solid var(--ard-tint-blue-border);
+	border-radius: 999px;
+	background: var(--ard-tint-blue);
+	color: var(--ard-primary);
+}
+
+.ards-pv__foot {
+	display: flex;
+	justify-content: space-between;
+	padding: 12px 14px;
+	background: var(--ard-primary-dark);
+	color: var(--ard-on-dark);
+	font-size: 11px;
+}
+
+/* ---------------------------------------------------------------- نوار ذخیره، پیام، تأیید */
+
+.ards-bar {
+	position: fixed;
+	bottom: 20px;
+	left: 50%;
+	z-index: 9990;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	max-inline-size: calc(100vw - 32px);
+	padding: 10px 18px 10px 10px;
+	border-radius: 14px;
+	background: var(--s-ink);
+	box-shadow: 0 16px 40px rgba(16, 24, 40, .28);
+	color: #fff;
+	opacity: 0;
+	pointer-events: none;
+	transform: translate(-50%, 140%);
+	transition: transform .25s ease, opacity .25s ease;
+}
+
+.ards-bar.is-on {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translate(-50%, 0);
+}
+
+.ards-bar__dot {
+	inline-size: 8px;
+	block-size: 8px;
+	border-radius: 50%;
+	background: #f5a623;
+}
+
+.ards-bar__text {
+	font-size: 13.5px;
+}
+
+.ards-bar__tabs {
+	color: #9aa7b4;
+	font-size: 12px;
+}
+
+.ards-bar__revert {
+	block-size: 36px;
+	padding: 0 14px;
+	border: 1px solid var(--s-ink-2);
+	border-radius: 9px;
+	background: transparent;
+	color: #e6ebf1;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.ards-bar__revert:hover {
+	background: #24303d;
+}
+
+.ards-bar__save {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	block-size: 36px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 9px;
+	background: var(--s-blue);
+	color: #fff;
+	font-size: 13.5px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.ards-bar__save:disabled {
+	background: #3e6fb0;
+	cursor: progress;
+}
+
+.ards-toast {
+	position: fixed;
+	top: 52px;
+	left: 20px;
+	z-index: 9991;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 16px;
+	border: 1px solid var(--s-ok-line);
+	border-radius: 12px;
+	background: var(--s-ok-bg);
+	box-shadow: 0 10px 30px rgba(16, 24, 40, .14);
+	color: var(--s-ok-ink);
+	font-size: 13.5px;
+}
+
+.ards-toast.is-info {
+	border-color: var(--s-tint-line);
+	background: var(--s-tint);
+	color: var(--s-navy);
+}
+
+.ards-toast__icon {
+	display: grid;
+	place-items: center;
+	inline-size: 18px;
+	block-size: 18px;
+	border-radius: 50%;
+	background: var(--s-ok);
+	color: #fff;
+	font-size: 11px;
+}
+
+.ards-toast.is-info .ards-toast__icon {
+	background: var(--s-blue);
+}
+
+.ards-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	display: grid;
+	place-items: center;
+	padding: 20px;
+	background: rgba(16, 24, 40, .42);
+}
+
+.ards-modal__box {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	inline-size: 100%;
+	max-inline-size: 420px;
+	padding: 22px;
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 24px 60px rgba(16, 24, 40, .3);
+}
+
+.ards .ards-modal__box h3 {
+	margin: 0;
+	font-size: 16px;
+}
+
+.ards-modal__box p {
+	margin: 0;
+	color: var(--s-ink-3);
+	font-size: 13.5px;
+	line-height: 1.9;
+}
+
+.ards-modal__actions {
+	display: flex;
+	justify-content: flex-end;
 	gap: 8px;
 	margin-top: 8px;
 }
 
-.ardal-sms-test input {
-	width: 200px;
-}
-
-.ardal-sms-test__out {
-	font-size: 12px;
-}
-
-.ardal-sms-test__out.is-ok {
-	color: #1a7f37;
-}
-
-.ardal-sms-test__out.is-bad {
-	color: #b32d2e;
-}
-
-.ardal-wrap {
-	--a-fg: #1d2327;
-	--a-muted: #646970;
-	--a-border: #dcdcde;
-	--a-card: #fff;
-
-	max-width: 1360px;
-}
-
-.ardal-title {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	font-size: 22px;
-	font-weight: 800;
-}
-
-.ardal-title__mark {
-	width: 26px;
-	height: 26px;
-	border-radius: 8px;
-	background: linear-gradient(140deg, var(--ard-primary-dark, #0B3C8C), var(--ard-accent, #7DC61E));
-}
-
-.ardal-lede {
-	max-width: 760px;
-	margin: 6px 0 22px;
+.ards-modal__actions .ards-btn {
+	block-size: 38px;
+	padding: 0 16px;
 	font-size: 13.5px;
-	line-height: 2;
-	color: var(--a-muted);
 }
 
-.ardal-layout {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) 360px;
-	gap: 20px;
-	align-items: start;
-}
+/* ---------------------------------------------------------------- ریسپانسیو */
 
-.ardal-main,
-.ardal-side {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-	min-width: 0;
-}
-
-.ardal-card {
-	padding: 20px;
-	border: 1px solid var(--a-border);
-	border-radius: 10px;
-	background: var(--a-card);
-	box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
-}
-
-.ardal-card h2 {
-	margin: 0 0 4px;
-	padding: 0;
-	font-size: 15px;
-	font-weight: 800;
-	color: var(--a-fg);
-}
-
-.ardal-hint {
-	margin: 4px 0 14px;
-	font-size: 12.5px;
-	line-height: 1.9;
-	color: var(--a-muted);
-}
-
-/* پالت‌های آماده */
-.ardal-presets {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-	gap: 10px;
-}
-
-.ardal-preset {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 10px 12px;
-	border: 1px solid var(--a-border);
-	border-radius: 9px;
-	background: #fff;
-	cursor: pointer;
-	text-align: right;
-	transition: border-color .15s, box-shadow .15s;
-}
-
-.ardal-preset:hover {
-	border-color: #2271b1;
-	box-shadow: 0 2px 8px rgba(34, 113, 177, .14);
-}
-
-.ardal-preset__swatches {
-	display: flex;
-	flex: none;
-}
-
-.ardal-preset__swatches i {
-	width: 15px;
-	height: 24px;
-	border: 1px solid rgba(0, 0, 0, .08);
-}
-
-.ardal-preset__swatches i:first-child {
-	border-radius: 0 5px 5px 0;
-}
-
-.ardal-preset__swatches i:last-child {
-	border-radius: 5px 0 0 5px;
-}
-
-.ardal-preset__name {
-	font-size: 12.5px;
-	font-weight: 600;
-	line-height: 1.6;
-}
-
-/* فیلدها */
-.ardal-fields {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	gap: 14px 20px;
-	margin-top: 14px;
-}
-
-.ardal-fields--stack {
-	grid-template-columns: 1fr;
-	gap: 18px;
-}
-
-.ardal-field {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
-	gap: 12px;
-	padding-bottom: 12px;
-	border-bottom: 1px solid #f0f0f1;
-}
-
-.ardal-fields--stack .ardal-field {
-	flex-direction: column;
-	align-items: stretch;
-	gap: 8px;
-}
-
-.ardal-field:last-child {
-	border-bottom: 0;
-	padding-bottom: 0;
-}
-
-.ardal-field label {
-	display: flex;
-	flex-direction: column;
-	gap: 3px;
-	min-width: 0;
-}
-
-.ardal-field__label {
-	font-size: 13px;
-	font-weight: 700;
-	color: var(--a-fg);
-}
-
-.ardal-field__desc {
-	font-size: 11.5px;
-	line-height: 1.7;
-	color: var(--a-muted);
-}
-
-.ardal-check {
-	flex-direction: row !important;
-	align-items: flex-start;
-	gap: 10px !important;
-	cursor: pointer;
-}
-
-.ardal-check input {
-	margin-top: 3px;
-}
-
-.ardal-check > span {
-	display: flex;
-	flex-direction: column;
-	gap: 3px;
-}
-
-/*
- * کد رنگ و اعداد همیشه چپ‌چین خوانده می‌شوند، حتی داخل صفحه RTL.
- *
- * فیلدهای متنیِ چپ‌چین فقط مال تب پالت‌اند (hex و px)؛ تب پنل کاربری پر از
- * جملهٔ فارسی است و آنجا چپ‌چینی متن را به هم می‌ریزد.
- */
-.ardal-color,
-.ardal-field--number input,
-[data-ardal-panel="palette"] .ardal-field--text input {
-	direction: ltr;
-	text-align: left;
-}
-
-.ardal-wrap .wp-picker-container {
-	flex: none;
-}
-
-.ardal-wrap .wp-color-result.button {
-	margin: 0;
-}
-
-.ardal-actions {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	margin: 0;
-	padding: 4px 0 20px;
-}
-
-.ardal-widget-list {
-	margin: 0;
-	padding-inline-start: 20px;
-	font-size: 12.5px;
-	line-height: 2.1;
-	color: var(--a-muted);
-}
-
-/* پیش‌نمایش */
-.ardal-preview-card {
-	position: sticky;
-	top: 42px;
-}
-
-.ardal-preview {
-	margin-top: 12px;
-	border: 1px solid var(--a-border);
-	border-radius: 12px;
-	overflow: hidden;
-	direction: rtl;
-	font-size: 12px;
-}
-
-.ardal-pv-topbar {
-	padding: 8px 12px;
-	background: var(--ard-primary-dark);
-	color: var(--ard-on-dark);
-	font-size: 10.5px;
-	text-align: center;
-}
-
-.ardal-pv-hero {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 9px;
-	padding: 16px 14px;
-	background: var(--ard-hero-gradient);
-}
-
-.ardal-pv-tag {
-	padding: 4px 9px;
-	border-radius: 20px;
-	background: var(--ard-accent);
-	color: var(--ard-accent-ink);
-	font-size: 10px;
-	font-weight: 800;
-}
-
-.ardal-pv-hero strong {
-	font-size: 16px;
-	font-weight: 900;
-	line-height: 1.5;
-	color: #fff;
-}
-
-.ardal-pv-btn {
-	padding: 8px 16px;
-	border-radius: 20px;
-	background: var(--ard-accent);
-	color: var(--ard-accent-ink);
-	font-size: 11px;
-	font-weight: 800;
-}
-
-.ardal-pv-card {
-	position: relative;
-	margin: 14px 14px 14px 22px;
-	padding: 10px;
-	border: 1px solid var(--ard-border);
-	border-radius: 14px;
-	background: var(--ard-base);
-}
-
-.ardal-pv-thumb {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 76px;
-	margin-bottom: 8px;
-	border-radius: 10px;
-	background: repeating-linear-gradient(45deg, var(--ard-surface) 0 9px, var(--ard-base) 9px 18px);
-	color: var(--ard-muted);
-	font: 600 9.5px ui-monospace, monospace;
-}
-
-.ardal-pv-off {
-	position: absolute;
-	top: 7px;
-	right: 7px;
-	padding: 3px 7px;
-	border-radius: 6px;
-	background: var(--ard-sale);
-	color: #fff;
-	font-size: 10px;
-	font-weight: 800;
-	font-style: normal;
-}
-
-.ardal-pv-name {
-	margin-bottom: 5px;
-	font-size: 11.5px;
-	font-weight: 700;
-	line-height: 1.7;
-	color: var(--ard-text);
-}
-
-.ardal-pv-stars {
-	color: var(--ard-star);
-	font-size: 10px;
-	letter-spacing: 1px;
-}
-
-.ardal-pv-old {
-	margin-top: 4px;
-	font-size: 10.5px;
-	color: var(--ard-muted);
-	text-decoration: line-through;
-}
-
-.ardal-pv-price {
-	font-size: 14px;
-	font-weight: 900;
-	color: var(--ard-primary-dark);
-}
-
-.ardal-pv-price .ard-currency--icon {
-	display: inline-flex;
-	align-items: center;
-	vertical-align: middle;
-	color: var(--ard-toman);
-}
-
-.ardal-pv-price .ard-toman {
-	display: block;
-	block-size: var(--ard-toman-size, 1.7em);
-	inline-size: auto;
-}
-
-.ardal-pv-price .ard-currency--text,
-.ardal-pv-price small {
-	font-size: 9.5px;
-	font-weight: 500;
-	color: var(--ard-text-soft);
-}
-
-.ardal-pv-fab {
-	position: absolute;
-	bottom: -8px;
-	left: -8px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 34px;
-	height: 34px;
-	border-radius: 50%;
-	background: var(--ard-accent);
-	color: var(--ard-accent-ink);
-	font-size: 18px;
-	font-weight: 900;
-	box-shadow: 0 4px 12px rgba(var(--ard-accent-dark-rgb), .4);
-}
-
-.ardal-pv-deal {
-	margin: 0 14px 14px;
-	padding: 12px;
-	border: 1.5px solid var(--ard-tint-green-border);
-	border-radius: 14px;
-	background: linear-gradient(180deg, var(--ard-tint-green), var(--ard-base));
-}
-
-.ardal-pv-deal-title {
-	margin-bottom: 9px;
-	font-size: 12px;
-	font-weight: 900;
-	color: var(--ard-accent-deep);
-}
-
-.ardal-pv-clock {
-	display: flex;
-	gap: 6px;
-	margin-bottom: 9px;
-}
-
-.ardal-pv-clock i {
-	flex: 1;
-	padding: 6px 0;
-	border-radius: 8px;
-	background: var(--ard-primary-dark);
-	color: #fff;
-	font: 900 14px ui-monospace, monospace;
-	font-style: normal;
-	text-align: center;
-}
-
-.ardal-pv-bar {
-	height: 6px;
-	border-radius: 4px;
-	background: var(--ard-surface);
-	overflow: hidden;
-}
-
-.ardal-pv-bar span {
-	display: block;
-	width: 64%;
-	height: 100%;
-	background: var(--ard-accent);
-}
-
-.ardal-pv-footer {
-	padding: 12px 14px;
-	background: var(--ard-primary-dark);
-	color: var(--ard-on-dark);
-	font-size: 10px;
-}
-
-@media (max-width: 1100px) {
-	.ardal-layout {
-		grid-template-columns: 1fr;
+@media (max-width: 1239px) {
+	.ards-subnav {
+		display: none;
 	}
 
-	.ardal-preview-card {
+	.ards-jump {
+		display: flex;
+	}
+
+	.ards-cards {
+		flex-basis: 320px;
+	}
+
+	.ards-aside {
+		flex: 0 1 290px;
+	}
+}
+
+@media (max-width: 782px) {
+	.ards {
+		margin-inline-start: -10px;
+		min-height: calc(100vh - 46px);
+	}
+
+	.ards-head {
+		top: 46px;
+	}
+
+	.ards-head__top {
+		padding: 14px 16px 0;
+	}
+
+	.ards-search {
+		flex-basis: 100%;
+		max-inline-size: none;
+		order: 3;
+	}
+
+	.ards-tabs {
+		padding: 10px 10px 0;
+	}
+
+	.ards-form {
+		padding: 20px 16px 140px;
+	}
+
+	.ards-card__head {
+		padding: 16px;
+	}
+
+	.ards-card__body {
+		padding: 0 16px 16px;
+	}
+
+	.ards-card__off {
+		margin: 0 16px 16px;
+	}
+
+	.ards-aside {
 		position: static;
+		flex: 1 1 100%;
+		max-inline-size: none;
+		max-block-size: none;
+	}
+
+	.ards-menu__row {
+		flex-wrap: wrap;
 	}
 }
 
-/* ============================================================
-   تب‌ها
-   ============================================================ */
-
-.ardal-tabs {
-	display: flex;
-	gap: 4px;
-	margin: 14px 0 18px;
-	border-bottom: 1px solid var(--a-border);
+@media (max-width: 600px) {
+	.ards-head {
+		top: 0;
+	}
 }
 
-.ardal-tab {
-	position: relative;
-	padding: 10px 18px;
-	border: 0;
-	background: none;
-	color: var(--a-muted);
-	font-family: inherit;
-	font-size: 14px;
-	font-weight: 700;
-	cursor: pointer;
-}
-
-.ardal-tab:hover {
-	color: var(--ard-primary, #0B62CE);
-}
-
-.ardal-tab.is-active {
-	color: var(--ard-primary-dark, #0B3C8C);
-}
-
-/* خط زیر تب فعال، دقیقاً روی خودِ خط پایینی نوار می‌نشیند. */
-.ardal-tab.is-active::after {
-	content: "";
-	position: absolute;
-	inset-inline: 0;
-	bottom: -1px;
-	height: 2px;
-	background: var(--ard-accent, #7DC61E);
-}
-
-.ardal-panel[hidden] {
-	display: none;
-}
-
-/* تب پنل کاربری پیش‌نمایش کناری ندارد، پس تمام عرض را می‌گیرد. */
-.ardal-layout--wide {
-	grid-template-columns: minmax(0, 1fr);
-}
-
-/* ============================================================
-   جدول منوی پنل
-   ============================================================ */
-
-.ardal-table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-.ardal-table th,
-.ardal-table td {
-	padding: 10px 8px;
-	border-bottom: 1px solid var(--a-border);
-	text-align: right;
-	vertical-align: middle;
-}
-
-.ardal-table th {
-	color: var(--a-muted);
-	font-size: 12.5px;
-	font-weight: 700;
-}
-
-.ardal-table tr:last-child td {
-	border-bottom: 0;
-}
-
-.ardal-table__on {
-	width: 62px;
-	text-align: center;
-}
-
-.ardal-table__ord {
-	width: 96px;
-}
-
-.ardal-table__ord input {
-	width: 80px;
-}
-
-.ardal-table td input[type="text"] {
-	width: min(320px, 100%);
-}
-
-.ardal-slug {
-	margin-inline-start: 8px;
-	color: var(--a-muted);
-	font-size: 11.5px;
-	background: #f0f0f1;
-	padding: 2px 6px;
-	border-radius: 4px;
-}
-
-.ardal-check--bare {
-	display: inline-flex;
-	margin: 0;
-}
-
-.ardal-sr {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	margin: -1px;
-	padding: 0;
-	border: 0;
-	overflow: hidden;
-	clip-path: inset(50%);
-	white-space: nowrap;
-}
-
-/* ============================================================
-   کارت‌های باکس پیشخوان
-   ============================================================ */
-
-/* کلید روشن/خاموش بالای هر کارت، جدا از فیلدهای متنی زیرش. */
-.ardal-field--top {
-	margin-top: 12px;
-	padding-bottom: 14px;
-	border-bottom: 1px solid #f0f0f1;
-}
-
-.ardal-field--icon {
-	flex-direction: column;
-	align-items: stretch;
-	gap: 8px;
-}
-
-/*
- * سلکت آیکون و پیش‌نمایشش کنار هم — پیش‌نمایش برای این است که کاربر بدون
- * ذخیره‌کردن بداند «بسته» یا «ارسال» کدام شکل است.
- */
-.ardal-icon-row {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-}
-
-.ardal-field--icon select {
-	max-width: 240px;
-}
-
-.ardal-icon-preview {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	inline-size: 34px;
-	block-size: 34px;
-	border-radius: 9px;
-	background: #f2f7fc;
-	color: #0B3C8C;
-	vertical-align: middle;
-}
-
-.ardal-field--textarea textarea {
-	min-block-size: 58px;
+@media (prefers-reduced-motion: reduce) {
+	.ards *,
+	.ards *::before,
+	.ards *::after {
+		transition: none !important;
+		animation: none !important;
+	}
 }

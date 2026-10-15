@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#F1F3F6;}
+body{font-family:Vazirmatn,Tahoma,sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:#0B62CE;text-decoration:none}a:hover{color:#0B3C8C;text-decoration:underline}
+*:focus-visible{outline:2px solid #0B62CE;outline-offset:2px}
+input,textarea,select,button{font-family:inherit}
+@keyframes ardSpin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div dir="rtl" lang="fa" style="min-height:100vh; background:#F1F3F6; color:#18212C; font-family:Vazirmatn,Tahoma,sans-serif; font-size:14px;">
+
+<sc-if value="{{ showWp }}" hint-placeholder-val="{{ true }}">
+  <div style="height:32px; background:#1D2327; color:#C3C4C7; display:flex; align-items:center; gap:20px; padding:0 14px; font-size:13px;">
+    <span style="color:#F0F0F1;">فروشگاه اسپرت‌لند</span>
+    <span>+ تازه</span>
+    <span style="margin-inline-start:auto;">سلام، مدیر</span>
+  </div>
+</sc-if>
+
+<div style="display:flex; align-items:stretch;">
+  <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+    <nav aria-label="منوی پیشخوان وردپرس" style="width:160px; flex:none; background:#1D2327; font-size:13.5px;">
+      <div style="position:sticky; top:0; padding:10px 0; display:flex; flex-direction:column;">
+        <div style="padding:8px 14px; color:#F0F0F1;">پیشخوان</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">نوشته‌ها</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">رسانه</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">برگه‌ها</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">ووکامرس</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">محصولات</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">المنتور</div>
+        <div style="background:#2271B1; color:#fff; padding:8px 14px; font-weight:600;">اردال</div>
+        <div style="background:#2C3338; padding:6px 0;">
+          <div style="padding:6px 22px 6px 14px; color:#fff; font-weight:600;">تنظیمات</div>
+          <div style="padding:6px 22px 6px 14px; color:#C3C4C7;">گزارش کیف پول</div>
+        </div>
+        <div style="padding:8px 14px; color:#F0F0F1;">نمایش</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">افزونه‌ها</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">کاربران</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">ابزارها</div>
+        <div style="padding:8px 14px; color:#F0F0F1;">تنظیمات</div>
+      </div>
+    </nav>
+  </sc-if>
+
+  <main style="flex:1; min-width:0;">
+    <header style="position:sticky; top:0; z-index:30; background:#FFFFFF; border-bottom:1px solid #E2E7EE;">
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:14px 20px; padding:16px 28px 0;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div aria-hidden="true" style="width:40px; height:40px; border-radius:11px; background:#0B3C8C; color:#FFFFFF; display:grid; place-items:center; font-weight:700; font-size:20px;">ا</div>
+          <div>
+            <h1 style="margin:0; font-size:18px; font-weight:700; line-height:1.4;">تنظیمات اردال</h1>
+            <div style="font-size:12.5px; color:#6B7685;">نسخهٔ ۱.۱.۴ · ویجت‌های المنتور و ابزارهای فروشگاه</div>
+          </div>
+        </div>
+        <div style="flex:1 1 260px; max-width:440px; position:relative; margin-inline-start:auto;">
+          <label for="ard-search" style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);">جستجو در تنظیمات</label>
+          <input id="ard-search" ref="{{ searchRef }}" type="search" value="{{ q }}" onChange="{{ onQ }}" onKeyDown="{{ onQKey }}" placeholder="جستجو در همهٔ تنظیمات…   ( / )" autocomplete="off" style="width:100%; box-sizing:border-box; height:40px; padding:0 14px; border:1px solid #D5DCE5; border-radius:10px; background:#F7F9FB; font-size:14px; color:#18212C; outline:none;" style-focus="border-color:#0B62CE; background:#FFFFFF; box-shadow:0 0 0 3px #D6E6FB;">
+          <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="listbox" style="position:absolute; top:46px; inset-inline:0; background:#FFFFFF; border:1px solid #E2E7EE; border-radius:12px; box-shadow:0 12px 32px rgba(16,24,40,.14); padding:6px; z-index:40; max-height:380px; overflow:auto;">
+              <sc-for list="{{ results }}" as="r" hint-placeholder-count="3">
+                <button type="button" role="option" onClick="{{ r.onClick }}" style="display:flex; flex-direction:column; align-items:flex-start; gap:2px; width:100%; text-align:right; padding:9px 12px; border:0; border-radius:8px; background:transparent; cursor:pointer;" style-hover="background:#F1F5FB;">
+                  <span style="font-size:13.5px; color:#18212C; font-weight:500;">{{ r.label }}</span>
+                  <span style="font-size:12px; color:#6B7685;">{{ r.path }}</span>
+                </button>
+              </sc-for>
+              <sc-if value="{{ noResults }}">
+                <div style="padding:14px 12px; font-size:13px; color:#6B7685;">تنظیمی با این عبارت پیدا نشد.</div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+        <div aria-live="polite" style="display:flex; align-items:center; gap:8px; font-size:12.5px; color:{{ statusColor }};">
+          <span style="width:8px; height:8px; border-radius:50%; background:{{ statusDot }};"></span>
+          <span>{{ statusText }}</span>
+        </div>
+      </div>
+      <div role="tablist" aria-label="بخش‌های تنظیمات" onKeyDown="{{ onTabKey }}" style="display:flex; gap:4px; padding:12px 22px 0; overflow-x:auto;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+          <button type="button" role="tab" id="{{ t.domId }}" aria-selected="{{ t.sel }}" tabIndex="{{ t.tabIndex }}" onClick="{{ t.onClick }}" style="display:flex; align-items:center; gap:8px; padding:10px 14px 12px; border:0; border-bottom:2px solid {{ t.line }}; background:transparent; color:{{ t.color }}; font-size:14.5px; font-weight:{{ t.weight }}; cursor:pointer; white-space:nowrap;" style-hover="color:#0B3C8C;">
+            <span>{{ t.title }}</span>
+            <sc-if value="{{ t.hasCount }}">
+              <span title="تغییر ذخیره نشده" style="min-width:18px; height:18px; padding:0 5px; box-sizing:border-box; border-radius:9px; background:#FFF1DC; color:#9A5B00; font-size:11.5px; font-weight:600; display:grid; place-items:center;">{{ t.countFa }}</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </header>
+
+    <div style="padding:24px 28px 140px; max-width:1440px; box-sizing:border-box;">
+      <div style="margin-bottom:20px; max-width:760px;">
+        <h2 style="margin:0 0 6px; font-size:21px; font-weight:700;">{{ tabTitle }}</h2>
+        <p style="margin:0; color:#586474; line-height:1.9; text-wrap:pretty;">{{ tabLede }}</p>
+      </div>
+
+      <sc-if value="{{ walletExtras }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+          <div style="flex:1 1 520px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:12px 14px; background:#FFFFFF; border:1px solid #E2E7EE; border-radius:12px;">
+            <span style="font-size:12.5px; color:#6B7685; margin-inline-end:4px;">وضعیت امکانات:</span>
+            <sc-for list="{{ walletFeatures }}" as="wf">
+              <button type="button" onClick="{{ wf.onClick }}" style="display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; border:1px solid {{ wf.border }}; background:{{ wf.bg }}; color:{{ wf.color }}; font-size:12.5px; cursor:pointer;">
+                <span style="width:7px; height:7px; border-radius:50%; background:{{ wf.dot }};"></span>{{ wf.label }}
+              </button>
+            </sc-for>
+          </div>
+          <a href="#ardal-wallet-report" style="flex:0 1 320px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; background:#EAF2FD; border:1px solid #CFE2F8; border-radius:12px; color:#0B3C8C; text-decoration:none;" style-hover="background:#DFEBFB;">
+            <span style="display:flex; flex-direction:column; gap:2px;"><strong style="font-size:13.5px;">گزارش کیف پول</strong><span style="font-size:12px; color:#3D4A58;">ابزارهای شارژ دستی و گروهی</span></span>
+            <span aria-hidden="true" style="font-size:18px;">←</span>
+          </a>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ wooMissing }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="padding:28px; background:#FFF4E0; border:1px solid #F3D9A6; border-radius:14px; color:#6B4300; max-width:720px; line-height:1.9;">
+          <strong style="display:block; font-size:15px; margin-bottom:4px;">کیف پول به ووکامرس نیاز دارد</strong>
+          برای استفاده از کیف پول، شارژ آنلاین و کش‌بگ، افزونهٔ ووکامرس را نصب و فعال کنید.
+        </div>
+      </sc-if>
+
+      <div style="display:flex; flex-wrap:wrap; align-items:flex-start; gap:24px;">
+        <sc-if value="{{ showSubnav }}" hint-placeholder-val="{{ true }}">
+          <nav aria-label="بخش‌های این صفحه" style="flex:0 0 210px; position:sticky; top:136px; display:flex; flex-direction:column; gap:2px;">
+            <sc-for list="{{ subnav }}" as="sn" hint-placeholder-count="6">
+              <sc-if value="{{ sn.divider }}">
+                <div style="margin:12px 10px 4px; font-size:11.5px; font-weight:600; color:#9A5B00;">پیشرفته</div>
+              </sc-if>
+              <button type="button" onClick="{{ sn.onClick }}" aria-current="{{ sn.current }}" style="display:flex; align-items:center; gap:8px; width:100%; text-align:right; padding:8px 10px; border:0; border-radius:8px; background:{{ sn.bg }}; color:{{ sn.color }}; font-size:13.5px; font-weight:{{ sn.weight }}; cursor:pointer;" style-hover="background:#E8EEF6;">
+                <sc-if value="{{ sn.hasState }}">
+                  <span title="{{ sn.stateTitle }}" style="width:7px; height:7px; flex:none; border-radius:50%; border:1.5px solid {{ sn.stateColor }}; background:{{ sn.stateFill }};"></span>
+                </sc-if>
+                <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ sn.title }}</span>
+                <sc-if value="{{ sn.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+              </button>
+            </sc-for>
+          </nav>
+        </sc-if>
+
+        <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1 1 100%; display:flex; flex-direction:column; gap:6px;">
+            <label for="ard-jump" style="font-size:12.5px; color:#586474;">پرش به بخش</label>
+            <select id="ard-jump" onChange="{{ onJump }}" value="{{ activeAnchor }}" style="height:42px; border:1px solid #D5DCE5; border-radius:10px; padding:0 10px; background:#FFFFFF; font-size:14px;">
+              <sc-for list="{{ subnav }}" as="sn"><option value="{{ sn.anchor }}">{{ sn.title }}</option></sc-for>
+            </select>
+          </div>
+        </sc-if>
+
+        <div style="flex:{{ cardsFlex }}; min-width:0; display:flex; flex-direction:column; gap:16px;">
+          <sc-for list="{{ cards }}" as="card" hint-placeholder-count="3">
+            <sc-if value="{{ card.advanced }}">
+              <div style="display:flex; align-items:center; gap:10px; margin-top:16px;">
+                <span style="font-size:13px; font-weight:600; color:#9A5B00;">پیشرفته</span>
+                <span style="flex:1; height:1px; background:#F0DDB8;"></span>
+              </div>
+            </sc-if>
+            <section id="{{ card.anchor }}" aria-labelledby="{{ card.headId }}" style="background:#FFFFFF; border:1px solid {{ card.border }}; border-radius:14px; scroll-margin-top:140px;">
+              <div style="display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px 16px; padding:18px 22px;">
+                <div style="flex:1 1 260px; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <h3 id="{{ card.headId }}" style="margin:0; font-size:15.5px; font-weight:600;">{{ card.title }}</h3>
+                    <sc-if value="{{ card.advanced }}"><span style="padding:2px 8px; border-radius:6px; background:#FFF1DC; color:#9A5B00; font-size:11.5px; font-weight:600;">ممکن است ظاهر فروشگاه را تغییر دهد</span></sc-if>
+                    <sc-if value="{{ card.hasAdvOn }}"><span style="padding:2px 8px; border-radius:6px; background:#FDEEEC; color:#B3261E; font-size:11.5px; font-weight:600;">{{ card.advOnText }}</span></sc-if>
+                    <sc-if value="{{ card.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; border-radius:50%; background:#E8890C;"></span></sc-if>
+                  </div>
+                  <sc-if value="{{ card.hasSub }}"><p style="margin:4px 0 0; font-size:13px; color:#6B7685; line-height:1.8; text-wrap:pretty;">{{ card.sub }}</p></sc-if>
+                </div>
+                <sc-if value="{{ card.hasMaster }}">
+                  <div style="display:flex; align-items:center; gap:10px; padding:6px 6px 6px 12px; border-radius:999px; background:#F4F6F9;">
+                    <label for="{{ card.masterId }}" style="font-size:13px; color:#3A4655; cursor:pointer;">{{ card.masterLabel }}</label>
+                    <button id="{{ card.masterId }}" type="button" role="switch" aria-checked="{{ card.masterAria }}" onClick="{{ card.onMaster }}" style="flex:none; width:40px; height:24px; border-radius:12px; border:0; padding:3px; background:{{ card.masterTrack }}; display:flex; justify-content:{{ card.masterKnob }}; cursor:pointer; transition:background .15s;"><span style="width:18px; height:18px; border-radius:50%; background:#FFFFFF; box-shadow:0 1px 2px rgba(0,0,0,.25);"></span></button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ card.advanced }}">
+                  <button type="button" aria-expanded="{{ card.advAria }}" onClick="{{ card.onAdv }}" style="height:34px; padding:0 14px; border:1px solid #E7C98F; border-radius:8px; background:#FFF8EC; color:#7A4800; font-size:13px; cursor:pointer;">{{ card.advBtn }}</button>
+                </sc-if>
+              </div>
+
+              <sc-if value="{{ card.showOff }}">
+                <div style="margin:0 22px 18px; padding:12px 14px; border-radius:10px; background:#F7F9FB; color:#6B7685; font-size:13px; border:1px dashed #D5DCE5;">{{ card.offText }}</div>
+              </sc-if>
+
+              <sc-if value="{{ card.showBody }}">
+                <div style="padding:0 22px 22px; display:flex; flex-direction:column; gap:16px;">
+                  <sc-if value="{{ card.hasInfo }}">
+                    <div style="display:flex; gap:10px; padding:11px 14px; border-radius:10px; background:#F2F7FD; color:#2B4766; font-size:13px; line-height:1.85;">
+                      <span aria-hidden="true" style="flex:none; width:18px; height:18px; border-radius:50%; background:#0B62CE; color:#FFFFFF; font-size:11px; font-weight:700; display:grid; place-items:center; margin-top:3px;">i</span>
+                      <span style="text-wrap:pretty;">{{ card.info }}</span>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ card.isPresets }}">
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px;">
+                      <sc-for list="{{ card.presets }}" as="pr" hint-placeholder-count="4">
+                        <button type="button" aria-pressed="{{ pr.pressed }}" onClick="{{ pr.onApply }}" style="text-align:right; padding:10px; border-radius:12px; border:1.5px solid {{ pr.border }}; background:{{ pr.bg }}; cursor:pointer; display:flex; flex-direction:column; gap:10px;" style-hover="border-color:#8DB5E8;">
+                          <span style="display:flex; height:34px; border-radius:8px; overflow:hidden;">
+                            <sc-for list="{{ pr.sw }}" as="c"><span style="flex:1; background:{{ c }};"></span></sc-for>
+                          </span>
+                          <span style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                            <span style="font-size:13px; font-weight:500; color:#18212C;">{{ pr.name }}</span>
+                            <sc-if value="{{ pr.active }}"><span style="font-size:11px; padding:1px 7px; border-radius:5px; background:#0B62CE; color:#FFFFFF;">فعال</span></sc-if>
+                          </span>
+                        </button>
+                      </sc-for>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end;">
+                      <button type="button" onClick="{{ askReset }}" style="height:34px; padding:0 14px; border:1px solid #D5DCE5; border-radius:8px; background:#FFFFFF; color:#3A4655; font-size:13px; cursor:pointer;" style-hover="border-color:#B3261E; color:#B3261E;">بازگشت به پالت دیزاین</button>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ card.isMenu }}">
+                    <div role="list" aria-label="آیتم‌های منوی پنل کاربری" style="border:1px solid #E2E7EE; border-radius:12px; overflow:hidden;">
+                      <div style="display:flex; align-items:center; gap:12px; padding:8px 14px; background:#F7F9FB; font-size:12px; color:#6B7685;">
+                        <span style="width:16px;"></span><span style="width:40px;">نمایش</span><span style="flex:1;">عنوان در منو</span><span>ترتیب</span>
+                      </div>
+                      <sc-for list="{{ card.menuRows }}" as="r" hint-placeholder-count="6">
+                        <div role="listitem" draggable="true" onDragStart="{{ r.onDragStart }}" onDragOver="{{ r.onDragOver }}" onDrop="{{ r.onDrop }}" onDragEnd="{{ r.onDragEnd }}" style="display:flex; align-items:center; gap:12px; padding:8px 14px; border-top:1px solid {{ r.topLine }}; background:{{ r.bg }};">
+                          <span aria-hidden="true" title="برای جابه‌جایی بکشید" style="width:16px; cursor:grab; color:#9AA5B3; font-size:15px; letter-spacing:-3px; user-select:none;">⋮⋮</span>
+                          <button type="button" role="switch" aria-checked="{{ r.aria }}" aria-label="{{ r.toggleLabel }}" onClick="{{ r.onToggle }}" style="flex:none; width:40px; height:24px; border-radius:12px; border:0; padding:3px; background:{{ r.track }}; display:flex; justify-content:{{ r.knob }}; cursor:pointer;"><span style="width:18px; height:18px; border-radius:50%; background:#FFFFFF; box-shadow:0 1px 2px rgba(0,0,0,.25);"></span></button>
+                          <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; opacity:{{ r.opacity }};">
+                            <input type="text" aria-label="{{ r.inputLabel }}" value="{{ r.label }}" onChange="{{ r.onLabel }}" style="height:34px; padding:0 10px; border:1px solid #DDE3EB; border-radius:8px; font-size:14px; color:#18212C; background:#FFFFFF; outline:none; min-width:0;" style-focus="border-color:#0B62CE; box-shadow:0 0 0 3px #D6E6FB;">
+                            <sc-if value="{{ r.renamed }}"><span style="font-size:11.5px; color:#8792A1;">پیش‌فرض: {{ r.defLabel }}</span></sc-if>
+                          </div>
+                          <span title="مقدار فیلد ترتیب" style="font-size:12px; color:#586474; background:#F1F4F8; border-radius:6px; padding:3px 8px; min-width:26px; text-align:center;">{{ r.orderFa }}</span>
+                          <div style="display:flex; flex-direction:column; gap:2px;">
+                            <button type="button" aria-label="{{ r.upLabel }}" disabled="{{ r.isFirst }}" onClick="{{ r.onUp }}" style="width:26px; height:16px; border:0; border-radius:4px; background:#F1F4F8; color:#3A4655; font-size:10px; line-height:1; cursor:pointer; padding:0;">▲</button>
+                            <button type="button" aria-label="{{ r.downLabel }}" disabled="{{ r.isLast }}" onClick="{{ r.onDown }}" style="width:26px; height:16px; border:0; border-radius:4px; background:#F1F4F8; color:#3A4655; font-size:10px; line-height:1; cursor:pointer; padding:0;">▼</button>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ card.isSms }}">
+                    <div role="status" style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:12px 14px; border-radius:10px; background:{{ card.nias.bg }}; border:1px solid {{ card.nias.border }}; color:{{ card.nias.color }}; font-size:13px;">
+                      <span style="width:8px; height:8px; border-radius:50%; background:{{ card.nias.dot }};"></span>
+                      <span style="flex:1 1 240px;">{{ card.nias.text }}</span>
+                      <sc-if value="{{ card.nias.hasLink }}"><a href="#nias-settings" style="font-size:12.5px; font-weight:600;">تنظیمات نیاس لاگین</a></sc-if>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                      <sc-for list="{{ card.sms }}" as="ev" hint-placeholder-count="5">
+                        <div id="{{ ev.anchor }}" style="border:1px solid {{ ev.border }}; border-radius:12px; overflow:hidden;">
+                          <div style="display:flex; align-items:center; gap:12px; padding:10px 12px 10px 14px; background:{{ ev.headBg }};">
+                            <button type="button" aria-expanded="{{ ev.aria }}" onClick="{{ ev.onOpen }}" style="flex:1; min-width:0; display:flex; align-items:center; gap:10px; border:0; background:transparent; text-align:right; cursor:pointer; padding:4px 0;">
+                              <span aria-hidden="true" style="width:14px; color:#6B7685; font-size:11px;">{{ ev.chevron }}</span>
+                              <span style="flex:1; min-width:0; font-size:14px; font-weight:500; color:#18212C;">{{ ev.label }}</span>
+                              <span style="flex:none; font-size:11.5px; padding:2px 8px; border-radius:6px; background:{{ ev.modeBg }}; color:{{ ev.modeColor }};">{{ ev.mode }}</span>
+                            </button>
+                            <button type="button" role="switch" aria-checked="{{ ev.toggleAria }}" aria-label="{{ ev.label }}" onClick="{{ ev.onToggle }}" style="flex:none; width:40px; height:24px; border-radius:12px; border:0; padding:3px; background:{{ ev.track }}; display:flex; justify-content:{{ ev.knob }}; cursor:pointer;"><span style="width:18px; height:18px; border-radius:50%; background:#FFFFFF; box-shadow:0 1px 2px rgba(0,0,0,.25);"></span></button>
+                          </div>
+                          <sc-if value="{{ ev.open }}">
+                            <div style="padding:14px; border-top:1px solid #EEF1F5; display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; opacity:{{ ev.bodyOpacity }};">
+                              <div style="display:flex; flex-direction:column; gap:6px;">
+                                <div style="display:flex; align-items:center; gap:8px;"><label for="{{ ev.pattern.id }}" style="font-size:13px; font-weight:500;">کد پترن</label><sc-if value="{{ ev.usesPattern }}"><span style="font-size:11px; padding:1px 7px; border-radius:5px; background:#E6F4EA; color:#1E6B34;">در حال استفاده</span></sc-if></div>
+                                <input id="{{ ev.pattern.id }}" data-name="{{ ev.pattern.name }}" type="text" dir="ltr" value="{{ ev.pattern.value }}" onChange="{{ ev.pattern.onInput }}" placeholder="مثلاً 284512 — خالی = متن آزاد" style="height:40px; padding:0 12px; border:1px solid #D5DCE5; border-radius:8px; font-size:14px; font-family:ui-monospace,Menlo,monospace; outline:none; text-align:left;" style-focus="border-color:#0B62CE; box-shadow:0 0 0 3px #D6E6FB;">
+                              </div>
+                              <div style="display:flex; flex-direction:column; gap:6px;">
+                                <label for="{{ ev.vars.id }}" style="font-size:13px; font-weight:500;">متغیرهای پترن</label>
+                                <input id="{{ ev.vars.id }}" data-name="{{ ev.vars.name }}" type="text" dir="ltr" value="{{ ev.vars.value }}" onChange="{{ ev.vars.onInput }}" style="height:40px; padding:0 12px; border:1px solid #D5DCE5; border-radius:8px; font-size:13px; font-family:ui-monospace,Menlo,monospace; outline:none; text-align:left;" style-focus="border-color:#0B62CE; box-shadow:0 0 0 3px #D6E6FB;">
+                                <span style="font-size:12px; color:#6B7685; line-height:1.7;">به ترتیب پترن پنل و با کاما؛ «نام:{جای‌گذار}» برای درگاه‌های نام‌دار یا فقط «{جای‌گذار}».</span>
+                              </div>
+                              <div style="grid-column:1 / -1; display:flex; flex-direction:column; gap:6px;">
+                                <div style="display:flex; align-items:center; gap:8px;"><label for="{{ ev.text.id }}" style="font-size:13px; font-weight:500;">متن آزاد</label><sc-if value="{{ ev.usesText }}"><span style="font-size:11px; padding:1px 7px; border-radius:5px; background:#E6F4EA; color:#1E6B34;">در حال استفاده</span></sc-if><span style="margin-inline-start:auto; font-size:11.5px; color:#8792A1;">{{ ev.counter }}</span></div>
+                                <textarea id="{{ ev.text.id }}" data-name="{{ ev.text.name }}" rows="3" value="{{ ev.text.value }}" onChange="{{ ev.text.onInput }}" style="padding:10px 12px; border:1px solid #D5DCE5; border-radius:8px; font-size:14px; line-height:1.8; resize:vertical; outline:none;" style-focus="border-color:#0B62CE; box-shadow:0 0 0 3px #D6E6FB;"></textarea>
+                                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
+                                  <span style="font-size:12px; color:#6B7685;">درج جای‌گذار:</span>
+                                  <sc-for list="{{ ev.tokens }}" as="tk">
+                                    <button type="button" onMouseDown="{{ tk.onDown }}" dir="ltr" style="height:26px; padding:0 9px; border:1px solid #CFE2F8; border-radius:6px; background:#F2F7FD; color:#0B3C8C; font-size:12px; font-family:ui-monospace,Menlo,monospace; cursor:pointer;" style-hover="background:#E2EEFC;">{{ tk.tk }}</button>
+                                  </sc-for>
+                                </div>
+                              </div>
+                              <div style="grid-column:1 / -1; display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:12px; border-radius:10px; background:#F7F9FB;">
+                                <label for="{{ ev.phoneId }}" style="font-size:13px; color:#3A4655;">پیامک آزمایشی به</label>
+                                <input id="{{ ev.phoneId }}" type="tel" dir="ltr" value="{{ ev.phone }}" onChange="{{ ev.onPhone }}" placeholder="09121234567" style="width:150px; height:36px; padding:0 10px; border:1px solid #D5DCE5; border-radius:8px; font-size:13.5px; outline:none; text-align:left;" style-focus="border-color:#0B62CE;">
+                                <button type="button" onClick="{{ ev.onSend }}" disabled="{{ ev.sending }}" style="height:36px; display:flex; align-items:center; gap:8px; padding:0 14px; border:1px solid #0B62CE; border-radius:8px; background:#FFFFFF; color:#0B62CE; font-size:13px; font-weight:500; cursor:pointer;">
+                                  <sc-if value="{{ ev.sending }}">{{ spinnerBlue }}</sc-if>{{ ev.sendLabel }}
+                                </button>
+                                <sc-if value="{{ ev.hasResult }}"><span role="status" style="font-size:12.5px; color:{{ ev.resultColor }};">{{ ev.result }}</span></sc-if>
+                              </div>
+                            </div>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ card.isRef }}">
+                    <div style="border:1px solid #E2E7EE; border-radius:12px; overflow:hidden;">
+                      <sc-for list="{{ card.refs }}" as="rf" hint-placeholder-count="3">
+                        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; padding:12px 14px; border-top:1px solid {{ rf.line }};">
+                          <code dir="ltr" style="font-family:ui-monospace,Menlo,monospace; font-size:12.5px; background:#F1F4F8; color:#0B3C8C; padding:4px 8px; border-radius:6px;">{{ rf.code }}</code>
+                          <span style="flex:1 1 240px; font-size:13px; color:#465161; line-height:1.8;">{{ rf.desc }}</span>
+                          <button type="button" onClick="{{ rf.onCopy }}" style="height:30px; padding:0 12px; border:1px solid #D5DCE5; border-radius:7px; background:{{ rf.bg }}; color:{{ rf.color }}; font-size:12.5px; cursor:pointer;">{{ rf.btn }}</button>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ card.isFields }}">
+                    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px 18px;">
+                      <sc-for list="{{ card.fields }}" as="f" hint-placeholder-count="4">
+
+                        <sc-if value="{{ f.isToggle }}">
+                          <div id="{{ f.wid }}" style="grid-column:1 / -1; display:{{ f.display }}; align-items:flex-start; gap:16px; padding:13px 16px; border-radius:10px; background:{{ f.rowBg }}; border:1px solid {{ f.rowBorder }}; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="flex:1; min-width:0;">
+                              <div style="display:flex; align-items:center; gap:8px;">
+                                <label for="{{ f.id }}" style="font-size:14px; font-weight:500; cursor:pointer;">{{ f.label }}</label>
+                                <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                              </div>
+                              <sc-if value="{{ f.helpShort }}"><p title="{{ f.help }}" style="margin:3px 0 0; font-size:12.5px; color:#6B7685; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ f.help }}</p></sc-if>
+                              <sc-if value="{{ f.helpFull }}"><p style="margin:3px 0 0; font-size:12.5px; color:#465161; line-height:1.8;">{{ f.help }}</p></sc-if>
+                            </div>
+                            <button id="{{ f.id }}" type="button" role="switch" aria-checked="{{ f.aria }}" data-name="{{ f.name }}" onClick="{{ f.onToggle }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" style="flex:none; width:40px; height:24px; border-radius:12px; border:0; padding:3px; background:{{ f.track }}; display:flex; justify-content:{{ f.knob }}; cursor:pointer; transition:background .15s;"><span style="width:18px; height:18px; border-radius:50%; background:#FFFFFF; box-shadow:0 1px 2px rgba(0,0,0,.25);"></span></button>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isText }}">
+                          <div id="{{ f.wid }}" style="display:{{ f.display }}; flex-direction:column; gap:6px; min-width:0; border-radius:8px; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="display:flex; align-items:center; gap:8px; min-height:20px;">
+                              <label for="{{ f.id }}" style="font-size:13px; font-weight:500;">{{ f.label }}</label>
+                              <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                              <sc-if value="{{ f.emptyHidden }}"><span style="margin-inline-start:auto; font-size:11px; padding:1px 7px; border-radius:5px; background:#F1F4F8; color:#586474;">در سایت نمایش داده نمی‌شود</span></sc-if>
+                            </div>
+                            <input id="{{ f.id }}" data-name="{{ f.name }}" type="text" dir="{{ f.dir }}" value="{{ f.value }}" placeholder="{{ f.placeholder }}" onChange="{{ f.onInput }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" style="width:100%; box-sizing:border-box; height:40px; padding:0 12px; border:1px solid {{ f.inputBorder }}; border-radius:8px; font-size:14px; color:#18212C; background:#FFFFFF; outline:none; box-shadow:{{ f.ring }}; text-align:{{ f.align }};">
+                            <sc-if value="{{ f.hasTokens }}">
+                              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                <sc-for list="{{ f.tokenList }}" as="tk"><button type="button" dir="ltr" onMouseDown="{{ tk.onDown }}" title="درج در متن" style="height:24px; padding:0 8px; border:1px solid #CFE2F8; border-radius:6px; background:#F2F7FD; color:#0B3C8C; font-size:11.5px; font-family:ui-monospace,Menlo,monospace; cursor:pointer;">{{ tk.tk }}</button></sc-for>
+                              </div>
+                            </sc-if>
+                            <sc-if value="{{ f.helpShort }}"><p title="{{ f.help }}" style="margin:0; font-size:12px; color:#6B7685; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ f.help }}</p></sc-if>
+                            <sc-if value="{{ f.helpFull }}"><p style="margin:0; font-size:12px; color:#465161; line-height:1.8;">{{ f.help }}</p></sc-if>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isArea }}">
+                          <div id="{{ f.wid }}" style="grid-column:1 / -1; display:{{ f.display }}; flex-direction:column; gap:6px; border-radius:8px; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                              <label for="{{ f.id }}" style="font-size:13px; font-weight:500;">{{ f.label }}</label>
+                              <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                            </div>
+                            <textarea id="{{ f.id }}" data-name="{{ f.name }}" rows="2" value="{{ f.value }}" onChange="{{ f.onInput }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" style="padding:10px 12px; border:1px solid {{ f.inputBorder }}; border-radius:8px; font-size:14px; line-height:1.8; resize:vertical; outline:none; box-shadow:{{ f.ring }};"></textarea>
+                            <sc-if value="{{ f.helpShort }}"><p title="{{ f.help }}" style="margin:0; font-size:12px; color:#6B7685; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ f.help }}</p></sc-if>
+                            <sc-if value="{{ f.helpFull }}"><p style="margin:0; font-size:12px; color:#465161; line-height:1.8;">{{ f.help }}</p></sc-if>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isNumber }}">
+                          <div id="{{ f.wid }}" style="display:{{ f.display }}; flex-direction:column; gap:6px; min-width:0; border-radius:8px; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="display:flex; align-items:center; gap:8px; min-height:20px;">
+                              <label for="{{ f.id }}" style="font-size:13px; font-weight:500;">{{ f.label }}</label>
+                              <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                            </div>
+                            <div style="display:flex; align-items:stretch; height:40px; border:1px solid {{ f.inputBorder }}; border-radius:8px; box-shadow:{{ f.ring }}; background:#FFFFFF; overflow:hidden;">
+                              <button type="button" aria-label="افزایش" onClick="{{ f.onInc }}" style="width:36px; flex:none; border:0; background:#F4F6F9; color:#3A4655; font-size:17px; cursor:pointer;">+</button>
+                              <input id="{{ f.id }}" data-name="{{ f.name }}" type="text" dir="ltr" value="{{ f.value }}" onChange="{{ f.onInput }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" aria-invalid="{{ f.invalid }}" style="flex:1; min-width:0; border:0; text-align:center; font-size:14px; color:#18212C; outline:none; background:transparent;">
+                              <sc-if value="{{ f.hasUnit }}"><span style="display:flex; align-items:center; padding:0 10px; font-size:12px; color:#6B7685; background:#F7F9FB; border-inline-start:1px solid #E2E7EE;">{{ f.unit }}</span></sc-if>
+                              <button type="button" aria-label="کاهش" onClick="{{ f.onDec }}" style="width:36px; flex:none; border:0; background:#F4F6F9; color:#3A4655; font-size:17px; cursor:pointer;">−</button>
+                            </div>
+                            <sc-if value="{{ f.hasError }}"><p role="alert" style="margin:0; font-size:12px; color:#B3261E;">{{ f.error }}</p></sc-if>
+                            <sc-if value="{{ f.helpShort }}"><p title="{{ f.help }}" style="margin:0; font-size:12px; color:#6B7685; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ f.help }}</p></sc-if>
+                            <sc-if value="{{ f.helpFull }}"><p style="margin:0; font-size:12px; color:#465161; line-height:1.8;">{{ f.help }}</p></sc-if>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isMoney }}">
+                          <div id="{{ f.wid }}" style="display:{{ f.display }}; flex-direction:column; gap:6px; min-width:0; border-radius:8px; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="display:flex; align-items:center; gap:8px; min-height:20px;">
+                              <label for="{{ f.id }}" style="font-size:13px; font-weight:500;">{{ f.label }}</label>
+                              <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                            </div>
+                            <div style="display:flex; align-items:stretch; height:40px; border:1px solid {{ f.inputBorder }}; border-radius:8px; box-shadow:{{ f.ring }}; background:#FFFFFF; overflow:hidden;">
+                              <input id="{{ f.id }}" data-name="{{ f.name }}" type="text" dir="ltr" value="{{ f.value }}" onChange="{{ f.onInput }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" style="flex:1; min-width:0; border:0; padding:0 12px; text-align:left; font-size:14px; color:#18212C; outline:none; background:transparent;">
+                              <span style="display:flex; align-items:center; padding:0 12px; font-size:12px; color:#6B7685; background:#F7F9FB; border-inline-end:1px solid #E2E7EE; order:-1;">تومان</span>
+                            </div>
+                            <span style="font-size:12px; color:#8792A1;">{{ f.words }}</span>
+                            <sc-if value="{{ f.helpShort }}"><p title="{{ f.help }}" style="margin:0; font-size:12px; color:#6B7685; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ f.help }}</p></sc-if>
+                            <sc-if value="{{ f.helpFull }}"><p style="margin:0; font-size:12px; color:#465161; line-height:1.8;">{{ f.help }}</p></sc-if>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isSelect }}">
+                          <div id="{{ f.wid }}" style="grid-column:1 / -1; display:{{ f.display }}; flex-direction:column; gap:6px; min-width:0; border-radius:8px; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                              <label for="{{ f.id }}" style="font-size:13px; font-weight:500;">{{ f.label }}</label>
+                              <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                            </div>
+                            <div role="radiogroup" aria-label="{{ f.label }}" style="display:flex; flex-wrap:wrap; gap:8px;">
+                              <sc-for list="{{ f.options }}" as="o">
+                                <button type="button" role="radio" aria-checked="{{ o.aria }}" onClick="{{ o.onPick }}" style="flex:1 1 220px; display:flex; align-items:center; gap:10px; text-align:right; padding:10px 12px; border-radius:10px; border:1.5px solid {{ o.border }}; background:{{ o.bg }}; font-size:13.5px; color:#18212C; cursor:pointer;">
+                                  <span style="width:16px; height:16px; flex:none; border-radius:50%; border:2px solid {{ o.ring }}; box-sizing:border-box; display:grid; place-items:center;"><span style="width:6px; height:6px; border-radius:50%; background:{{ o.dot }};"></span></span>{{ o.l }}
+                                </button>
+                              </sc-for>
+                            </div>
+                            <select id="{{ f.id }}" name="{{ f.name }}" value="{{ f.value }}" onChange="{{ f.onInput }}" aria-hidden="true" tabIndex="-1" style="display:none;">
+                              <sc-for list="{{ f.options }}" as="o"><option value="{{ o.k }}">{{ o.l }}</option></sc-for>
+                            </select>
+                            <sc-if value="{{ f.hasHelp }}"><p style="margin:0; font-size:12px; color:#6B7685; line-height:1.8;">{{ f.help }}</p></sc-if>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isIcon }}">
+                          <div id="{{ f.wid }}" style="display:{{ f.display }}; flex-direction:column; gap:6px; min-width:0; border-radius:8px; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="display:flex; align-items:center; gap:8px; min-height:20px;">
+                              <label for="{{ f.id }}" style="font-size:13px; font-weight:500;">{{ f.label }}</label>
+                              <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                              <span title="پیش‌نمایش آیکون" style="width:40px; height:40px; flex:none; border-radius:8px; background:#EAF2FD; border:1px solid #CFE2F8; color:#0B62CE; display:grid; place-items:center; font-size:10px; font-family:ui-monospace,Menlo,monospace;">{{ f.value }}</span>
+                              <select id="{{ f.id }}" data-name="{{ f.name }}" value="{{ f.value }}" onChange="{{ f.onInput }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" style="flex:1; min-width:0; height:40px; padding:0 10px; border:1px solid {{ f.inputBorder }}; border-radius:8px; background:#FFFFFF; font-size:14px; color:#18212C; outline:none;">
+                                <sc-for list="{{ f.options }}" as="o"><option value="{{ o.k }}">{{ o.l }}</option></sc-for>
+                              </select>
+                            </div>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isColor }}">
+                          <div id="{{ f.wid }}" title="{{ f.help }}" style="display:{{ f.display }}; align-items:center; gap:10px; padding:10px; border:1px solid {{ f.colorBorder }}; border-radius:10px; min-width:0; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <span style="position:relative; width:38px; height:38px; flex:none; border-radius:8px; background:{{ f.value }}; box-shadow:inset 0 0 0 1px rgba(0,0,0,.1); overflow:hidden;">
+                              <input type="color" value="{{ f.colorVal }}" onChange="{{ f.onInput }}" aria-label="{{ f.pickLabel }}" style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; border:0; padding:0;">
+                            </span>
+                            <div style="flex:1; min-width:0;">
+                              <div style="display:flex; align-items:center; gap:6px;">
+                                <label for="{{ f.id }}" style="font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ f.label }}</label>
+                                <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                              </div>
+                              <div style="font-size:11.5px; color:#8792A1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ f.help }}</div>
+                            </div>
+                            <input id="{{ f.id }}" data-name="{{ f.name }}" type="text" dir="ltr" value="{{ f.value }}" onChange="{{ f.onInput }}" onFocus="{{ f.onFocus }}" onBlur="{{ f.onBlur }}" maxlength="7" style="width:76px; flex:none; height:30px; padding:0 6px; border:1px solid {{ f.inputBorder }}; border-radius:6px; font-family:ui-monospace,Menlo,monospace; font-size:12px; color:#3A4655; text-transform:uppercase; outline:none; text-align:center;">
+                            <sc-if value="{{ f.canReset }}"><button type="button" onClick="{{ f.onReset }}" title="بازگشت به پیش‌فرض" aria-label="بازگشت به رنگ پیش‌فرض" style="width:26px; height:26px; flex:none; border:0; border-radius:6px; background:#F1F4F8; color:#586474; cursor:pointer; font-size:13px;">↺</button></sc-if>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ f.isImage }}">
+                          <div id="{{ f.wid }}" style="grid-column:1 / -1; display:{{ f.display }}; flex-direction:column; gap:8px; border-radius:8px; box-shadow:{{ f.hlShadow }}; scroll-margin-top:160px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                              <span style="font-size:13px; font-weight:500;">{{ f.label }}</span>
+                              <sc-if value="{{ f.dirty }}"><span title="تغییر ذخیره نشده" style="width:7px; height:7px; flex:none; border-radius:50%; background:#E8890C;"></span></sc-if>
+                            </div>
+                            <sc-if value="{{ f.noImage }}">
+                              <button type="button" onClick="{{ f.onPick }}" style="display:flex; align-items:center; gap:14px; padding:14px; border:1.5px dashed #C9D2DD; border-radius:10px; background:#FAFBFD; text-align:right; cursor:pointer;" style-hover="border-color:#0B62CE; background:#F2F7FD;">
+                                <span style="width:72px; height:52px; flex:none; border-radius:8px; background:repeating-linear-gradient(45deg,#EEF1F5 0 6px,#F7F9FB 6px 12px);"></span>
+                                <span style="display:flex; flex-direction:column; gap:3px;"><strong style="font-size:13.5px; color:#0B62CE;">انتخاب از کتابخانهٔ رسانه</strong><span style="font-size:12px; color:#6B7685;">{{ f.help }}</span></span>
+                              </button>
+                            </sc-if>
+                            <sc-if value="{{ f.hasImage }}">
+                              <div style="display:flex; align-items:center; gap:14px; padding:12px; border:1px solid #E2E7EE; border-radius:10px;">
+                                <span style="width:96px; height:64px; flex:none; border-radius:8px; background:repeating-linear-gradient(45deg,#E3EAF3 0 6px,#EEF3F9 6px 12px); display:grid; place-items:center; font-family:ui-monospace,Menlo,monospace; font-size:10px; color:#586474;">wallet art</span>
+                                <span dir="ltr" style="flex:1; min-width:0; font-size:12px; color:#586474; font-family:ui-monospace,Menlo,monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:left;">{{ f.value }}</span>
+                                <button type="button" onClick="{{ f.onPick }}" style="height:32px; padding:0 12px; border:1px solid #D5DCE5; border-radius:7px; background:#FFFFFF; font-size:12.5px; cursor:pointer;">تغییر</button>
+                                <button type="button" onClick="{{ f.onRemove }}" style="height:32px; padding:0 12px; border:1px solid #F2C9C3; border-radius:7px; background:#FFFFFF; color:#B3261E; font-size:12.5px; cursor:pointer;">حذف</button>
+                              </div>
+                            </sc-if>
+                          </div>
+                        </sc-if>
+
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </section>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ isPalette }}" hint-placeholder-val="{{ true }}">
+        <aside aria-label="پیش‌نمایش" style="flex:{{ asideFlex }}; min-width:0; max-width:400px; position:{{ asideSticky }}; top:136px; max-height:{{ asideMaxH }}; overflow:auto; display:grid; grid-auto-rows:max-content; align-content:start; gap:16px;">
+
+          <sc-if value="{{ isPalette }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#FFFFFF; border:1px solid #E2E7EE; border-radius:14px; overflow:hidden;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid #EEF1F5;">
+                <strong style="font-size:13.5px;">پیش‌نمایش زنده</strong><span style="font-size:12px; color:#8792A1;">همزمان با تغییرات</span>
+              </div>
+              <div style="background:{{ pv.surface }}; font-size:12px; color:{{ pv.text }};">
+                <div style="background:{{ pv.pd }}; color:{{ pv.ondark }}; text-align:center; padding:7px; font-size:11.5px;">ارسال رایگان برای خریدهای بالای {{ pv.freeShip }}</div>
+                <div style="margin:12px; padding:18px; border-radius:{{ pv.rad }}; background:{{ pv.heroBg }}; color:#FFFFFF; display:flex; flex-direction:column; align-items:flex-start; gap:6px;">
+                  <strong style="font-size:16px;">حراج پاییزه</strong>
+                  <span style="font-size:11.5px; color:{{ pv.ondark }};">تا {{ pv.off40 }} تخفیف پوشاک و کفش ورزشی</span>
+                  <span style="margin-top:6px; padding:6px 14px; border-radius:{{ pv.radSm }}; background:{{ pv.ac }}; color:#FFFFFF; font-weight:600;">خرید کنید</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 12px 12px;">
+                  <div style="background:{{ pv.base }}; border:1px solid {{ pv.border }}; border-radius:{{ pv.rad }}; padding:8px; display:flex; flex-direction:column; gap:5px;">
+                    <div style="position:relative; height:74px; border-radius:{{ pv.radSm }}; background:{{ pv.salt }}; display:grid; place-items:center; font-family:ui-monospace,Menlo,monospace; font-size:9px; color:{{ pv.muted }};">product shot
+                      <span style="position:absolute; top:6px; right:6px; padding:1px 6px; border-radius:5px; background:{{ pv.sale }}; color:#FFFFFF; font-family:Vazirmatn,Tahoma,sans-serif; font-size:10px;">{{ pv.off25 }}</span>
+                    </div>
+                    <span style="color:{{ pv.star }}; font-size:11px; letter-spacing:1px;">★★★★☆</span>
+                    <span style="font-weight:600; color:{{ pv.text }}; line-height:1.5;">کفش رانینگ مدل آیرو</span>
+                    <span style="color:{{ pv.muted }}; text-decoration:line-through; font-size:11px;">{{ pv.oldPrice }}</span>
+                    <div style="display:flex; align-items:center; justify-content:space-between;">
+                      <span style="display:flex; align-items:baseline; gap:3px; color:{{ pv.pd }}; font-weight:700; font-size:13px;">{{ pv.price }}
+                        <sc-if value="{{ pv.showWord }}"><span style="font-size:10px; font-weight:400; color:{{ pv.soft }};">تومان</span></sc-if>
+                        <sc-if value="{{ pv.showSym }}"><span title="نماد تومان" style="font-size:{{ pv.symSize }}; line-height:1; color:{{ pv.toman }}; font-weight:400;">ت</span></sc-if>
+                      </span>
+                      <span style="width:24px; height:24px; border-radius:{{ pv.radSm }}; background:{{ pv.ac }}; color:#FFFFFF; display:grid; place-items:center; font-size:15px;">+</span>
+                    </div>
+                  </div>
+                  <div style="background:{{ pv.tg }}; border:1px solid {{ pv.tgb }}; border-radius:{{ pv.rad }}; padding:10px; display:flex; flex-direction:column; gap:8px;">
+                    <strong style="color:{{ pv.acdp }}; font-size:12.5px;">پیشنهاد ویژه</strong>
+                    <div style="display:flex; gap:4px; direction:ltr; justify-content:flex-end;">
+                      <span style="padding:4px 6px; border-radius:6px; background:{{ pv.pd }}; color:#FFFFFF; font-weight:600;">{{ pv.cd1 }}</span>
+                      <span style="padding:4px 6px; border-radius:6px; background:{{ pv.pd }}; color:#FFFFFF; font-weight:600;">{{ pv.cd2 }}</span>
+                      <span style="padding:4px 6px; border-radius:6px; background:{{ pv.pd }}; color:#FFFFFF; font-weight:600;">{{ pv.cd3 }}</span>
+                    </div>
+                    <span style="color:{{ pv.soft }}; font-size:11px;">ساک ورزشی ۳۵ لیتری</span>
+                    <div style="height:6px; border-radius:3px; background:{{ pv.border }}; overflow:hidden;"><div style="width:64%; height:100%; background:{{ pv.ac }};"></div></div>
+                    <span style="color:{{ pv.soft }}; font-size:10.5px;">{{ pv.sold }} فروخته شده</span>
+                    <span style="margin-top:auto; padding:5px 8px; border-radius:{{ pv.radSm }}; background:{{ pv.pr }}; color:#FFFFFF; text-align:center; font-weight:600;">مشاهده</span>
+                  </div>
+                </div>
+                <div style="display:flex; gap:8px; padding:0 12px 12px;">
+                  <span style="padding:6px 10px; border-radius:999px; background:{{ pv.tb }}; border:1px solid {{ pv.tbb }}; color:{{ pv.pr }};">دویدن</span>
+                  <span style="padding:6px 10px; border-radius:999px; background:{{ pv.tb }}; border:1px solid {{ pv.tbb }}; color:{{ pv.pr }};">کوهنوردی</span>
+                  <span style="padding:6px 10px; border-radius:999px; background:{{ pv.tb }}; border:1px solid {{ pv.tbb }}; color:{{ pv.pr }};">بدنسازی</span>
+                </div>
+                <div style="background:{{ pv.pd }}; color:{{ pv.ondark }}; padding:12px 14px; display:flex; justify-content:space-between; font-size:11px;">
+                  <span>درباره ما · تماس · قوانین</span><span>اسپرت‌لند</span>
+                </div>
+              </div>
+            </div>
+            <div style="background:#FFFFFF; border:1px solid #E2E7EE; border-radius:14px; padding:14px; display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;"><strong style="font-size:13.5px;">ویجت‌های اردال در المنتور</strong><span style="font-size:12px; color:#8792A1;">{{ widgetCount }}</span></div>
+              <input type="search" aria-label="فیلتر ویجت‌ها" value="{{ wq }}" onChange="{{ onWq }}" placeholder="فیلتر ویجت‌ها…" style="height:34px; padding:0 10px; border:1px solid #D5DCE5; border-radius:8px; font-size:13px; outline:none;" style-focus="border-color:#0B62CE;">
+              <div style="display:flex; flex-wrap:wrap; gap:6px; max-height:220px; overflow:auto;">
+                <sc-for list="{{ widgets }}" as="w"><span style="padding:4px 9px; border-radius:6px; background:#F4F6F9; color:#3A4655; font-size:12px;">{{ w }}</span></sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+        </aside>
+        </sc-if>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div role="region" aria-label="ذخیرهٔ تغییرات" style="position:fixed; bottom:20px; left:50%; z-index:50; transform:{{ barTransform }}; opacity:{{ barOpacity }}; pointer-events:{{ barEvents }}; transition:transform .25s ease, opacity .25s ease; display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:10px 10px 10px 18px; background:#18212C; color:#FFFFFF; border-radius:14px; box-shadow:0 16px 40px rgba(16,24,40,.28); max-width:calc(100vw - 32px); box-sizing:border-box;">
+  <span style="width:8px; height:8px; border-radius:50%; background:#F5A623;"></span>
+  <span style="font-size:13.5px;">{{ barText }}</span>
+  <span style="font-size:12px; color:#9AA7B4;">{{ barTabs }}</span>
+  <button type="button" onClick="{{ onRevert }}" disabled="{{ saving }}" style="height:36px; padding:0 14px; border:1px solid #3A4655; border-radius:9px; background:transparent; color:#E6EBF1; font-size:13px; cursor:pointer;" style-hover="background:#24303D;">بازگردانی</button>
+  <button type="button" onClick="{{ onSave }}" disabled="{{ saveDisabled }}" style="height:36px; display:flex; align-items:center; gap:8px; padding:0 18px; border:0; border-radius:9px; background:{{ saveBg }}; color:#FFFFFF; font-size:13.5px; font-weight:600; cursor:pointer;">
+    <sc-if value="{{ saving }}">{{ spinnerWhite }}</sc-if>{{ saveLabel }}
+  </button>
+</div>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" aria-live="polite" style="position:fixed; top:20px; left:20px; z-index:60; display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px; background:{{ toastBg }}; color:{{ toastColor }}; border:1px solid {{ toastBorder }}; box-shadow:0 10px 30px rgba(16,24,40,.14); font-size:13.5px;">
+    <span style="width:18px; height:18px; border-radius:50%; background:{{ toastIconBg }}; color:#FFFFFF; display:grid; place-items:center; font-size:11px;">✓</span>{{ toastText }}
+  </div>
+</sc-if>
+
+<sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; inset:0; z-index:70; background:rgba(16,24,40,.42); display:grid; place-items:center; padding:20px;">
+    <div role="dialog" aria-modal="true" aria-labelledby="ard-confirm-t" style="width:100%; max-width:420px; background:#FFFFFF; border-radius:16px; padding:22px; display:flex; flex-direction:column; gap:10px; box-shadow:0 24px 60px rgba(16,24,40,.3);">
+      <h3 id="ard-confirm-t" style="margin:0; font-size:16px;">بازگشت به پالت دیزاین؟</h3>
+      <p style="margin:0; color:#586474; line-height:1.9; font-size:13.5px;">همهٔ رنگ‌ها به مقدار پیش‌فرض دیزاین برمی‌گردند. تا «ذخیره تغییرات» را نزنید چیزی ثبت نمی‌شود.</p>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:8px;">
+        <button type="button" onClick="{{ closeConfirm }}" style="height:38px; padding:0 16px; border:1px solid #D5DCE5; border-radius:9px; background:#FFFFFF; font-size:13.5px; cursor:pointer;">انصراف</button>
+        <button type="button" onClick="{{ doReset }}" style="height:38px; padding:0 16px; border:0; border-radius:9px; background:#B3261E; color:#FFFFFF; font-size:13.5px; font-weight:600; cursor:pointer;">بازگردانی رنگ‌ها</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;niasStatus&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ok&quot;,&quot;no_gateway&quot;,&quot;not_installed&quot;],&quot;default&quot;:&quot;ok&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;وضعیت محیط&quot;},&quot;wooActive&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;وضعیت محیط&quot;},&quot;showWpChrome&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;نمایش&quot;},&quot;startTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;palette&quot;,&quot;account&quot;,&quot;wishlist&quot;,&quot;wallet&quot;],&quot;default&quot;:&quot;palette&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;نمایش&quot;}}">
+const fa=s=>String(s==null?'':s).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const en=s=>String(s==null?'':s).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+const grp=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const money=s=>{const n=en(s).replace(/[^\d]/g,'');return n?fa(grp(Number(n))).replace(/,/g,'٬'):'';};
+const shortAmt=x=>{const n=Number(en(x))||0;if(n>=1e6)return fa(+(n/1e6).toFixed(1)).replace('.','٫')+' میلیون تومان';if(n>=1e3)return fa(Math.round(n/1e3))+' هزار تومان';return fa(n)+' تومان';};
+const P='ardal_palette',AC='ardal_account',WI='ardal_wishlist',WA='ardal_wallet';
+const F=(o,k,t,l,d,x)=>Object.assign({opt:o,key:k,name:o+'['+k+']',type:t,label:l,def:d==null?'':String(d)},x||{});
+const C=(k,l,d,h)=>F(P,k,'color',l,d,{help:h});
+const E={emptyHide:true};
+const ICONS={dash:'خانه',orders:'سفارش',box:'بسته',truck:'ارسال',cart:'سبد خرید',fav:'قلب',chart:'نمودار',wallet:'کیف پول',ticket:'کد تخفیف',review:'دیدگاه',user:'کاربر',addr:'آدرس',bell:'زنگ',clock:'ساعت',check:'تیک',plus:'به‌علاوه',down:'دانلود',work:'فروشگاه',thumb:'پسندیدن',logout:'خروج',card:'کارت بانکی'};
+const IC=(k,l,d,sw)=>F(AC,k,'icon',l,d,{options:ICONS,show_when:sw});
+const OFF_DASH='این باکس در پیشخوان کاربر رندر نمی‌شود. برای ویرایش متن‌هایش روشنش کنید.';
+const dash=(id,title,short,sub,fields)=>({id,title,short,sub,master:AC+'['+id+']',offText:OFF_DASH,fields:[F(AC,id,'toggle','نمایش در پیشخوان','1')].concat(fields.map(f=>Object.assign(f,{show_when:id})))});
+const MENU=[['dashboard','پیشخوان',10],['orders','سفارش‌های من',20],['wishlist','علاقه‌مندی‌ها',30],['wallet','کیف پول',35],['edit-address','آدرس‌های من',40],['edit-account','اطلاعات حساب',50],['reviews','نظرات من',60],['downloads','دانلودها',70],['payment-methods','روش‌های پرداخت',80]];
+const menuFields=[].concat(...MENU.map(([s,l,o])=>[F(AC,'menu_'+s,'toggle',l,'1'),F(AC,'menu_'+s+'_label','text',l,l),F(AC,'menu_'+s+'_order','number','ترتیب '+l,o)]));
+const BASE_TK='{name} {amount} {amount_raw} {balance} {balance_raw} {site}',WD_TK=BASE_TK+' {ref} {reason} {iban}';
+const SMS=[
+ {k:'topup',label:'بعد از شارژ موفق توسط خود کاربر',def:'1',vars:'amount:{amount_raw},balance:{balance_raw}',text:'کیف پول شما {amount} شارژ شد.\nموجودی فعلی: {balance}\n{site}',tk:BASE_TK},
+ {k:'admin',label:'بعد از شارژ دستی یا گروهی توسط مدیر',def:'1',vars:'amount:{amount_raw},balance:{balance_raw}',text:'{amount} به کیف پول شما اضافه شد.\nموجودی فعلی: {balance}\n{site}',tk:BASE_TK},
+ {k:'cashback',label:'بعد از واریز کش‌بگ خرید',def:'0',vars:'amount:{amount_raw},balance:{balance_raw}',text:'کش‌بگ خرید شما ({amount}) به کیف پول اضافه شد.\nموجودی فعلی: {balance}\n{site}',tk:BASE_TK},
+ {k:'withdraw_paid',label:'بعد از واریز درخواست برداشت ({ref} = کد پیگیری)',def:'1',vars:'amount:{amount_raw},ref:{ref}',text:'برداشت {amount} از کیف پول به حساب شما واریز شد.\nکد پیگیری: {ref}\n{site}',tk:WD_TK},
+ {k:'withdraw_rejected',label:'بعد از رد درخواست برداشت ({reason} = دلیل)',def:'1',vars:'amount:{amount_raw},reason:{reason}',text:'درخواست برداشت {amount} رد شد و مبلغ به کیف پول برگشت.\n{reason}\n{site}',tk:WD_TK}
+];
+const smsFields=[].concat(...SMS.map(e=>[F(WA,'sms_'+e.k,'toggle',e.label,e.def,{show_when:'sms_enabled'}),F(WA,'sms_'+e.k+'_pattern','text','کد پترن','',{dir:'ltr'}),F(WA,'sms_'+e.k+'_vars','text','متغیرهای پترن',e.vars,{dir:'ltr'}),F(WA,'sms_'+e.k+'_text','textarea','متن آزاد',e.text)]));
+const RISK={risk:'advanced'};
+const TABS=[
+{id:'palette',title:'پالت و ظاهر',lede:'رنگ‌های زیر روی همه ویجت‌های اردال در المنتور اعمال می‌شوند. با تغییر هر رنگ، پیش‌نمایش کنار صفحه بلافاصله به‌روز می‌شود.',cards:[
+ {id:'presets',title:'پالت‌های آماده',kind:'presets',sub:'با یک کلیک همه رنگ‌ها را جایگزین کنید. تا وقتی «ذخیره تغییرات» را نزنید چیزی ثبت نمی‌شود.'},
+ {id:'colors_brand',title:'رنگ‌های برند',fields:[C('primary_dark','سرمه‌ای اصلی','#0B3C8C','رنگ برند: هدر، فوتر، قیمت‌ها و نوار اعلان'),C('primary','آبی اصلی','#0B62CE','دکمه‌ها، لینک‌ها و عناصر تعاملی'),C('primary_light','آبی روشن','#2E9BF0','انتهای گرادیان‌ها و حالت‌های روشن'),C('accent','سبز تاکیدی','#7DC61E','دکمه افزودن به سبد، نشانگرها و نوار پیشرفت'),C('accent_dark','سبز تیره','#5FA315','حالت هاور سبز و آیکون‌ها'),C('accent_deep','سبز متن','#3F7A0C','عنوان‌های روی زمینه سبز روشن'),C('toman','رنگ نماد تومان','#003061','وقتی «نماد تومان» روشن باشد، رنگ آیکون کنار قیمت‌ها')]},
+ {id:'colors_state',title:'رنگ‌های وضعیت',fields:[C('sale','قرمز حراج','#C0392B','برچسب تخفیف و درصدها'),C('star','زرد امتیاز','#F0A500','ستاره‌های امتیاز محصولات')]},
+ {id:'colors_text',title:'متن',fields:[C('text','متن اصلی','#20303F','عنوان‌ها و متن‌های پررنگ'),C('text_body','متن منو','#3D4A58','آیتم‌های منو و متن‌های میانی'),C('text_soft','متن ثانویه','#5D6B7A','توضیحات و پاراگراف‌ها'),C('muted','متن کم‌رنگ','#9AA7B4','قیمت خط‌خورده، تاریخ و placeholder'),C('on_dark','متن روی سرمه‌ای','#CFE4FF','متن فوتر و نوار اعلان بالای صفحه')]},
+ {id:'colors_surface',title:'سطوح و حاشیه‌ها',fields:[C('border','حاشیه کارت','#E9EEF4','دور کارت محصول و باکس‌ها'),C('border_soft','حاشیه ملایم','#EEF1F5','خط جداکننده بخش‌ها'),C('surface','سطح خنثی','#F4F7FA','زمینه جستجو و چیپ‌ها'),C('surface_alt','سطح خنثی دوم','#F6F9FC','زمینه بخش خبرنامه و کارت‌های ساده'),C('tint_blue','آبی پس‌زمینه','#EAF4FF','حلقه دسته‌بندی و آیکون‌های آبی'),C('tint_blue_border','آبی حاشیه','#CFE2F8','حاشیه عناصر آبی روشن'),C('tint_green','سبز پس‌زمینه','#F1F8E6','باکس پیشنهاد ویژه و سبد خرید'),C('tint_green_border','سبز حاشیه','#DBEEC2','حاشیه عناصر سبز روشن'),C('base','زمینه سفید','#FFFFFF','زمینه کارت‌ها و صفحه')]},
+ {id:'extras_type',title:'تایپوگرافی و ابعاد',fields:[F(P,'radius','number','گردی گوشه‌ها','16',{unit:'پیکسل',help:'مبنای گردی کارت‌ها بر حسب پیکسل؛ بقیه اندازه‌ها نسبت به آن محاسبه می‌شوند.'}),F(P,'container','number','حداکثر عرض محتوا','1440',{unit:'پیکسل',step:10,help:'عرض کانتینر بخش‌ها بر حسب پیکسل. دیزاین برای ۱۴۴۰ پیکسل طراحی شده است.'})]},
+ {id:'extras_money',title:'واحد پول و اعداد',fields:[F(P,'toman_symbol','toggle','تغییر ساختار تومان','0',{help:'به‌جای نوشتن «تومان» کنار قیمت‌ها، نماد رسمی تومان نمایش داده می‌شود.'}),F(P,'toman_woo','toggle','اعمال روی قیمت‌های خود ووکامرس','0',{help:'علاوه بر ویجت‌های اردال، روی قیمت محصول در فروشگاه، آرشیو، صفحه محصول، سبد خرید و تسویه هم اعمال می‌شود. ایمیل‌ها و پیشخوان دست‌نخورده می‌مانند.'}),F(P,'toman_size','number','اندازه نماد تومان','170',{unit:'٪',step:10,help:'درصدِ اندازهٔ قلمِ قیمت. نماد تومان دوطبقه است، برای همین از خودِ رقم‌ها بلندتر تنظیم می‌شود.'}),F(P,'persian_digits','toggle','تبدیل خودکار اعداد به فارسی','1',{help:'قیمت‌ها، شمارنده‌ها و تعدادها با ارقام فارسی نمایش داده می‌شوند.'})]},
+ {id:'extras_product',title:'صفحه محصول',fields:[F(P,'product_subtitle','toggle','نمایش عنوان انگلیسی محصول','0',{help:'زیرعنوان لاتین زیر نام محصول. متن آن از فیلد سفارشی محصول یا از تنظیم خود ویجت خوانده می‌شود.'}),F(P,'product_subtitle_key','text','کلید فیلد سفارشی عنوان انگلیسی','_ardal_subtitle',{dir:'ltr',help:'نام متای محصول که عنوان انگلیسی از آن خوانده می‌شود. اگر خالی یا موجود نبود، از متن ویجت استفاده می‌شود.'}),F(P,'product_compare','toggle','فعال‌سازی مقایسه','1',{help:'دکمهٔ مقایسه در گالری و کارت محصول. با خاموش‌کردن، همه‌جا حذف می‌شود.'})]},
+ {id:'extras_archive',title:'آرشیو فروشگاه',fields:[F(P,'archive_per_page','number','تعداد محصول در هر صفحه آرشیو','0',{unit:'محصول',min:0,help:'روی صفحه فروشگاه و آرشیو دسته‌ها اعمال می‌شود. صفر یعنی همان مقدار پیش‌فرض ووکامرس.'})]},
+ {id:'extras_woocommerce_assets',title:'فایل‌های ووکامرس',advanced:true,sub:'هر گزینه یکی از فایل‌های CSS یا JavaScript خود ووکامرس را از صفحه‌ها حذف می‌کند. فقط وقتی روشن کنید که قالب یا ویجت‌های اردال جایگزین آن را دارند.',fields:[
+  F(P,'disable_wc_general_css','toggle','غیرفعال‌سازی CSS اصلی ووکامرس (woocommerce-general)','0',Object.assign({help:'استایل‌های عمومی دکمه‌ها، پیام‌ها و جدول‌های ووکامرس. فعال‌سازی این گزینه ممکن است ظاهر فروشگاه، سبد و تسویه‌حساب را تغییر دهد.'},RISK)),
+  F(P,'disable_wc_layout_css','toggle','غیرفعال‌سازی CSS چیدمان ووکامرس (woocommerce-layout)','0',Object.assign({help:'چیدمان پیش‌فرض فروشگاه و صفحه محصول، شامل ستون‌ها و ساختار محتوا. فقط وقتی قالب/Elementor جایگزین کامل چیدمان است فعال کنید.'},RISK)),
+  F(P,'disable_wc_smallscreen_css','toggle','غیرفعال‌سازی CSS واکنش‌گرا ووکامرس (woocommerce-smallscreen)','0',Object.assign({help:'قواعد واکنش‌گرا برای نمایش ووکامرس در موبایل و صفحه‌های کوچک. ممکن است ظاهر فروشگاه در موبایل را تحت تأثیر قرار دهد.'},RISK)),
+  F(P,'disable_wc_add_to_cart_js','toggle','غیرفعال‌سازی JavaScript افزودن ایجکس به سبد (wc-add-to-cart)','0',Object.assign({help:'افزودن محصول از لیست/کارت بدون رفرش صفحه را خاموش می‌کند؛ دکمه‌ها با رفتن به لینک محصول یا سبد کار می‌کنند.'},RISK)),
+  F(P,'disable_wc_cart_fragments_js','toggle','غیرفعال‌سازی JavaScript به‌روزرسانی مینی‌سبد (wc-cart-fragments)','0',Object.assign({help:'شمارنده و محتوای مینی‌سبد پس از افزودن کالا خودکار به‌روزرسانی نمی‌شود؛ برای کاهش درخواست‌های Ajax مناسب است.'},RISK)),
+  F(P,'disable_wc_single_product_js','toggle','غیرفعال‌سازی JavaScript صفحه محصول (wc-single-product)','0',Object.assign({help:'رفتار گالری استاندارد ووکامرس و وابستگی‌های آن را خاموش می‌کند. اگر از گالری سفارشی اردال استفاده می‌کنید می‌تواند مفید باشد.'},RISK)),
+  F(P,'disable_wc_variation_js','toggle','غیرفعال‌سازی JavaScript محصول متغیر (wc-add-to-cart-variation)','0',Object.assign({help:'انتخاب ویژگی‌ها، قیمت و موجودی محصول متغیر در فرم استاندارد ووکامرس را غیرفعال می‌کند. برای محصولات متغیر معمولاً خاموش بماند.'},RISK))
+ ]}
+]},
+{id:'account',title:'پنل کاربری',lede:'صفحه‌های پنل کاربری، ترتیب و نامشان، و بخش‌های صفحهٔ پیشخوان از همین‌جا کنترل می‌شوند.',cards:[
+ {id:'menu',title:'منوی پنل کاربری',short:'منوی پنل',kind:'menu',sub:'برای تغییر ترتیب ردیف‌ها را بکشید یا از دکمه‌های بالا/پایین استفاده کنید.',info:'صفحه‌ای که ووکامرس نساخته باشد حتی با روشن‌بودن کلید هم در منو نمایش داده نمی‌شود.'},
+ dash('dash_welcome','پیشخوان — کارت خوش‌آمد','کارت خوش‌آمد','نام کاربر، خلاصهٔ وضعیت و دکمه‌های میان‌بر',[F(AC,'welcome_title','text','عنوان خوش‌آمد','سلام {name}، خوش برگشتی',{tokens:'{name}'}),F(AC,'welcome_sub','textarea','توضیح، وقتی خبری نیست','اینجا خلاصهٔ سفارش‌ها، علاقه‌مندی‌ها و اطلاعات حسابت را می‌بینی.',{help:'وقتی نه سفارشی در جریان است و نه علاقه‌مندی موجودی.'}),F(AC,'welcome_line_ship','text','جملهٔ «سفارش در حال ارسال»','یک سفارش در حال ارسال داری',{help:'این جمله‌ها با «، » به هم می‌چسبند و توضیح خوش‌آمد را می‌سازند.'}),F(AC,'welcome_line_pay','text','جملهٔ «در انتظار پرداخت»','یک سفارش منتظر پرداخت است'),F(AC,'welcome_line_wish','text','جملهٔ «علاقه‌مندی موجود»','{count} کالای علاقه‌مندی‌ات موجود است',{tokens:'{count}'}),F(AC,'welcome_btn','text','دکمهٔ اصلی','ادامه خرید',Object.assign({help:'به صفحهٔ فروشگاه می‌رود. خالی = بدون دکمه.'},E)),F(AC,'welcome_btn_down','text','دکمهٔ دوم، وقتی فایل دانلودی دارد','فایل‌های دانلودی',E),F(AC,'welcome_btn_orders','text','دکمهٔ دوم، در حالت عادی','سفارش‌های من',E)]),
+ dash('dash_stats','پیشخوان — کارت‌های آمار','کارت‌های آمار','تعداد سفارش، مبلغ خرید، علاقه‌مندی و نظرات',[F(AC,'stat_orders_label','text','آمار ۱ — عنوان','مجموع سفارش‌ها'),F(AC,'stat_orders_unit','text','آمار ۱ — واحد','سفارش',E),IC('stat_orders_icon','آمار ۱ — آیکون','box'),F(AC,'stat_spent_label','text','آمار ۲ — عنوان','مبلغ کل خرید'),F(AC,'stat_spent_unit','text','آمار ۲ — واحد','میلیون',E),IC('stat_spent_icon','آمار ۲ — آیکون','chart'),F(AC,'stat_wish_label','text','آمار ۳ — عنوان','علاقه‌مندی‌ها'),F(AC,'stat_wish_unit','text','آمار ۳ — واحد','کالا',E),IC('stat_wish_icon','آمار ۳ — آیکون','fav'),F(AC,'stat_review_label','text','آمار ۴ — عنوان','نظرات ثبت شده'),F(AC,'stat_review_unit','text','آمار ۴ — واحد','دیدگاه',E),IC('stat_review_icon','آمار ۴ — آیکون','review')]),
+ dash('dash_alert','پیشخوان — نوار هشدار','نوار هشدار','یادآوری تکمیل اطلاعات حساب',[F(AC,'alert_title','text','عنوان هشدار پرداخت','سفارش {number} در انتظار پرداخت',{tokens:'{number}'}),F(AC,'alert_note','text','خط دوم هشدار','{count} کالا · {total} تومان',{tokens:'{count} و {total}'}),F(AC,'alert_btn','text','متن دکمهٔ پرداخت','پرداخت سفارش',E)]),
+ dash('dash_track','پیشخوان — پیگیری سفارش جاری','پیگیری سفارش','مراحل آماده‌سازی و ارسال آخرین سفارش',[F(AC,'track_title','text','عنوان کارت پیگیری','سفارش در حال ارسال'),F(AC,'track_btn','text','متن دکمهٔ جزئیات','جزئیات و رهگیری',E),IC('track_empty_icon','آیکون حالت خالی','truck'),F(AC,'track_empty_title','text','عنوان حالت خالی','سفارشی در راه نیست'),F(AC,'track_empty_text','textarea','توضیح حالت خالی','هر سفارشی که ثبت کنی، مراحل آماده‌سازی و ارسالش را همین‌جا می‌بینی.'),F(AC,'track_empty_btn','text','دکمهٔ حالت خالی','شروع خرید',E)]),
+ dash('dash_chart','پیشخوان — نمودار خرید ۶ ماه','نمودار خرید','میله‌های مجموع خرید ماه‌های گذشته',[F(AC,'chart_title','text','عنوان نمودار','خرید ۶ ماه گذشته'),F(AC,'chart_note','text','یادداشت کنار عنوان','میلیون تومان',E)]),
+ dash('dash_coupon','پیشخوان — کد تخفیف اختصاصی','کد تخفیف','کارت کد تخفیف با دکمهٔ کپی',[F(AC,'coupon_title','text','عنوان کارت کد تخفیف','کد تخفیف اختصاصی'),F(AC,'coupon_btn','text','متن دکمهٔ کپی','کپی')]),
+ dash('dash_suggest','پیشخوان — پیشنهاد بر اساس خرید','پیشنهاد محصول','محصولاتی از دسته‌هایی که کاربر بیشتر خریده',[F(AC,'suggest_title','text','عنوان کارت پیشنهاد','بر اساس خریدهای تو'),F(AC,'suggest_sub','text','زیرعنوان','انتخاب‌هایی از دسته‌هایی که بیشتر سراغشان رفته‌ای',E),F(AC,'suggest_link','text','متن لینک گوشه','مشاهده همه',E)]),
+ {id:'dashboard_counts',title:'پیشخوان — تعدادها',short:'تعدادها',fields:[F(AC,'suggest_count','number','تعداد پیشنهاد در پیشخوان','4',{min:1,unit:'محصول',help:'چند محصول در کارت «بر اساس خریدهای تو» نمایش داده شود.'}),F(AC,'orders_per_page','number','تعداد سفارش در هر صفحه','10',{min:1,unit:'سفارش',help:'در صفحهٔ «سفارش‌های من».'})]},
+ {id:'support',title:'کارت پشتیبانی پنل',short:'کارت پشتیبانی',sub:'در ستون کناری پنل کاربری و کشوی موبایل',fields:[F(P,'account_support_phone','text','شماره پشتیبانی','',{dir:'ltr',ph:'021-91004500',help:'در کارت پشتیبانی ستون کناری پنل کاربری و کشوی موبایل نمایش داده می‌شود. خالی بگذارید تا دکمهٔ تماس حذف شود.'}),F(P,'account_support_hours','text','ساعت پاسخگویی','هر روز از ۹ صبح تا ۹ شب پاسخگوی شما هستیم.',{help:'متن کوتاه زیر عنوان کارت پشتیبانی در پنل کاربری.'})]}
+]},
+{id:'wishlist',title:'علاقه‌مندی',lede:'رفتار دکمهٔ قلب، پیام‌ها و صفحهٔ علاقه‌مندی‌ها. ظاهر دکمه و فهرست در خود ویجت‌های المنتور تنظیم می‌شود.',cards:[
+ {id:'status',title:'وضعیت و رفتار',info:'علاقه‌مندی برای کاربر واردشده همیشه روی حسابش ذخیره می‌شود و هر کلیک همان لحظه ثبت می‌شود.',fields:[F(P,'product_wishlist','toggle','علاقه‌مندی فعال است','1',{help:'دکمهٔ قلب در کارت محصول، گالری و باکس خرید، صفحهٔ «علاقه‌مندی‌ها» در پنل و ویجت‌های علاقه‌مندی. با خاموش‌کردن همه‌جا حذف می‌شود.'}),F(WI,'guest_mode','select','کاربر مهمان (واردنشده)','local',{options:{local:'ذخیره در مرورگر خودش',login:'پیام «اول وارد شو» با دکمهٔ ورود'},help:'در حالت «ذخیره در مرورگر»، فهرست مهمان بعد از ورود یک بار با حسابش ادغام می‌شود.'}),F(WI,'merge_on_login','toggle','ادغام فهرست مهمان بعد از ورود','1',{help:'محصول‌هایی که پیش از ورود قلب خورده‌اند به حساب اضافه شوند.'}),F(WI,'max','number','بیشترین تعداد قابل ذخیره','200',{min:1,step:10,unit:'کالا',help:'از این بیشتر، پیام «فهرست پر است» نمایش داده می‌شود.'}),F(WI,'hide_unstock','toggle','کالاهای ناموجود در فهرست نشان داده نشوند','0',{help:'در فهرست می‌مانند و با موجود شدن دوباره دیده می‌شوند.'})]},
+ {id:'texts',title:'متن‌ها و پیام‌ها',fields:[F(WI,'toast','toggle','پیام شناور بعد از افزودن و حذف','1',{help:'پیام ورود و خطا همیشه نمایش داده می‌شود.'}),F(WI,'text_add','text','متن دکمه (افزودن)','افزودن به علاقه‌مندی‌ها',{help:'برچسب و راهنمای دکمهٔ قلب.'}),F(WI,'text_remove','text','متن دکمه (حذف)','حذف از علاقه‌مندی‌ها'),F(WI,'msg_added','text','پیام افزودن','به علاقه‌مندی‌ها اضافه شد.',{show_when:'toast'}),F(WI,'msg_removed','text','پیام حذف','از علاقه‌مندی‌ها حذف شد.',{show_when:'toast'}),F(WI,'view_text','text','دکمهٔ «مشاهدهٔ فهرست» در پیام','مشاهدهٔ فهرست',{show_when:'toast'}),F(WI,'msg_login','text','پیام نیاز به ورود','برای ذخیرهٔ علاقه‌مندی‌ها ابتدا وارد حساب شو.'),F(WI,'login_text','text','متن دکمهٔ ورود','ورود به حساب'),F(WI,'msg_full','text','پیام پر بودن فهرست','فهرست علاقه‌مندی‌ها پر است؛ چند مورد قدیمی را حذف کن.')]},
+ {id:'page',title:'صفحهٔ علاقه‌مندی در پنل کاربری',short:'صفحهٔ علاقه‌مندی',info:'نام آیتم منو و ترتیبش در تب «پنل کاربری» تنظیم می‌شود.',fields:[F(AC,'wishlist_title','text','عنوان صفحه','علاقه‌مندی‌ها'),F(AC,'wishlist_columns','number','تعداد ستون','4',{min:1,unit:'ستون',help:'در موبایل خودکار کمتر می‌شود.'}),F(AC,'wishlist_add_all','toggle','دکمهٔ «افزودن همه به سبد»','1',{help:'وقتی دست‌کم یک کالای موجود در فهرست باشد.'}),F(AC,'wishlist_empty_title','text','عنوان حالت خالی','هنوز کالایی ذخیره نکرده‌ای'),F(AC,'wishlist_empty_text','text','توضیح حالت خالی','با زدن آیکون قلب روی هر محصول، آن را اینجا نگه دار تا بعداً سراغش بیایی.'),F(AC,'wishlist_empty_btn','text','متن دکمهٔ حالت خالی','دیدن محصول‌ها',Object.assign({help:'خالی بگذارید تا دکمه حذف شود.'},E))]},
+ {id:'shortcodes',title:'شورت‌کدها و ویجت‌ها',short:'شورت‌کدها',kind:'ref',refs:[['[ardal_wishlist_button]','دکمهٔ قلب محصول جاری (یا id="12" برای محصول دلخواه، text="yes" برای نمایش متن).'],['[ardal_wishlist]','فهرست علاقه‌مندی‌های کاربر در هر صفحه‌ای.'],['[ardal_wishlist_count]','آیکون قلب با شمارنده برای هدر (hide_zero="no" برای نمایش صفر).']]}
+]},
+{id:'wallet',title:'کیف پول',lede:'کیف پول، شارژ آنلاین، پرداخت در تسویه، کش‌بگ، برداشت و پیامک.',cards:[
+ {id:'status',title:'وضعیت کلی',fields:[F(WA,'enabled','toggle','کیف پول فعال است','1',{help:'صفحهٔ کیف پول در پنل، پرداخت در تسویه، کش‌بگ، گزارش و ویجت‌ها. خاموش‌کردن موجودی کسی را پاک نمی‌کند.'}),F(WA,'title','text','عنوان صفحهٔ کیف پول','کیف پول',{help:'عنوان بالای صفحه در پنل کاربری. نام آیتم منو در تب «پنل کاربری» است.'})]},
+ {id:'topup',title:'افزایش اعتبار',info:'شارژ با ساخت یک سفارش ووکامرس انجام می‌شود، پس همهٔ درگاه‌های فعال فروشگاه بدون تنظیم اضافه کار می‌کنند. اعتبار فقط بعد از پرداخت موفق اضافه می‌شود.',fields:[F(WA,'topup_enabled','toggle','کاربر بتواند کیف پولش را شارژ کند','1'),F(WA,'min_topup','money','کمترین مبلغ شارژ (تومان)','10000',{show_when:'topup_enabled'}),F(WA,'max_topup','money','بیشترین مبلغ شارژ (تومان)','50000000',{show_when:'topup_enabled',help:'صفر یعنی بی‌سقف.'}),F(WA,'quick_amounts','text','مبلغ‌های پیشنهادی','100000,200000,500000',{show_when:'topup_enabled',dir:'ltr',help:'با کاما جدا کنید؛ مثلاً 100000,200000,500000'}),F(WA,'short_amounts','toggle','نمایش کوتاه مبلغ‌ها («۱۰۰ هزار تومان»)','1',{show_when:'topup_enabled'}),F(WA,'topup_note','text','متن راهنمای زیر کارت','با هر خرید، بخشی از مبلغ به‌صورت کش‌بگ به کیف پولت برمی‌گردد.',Object.assign({help:'خالی بگذارید تا نمایش داده نشود.'},E)),F(WA,'hero_image','image','تصویر کیف پول','',{help:'خالی بماند، طرح پیش‌فرض با رنگ‌های پالت نمایش داده می‌شود.'})]},
+ {id:'checkout',title:'پرداخت از کیف پول در تسویه حساب',short:'پرداخت در تسویه',fields:[F(WA,'checkout','toggle','پرداخت از کیف پول در تسویه حساب','1',{help:'گزینهٔ «پرداخت از کیف پول» داخل باکس شیوهٔ پرداخت.'}),F(WA,'partial','toggle','پرداخت جزئی مجاز است','1',{show_when:'checkout',help:'خاموش باشد، کیف پول فقط وقتی قابل استفاده است که کل مبلغ را بپوشاند.'}),F(WA,'max_percent','number','حداکثر درصد قابل پرداخت با کیف پول','100',{min:1,max:100,step:5,unit:'٪',show_when:'checkout',help:'از ۱ تا ۱۰۰. مثلاً ۵۰ یعنی نیمی از مبلغ سفارش.'}),F(WA,'checkout_label','text','عنوان ردیف در تسویه و فاکتور','پرداخت از کیف پول',{show_when:'checkout'}),F(WA,'auto_apply','toggle','تیک کیف پول از اول زده باشد','0',{show_when:'checkout'}),F(WA,'refund_cancel','toggle','بازگشت اعتبار با لغو سفارش','1',{help:'شامل لغو خودکار سفارش‌های پرداخت‌نشده هم می‌شود.'}),F(WA,'refund_refunded','toggle','بازگشت اعتبار با مسترد شدن سفارش','1')]},
+ {id:'cashback',title:'کش‌بگ',master:WA+'[cashback]',offText:'کش‌بگ خاموش است؛ تنظیماتش تا روشن‌شدن پنهان می‌ماند و مقدارها حفظ می‌شوند.',info:'بخشی از مبلغ هر خرید به کیف پول مشتری برمی‌گردد. مبلغ از خود سفارش و پس از کسر تخفیف حساب می‌شود؛ سفارش شارژ کیف پول کش‌بگ ندارد.',fields:[F(WA,'cashback','toggle','کش‌بگ خودکار فعال است','0'),F(WA,'cashback_percent','number','درصد کش‌بگ','5',{min:0,max:100,step:0.5,unit:'٪',show_when:'cashback'}),F(WA,'cashback_max','money','سقف کش‌بگ هر سفارش (تومان)','0',{show_when:'cashback',help:'صفر یعنی بی‌سقف.'}),F(WA,'cashback_min_total','money','حداقل مبلغ سفارش (تومان)','0',{show_when:'cashback'}),F(WA,'cashback_days','number','مهلت استفاده (روز)','30',{min:0,unit:'روز',show_when:'cashback',help:'صفر یعنی بدون انقضا. کش‌بگ منقضی‌شده هر روز خودکار از موجودی کسر می‌شود.'}),F(WA,'cashback_status','select','زمان واریز کش‌بگ','completed',{show_when:'cashback',options:{completed:'وقتی سفارش «تکمیل‌شده» شد',processing:'وقتی سفارش «در حال انجام» شد'}}),F(WA,'cashback_on_wallet','toggle','به بخشی که با کیف پول پرداخت شده هم کش‌بگ تعلق بگیرد','0',{show_when:'cashback'})]},
+ {id:'withdraw',title:'برداشت از کیف پول',short:'برداشت',master:WA+'[withdraw_enabled]',offText:'برداشت خاموش است؛ دکمهٔ «برداشت» در صفحهٔ کیف پول نمایش داده نمی‌شود.',info:'کاربر مبلغ و شمارهٔ شبا را می‌فرستد و مبلغ همان لحظه از موجودی کسر (نگه داشته) می‌شود. درخواست‌ها در «گزارش کیف پول ← درخواست‌های برداشت» بررسی می‌شوند: «پرداخت شد» با کد پیگیری بانک، یا «رد» که مبلغ را به کیف پول برمی‌گرداند. کاربر هم تا پیش از بررسی می‌تواند درخواستش را لغو کند.',fields:[F(WA,'withdraw_enabled','toggle','برداشت از کیف پول فعال است','0'),F(WA,'min_withdraw','money','کمترین مبلغ برداشت (تومان)','100000',{show_when:'withdraw_enabled'}),F(WA,'max_withdraw','money','بیشترین مبلغ هر برداشت (تومان)','0',{show_when:'withdraw_enabled',help:'صفر یعنی تا سقف موجودی.'}),F(WA,'withdraw_cashback','toggle','کش‌بگ هم قابل برداشت باشد','0',{show_when:'withdraw_enabled',help:'خاموش باشد، کش‌بگ مصرف‌نشده از مبلغ قابل برداشت کم می‌شود و فقط برای خرید قابل استفاده است.'}),F(WA,'withdraw_notify','toggle','ایمیل به مدیر برای هر درخواست تازه','1',{show_when:'withdraw_enabled'}),F(WA,'withdraw_note','text','توضیح زیر فرم برداشت','درخواست برداشت حداکثر تا ۷۲ ساعت کاری بررسی و به حساب بانکی شما واریز می‌شود.',{show_when:'withdraw_enabled',help:'مثلاً زمان بررسی و واریز.'})]},
+ {id:'sms',title:'پیامک (از درگاه نیاس لاگین)',short:'پیامک',kind:'sms',master:WA+'[sms_enabled]',offText:'پیامک کیف پول خاموش است. ارسال در پس‌زمینه انجام می‌شود تا بازگشت از درگاه پرداخت و شارژ گروهی کند نشود.',info:'اردال درگاه پیامکی خودش را ندارد؛ پیامک‌ها با همان درگاه و حسابی می‌روند که در تنظیمات نیاس لاگین انتخاب شده و در «گزارش پیام‌ها»ی نیاس هم ثبت می‌شوند. کد پترن پر باشد با پترن ارسال می‌شود، خالی باشد با متن آزاد (بیشتر پنل‌ها متن آزاد را فقط از خط اختصاصی می‌فرستند).',fields:[F(WA,'sms_enabled','toggle','پیامک کیف پول فعال است','0')]},
+ {id:'shortcodes',title:'شورت‌کدها و ویجت‌ها',short:'شورت‌کدها',kind:'ref',refs:[['[ardal_wallet]','کارت موجودی و شارژ کیف پول (quick="50000,100000" art="no" button="شارژ").'],['[ardal_wallet_balance]','فقط عدد موجودی با لینک به کیف پول (before="موجودی:" link="no").'],['[ardal_wallet_transactions]','تراکنش‌های کاربر (style="table" per_page="20" hide_cashback="yes").'],['[ardal_wallet_cashback]','تاریخچهٔ کش‌بگ با وضعیت و تاریخ انقضا.'],['[ardal_wallet_withdraw]','فرم برداشت از کیف پول و فهرست درخواست‌های کاربر.']]}
+]}
+];
+TABS[0].cards.forEach(c=>{});
+const COLOR_KEYS=[].concat(...TABS[0].cards.map(c=>(c.fields||[]).filter(f=>f.type==='color')));
+const PRESETS=[
+ {id:'design',name:'پیش‌فرض دیزاین (اسپرت‌لند)',sw:['#0B3C8C','#0B62CE','#7DC61E','#C0392B'],values:Object.fromEntries(COLOR_KEYS.map(f=>[f.key,f.def]))},
+ {id:'ember',name:'نارنجی پرانرژی',sw:['#1F2A44','#E8590C','#FFB020','#D6336C'],values:{primary_dark:'#1F2A44',primary:'#E8590C',primary_light:'#FF922B',accent:'#FFB020',accent_dark:'#E09000',accent_deep:'#8A5700',sale:'#D6336C',star:'#F0A500',tint_blue:'#FFF1E6',tint_blue_border:'#FFD8BC',tint_green:'#FFF7E0',tint_green_border:'#FFE39B',on_dark:'#FFE0CC'}},
+ {id:'teal',name:'فیروزه‌ای آرام',sw:['#0B3B3C','#0E7C86','#4CC9A7','#E4572E'],values:{primary_dark:'#0B3B3C',primary:'#0E7C86',primary_light:'#2BB3C0',accent:'#4CC9A7',accent_dark:'#2FA184',accent_deep:'#1B6B57',sale:'#E4572E',star:'#F2B705',tint_blue:'#E4F5F7',tint_blue_border:'#BFE6EB',tint_green:'#E6F8F1',tint_green_border:'#BEE9DA',on_dark:'#C8ECEF'}},
+ {id:'ink',name:'مشکی و طلایی',sw:['#111418','#2B2F36','#C9A227','#B3261E'],values:{primary_dark:'#111418',primary:'#2B2F36',primary_light:'#4A515C',accent:'#C9A227',accent_dark:'#A8871B',accent_deep:'#6E5A12',sale:'#B3261E',star:'#C9A227',tint_blue:'#F1F2F4',tint_blue_border:'#DCDEE3',tint_green:'#FAF4E0',tint_green_border:'#EADFBB',on_dark:'#D9DCE1'}}
+];
+const WIDGETS=['نوار اعلان بالای صفحه','هدر فروشگاه (لوگو، جستجو، سبد خرید)','منوی دسته‌بندی‌ها','مگا منو (از فهرست‌های وردپرس)','اسلایدر هیرو','پیشنهاد ویژه با شمارش معکوس','خدمات و مزیت‌ها','دسته‌بندی‌های دایره‌ای','شبکه محصولات','کارت محصول (برای حلقه‌های المنتور)','جشنواره حراج','بنرهای تبلیغاتی','پرفروش‌ترین‌ها','برندها','حلقه برندها (شبکه، اسلایدر، مارکی)','دکمه علاقه‌مندی','فهرست علاقه‌مندی‌ها','شمارنده علاقه‌مندی (هدر)','کیف پول — کارت موجودی و شارژ','کیف پول — تراکنش‌ها و کش‌بگ','کیف پول — موجودی (هدر)','نظر مشتریان','مطالب وبلاگ','اسلایدر مطالب','برچسب‌های نوشته','دسته‌بندی نوشته‌ها','تب‌های نوشته‌ها (ترند، تازه، دیدگاه)','آخرین مقالات','نظرات نوشته/محصول','فهرست ناحیه‌های صفحه','شمارش معکوس','دکمه شناور پشتیبانی','جست‌وجوی زنده','نتیجه‌های جست‌وجو','خبرنامه','فوتر فروشگاه','نوار پایین موبایل','مسیر صفحه محصول (Breadcrumb)','گالری تصاویر محصول','عنوان محصول','برند محصول','نوار اطلاعات محصول','انتخاب رنگ محصول','انتخاب سایز محصول','مشخصات کوتاه محصول','تاریخ به‌روزرسانی قیمت','باکس خرید و قیمت','تب‌های جامع محصول','محصولات مرتبط','نوار چسبان خرید محصول','جدول واریاسیون‌ها','ماتریس واریاسیون‌ها','ریل دسته‌بندی آرشیو','فیلتر محصولات (ستون کناری)','فیلترهای فعال','نوار مرتب‌سازی آرشیو','توضیحات دسته','پنل کاربری','سبد خرید (قالب الانو)','تسویه حساب (قالب الانو)','تشکر از خرید (قالب الانو)'];
+
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.tabOf={};this.cardNames={};this.idx=[];const defs={};
+    TABS.forEach(t=>t.cards.forEach(c=>{
+      const fl=(c.fields||[]).concat(c.kind==='menu'?menuFields:[]).concat(c.kind==='sms'?smsFields:[]);
+      this.cardNames[t.id+'/'+c.id]=fl.map(f=>f.name);
+      fl.forEach(f=>{this.tabOf[f.name]=t.id;defs[f.name]=f.def;});
+      const path=t.title+' › '+(c.short||c.title);
+      this.idx.push({label:c.title,path:t.title,tab:t.id,card:c.id,name:null});
+      (c.fields||[]).forEach(f=>{if(f.name!==c.master)this.idx.push({label:f.label,path,tab:t.id,card:c.id,name:f.name});});
+      if(c.kind==='menu')MENU.forEach(([s,l])=>this.idx.push({label:'منو: '+l,path,tab:t.id,card:c.id,name:AC+'[menu_'+s+'_label]'}));
+      if(c.kind==='sms')SMS.forEach(e=>this.idx.push({label:'پیامک '+e.label,path,tab:t.id,card:c.id,name:null,sms:e.k}));
+    }));
+    defs[P+'[account_support_phone]']='021-91004500';
+    this.searchRef=React.createRef();
+    this.state={tab:props.startTab||'palette',values:Object.assign({},defs),saved:Object.assign({},defs),focus:null,q:'',wq:'',advOpen:false,smsOpen:{topup:true},smsTest:{},toast:null,saving:false,confirm:false,activeCard:null,narrow:typeof window!=='undefined'&&window.innerWidth<782,drag:null,over:null,copied:null,hl:null};
+  }
+  componentDidMount(){
+    this._sc=()=>{if(this._raf)return;this._raf=requestAnimationFrame(()=>{this._raf=0;const t=TABS.find(x=>x.id===this.state.tab);let cur=t.cards[0].id;for(const c of t.cards){const el=document.getElementById('card-'+t.id+'-'+c.id);if(el&&el.getBoundingClientRect().top<230)cur=c.id;}if(cur!==this.state.activeCard)this.setState({activeCard:cur});});};
+    this._rs=()=>{const n=window.innerWidth<782,m=window.innerWidth<1240;if(n!==this.state.narrow||m!==this.state.medium)this.setState({narrow:n,medium:m});};this._rs();
+    this._kd=e=>{const tg=e.target.tagName;if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(tg)){e.preventDefault();this.searchRef.current&&this.searchRef.current.focus();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();this.save();}};
+    window.addEventListener('scroll',this._sc,{passive:true});window.addEventListener('resize',this._rs);window.addEventListener('keydown',this._kd);
+  }
+  componentDidUpdate(pp){if(pp.startTab!==this.props.startTab&&this.props.startTab)this.switchTab(this.props.startTab);}
+  componentWillUnmount(){window.removeEventListener('scroll',this._sc);window.removeEventListener('resize',this._rs);window.removeEventListener('keydown',this._kd);clearTimeout(this._tt);clearTimeout(this._ht);}
+  val(n){return this.state.values[n]==null?'':this.state.values[n];}
+  set(n,v){this.setState(s=>({values:Object.assign({},s.values,{[n]:v})}));}
+  setMany(o){this.setState(s=>({values:Object.assign({},s.values,o)}));}
+  toast(text,kind){clearTimeout(this._tt);this.setState({toast:{text,kind:kind||'ok'}});this._tt=setTimeout(()=>this.setState({toast:null}),2600);}
+  dirtyNames(){const s=this.state;return Object.keys(s.values).filter(k=>s.values[k]!==s.saved[k]);}
+  save(){if(this.state.saving||!this.dirtyNames().length)return;this.setState({saving:true});setTimeout(()=>{this.setState(s=>({saving:false,saved:Object.assign({},s.values)}));this.toast('تنظیمات ذخیره شد');},900);}
+  revert(){this.setState(s=>({values:Object.assign({},s.saved)}));this.toast('تغییرات به آخرین حالت ذخیره‌شده برگشت','info');}
+  switchTab(id){this.setState({tab:id,activeCard:null,focus:null});window.scrollTo(0,0);}
+  scrollTo(id){const el=document.getElementById(id);if(el){const y=el.getBoundingClientRect().top+window.scrollY-150;window.scrollTo({top:y,behavior:'smooth'});}}
+  goTo(tab,card,name,sms){
+    const t=TABS.find(x=>x.id===tab);const c=t.cards.find(x=>x.id===card);
+    const patch={tab,q:'',hl:name,activeCard:card};
+    if(c&&c.advanced)patch.advOpen=true;
+    if(sms)patch.smsOpen=Object.assign({},this.state.smsOpen,{[sms]:true});
+    this.setState(patch,()=>setTimeout(()=>{const fid=name&&('w_f_'+name.replace(/[^a-z0-9_]/gi,'_'));const el=fid&&document.getElementById(fid);this.scrollTo(el&&el.offsetParent?fid:(sms?'sms-'+sms:'card-'+tab+'-'+card));},60));
+    clearTimeout(this._ht);this._ht=setTimeout(()=>this.setState({hl:null}),2600);
+  }
+  insertToken(allowed,def,tk){
+    const el=document.activeElement;const nm=el&&el.getAttribute&&el.getAttribute('data-name');
+    const name=allowed.indexOf(nm)>=0?nm:def;const cur=this.val(name);
+    const target=nm===name?el:document.querySelector('[data-name="'+name.replace(/"/g,'\\"')+'"]');
+    let a=cur.length,b=cur.length;
+    if(target&&typeof target.selectionStart==='number'){a=target.selectionStart;b=target.selectionEnd;}
+    this.set(name,cur.slice(0,a)+tk+cur.slice(b));
+    setTimeout(()=>{if(target){target.focus();const p=a+tk.length;try{target.setSelectionRange(p,p);}catch(_){}}},0);
+  }
+  onInput(fd,raw){
+    let v=raw;
+    if(fd.type==='money')v=en(raw).replace(/[^\d]/g,'');
+    else if(fd.type==='number')v=en(raw).replace(/[^\d.]/g,'');
+    else if(fd.type==='color'){v=raw.toUpperCase();if(v&&v[0]!=='#')v='#'+v;}
+    this.set(fd.name,v);
+  }
+  step(fd,dir){const st=Number(fd.step)||1;let n=(Number(en(this.val(fd.name)))||0)+dir*st;if(fd.min!=null)n=Math.max(fd.min,n);if(fd.max!=null)n=Math.min(fd.max,n);n=Math.round(n*100)/100;if(fd.min==null&&n<0)n=0;this.set(fd.name,String(n));}
+  fieldView(fd){
+    const v=this.val(fd.name),t=fd.type,focus=this.state.focus===fd.name,s=this.state;
+    const depOn=fd.show_when?this.val(fd.opt+'['+fd.show_when+']')==='1':true;
+    let error='';
+    if(t==='number'&&v!==''){const n=Number(v);if(isNaN(n))error='فقط عدد وارد کنید.';else if(fd.min!=null&&n<fd.min)error='کمترین مقدار مجاز '+fa(fd.min)+' است.';else if(fd.max!=null&&n>fd.max)error='بیشترین مقدار مجاز '+fa(fd.max)+' است.';}
+    if(t==='color'&&!/^#[0-9A-F]{6}$/i.test(v))error='کد رنگ معتبر نیست';
+    const on=v==='1',hl=s.hl===fd.name;
+    const tokens=fd.tokens?(fd.tokens.match(/\{[a-z_]+\}/g)||[]):[];
+    const id='f_'+fd.name.replace(/[^a-z0-9_]/gi,'_');
+    return Object.assign({},fd,{
+      id,wid:'w_'+id,value:t==='money'?money(v):(t==='number'?fa(v).replace('.','٫'):v),
+      display:depOn?'flex':'none',
+      isToggle:t==='toggle',isText:t==='text',isArea:t==='textarea',isNumber:t==='number',isMoney:t==='money',isSelect:t==='select',isIcon:t==='icon',isColor:t==='color',isImage:t==='image',
+      on,aria:on?'true':'false',track:on?(fd.risk?'#B3261E':'#0B62CE'):'#C3CBD6',knob:on?'flex-end':'flex-start',
+      rowBg:fd.risk&&on?'#FDF1EF':'#F7F9FB',rowBorder:fd.risk&&on?'#F2C9C3':'transparent',
+      dirty:v!==s.saved[fd.name],hasHelp:!!fd.help,helpFull:focus&&!!fd.help,helpShort:!focus&&!!fd.help,
+      hasError:!!error,error,invalid:error?'true':'false',inputBorder:error?'#B3261E':(focus?'#0B62CE':'#D5DCE5'),ring:focus?(error?'0 0 0 3px #F8D7D3':'0 0 0 3px #D6E6FB'):'none',
+      colorBorder:error?'#B3261E':(focus?'#0B62CE':'#E2E7EE'),
+      hlShadow:hl?'0 0 0 3px #F5C451':'none',dir:fd.dir||'rtl',align:fd.dir==='ltr'?'left':'right',
+      hasTokens:tokens.length>0,tokenList:tokens.map(tk=>({tk,onDown:e=>{e.preventDefault();this.insertToken([fd.name],fd.name,tk);}})),
+      hasUnit:!!fd.unit,emptyHidden:!!fd.emptyHide&&v.trim()==='',placeholder:fd.emptyHide?'خالی = نمایش داده نشود':(fd.ph||''),
+      options:fd.options?Object.keys(fd.options).map(k=>{const sel=k===v;return {k,l:fd.options[k],aria:sel?'true':'false',border:sel?'#0B62CE':'#E2E7EE',bg:sel?'#F2F7FD':'#FFFFFF',ring:sel?'#0B62CE':'#B7C1CD',dot:sel?'#0B62CE':'transparent',onPick:()=>this.set(fd.name,k)};}):[],
+      words:t==='money'?(Number(v)?'معادل '+shortAmt(v):(fd.help&&fd.help.indexOf('صفر')===0?'صفر':'')):'',
+      canReset:t==='color'&&v.toUpperCase()!==fd.def.toUpperCase(),colorVal:/^#[0-9A-F]{6}$/i.test(v)?v.toLowerCase():'#000000',pickLabel:'انتخاب رنگ '+fd.label,
+      hasImage:t==='image'&&!!v,noImage:t==='image'&&!v,
+      onInput:e=>this.onInput(fd,e.target.value),onToggle:()=>this.set(fd.name,on?'0':'1'),
+      onFocus:()=>this.setState({focus:fd.name}),onBlur:()=>this.setState(st=>st.focus===fd.name?{focus:null}:null),
+      onReset:()=>this.set(fd.name,fd.def),onInc:()=>this.step(fd,1),onDec:()=>this.step(fd,-1),
+      onPick:()=>this.set(fd.name,'https://sportland.ir/wp-content/uploads/2026/10/wallet-hero.png'),onRemove:()=>this.set(fd.name,'')
+    });
+  }
+  menuRows(){
+    const rows=MENU.map(([s,l,o])=>({s,l,o:Number(this.val(AC+'[menu_'+s+'_order]'))||o})).sort((a,b)=>a.o-b.o);
+    const order=rows.map(r=>r.s);
+    const apply=arr=>{const o={};arr.forEach((s,i)=>{o[AC+'[menu_'+s+'_order]']=String((i+1)*10);});this.setMany(o);};
+    const move=(i,j)=>{if(j<0||j>=order.length)return;const a=order.slice();const x=a.splice(i,1)[0];a.splice(j,0,x);apply(a);};
+    return rows.map((r,i)=>{
+      const on=this.val(AC+'[menu_'+r.s+']')==='1',lab=this.val(AC+'[menu_'+r.s+'_label]');
+      const over=this.state.over===r.s&&this.state.drag&&this.state.drag!==r.s;
+      return {slug:r.s,label:lab,defLabel:r.l,renamed:lab!==r.l,aria:on?'true':'false',track:on?'#0B62CE':'#C3CBD6',knob:on?'flex-end':'flex-start',opacity:on?'1':'.5',
+        toggleLabel:'نمایش «'+r.l+'» در منو',inputLabel:'عنوان «'+r.l+'» در منو',upLabel:'انتقال «'+r.l+'» به بالا',downLabel:'انتقال «'+r.l+'» به پایین',
+        orderFa:fa(r.o),isFirst:i===0,isLast:i===rows.length-1,topLine:over?'#0B62CE':(i===0?'#E2E7EE':'#EEF1F5'),bg:this.state.drag===r.s?'#F2F7FD':'#FFFFFF',
+        onToggle:()=>this.set(AC+'[menu_'+r.s+']',on?'0':'1'),onLabel:e=>this.set(AC+'[menu_'+r.s+'_label]',e.target.value),
+        onUp:()=>move(i,i-1),onDown:()=>move(i,i+1),
+        onDragStart:e=>{if(e.dataTransfer){e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',r.s);}catch(_){}}this.setState({drag:r.s});},
+        onDragOver:e=>{e.preventDefault();if(this.state.over!==r.s)this.setState({over:r.s});},
+        onDrop:e=>{e.preventDefault();const d=this.state.drag;if(d&&d!==r.s)move(order.indexOf(d),i);this.setState({drag:null,over:null});},
+        onDragEnd:()=>this.setState({drag:null,over:null})};
+    });
+  }
+  smsView(){
+    const ns=this.props.niasStatus||'ok';
+    return SMS.map(e=>{
+      const b=WA+'[sms_'+e.k,on=this.val(b+']')==='1',open=!!this.state.smsOpen[e.k];
+      const pat=this.fieldView(smsFields.find(f=>f.name===b+'_pattern]')),vars=this.fieldView(smsFields.find(f=>f.name===b+'_vars]')),text=this.fieldView(smsFields.find(f=>f.name===b+'_text]'));
+      const usesPattern=this.val(b+'_pattern]').trim()!=='';
+      const txt=this.val(b+'_text]'),len=txt.length,parts=len<=70?1:Math.ceil(len/67);
+      const ts=this.state.smsTest[e.k]||{phone:'',status:'idle',msg:''};
+      const setT=o=>this.setState(s=>({smsTest:Object.assign({},s.smsTest,{[e.k]:Object.assign({},s.smsTest[e.k]||{phone:'',status:'idle'},o)})}));
+      return {k:e.k,anchor:'sms-'+e.k,label:e.label,open,aria:open?'true':'false',chevron:open?'▾':'◂',
+        toggleAria:on?'true':'false',track:on?'#0B62CE':'#C3CBD6',knob:on?'flex-end':'flex-start',border:open?'#CFDDEE':'#E2E7EE',headBg:open?'#F7FAFE':'#FFFFFF',bodyOpacity:on?'1':'.55',
+        mode:!on?'خاموش':(usesPattern?'پترن':'متن آزاد'),modeBg:!on?'#F1F4F8':(usesPattern?'#EAF2FD':'#F1F8E6'),modeColor:!on?'#6B7685':(usesPattern?'#0B3C8C':'#3F7A0C'),
+        onOpen:()=>this.setState(s=>({smsOpen:Object.assign({},s.smsOpen,{[e.k]:!s.smsOpen[e.k]})})),onToggle:()=>this.set(b+']',on?'0':'1'),
+        pattern:pat,vars,text,usesPattern,usesText:!usesPattern,counter:fa(len)+' نویسه · '+fa(parts)+' پیامک',
+        tokens:e.tk.split(' ').map(tk=>({tk,onDown:ev=>{ev.preventDefault();this.insertToken([vars.name,text.name],text.name,tk);}})),
+        phoneId:'sms_phone_'+e.k,phone:ts.phone,onPhone:ev=>setT({phone:ev.target.value,status:'idle'}),
+        sending:ts.status==='loading',sendLabel:ts.status==='loading'?'در حال ارسال…':'ارسال پیامک آزمایشی',
+        hasResult:ts.status==='ok'||ts.status==='fail',result:ts.msg,resultColor:ts.status==='ok'?'#1E6B34':'#B3261E',
+        onSend:()=>{const ph=en(ts.phone).replace(/[\s-]/g,'');
+          if(!/^09\d{9}$/.test(ph)){setT({status:'fail',msg:'شمارهٔ موبایل معتبر نیست؛ مثل ۰۹۱۲۱۲۳۴۵۶۷'});return;}
+          setT({status:'loading',msg:''});
+          setTimeout(()=>{const nsn=this.props.niasStatus||'ok';if(nsn!=='ok')setT({status:'fail',msg:'ارسال نشد: درگاه پیامک در نیاس لاگین آماده نیست.'});else setT({status:'ok',msg:'✓ پیامک آزمایشی به '+fa(ph)+' فرستاده شد ('+(this.val(b+'_pattern]').trim()?'پترن':'متن آزاد')+').'});},1400);}
+      };
+    });
+  }
+  cardView(tab,c){
+    const s=this.state,v=s.values;
+    const masterOn=c.master?v[c.master]==='1':true;
+    const names=this.cardNames[tab.id+'/'+c.id]||[];
+    const advOn=c.advanced?(c.fields||[]).filter(f=>v[f.name]==='1').length:0;
+    const mf=c.master&&(c.fields||[]).find(f=>f.name===c.master);
+    const cv={id:c.id,title:c.title,anchor:'card-'+tab.id+'-'+c.id,headId:'h-'+tab.id+'-'+c.id,advanced:!!c.advanced,
+      border:c.advanced?'#F0DDB8':'#E2E7EE',dirty:names.some(n=>v[n]!==s.saved[n]),hasSub:!!c.sub,sub:c.sub,hasInfo:!!c.info,info:c.info,
+      hasMaster:!!c.master,masterId:'m_'+tab.id+'_'+c.id,masterLabel:mf?mf.label:'',masterAria:masterOn?'true':'false',masterTrack:masterOn?'#0B62CE':'#C3CBD6',masterKnob:masterOn?'flex-end':'flex-start',
+      onMaster:()=>this.set(c.master,masterOn?'0':'1'),
+      showOff:!masterOn,offText:c.offText||'',showBody:masterOn&&(!c.advanced||s.advOpen),
+      advAria:s.advOpen?'true':'false',advBtn:s.advOpen?'بستن':'نمایش '+fa((c.fields||[]).length)+' گزینه',onAdv:()=>this.setState(st=>({advOpen:!st.advOpen})),
+      hasAdvOn:advOn>0,advOnText:fa(advOn)+' مورد روشن',
+      isPresets:c.kind==='presets',isMenu:c.kind==='menu',isSms:c.kind==='sms',isRef:c.kind==='ref',isFields:!c.kind,
+      fields:c.kind?[]:(c.fields||[]).filter(f=>f.name!==c.master).map(f=>this.fieldView(f))};
+    if(c.kind==='presets')cv.presets=PRESETS.map(pr=>{const act=Object.keys(pr.values).every(k=>(v[P+'['+k+']']||'').toUpperCase()===pr.values[k].toUpperCase());
+      return {name:pr.name,sw:pr.sw,active:act,pressed:act?'true':'false',border:act?'#0B62CE':'#E2E7EE',bg:act?'#F2F7FD':'#FFFFFF',
+        onApply:()=>{const o={};Object.keys(pr.values).forEach(k=>o[P+'['+k+']']=pr.values[k]);this.setMany(o);this.toast('پالت «'+pr.name+'» اعمال شد؛ برای ثبت ذخیره کنید','info');}};});
+    if(c.kind==='menu')cv.menuRows=this.menuRows();
+    if(c.kind==='sms'){cv.sms=this.smsView();const ns=this.props.niasStatus||'ok';
+      cv.nias=ns==='ok'?{bg:'#EEF7EF',border:'#CFE6D3',color:'#1E5A2C',dot:'#2F8F46',text:'درگاه فعال در نیاس: کاوه‌نگار — هم پترن و هم متن آزاد',hasLink:false}
+        :ns==='no_gateway'?{bg:'#FFF4E0',border:'#F3D9A6',color:'#6B4300',dot:'#E8890C',text:'نیاس لاگین فعال است ولی درگاه پیامکی انتخاب نشده.',hasLink:true}
+        :{bg:'#FDEEEC',border:'#F2C9C3',color:'#8A1C15',dot:'#B3261E',text:'نیاس لاگین نسخهٔ ۱.۴ یا بالاتر نصب و فعال نیست.',hasLink:false};}
+    if(c.kind==='ref')cv.refs=c.refs.map(([code,desc],i)=>{const cp=s.copied===code;return {code,desc,line:i?'#EEF1F5':'transparent',btn:cp?'کپی شد ✓':'کپی',bg:cp?'#EEF7EF':'#FFFFFF',color:cp?'#1E6B34':'#3A4655',
+      onCopy:()=>{try{navigator.clipboard&&navigator.clipboard.writeText(code).catch(()=>{});}catch(_){}this.setState({copied:code});setTimeout(()=>this.setState(st=>st.copied===code?{copied:null}:null),1800);}};});
+    return cv;
+  }
+  renderVals(){
+    const s=this.state,v=s.values,woo=this.props.wooActive!==false,showWp=this.props.showWpChrome!==false;
+    const tab=TABS.find(t=>t.id===s.tab)||TABS[0];
+    const dirty=this.dirtyNames();
+    const tabs=TABS.map(t=>{const n=dirty.filter(k=>this.tabOf[k]===t.id).length,a=t.id===tab.id;
+      return {domId:'tab-'+t.id,title:t.title,sel:a?'true':'false',tabIndex:a?0:-1,hasCount:n>0,countFa:fa(n),line:a?'#0B62CE':'transparent',color:a?'#0B3C8C':'#586474',weight:a?'600':'500',onClick:()=>this.switchTab(t.id)};});
+    const wooMissing=tab.id==='wallet'&&!woo;
+    const cards=wooMissing?[]:tab.cards.map(c=>this.cardView(tab,c));
+    const active=s.activeCard||tab.cards[0].id;
+    const subnav=wooMissing?[]:tab.cards.map(c=>{const a=c.id===active,mOn=c.master?v[c.master]==='1':null;
+      return {anchor:'card-'+tab.id+'-'+c.id,title:c.short||c.title.replace('پیشخوان — ',''),divider:!!c.advanced,current:a?'true':'false',bg:a?'#E3ECF8':'transparent',color:a?'#0B3C8C':'#3A4655',weight:a?'600':'400',
+        dirty:(this.cardNames[tab.id+'/'+c.id]||[]).some(n=>v[n]!==s.saved[n]),hasState:mOn!==null,stateColor:mOn?'#2F8F46':'#A9B3BF',stateFill:mOn?'#2F8F46':'transparent',stateTitle:mOn?'روشن':'خاموش',
+        onClick:()=>{if(c.advanced&&!s.advOpen)this.setState({advOpen:true});this.setState({activeCard:c.id});this.scrollTo('card-'+tab.id+'-'+c.id);}};});
+    const q=s.q.trim();
+    const results=q?this.idx.filter(r=>r.label.indexOf(q)>=0||r.path.indexOf(q)>=0).slice(0,8).map(r=>({label:r.label,path:r.path,onClick:()=>this.goTo(r.tab,r.card,r.name,r.sms)})):[];
+    const g=k=>v[P+'['+k+']']||'';
+    const digits=g('persian_digits')==='1',num=x=>digits?fa(x):x;
+    const rad=Math.max(0,Number(g('radius'))||0);
+    const pv={pd:g('primary_dark'),pr:g('primary'),pl:g('primary_light'),ac:g('accent'),acd:g('accent_dark'),acdp:g('accent_deep'),toman:g('toman'),sale:g('sale'),star:g('star'),text:g('text'),soft:g('text_soft'),muted:g('muted'),ondark:g('on_dark'),border:g('border'),surface:g('surface'),salt:g('surface_alt'),tb:g('tint_blue'),tbb:g('tint_blue_border'),tg:g('tint_green'),tgb:g('tint_green_border'),base:g('base'),
+      rad:rad+'px',radSm:Math.round(rad*0.6)+'px',heroBg:'linear-gradient(135deg,'+g('primary_dark')+','+g('primary')+' 60%,'+g('primary_light')+')',
+      price:num('1,890,000').replace(/,/g,digits?'٬':','),oldPrice:num('2,520,000').replace(/,/g,digits?'٬':','),freeShip:digits?'۲ میلیون تومان':'2 میلیون تومان',off25:digits?'۲۵٪':'25%',off40:digits?'۴۰٪':'40%',sold:digits?'۶۴٪':'64%',
+      cd1:num('02'),cd2:num('14'),cd3:num('38'),showWord:g('toman_symbol')!=='1',showSym:g('toman_symbol')==='1',symSize:Math.round((Number(g('toman_size'))||100)*0.13)/10+'px'};
+    pv.symSize=Math.max(8,Math.round(13*(Number(g('toman_size'))||100)/100))+'px';
+    const wqq=s.wq.trim(),widgets=wqq?WIDGETS.filter(w=>w.indexOf(wqq)>=0):WIDGETS;
+    const l=k=>v[WA+'['+k+']']||'',lOn=k=>l(k)==='1';
+    const feat=[['enabled','کیف پول','status'],['topup_enabled','شارژ آنلاین','topup'],['checkout','پرداخت در تسویه','checkout'],['cashback','کش‌بگ','cashback'],['withdraw_enabled','برداشت','withdraw'],['sms_enabled','پیامک','sms']];
+    const walletFeatures=feat.map(([k,lab,cid])=>{const on=lOn(k);return {label:lab+(on?' · روشن':' · خاموش'),bg:on?'#EEF7EF':'#F4F6F9',border:on?'#CFE6D3':'#E2E7EE',color:on?'#1E5A2C':'#6B7685',dot:on?'#2F8F46':'#A9B3BF',onClick:()=>this.scrollTo('card-wallet-'+cid)};});
+    const dtabs=TABS.filter(t=>dirty.some(k=>this.tabOf[k]===t.id)).map(t=>t.title);
+    const show=dirty.length>0||s.saving;
+    const spin=c=>React.createElement('span',{'aria-hidden':'true',style:{width:14,height:14,borderRadius:'50%',border:'2px solid '+c,borderTopColor:'transparent',display:'inline-block',animation:'ardSpin .7s linear infinite'}});
+    const tk=s.toast;
+    return {
+      showWp,showSidebar:showWp&&!s.narrow,narrow:(s.narrow||s.medium)&&!wooMissing,showSubnav:!s.narrow&&!s.medium&&!wooMissing,cardsFlex:s.medium&&!s.narrow?'1 1 320px':'1 1 520px',asideFlex:s.medium&&!s.narrow?'0 1 290px':'1 1 330px',asideSticky:s.narrow?'static':'sticky',asideMaxH:s.narrow?'none':'calc(100vh - 150px)',
+      searchRef:this.searchRef,q:s.q,onQ:e=>this.setState({q:e.target.value}),searchOpen:!!q,results,noResults:!!q&&!results.length,
+      onQKey:e=>{if(e.key==='Enter'&&results[0]){e.preventDefault();results[0].onClick();}if(e.key==='Escape')this.setState({q:''});},
+      statusText:s.saving?'در حال ذخیره…':(dirty.length?fa(dirty.length)+' تغییر ذخیره نشده':'همهٔ تغییرات ذخیره شده'),statusColor:dirty.length?'#9A5B00':'#4E6B57',statusDot:dirty.length?'#E8890C':'#2F8F46',
+      tabs,onTabKey:e=>{const i=TABS.findIndex(t=>t.id===tab.id);let j=-1;if(e.key==='ArrowLeft')j=(i+1)%TABS.length;if(e.key==='ArrowRight')j=(i-1+TABS.length)%TABS.length;if(j>=0){e.preventDefault();this.switchTab(TABS[j].id);setTimeout(()=>{const b=document.getElementById('tab-'+TABS[j].id);b&&b.focus();},0);}},
+      tabTitle:tab.title,tabLede:tab.lede,walletExtras:tab.id==='wallet'&&woo,walletFeatures,wooMissing,
+      subnav,activeAnchor:'card-'+tab.id+'-'+active,onJump:e=>this.scrollTo(e.target.value),
+      cards,askReset:()=>this.setState({confirm:true}),confirmOpen:s.confirm,closeConfirm:()=>this.setState({confirm:false}),
+      doReset:()=>{const o={};COLOR_KEYS.forEach(f=>o[f.name]=f.def);this.setMany(o);this.setState({confirm:false});this.toast('رنگ‌ها به پالت دیزاین برگشت؛ برای ثبت ذخیره کنید','info');},
+      isPalette:tab.id==='palette',
+      pv,widgets,widgetCount:fa(widgets.length)+' ویجت',wq:s.wq,onWq:e=>this.setState({wq:e.target.value}),
+      barTransform:show?'translate(-50%,0)':'translate(-50%,140%)',barOpacity:show?'1':'0',barEvents:show?'auto':'none',
+      barText:s.saving?'در حال ذخیره…':fa(dirty.length)+' تغییر ذخیره نشده',barTabs:dtabs.length?'در '+dtabs.join('، '):'',
+      onRevert:()=>this.revert(),onSave:()=>this.save(),saving:s.saving,saveDisabled:s.saving,saveBg:s.saving?'#3E6FB0':'#0B62CE',saveLabel:s.saving?'در حال ذخیره':'ذخیره تغییرات',
+      spinnerWhite:spin('#FFFFFF'),spinnerBlue:spin('#0B62CE'),
+      hasToast:!!tk,toastText:tk?tk.text:'',toastBg:tk&&tk.kind==='info'?'#F2F7FD':'#EEF7EF',toastColor:tk&&tk.kind==='info'?'#0B3C8C':'#1E5A2C',toastBorder:tk&&tk.kind==='info'?'#CFE2F8':'#CFE6D3',toastIconBg:tk&&tk.kind==='info'?'#0B62CE':'#2F8F46'
+    };
+  }
+}
+</script>
+</body>
+</html>

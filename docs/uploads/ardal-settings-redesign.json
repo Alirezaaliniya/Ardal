@@ -1,0 +1,2382 @@
+{
+    "$schema_note": "This file is a design brief + exact data model for redesigning the admin settings UI of a WordPress plugin. UI copy is Persian (RTL); keys, field names and instructions are English.",
+    "project": {
+        "name": "Ardal (اردال)",
+        "type": "WordPress plugin — Elementor widgets + WooCommerce store toolkit for Persian (Iranian) shops",
+        "version": "1.1.4",
+        "screen": "wp-admin → menu «اردال» → page slug \"ardal-settings\" (top-level menu, dashicons-art)",
+        "audience": "Iranian shop owners and site builders (non-developers mostly), Persian UI, RTL."
+    },
+    "task": {
+        "goal": "Redesign the plugin settings screen into a modern, calm, well-organized admin experience. Keep every setting and its exact field name; improve layout, hierarchy, navigation, grouping, states and micro-interactions.",
+        "deliverables": [
+            "High-fidelity design of the settings shell (header, tab/side navigation, sticky save bar, search) — desktop 1440 and narrow admin (≤782px).",
+            "One full screen per tab: palette, account, wishlist, wallet — showing every card and field listed in information_architecture.",
+            "Component sheet: toggle, text, number, money input, textarea, select, icon select with preview, color picker, preset picker, image picker, sortable menu table, collapsible SMS event row with token chips, status banner, reference table with copy, unsaved-changes bar, toast.",
+            "States: default, focus, disabled/hidden-by-dependency, error, saved, unsaved changes, loading (SMS test), success/failure of SMS test.",
+            "Optional: an HTML/CSS prototype that uses the exact `name` attributes so it can be wired into the existing options.php form."
+        ]
+    },
+    "hard_constraints": [
+        "Direction RTL, language Persian. Persian digits for display. Suggested font: Vazirmatn (or Yekan Bakh); must look native next to wp-admin chrome (WP admin sidebar stays on the right in RTL).",
+        "All tabs are ONE <form method=\"post\" action=\"options.php\"> with settings_fields(\"ardal_settings_group\"); one save submits all four options (ardal_palette, ardal_account, ardal_wishlist, ardal_wallet). Never split into separate forms.",
+        "Every field keeps its `name` exactly as given. Toggles/checkboxes post value \"1\" when on and nothing when off.",
+        "Hidden-by-dependency fields (show_when) must stay in the DOM (hide visually, still submitted).",
+        "A field key must appear only once in the form (duplicate names silently override each other).",
+        "Accessible: real <label for>, visible focus, keyboard-operable tabs/toggles/accordions, contrast AA.",
+        "No external CDN assets in the final product except fonts if bundled; wp-color-picker and wp.media (media library) are available."
+    ],
+    "current_ui_pain_points": [
+        "Very long single-column pages; account tab alone has 9 cards and ~45 fields with no way to jump or search.",
+        "Tabs are plain buttons; no indication of which tab has unsaved changes; save button only at bottom of each tab.",
+        "Help text under every field is long and always visible — visual noise.",
+        "SMS card repeats 4 fields × 5 events in one flat list.",
+        "Dangerous WooCommerce asset toggles look identical to harmless options.",
+        "Live preview exists only for the palette; other tabs give no visual feedback.",
+        "Menu ordering by typing numbers.",
+        "Widget list in sidebar is a plain long numbered list.",
+        "Support phone/hours live in the palette tab though they belong to the account panel."
+    ],
+    "improvement_ideas": [
+        "Left-side (RTL: right-side) section navigation with sub-anchors per card; sticky header with search across labels.",
+        "Sticky bottom save bar that appears when anything changes (\"تغییرات ذخیره نشده\" + ذخیره + بازگردانی).",
+        "Collapse help text into an info icon/tooltip or show on focus; keep short label + one-line hint.",
+        "Group card master switch (e.g. «این باکس نمایش داده شود») in the card header; dim/collapse the card body when off.",
+        "Mark advanced/risky fields (risk: advanced) in a separate «پیشرفته» area with warning styling.",
+        "Palette tab: big live preview panel (already exists: topbar, hero, product card, deal countdown, footer) + preset cards with swatches + reset to design.",
+        "Wallet tab: show a small summary strip (enabled features) and a link-card to «گزارش کیف پول».",
+        "Drag & drop menu rows that write into the hidden order inputs.",
+        "Token chips ({name} {amount} …) that insert into the focused input/textarea."
+    ],
+    "brand": {
+        "note": "The admin UI may use a neutral modern look with Ardal accent; current front-end design tokens below (defaults, user-changeable).",
+        "palette_defaults": {
+            "primary_dark": "#0B3C8C",
+            "primary": "#0B62CE",
+            "primary_light": "#2E9BF0",
+            "accent": "#7DC61E",
+            "accent_dark": "#5FA315",
+            "accent_deep": "#3F7A0C",
+            "toman": "#003061",
+            "sale": "#C0392B",
+            "star": "#F0A500",
+            "text": "#20303F",
+            "text_body": "#3D4A58",
+            "text_soft": "#5D6B7A",
+            "muted": "#9AA7B4",
+            "on_dark": "#CFE4FF",
+            "border": "#E9EEF4",
+            "border_soft": "#EEF1F5",
+            "surface": "#F4F7FA",
+            "surface_alt": "#F6F9FC",
+            "tint_blue": "#EAF4FF",
+            "tint_blue_border": "#CFE2F8",
+            "tint_green": "#F1F8E6",
+            "tint_green_border": "#DBEEC2",
+            "base": "#FFFFFF",
+            "radius": "16",
+            "container": "1440",
+            "toman_symbol": "0",
+            "toman_woo": "0",
+            "toman_size": "170",
+            "persian_digits": "1",
+            "product_subtitle": "0",
+            "product_subtitle_key": "_ardal_subtitle",
+            "archive_per_page": "0",
+            "account_support_phone": "",
+            "account_support_hours": "هر روز از ۹ صبح تا ۹ شب پاسخگوی شما هستیم.",
+            "product_wishlist": "1",
+            "product_compare": "1",
+            "disable_wc_general_css": "0",
+            "disable_wc_layout_css": "0",
+            "disable_wc_smallscreen_css": "0",
+            "disable_wc_add_to_cart_js": "0",
+            "disable_wc_cart_fragments_js": "0",
+            "disable_wc_single_product_js": "0",
+            "disable_wc_variation_js": "0"
+        },
+        "elano_template_colors": {
+            "primary": "#f11763",
+            "primary_2": "#fb397c",
+            "bg": "#f4f5f9",
+            "text": "#2f2f33",
+            "border": "#e6e9f3"
+        }
+    },
+    "field_types": {
+        "toggle": "on/off switch; posts \"1\"",
+        "text": "single-line text",
+        "textarea": "multi-line text",
+        "number": "integer/decimal with optional min/max/step",
+        "money": "number in Toman with thousand separators",
+        "select": "options map value => label",
+        "icon_select": "select of icon keys with live SVG preview",
+        "color": "hex color with picker + reset to default",
+        "image": "URL chosen from WP media library"
+    },
+    "information_architecture": [
+        {
+            "tab": "palette",
+            "title": "پالت و ظاهر",
+            "lede": "رنگ‌های زیر روی همه ویجت‌های اردال در المنتور اعمال می‌شوند. با تغییر هر رنگ، پیش‌نمایش کنار صفحه بلافاصله به‌روز می‌شود.",
+            "aside": {
+                "live_preview": "نمونهٔ زنده: نوار اعلان، هیرو با دکمه، کارت محصول (تخفیف، ستاره، قیمت خط‌خورده، قیمت با «تومان» یا نماد تومان، دکمهٔ +)، باکس پیشنهاد ویژه با شمارش معکوس و نوار پیشرفت، فوتر. همه با متغیرهای CSS --ard-*.",
+                "widget_list": [
+                    {
+                        "slug": "topbar",
+                        "title": "نوار اعلان بالای صفحه"
+                    },
+                    {
+                        "slug": "header",
+                        "title": "هدر فروشگاه (لوگو، جستجو، سبد خرید)"
+                    },
+                    {
+                        "slug": "nav",
+                        "title": "منوی دسته‌بندی‌ها"
+                    },
+                    {
+                        "slug": "mega-menu",
+                        "title": "مگا منو (از فهرست‌های وردپرس)"
+                    },
+                    {
+                        "slug": "hero",
+                        "title": "اسلایدر هیرو"
+                    },
+                    {
+                        "slug": "deal",
+                        "title": "پیشنهاد ویژه با شمارش معکوس"
+                    },
+                    {
+                        "slug": "services",
+                        "title": "خدمات و مزیت‌ها"
+                    },
+                    {
+                        "slug": "categories",
+                        "title": "دسته‌بندی‌های دایره‌ای"
+                    },
+                    {
+                        "slug": "products",
+                        "title": "شبکه محصولات"
+                    },
+                    {
+                        "slug": "product-card",
+                        "title": "کارت محصول (برای حلقه‌های المنتور)"
+                    },
+                    {
+                        "slug": "sale-festival",
+                        "title": "جشنواره حراج"
+                    },
+                    {
+                        "slug": "banners",
+                        "title": "بنرهای تبلیغاتی"
+                    },
+                    {
+                        "slug": "bestsellers",
+                        "title": "پرفروش‌ترین‌ها"
+                    },
+                    {
+                        "slug": "brands",
+                        "title": "برندها"
+                    },
+                    {
+                        "slug": "brand-rings",
+                        "title": "حلقه برندها (شبکه، اسلایدر، مارکی)"
+                    },
+                    {
+                        "slug": "wishlist-button",
+                        "title": "دکمه علاقه‌مندی"
+                    },
+                    {
+                        "slug": "wishlist",
+                        "title": "فهرست علاقه‌مندی‌ها"
+                    },
+                    {
+                        "slug": "wishlist-counter",
+                        "title": "شمارنده علاقه‌مندی (هدر)"
+                    },
+                    {
+                        "slug": "wallet",
+                        "title": "کیف پول — کارت موجودی و شارژ"
+                    },
+                    {
+                        "slug": "wallet-transactions",
+                        "title": "کیف پول — تراکنش‌ها و کش‌بگ"
+                    },
+                    {
+                        "slug": "wallet-balance",
+                        "title": "کیف پول — موجودی (هدر)"
+                    },
+                    {
+                        "slug": "reviews",
+                        "title": "نظر مشتریان"
+                    },
+                    {
+                        "slug": "posts",
+                        "title": "مطالب وبلاگ"
+                    },
+                    {
+                        "slug": "posts-slider",
+                        "title": "اسلایدر مطالب"
+                    },
+                    {
+                        "slug": "post-tags",
+                        "title": "برچسب‌های نوشته"
+                    },
+                    {
+                        "slug": "post-categories",
+                        "title": "دسته‌بندی نوشته‌ها"
+                    },
+                    {
+                        "slug": "post-feed-tabs",
+                        "title": "تب‌های نوشته‌ها (ترند، تازه، دیدگاه)"
+                    },
+                    {
+                        "slug": "latest-posts",
+                        "title": "آخرین مقالات"
+                    },
+                    {
+                        "slug": "post-comments",
+                        "title": "نظرات نوشته/محصول"
+                    },
+                    {
+                        "slug": "toc",
+                        "title": "فهرست ناحیه‌های صفحه"
+                    },
+                    {
+                        "slug": "countdown",
+                        "title": "شمارش معکوس"
+                    },
+                    {
+                        "slug": "support",
+                        "title": "دکمه شناور پشتیبانی"
+                    },
+                    {
+                        "slug": "search",
+                        "title": "جست‌وجوی زنده"
+                    },
+                    {
+                        "slug": "search-results",
+                        "title": "نتیجه‌های جست‌وجو"
+                    },
+                    {
+                        "slug": "newsletter",
+                        "title": "خبرنامه"
+                    },
+                    {
+                        "slug": "footer",
+                        "title": "فوتر فروشگاه"
+                    },
+                    {
+                        "slug": "mobile-nav",
+                        "title": "نوار پایین موبایل"
+                    },
+                    {
+                        "slug": "product-breadcrumb",
+                        "title": "مسیر صفحه محصول (Breadcrumb)"
+                    },
+                    {
+                        "slug": "product-gallery",
+                        "title": "گالری تصاویر محصول"
+                    },
+                    {
+                        "slug": "product-title",
+                        "title": "عنوان محصول"
+                    },
+                    {
+                        "slug": "product-brand",
+                        "title": "برند محصول"
+                    },
+                    {
+                        "slug": "product-meta",
+                        "title": "نوار اطلاعات محصول"
+                    },
+                    {
+                        "slug": "product-color",
+                        "title": "انتخاب رنگ محصول"
+                    },
+                    {
+                        "slug": "product-size",
+                        "title": "انتخاب سایز محصول"
+                    },
+                    {
+                        "slug": "product-specs",
+                        "title": "مشخصات کوتاه محصول"
+                    },
+                    {
+                        "slug": "product-price-date",
+                        "title": "تاریخ به‌روزرسانی قیمت"
+                    },
+                    {
+                        "slug": "product-buybox",
+                        "title": "باکس خرید و قیمت"
+                    },
+                    {
+                        "slug": "product-tabs",
+                        "title": "تب‌های جامع محصول"
+                    },
+                    {
+                        "slug": "product-related",
+                        "title": "محصولات مرتبط"
+                    },
+                    {
+                        "slug": "product-sticky-bar",
+                        "title": "نوار چسبان خرید محصول"
+                    },
+                    {
+                        "slug": "product-variations",
+                        "title": "جدول واریاسیون‌ها"
+                    },
+                    {
+                        "slug": "variation-matrix",
+                        "title": "ماتریس واریاسیون‌ها"
+                    },
+                    {
+                        "slug": "archive-rail",
+                        "title": "ریل دسته‌بندی آرشیو"
+                    },
+                    {
+                        "slug": "archive-filters",
+                        "title": "فیلتر محصولات (ستون کناری)"
+                    },
+                    {
+                        "slug": "archive-chips",
+                        "title": "فیلترهای فعال"
+                    },
+                    {
+                        "slug": "archive-toolbar",
+                        "title": "نوار مرتب‌سازی آرشیو"
+                    },
+                    {
+                        "slug": "archive-description",
+                        "title": "توضیحات دسته"
+                    },
+                    {
+                        "slug": "account",
+                        "title": "پنل کاربری"
+                    },
+                    {
+                        "slug": "elano-cart",
+                        "title": "سبد خرید (قالب الانو)"
+                    },
+                    {
+                        "slug": "elano-checkout",
+                        "title": "تسویه حساب (قالب الانو)"
+                    },
+                    {
+                        "slug": "elano-thankyou",
+                        "title": "تشکر از خرید (قالب الانو)"
+                    }
+                ]
+            },
+            "cards": [
+                {
+                    "id": "presets",
+                    "title": "پالت‌های آماده",
+                    "hint": "با یک کلیک همه رنگ‌ها را جایگزین کنید. تا وقتی «ذخیره تغییرات» را نزنید چیزی ثبت نمی‌شود.",
+                    "component": "preset_picker",
+                    "presets": [
+                        {
+                            "id": "design",
+                            "name": "پیش‌فرض دیزاین (اسپرت‌لند)",
+                            "swatch": [
+                                "#0B3C8C",
+                                "#0B62CE",
+                                "#7DC61E",
+                                "#C0392B"
+                            ],
+                            "values": {
+                                "primary_dark": "#0B3C8C",
+                                "primary": "#0B62CE",
+                                "primary_light": "#2E9BF0",
+                                "accent": "#7DC61E",
+                                "accent_dark": "#5FA315",
+                                "accent_deep": "#3F7A0C",
+                                "toman": "#003061",
+                                "sale": "#C0392B",
+                                "star": "#F0A500",
+                                "text": "#20303F",
+                                "text_body": "#3D4A58",
+                                "text_soft": "#5D6B7A",
+                                "muted": "#9AA7B4",
+                                "on_dark": "#CFE4FF",
+                                "border": "#E9EEF4",
+                                "border_soft": "#EEF1F5",
+                                "surface": "#F4F7FA",
+                                "surface_alt": "#F6F9FC",
+                                "tint_blue": "#EAF4FF",
+                                "tint_blue_border": "#CFE2F8",
+                                "tint_green": "#F1F8E6",
+                                "tint_green_border": "#DBEEC2",
+                                "base": "#FFFFFF",
+                                "radius": "16",
+                                "container": "1440",
+                                "toman_symbol": "0",
+                                "toman_woo": "0",
+                                "toman_size": "170",
+                                "persian_digits": "1",
+                                "product_subtitle": "0",
+                                "product_subtitle_key": "_ardal_subtitle",
+                                "archive_per_page": "0",
+                                "account_support_phone": "",
+                                "account_support_hours": "هر روز از ۹ صبح تا ۹ شب پاسخگوی شما هستیم.",
+                                "product_wishlist": "1",
+                                "product_compare": "1",
+                                "disable_wc_general_css": "0",
+                                "disable_wc_layout_css": "0",
+                                "disable_wc_smallscreen_css": "0",
+                                "disable_wc_add_to_cart_js": "0",
+                                "disable_wc_cart_fragments_js": "0",
+                                "disable_wc_single_product_js": "0",
+                                "disable_wc_variation_js": "0"
+                            }
+                        },
+                        {
+                            "id": "ember",
+                            "name": "نارنجی پرانرژی",
+                            "swatch": [
+                                "#1F2A44",
+                                "#E8590C",
+                                "#FFB020",
+                                "#D6336C"
+                            ],
+                            "values": {
+                                "primary_dark": "#1F2A44",
+                                "primary": "#E8590C",
+                                "primary_light": "#FF922B",
+                                "accent": "#FFB020",
+                                "accent_dark": "#E09000",
+                                "accent_deep": "#8A5700",
+                                "sale": "#D6336C",
+                                "star": "#F0A500",
+                                "tint_blue": "#FFF1E6",
+                                "tint_blue_border": "#FFD8BC",
+                                "tint_green": "#FFF7E0",
+                                "tint_green_border": "#FFE39B",
+                                "on_dark": "#FFE0CC"
+                            }
+                        },
+                        {
+                            "id": "teal",
+                            "name": "فیروزه‌ای آرام",
+                            "swatch": [
+                                "#0B3B3C",
+                                "#0E7C86",
+                                "#4CC9A7",
+                                "#E4572E"
+                            ],
+                            "values": {
+                                "primary_dark": "#0B3B3C",
+                                "primary": "#0E7C86",
+                                "primary_light": "#2BB3C0",
+                                "accent": "#4CC9A7",
+                                "accent_dark": "#2FA184",
+                                "accent_deep": "#1B6B57",
+                                "sale": "#E4572E",
+                                "star": "#F2B705",
+                                "tint_blue": "#E4F5F7",
+                                "tint_blue_border": "#BFE6EB",
+                                "tint_green": "#E6F8F1",
+                                "tint_green_border": "#BEE9DA",
+                                "on_dark": "#C8ECEF"
+                            }
+                        },
+                        {
+                            "id": "ink",
+                            "name": "مشکی و طلایی",
+                            "swatch": [
+                                "#111418",
+                                "#2B2F36",
+                                "#C9A227",
+                                "#B3261E"
+                            ],
+                            "values": {
+                                "primary_dark": "#111418",
+                                "primary": "#2B2F36",
+                                "primary_light": "#4A515C",
+                                "accent": "#C9A227",
+                                "accent_dark": "#A8871B",
+                                "accent_deep": "#6E5A12",
+                                "sale": "#B3261E",
+                                "star": "#C9A227",
+                                "tint_blue": "#F1F2F4",
+                                "tint_blue_border": "#DCDEE3",
+                                "tint_green": "#FAF4E0",
+                                "tint_green_border": "#EADFBB",
+                                "on_dark": "#D9DCE1"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "colors_brand",
+                    "title": "رنگ‌های برند",
+                    "fields": [
+                        {
+                            "key": "primary_dark",
+                            "name": "ardal_palette[primary_dark]",
+                            "type": "color",
+                            "label": "سرمه‌ای اصلی",
+                            "help": "رنگ برند: هدر، فوتر، قیمت‌ها و نوار اعلان",
+                            "default": "#0B3C8C"
+                        },
+                        {
+                            "key": "primary",
+                            "name": "ardal_palette[primary]",
+                            "type": "color",
+                            "label": "آبی اصلی",
+                            "help": "دکمه‌ها، لینک‌ها و عناصر تعاملی",
+                            "default": "#0B62CE"
+                        },
+                        {
+                            "key": "primary_light",
+                            "name": "ardal_palette[primary_light]",
+                            "type": "color",
+                            "label": "آبی روشن",
+                            "help": "انتهای گرادیان‌ها و حالت‌های روشن",
+                            "default": "#2E9BF0"
+                        },
+                        {
+                            "key": "accent",
+                            "name": "ardal_palette[accent]",
+                            "type": "color",
+                            "label": "سبز تاکیدی",
+                            "help": "دکمه افزودن به سبد، نشانگرها و نوار پیشرفت",
+                            "default": "#7DC61E"
+                        },
+                        {
+                            "key": "accent_dark",
+                            "name": "ardal_palette[accent_dark]",
+                            "type": "color",
+                            "label": "سبز تیره",
+                            "help": "حالت هاور سبز و آیکون‌ها",
+                            "default": "#5FA315"
+                        },
+                        {
+                            "key": "accent_deep",
+                            "name": "ardal_palette[accent_deep]",
+                            "type": "color",
+                            "label": "سبز متن",
+                            "help": "عنوان‌های روی زمینه سبز روشن",
+                            "default": "#3F7A0C"
+                        },
+                        {
+                            "key": "toman",
+                            "name": "ardal_palette[toman]",
+                            "type": "color",
+                            "label": "رنگ نماد تومان",
+                            "help": "وقتی «نماد تومان» روشن باشد، رنگ آیکون کنار قیمت‌ها",
+                            "default": "#003061"
+                        }
+                    ]
+                },
+                {
+                    "id": "colors_state",
+                    "title": "رنگ‌های وضعیت",
+                    "fields": [
+                        {
+                            "key": "sale",
+                            "name": "ardal_palette[sale]",
+                            "type": "color",
+                            "label": "قرمز حراج",
+                            "help": "برچسب تخفیف و درصدها",
+                            "default": "#C0392B"
+                        },
+                        {
+                            "key": "star",
+                            "name": "ardal_palette[star]",
+                            "type": "color",
+                            "label": "زرد امتیاز",
+                            "help": "ستاره‌های امتیاز محصولات",
+                            "default": "#F0A500"
+                        }
+                    ]
+                },
+                {
+                    "id": "colors_text",
+                    "title": "متن",
+                    "fields": [
+                        {
+                            "key": "text",
+                            "name": "ardal_palette[text]",
+                            "type": "color",
+                            "label": "متن اصلی",
+                            "help": "عنوان‌ها و متن‌های پررنگ",
+                            "default": "#20303F"
+                        },
+                        {
+                            "key": "text_body",
+                            "name": "ardal_palette[text_body]",
+                            "type": "color",
+                            "label": "متن منو",
+                            "help": "آیتم‌های منو و متن‌های میانی",
+                            "default": "#3D4A58"
+                        },
+                        {
+                            "key": "text_soft",
+                            "name": "ardal_palette[text_soft]",
+                            "type": "color",
+                            "label": "متن ثانویه",
+                            "help": "توضیحات و پاراگراف‌ها",
+                            "default": "#5D6B7A"
+                        },
+                        {
+                            "key": "muted",
+                            "name": "ardal_palette[muted]",
+                            "type": "color",
+                            "label": "متن کم‌رنگ",
+                            "help": "قیمت خط‌خورده، تاریخ و placeholder",
+                            "default": "#9AA7B4"
+                        },
+                        {
+                            "key": "on_dark",
+                            "name": "ardal_palette[on_dark]",
+                            "type": "color",
+                            "label": "متن روی سرمه‌ای",
+                            "help": "متن فوتر و نوار اعلان بالای صفحه",
+                            "default": "#CFE4FF"
+                        }
+                    ]
+                },
+                {
+                    "id": "colors_surface",
+                    "title": "سطوح و حاشیه‌ها",
+                    "fields": [
+                        {
+                            "key": "border",
+                            "name": "ardal_palette[border]",
+                            "type": "color",
+                            "label": "حاشیه کارت",
+                            "help": "دور کارت محصول و باکس‌ها",
+                            "default": "#E9EEF4"
+                        },
+                        {
+                            "key": "border_soft",
+                            "name": "ardal_palette[border_soft]",
+                            "type": "color",
+                            "label": "حاشیه ملایم",
+                            "help": "خط جداکننده بخش‌ها",
+                            "default": "#EEF1F5"
+                        },
+                        {
+                            "key": "surface",
+                            "name": "ardal_palette[surface]",
+                            "type": "color",
+                            "label": "سطح خنثی",
+                            "help": "زمینه جستجو و چیپ‌ها",
+                            "default": "#F4F7FA"
+                        },
+                        {
+                            "key": "surface_alt",
+                            "name": "ardal_palette[surface_alt]",
+                            "type": "color",
+                            "label": "سطح خنثی دوم",
+                            "help": "زمینه بخش خبرنامه و کارت‌های ساده",
+                            "default": "#F6F9FC"
+                        },
+                        {
+                            "key": "tint_blue",
+                            "name": "ardal_palette[tint_blue]",
+                            "type": "color",
+                            "label": "آبی پس‌زمینه",
+                            "help": "حلقه دسته‌بندی و آیکون‌های آبی",
+                            "default": "#EAF4FF"
+                        },
+                        {
+                            "key": "tint_blue_border",
+                            "name": "ardal_palette[tint_blue_border]",
+                            "type": "color",
+                            "label": "آبی حاشیه",
+                            "help": "حاشیه عناصر آبی روشن",
+                            "default": "#CFE2F8"
+                        },
+                        {
+                            "key": "tint_green",
+                            "name": "ardal_palette[tint_green]",
+                            "type": "color",
+                            "label": "سبز پس‌زمینه",
+                            "help": "باکس پیشنهاد ویژه و سبد خرید",
+                            "default": "#F1F8E6"
+                        },
+                        {
+                            "key": "tint_green_border",
+                            "name": "ardal_palette[tint_green_border]",
+                            "type": "color",
+                            "label": "سبز حاشیه",
+                            "help": "حاشیه عناصر سبز روشن",
+                            "default": "#DBEEC2"
+                        },
+                        {
+                            "key": "base",
+                            "name": "ardal_palette[base]",
+                            "type": "color",
+                            "label": "زمینه سفید",
+                            "help": "زمینه کارت‌ها و صفحه",
+                            "default": "#FFFFFF"
+                        }
+                    ]
+                },
+                {
+                    "id": "extras_type",
+                    "title": "تایپوگرافی و ابعاد",
+                    "fields": [
+                        {
+                            "key": "radius",
+                            "name": "ardal_palette[radius]",
+                            "type": "number",
+                            "label": "گردی گوشه‌ها",
+                            "help": "مبنای گردی کارت‌ها بر حسب پیکسل؛ بقیه اندازه‌ها نسبت به آن محاسبه می‌شوند.",
+                            "default": "16"
+                        },
+                        {
+                            "key": "container",
+                            "name": "ardal_palette[container]",
+                            "type": "number",
+                            "label": "حداکثر عرض محتوا",
+                            "help": "عرض کانتینر بخش‌ها بر حسب پیکسل. دیزاین برای ۱۴۴۰ پیکسل طراحی شده است.",
+                            "default": "1440"
+                        }
+                    ]
+                },
+                {
+                    "id": "extras_money",
+                    "title": "واحد پول و اعداد",
+                    "fields": [
+                        {
+                            "key": "toman_symbol",
+                            "name": "ardal_palette[toman_symbol]",
+                            "type": "toggle",
+                            "label": "تغییر ساختار تومان",
+                            "help": "به‌جای نوشتن «تومان» کنار قیمت‌ها، نماد رسمی تومان نمایش داده می‌شود.",
+                            "default": "0"
+                        },
+                        {
+                            "key": "toman_woo",
+                            "name": "ardal_palette[toman_woo]",
+                            "type": "toggle",
+                            "label": "اعمال روی قیمت‌های خود ووکامرس",
+                            "help": "علاوه بر ویجت‌های اردال، روی قیمت محصول در فروشگاه، آرشیو، صفحه محصول، سبد خرید و تسویه هم اعمال می‌شود. ایمیل‌ها و پیشخوان دست‌نخورده می‌مانند.",
+                            "default": "0"
+                        },
+                        {
+                            "key": "toman_size",
+                            "name": "ardal_palette[toman_size]",
+                            "type": "number",
+                            "label": "اندازه نماد تومان",
+                            "help": "درصدِ اندازهٔ قلمِ قیمت. نماد تومان دوطبقه است، برای همین از خودِ رقم‌ها بلندتر تنظیم می‌شود.",
+                            "default": "170"
+                        },
+                        {
+                            "key": "persian_digits",
+                            "name": "ardal_palette[persian_digits]",
+                            "type": "toggle",
+                            "label": "تبدیل خودکار اعداد به فارسی",
+                            "help": "قیمت‌ها، شمارنده‌ها و تعدادها با ارقام فارسی نمایش داده می‌شوند.",
+                            "default": "1"
+                        }
+                    ]
+                },
+                {
+                    "id": "extras_product",
+                    "title": "صفحه محصول",
+                    "fields": [
+                        {
+                            "key": "product_subtitle",
+                            "name": "ardal_palette[product_subtitle]",
+                            "type": "toggle",
+                            "label": "نمایش عنوان انگلیسی محصول",
+                            "help": "زیرعنوان لاتین زیر نام محصول. متن آن از فیلد سفارشی محصول یا از تنظیم خود ویجت خوانده می‌شود.",
+                            "default": "0"
+                        },
+                        {
+                            "key": "product_subtitle_key",
+                            "name": "ardal_palette[product_subtitle_key]",
+                            "type": "text",
+                            "label": "کلید فیلد سفارشی عنوان انگلیسی",
+                            "help": "نام متای محصول که عنوان انگلیسی از آن خوانده می‌شود. اگر خالی یا موجود نبود، از متن ویجت استفاده می‌شود.",
+                            "default": "_ardal_subtitle"
+                        },
+                        {
+                            "key": "product_compare",
+                            "name": "ardal_palette[product_compare]",
+                            "type": "toggle",
+                            "label": "فعال‌سازی مقایسه",
+                            "help": "دکمهٔ مقایسه در گالری و کارت محصول. با خاموش‌کردن، همه‌جا حذف می‌شود.",
+                            "default": "1"
+                        }
+                    ]
+                },
+                {
+                    "id": "extras_archive",
+                    "title": "آرشیو فروشگاه",
+                    "fields": [
+                        {
+                            "key": "archive_per_page",
+                            "name": "ardal_palette[archive_per_page]",
+                            "type": "number",
+                            "label": "تعداد محصول در هر صفحه آرشیو",
+                            "help": "روی صفحه فروشگاه و آرشیو دسته‌ها اعمال می‌شود. صفر یعنی همان مقدار پیش‌فرض ووکامرس.",
+                            "default": "0"
+                        }
+                    ]
+                },
+                {
+                    "id": "extras_woocommerce_assets",
+                    "title": "فایل‌های ووکامرس",
+                    "fields": [
+                        {
+                            "key": "disable_wc_general_css",
+                            "name": "ardal_palette[disable_wc_general_css]",
+                            "type": "toggle",
+                            "label": "غیرفعال‌سازی CSS اصلی ووکامرس (woocommerce-general)",
+                            "help": "استایل‌های عمومی دکمه‌ها، پیام‌ها و جدول‌های ووکامرس. فعال‌سازی این گزینه ممکن است ظاهر فروشگاه، سبد و تسویه‌حساب را تغییر دهد.",
+                            "default": "0",
+                            "risk": "advanced"
+                        },
+                        {
+                            "key": "disable_wc_layout_css",
+                            "name": "ardal_palette[disable_wc_layout_css]",
+                            "type": "toggle",
+                            "label": "غیرفعال‌سازی CSS چیدمان ووکامرس (woocommerce-layout)",
+                            "help": "چیدمان پیش‌فرض فروشگاه و صفحه محصول، شامل ستون‌ها و ساختار محتوا. فقط وقتی قالب/Elementor جایگزین کامل چیدمان است فعال کنید.",
+                            "default": "0",
+                            "risk": "advanced"
+                        },
+                        {
+                            "key": "disable_wc_smallscreen_css",
+                            "name": "ardal_palette[disable_wc_smallscreen_css]",
+                            "type": "toggle",
+                            "label": "غیرفعال‌سازی CSS واکنش‌گرا ووکامرس (woocommerce-smallscreen)",
+                            "help": "قواعد واکنش‌گرا برای نمایش ووکامرس در موبایل و صفحه‌های کوچک. ممکن است ظاهر فروشگاه در موبایل را تحت تأثیر قرار دهد.",
+                            "default": "0",
+                            "risk": "advanced"
+                        },
+                        {
+                            "key": "disable_wc_add_to_cart_js",
+                            "name": "ardal_palette[disable_wc_add_to_cart_js]",
+                            "type": "toggle",
+                            "label": "غیرفعال‌سازی JavaScript افزودن ایجکس به سبد (wc-add-to-cart)",
+                            "help": "افزودن محصول از لیست/کارت بدون رفرش صفحه را خاموش می‌کند؛ دکمه‌ها با رفتن به لینک محصول یا سبد کار می‌کنند.",
+                            "default": "0",
+                            "risk": "advanced"
+                        },
+                        {
+                            "key": "disable_wc_cart_fragments_js",
+                            "name": "ardal_palette[disable_wc_cart_fragments_js]",
+                            "type": "toggle",
+                            "label": "غیرفعال‌سازی JavaScript به‌روزرسانی مینی‌سبد (wc-cart-fragments)",
+                            "help": "شمارنده و محتوای مینی‌سبد پس از افزودن کالا خودکار به‌روزرسانی نمی‌شود؛ برای کاهش درخواست‌های Ajax مناسب است.",
+                            "default": "0",
+                            "risk": "advanced"
+                        },
+                        {
+                            "key": "disable_wc_single_product_js",
+                            "name": "ardal_palette[disable_wc_single_product_js]",
+                            "type": "toggle",
+                            "label": "غیرفعال‌سازی JavaScript صفحه محصول (wc-single-product)",
+                            "help": "رفتار گالری استاندارد ووکامرس و وابستگی‌های آن را خاموش می‌کند. اگر از گالری سفارشی اردال استفاده می‌کنید می‌تواند مفید باشد.",
+                            "default": "0",
+                            "risk": "advanced"
+                        },
+                        {
+                            "key": "disable_wc_variation_js",
+                            "name": "ardal_palette[disable_wc_variation_js]",
+                            "type": "toggle",
+                            "label": "غیرفعال‌سازی JavaScript محصول متغیر (wc-add-to-cart-variation)",
+                            "help": "انتخاب ویژگی‌ها، قیمت و موجودی محصول متغیر در فرم استاندارد ووکامرس را غیرفعال می‌کند. برای محصولات متغیر معمولاً خاموش بماند.",
+                            "default": "0",
+                            "risk": "advanced"
+                        }
+                    ]
+                }
+            ],
+            "actions": {
+                "save": "ذخیره تغییرات",
+                "reset": "بازگشت به پالت دیزاین (با تأیید)"
+            }
+        },
+        {
+            "tab": "account",
+            "title": "پنل کاربری",
+            "lede": "صفحه‌های پنل کاربری، ترتیب و نامشان، و بخش‌های صفحهٔ پیشخوان از همین‌جا کنترل می‌شوند.",
+            "cards": [
+                {
+                    "id": "menu",
+                    "title": "منوی پنل کاربری",
+                    "hint": "تیک هر ردیف یعنی آن صفحه در منو باشد. «ترتیب» عدد است — کوچک‌تر بالاتر. صفحه‌ای که ووکامرس نساخته باشد حتی با تیک هم نمایش داده نمی‌شود.",
+                    "component": "sortable_menu_table",
+                    "note": "ترتیب امروز با فیلد عددی است؛ در طراحی جدید می‌تواند drag & drop باشد که همان فیلد عددی order را پر می‌کند (فیلد باید بماند، می‌تواند مخفی شود).",
+                    "rows": [
+                        {
+                            "slug": "dashboard",
+                            "default_label": "پیشخوان",
+                            "default_order": 10,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_dashboard]",
+                                "label": "ardal_account[menu_dashboard_label]",
+                                "order": "ardal_account[menu_dashboard_order]"
+                            }
+                        },
+                        {
+                            "slug": "orders",
+                            "default_label": "سفارش‌های من",
+                            "default_order": 20,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_orders]",
+                                "label": "ardal_account[menu_orders_label]",
+                                "order": "ardal_account[menu_orders_order]"
+                            }
+                        },
+                        {
+                            "slug": "wishlist",
+                            "default_label": "علاقه‌مندی‌ها",
+                            "default_order": 30,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_wishlist]",
+                                "label": "ardal_account[menu_wishlist_label]",
+                                "order": "ardal_account[menu_wishlist_order]"
+                            }
+                        },
+                        {
+                            "slug": "wallet",
+                            "default_label": "کیف پول",
+                            "default_order": 35,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_wallet]",
+                                "label": "ardal_account[menu_wallet_label]",
+                                "order": "ardal_account[menu_wallet_order]"
+                            }
+                        },
+                        {
+                            "slug": "edit-address",
+                            "default_label": "آدرس‌های من",
+                            "default_order": 40,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_edit-address]",
+                                "label": "ardal_account[menu_edit-address_label]",
+                                "order": "ardal_account[menu_edit-address_order]"
+                            }
+                        },
+                        {
+                            "slug": "edit-account",
+                            "default_label": "اطلاعات حساب",
+                            "default_order": 50,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_edit-account]",
+                                "label": "ardal_account[menu_edit-account_label]",
+                                "order": "ardal_account[menu_edit-account_order]"
+                            }
+                        },
+                        {
+                            "slug": "reviews",
+                            "default_label": "نظرات من",
+                            "default_order": 60,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_reviews]",
+                                "label": "ardal_account[menu_reviews_label]",
+                                "order": "ardal_account[menu_reviews_order]"
+                            }
+                        },
+                        {
+                            "slug": "downloads",
+                            "default_label": "دانلودها",
+                            "default_order": 70,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_downloads]",
+                                "label": "ardal_account[menu_downloads_label]",
+                                "order": "ardal_account[menu_downloads_order]"
+                            }
+                        },
+                        {
+                            "slug": "payment-methods",
+                            "default_label": "روش‌های پرداخت",
+                            "default_order": 80,
+                            "default_on": true,
+                            "fields": {
+                                "on": "ardal_account[menu_payment-methods]",
+                                "label": "ardal_account[menu_payment-methods_label]",
+                                "order": "ardal_account[menu_payment-methods_order]"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "dash_welcome",
+                    "title": "پیشخوان — کارت خوش‌آمد",
+                    "hint": "نام کاربر، خلاصهٔ وضعیت و دکمه‌های میان‌بر",
+                    "fields": [
+                        {
+                            "key": "dash_welcome",
+                            "name": "ardal_account[dash_welcome]",
+                            "type": "toggle",
+                            "label": "این باکس نمایش داده شود",
+                            "help": "خاموش که باشد اصلاً رندر نمی‌شود.",
+                            "default": "1",
+                            "role": "card_master_switch"
+                        },
+                        {
+                            "key": "welcome_title",
+                            "name": "ardal_account[welcome_title]",
+                            "type": "text",
+                            "label": "عنوان خوش‌آمد",
+                            "default": "سلام {name}، خوش برگشتی",
+                            "show_when": "dash_welcome",
+                            "tokens": "{name}"
+                        },
+                        {
+                            "key": "welcome_sub",
+                            "name": "ardal_account[welcome_sub]",
+                            "type": "textarea",
+                            "label": "توضیح، وقتی خبری نیست",
+                            "help": "وقتی نه سفارشی در جریان است و نه علاقه‌مندی موجودی.",
+                            "default": "اینجا خلاصهٔ سفارش‌ها، علاقه‌مندی‌ها و اطلاعات حسابت را می‌بینی.",
+                            "show_when": "dash_welcome"
+                        },
+                        {
+                            "key": "welcome_line_ship",
+                            "name": "ardal_account[welcome_line_ship]",
+                            "type": "text",
+                            "label": "جملهٔ «سفارش در حال ارسال»",
+                            "help": "این جمله‌ها با «، » به هم می‌چسبند و توضیح خوش‌آمد را می‌سازند.",
+                            "default": "یک سفارش در حال ارسال داری",
+                            "show_when": "dash_welcome"
+                        },
+                        {
+                            "key": "welcome_line_pay",
+                            "name": "ardal_account[welcome_line_pay]",
+                            "type": "text",
+                            "label": "جملهٔ «در انتظار پرداخت»",
+                            "default": "یک سفارش منتظر پرداخت است",
+                            "show_when": "dash_welcome"
+                        },
+                        {
+                            "key": "welcome_line_wish",
+                            "name": "ardal_account[welcome_line_wish]",
+                            "type": "text",
+                            "label": "جملهٔ «علاقه‌مندی موجود»",
+                            "default": "{count} کالای علاقه‌مندی‌ات موجود است",
+                            "show_when": "dash_welcome",
+                            "tokens": "{count}"
+                        },
+                        {
+                            "key": "welcome_btn",
+                            "name": "ardal_account[welcome_btn]",
+                            "type": "text",
+                            "label": "دکمهٔ اصلی",
+                            "help": "به صفحهٔ فروشگاه می‌رود. خالی = بدون دکمه.",
+                            "default": "ادامه خرید",
+                            "show_when": "dash_welcome",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "welcome_btn_down",
+                            "name": "ardal_account[welcome_btn_down]",
+                            "type": "text",
+                            "label": "دکمهٔ دوم، وقتی فایل دانلودی دارد",
+                            "default": "فایل‌های دانلودی",
+                            "show_when": "dash_welcome",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "welcome_btn_orders",
+                            "name": "ardal_account[welcome_btn_orders]",
+                            "type": "text",
+                            "label": "دکمهٔ دوم، در حالت عادی",
+                            "default": "سفارش‌های من",
+                            "show_when": "dash_welcome",
+                            "empty_means": "المان نمایش داده نشود"
+                        }
+                    ]
+                },
+                {
+                    "id": "dash_stats",
+                    "title": "پیشخوان — کارت‌های آمار",
+                    "hint": "تعداد سفارش، مبلغ خرید، علاقه‌مندی و نظرات",
+                    "fields": [
+                        {
+                            "key": "dash_stats",
+                            "name": "ardal_account[dash_stats]",
+                            "type": "toggle",
+                            "label": "این باکس نمایش داده شود",
+                            "help": "خاموش که باشد اصلاً رندر نمی‌شود.",
+                            "default": "1",
+                            "role": "card_master_switch"
+                        },
+                        {
+                            "key": "stat_orders_label",
+                            "name": "ardal_account[stat_orders_label]",
+                            "type": "text",
+                            "label": "آمار ۱ — عنوان",
+                            "default": "مجموع سفارش‌ها",
+                            "show_when": "dash_stats"
+                        },
+                        {
+                            "key": "stat_orders_unit",
+                            "name": "ardal_account[stat_orders_unit]",
+                            "type": "text",
+                            "label": "آمار ۱ — واحد",
+                            "default": "سفارش",
+                            "show_when": "dash_stats",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "stat_orders_icon",
+                            "name": "ardal_account[stat_orders_icon]",
+                            "type": "icon_select",
+                            "label": "آمار ۱ — آیکون",
+                            "default": "box",
+                            "show_when": "dash_stats",
+                            "options": {
+                                "dash": "خانه",
+                                "orders": "سفارش",
+                                "box": "بسته",
+                                "truck": "ارسال",
+                                "cart": "سبد خرید",
+                                "fav": "قلب",
+                                "chart": "نمودار",
+                                "wallet": "کیف پول",
+                                "ticket": "کد تخفیف",
+                                "review": "دیدگاه",
+                                "user": "کاربر",
+                                "addr": "آدرس",
+                                "bell": "زنگ",
+                                "clock": "ساعت",
+                                "check": "تیک",
+                                "plus": "به‌علاوه",
+                                "down": "دانلود",
+                                "work": "فروشگاه",
+                                "thumb": "پسندیدن",
+                                "logout": "خروج",
+                                "card": "کارت بانکی"
+                            },
+                            "preview": "svg آیکون انتخاب‌شده کنار سلکت (مسیرها در ardalAdmin.iconPaths)"
+                        },
+                        {
+                            "key": "stat_spent_label",
+                            "name": "ardal_account[stat_spent_label]",
+                            "type": "text",
+                            "label": "آمار ۲ — عنوان",
+                            "default": "مبلغ کل خرید",
+                            "show_when": "dash_stats"
+                        },
+                        {
+                            "key": "stat_spent_unit",
+                            "name": "ardal_account[stat_spent_unit]",
+                            "type": "text",
+                            "label": "آمار ۲ — واحد",
+                            "default": "میلیون",
+                            "show_when": "dash_stats",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "stat_spent_icon",
+                            "name": "ardal_account[stat_spent_icon]",
+                            "type": "icon_select",
+                            "label": "آمار ۲ — آیکون",
+                            "default": "chart",
+                            "show_when": "dash_stats",
+                            "options": {
+                                "dash": "خانه",
+                                "orders": "سفارش",
+                                "box": "بسته",
+                                "truck": "ارسال",
+                                "cart": "سبد خرید",
+                                "fav": "قلب",
+                                "chart": "نمودار",
+                                "wallet": "کیف پول",
+                                "ticket": "کد تخفیف",
+                                "review": "دیدگاه",
+                                "user": "کاربر",
+                                "addr": "آدرس",
+                                "bell": "زنگ",
+                                "clock": "ساعت",
+                                "check": "تیک",
+                                "plus": "به‌علاوه",
+                                "down": "دانلود",
+                                "work": "فروشگاه",
+                                "thumb": "پسندیدن",
+                                "logout": "خروج",
+                                "card": "کارت بانکی"
+                            },
+                            "preview": "svg آیکون انتخاب‌شده کنار سلکت (مسیرها در ardalAdmin.iconPaths)"
+                        },
+                        {
+                            "key": "stat_wish_label",
+                            "name": "ardal_account[stat_wish_label]",
+                            "type": "text",
+                            "label": "آمار ۳ — عنوان",
+                            "default": "علاقه‌مندی‌ها",
+                            "show_when": "dash_stats"
+                        },
+                        {
+                            "key": "stat_wish_unit",
+                            "name": "ardal_account[stat_wish_unit]",
+                            "type": "text",
+                            "label": "آمار ۳ — واحد",
+                            "default": "کالا",
+                            "show_when": "dash_stats",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "stat_wish_icon",
+                            "name": "ardal_account[stat_wish_icon]",
+                            "type": "icon_select",
+                            "label": "آمار ۳ — آیکون",
+                            "default": "fav",
+                            "show_when": "dash_stats",
+                            "options": {
+                                "dash": "خانه",
+                                "orders": "سفارش",
+                                "box": "بسته",
+                                "truck": "ارسال",
+                                "cart": "سبد خرید",
+                                "fav": "قلب",
+                                "chart": "نمودار",
+                                "wallet": "کیف پول",
+                                "ticket": "کد تخفیف",
+                                "review": "دیدگاه",
+                                "user": "کاربر",
+                                "addr": "آدرس",
+                                "bell": "زنگ",
+                                "clock": "ساعت",
+                                "check": "تیک",
+                                "plus": "به‌علاوه",
+                                "down": "دانلود",
+                                "work": "فروشگاه",
+                                "thumb": "پسندیدن",
+                                "logout": "خروج",
+                                "card": "کارت بانکی"
+                            },
+                            "preview": "svg آیکون انتخاب‌شده کنار سلکت (مسیرها در ardalAdmin.iconPaths)"
+                        },
+                        {
+                            "key": "stat_review_label",
+                            "name": "ardal_account[stat_review_label]",
+                            "type": "text",
+                            "label": "آمار ۴ — عنوان",
+                            "default": "نظرات ثبت شده",
+                            "show_when": "dash_stats"
+                        },
+                        {
+                            "key": "stat_review_unit",
+                            "name": "ardal_account[stat_review_unit]",
+                            "type": "text",
+                            "label": "آمار ۴ — واحد",
+                            "default": "دیدگاه",
+                            "show_when": "dash_stats",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "stat_review_icon",
+                            "name": "ardal_account[stat_review_icon]",
+                            "type": "icon_select",
+                            "label": "آمار ۴ — آیکون",
+                            "default": "review",
+                            "show_when": "dash_stats",
+                            "options": {
+                                "dash": "خانه",
+                                "orders": "سفارش",
+                                "box": "بسته",
+                                "truck": "ارسال",
+                                "cart": "سبد خرید",
+                                "fav": "قلب",
+                                "chart": "نمودار",
+                                "wallet": "کیف پول",
+                                "ticket": "کد تخفیف",
+                                "review": "دیدگاه",
+                                "user": "کاربر",
+                                "addr": "آدرس",
+                                "bell": "زنگ",
+                                "clock": "ساعت",
+                                "check": "تیک",
+                                "plus": "به‌علاوه",
+                                "down": "دانلود",
+                                "work": "فروشگاه",
+                                "thumb": "پسندیدن",
+                                "logout": "خروج",
+                                "card": "کارت بانکی"
+                            },
+                            "preview": "svg آیکون انتخاب‌شده کنار سلکت (مسیرها در ardalAdmin.iconPaths)"
+                        }
+                    ]
+                },
+                {
+                    "id": "dash_alert",
+                    "title": "پیشخوان — نوار هشدار",
+                    "hint": "یادآوری تکمیل اطلاعات حساب",
+                    "fields": [
+                        {
+                            "key": "dash_alert",
+                            "name": "ardal_account[dash_alert]",
+                            "type": "toggle",
+                            "label": "این باکس نمایش داده شود",
+                            "help": "خاموش که باشد اصلاً رندر نمی‌شود.",
+                            "default": "1",
+                            "role": "card_master_switch"
+                        },
+                        {
+                            "key": "alert_title",
+                            "name": "ardal_account[alert_title]",
+                            "type": "text",
+                            "label": "عنوان هشدار پرداخت",
+                            "default": "سفارش {number} در انتظار پرداخت",
+                            "show_when": "dash_alert",
+                            "tokens": "{number}"
+                        },
+                        {
+                            "key": "alert_note",
+                            "name": "ardal_account[alert_note]",
+                            "type": "text",
+                            "label": "خط دوم هشدار",
+                            "default": "{count} کالا · {total} تومان",
+                            "show_when": "dash_alert",
+                            "tokens": "{count} و {total}"
+                        },
+                        {
+                            "key": "alert_btn",
+                            "name": "ardal_account[alert_btn]",
+                            "type": "text",
+                            "label": "متن دکمهٔ پرداخت",
+                            "default": "پرداخت سفارش",
+                            "show_when": "dash_alert",
+                            "empty_means": "المان نمایش داده نشود"
+                        }
+                    ]
+                },
+                {
+                    "id": "dash_track",
+                    "title": "پیشخوان — پیگیری سفارش جاری",
+                    "hint": "مراحل آماده‌سازی و ارسال آخرین سفارش",
+                    "fields": [
+                        {
+                            "key": "dash_track",
+                            "name": "ardal_account[dash_track]",
+                            "type": "toggle",
+                            "label": "این باکس نمایش داده شود",
+                            "help": "خاموش که باشد اصلاً رندر نمی‌شود.",
+                            "default": "1",
+                            "role": "card_master_switch"
+                        },
+                        {
+                            "key": "track_title",
+                            "name": "ardal_account[track_title]",
+                            "type": "text",
+                            "label": "عنوان کارت پیگیری",
+                            "default": "سفارش در حال ارسال",
+                            "show_when": "dash_track"
+                        },
+                        {
+                            "key": "track_btn",
+                            "name": "ardal_account[track_btn]",
+                            "type": "text",
+                            "label": "متن دکمهٔ جزئیات",
+                            "default": "جزئیات و رهگیری",
+                            "show_when": "dash_track",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "track_empty_icon",
+                            "name": "ardal_account[track_empty_icon]",
+                            "type": "icon_select",
+                            "label": "آیکون حالت خالی",
+                            "default": "truck",
+                            "show_when": "dash_track",
+                            "options": {
+                                "dash": "خانه",
+                                "orders": "سفارش",
+                                "box": "بسته",
+                                "truck": "ارسال",
+                                "cart": "سبد خرید",
+                                "fav": "قلب",
+                                "chart": "نمودار",
+                                "wallet": "کیف پول",
+                                "ticket": "کد تخفیف",
+                                "review": "دیدگاه",
+                                "user": "کاربر",
+                                "addr": "آدرس",
+                                "bell": "زنگ",
+                                "clock": "ساعت",
+                                "check": "تیک",
+                                "plus": "به‌علاوه",
+                                "down": "دانلود",
+                                "work": "فروشگاه",
+                                "thumb": "پسندیدن",
+                                "logout": "خروج",
+                                "card": "کارت بانکی"
+                            },
+                            "preview": "svg آیکون انتخاب‌شده کنار سلکت (مسیرها در ardalAdmin.iconPaths)"
+                        },
+                        {
+                            "key": "track_empty_title",
+                            "name": "ardal_account[track_empty_title]",
+                            "type": "text",
+                            "label": "عنوان حالت خالی",
+                            "default": "سفارشی در راه نیست",
+                            "show_when": "dash_track"
+                        },
+                        {
+                            "key": "track_empty_text",
+                            "name": "ardal_account[track_empty_text]",
+                            "type": "textarea",
+                            "label": "توضیح حالت خالی",
+                            "default": "هر سفارشی که ثبت کنی، مراحل آماده‌سازی و ارسالش را همین‌جا می‌بینی.",
+                            "show_when": "dash_track"
+                        },
+                        {
+                            "key": "track_empty_btn",
+                            "name": "ardal_account[track_empty_btn]",
+                            "type": "text",
+                            "label": "دکمهٔ حالت خالی",
+                            "default": "شروع خرید",
+                            "show_when": "dash_track",
+                            "empty_means": "المان نمایش داده نشود"
+                        }
+                    ]
+                },
+                {
+                    "id": "dash_chart",
+                    "title": "پیشخوان — نمودار خرید ۶ ماه",
+                    "hint": "میله‌های مجموع خرید ماه‌های گذشته",
+                    "fields": [
+                        {
+                            "key": "dash_chart",
+                            "name": "ardal_account[dash_chart]",
+                            "type": "toggle",
+                            "label": "این باکس نمایش داده شود",
+                            "help": "خاموش که باشد اصلاً رندر نمی‌شود.",
+                            "default": "1",
+                            "role": "card_master_switch"
+                        },
+                        {
+                            "key": "chart_title",
+                            "name": "ardal_account[chart_title]",
+                            "type": "text",
+                            "label": "عنوان نمودار",
+                            "default": "خرید ۶ ماه گذشته",
+                            "show_when": "dash_chart"
+                        },
+                        {
+                            "key": "chart_note",
+                            "name": "ardal_account[chart_note]",
+                            "type": "text",
+                            "label": "یادداشت کنار عنوان",
+                            "default": "میلیون تومان",
+                            "show_when": "dash_chart",
+                            "empty_means": "المان نمایش داده نشود"
+                        }
+                    ]
+                },
+                {
+                    "id": "dash_coupon",
+                    "title": "پیشخوان — کد تخفیف اختصاصی",
+                    "hint": "کارت کد تخفیف با دکمهٔ کپی",
+                    "fields": [
+                        {
+                            "key": "dash_coupon",
+                            "name": "ardal_account[dash_coupon]",
+                            "type": "toggle",
+                            "label": "این باکس نمایش داده شود",
+                            "help": "خاموش که باشد اصلاً رندر نمی‌شود.",
+                            "default": "1",
+                            "role": "card_master_switch"
+                        },
+                        {
+                            "key": "coupon_title",
+                            "name": "ardal_account[coupon_title]",
+                            "type": "text",
+                            "label": "عنوان کارت کد تخفیف",
+                            "default": "کد تخفیف اختصاصی",
+                            "show_when": "dash_coupon"
+                        },
+                        {
+                            "key": "coupon_btn",
+                            "name": "ardal_account[coupon_btn]",
+                            "type": "text",
+                            "label": "متن دکمهٔ کپی",
+                            "default": "کپی",
+                            "show_when": "dash_coupon"
+                        }
+                    ]
+                },
+                {
+                    "id": "dash_suggest",
+                    "title": "پیشخوان — پیشنهاد بر اساس خرید",
+                    "hint": "محصولاتی از دسته‌هایی که کاربر بیشتر خریده",
+                    "fields": [
+                        {
+                            "key": "dash_suggest",
+                            "name": "ardal_account[dash_suggest]",
+                            "type": "toggle",
+                            "label": "این باکس نمایش داده شود",
+                            "help": "خاموش که باشد اصلاً رندر نمی‌شود.",
+                            "default": "1",
+                            "role": "card_master_switch"
+                        },
+                        {
+                            "key": "suggest_title",
+                            "name": "ardal_account[suggest_title]",
+                            "type": "text",
+                            "label": "عنوان کارت پیشنهاد",
+                            "default": "بر اساس خریدهای تو",
+                            "show_when": "dash_suggest"
+                        },
+                        {
+                            "key": "suggest_sub",
+                            "name": "ardal_account[suggest_sub]",
+                            "type": "text",
+                            "label": "زیرعنوان",
+                            "default": "انتخاب‌هایی از دسته‌هایی که بیشتر سراغشان رفته‌ای",
+                            "show_when": "dash_suggest",
+                            "empty_means": "المان نمایش داده نشود"
+                        },
+                        {
+                            "key": "suggest_link",
+                            "name": "ardal_account[suggest_link]",
+                            "type": "text",
+                            "label": "متن لینک گوشه",
+                            "default": "مشاهده همه",
+                            "show_when": "dash_suggest",
+                            "empty_means": "المان نمایش داده نشود"
+                        }
+                    ]
+                },
+                {
+                    "id": "dashboard_counts",
+                    "title": "پیشخوان — تعدادها",
+                    "fields": [
+                        {
+                            "key": "suggest_count",
+                            "name": "ardal_account[suggest_count]",
+                            "type": "number",
+                            "label": "تعداد پیشنهاد در پیشخوان",
+                            "help": "چند محصول در کارت «بر اساس خریدهای تو» نمایش داده شود.",
+                            "default": "4",
+                            "min": 1
+                        },
+                        {
+                            "key": "orders_per_page",
+                            "name": "ardal_account[orders_per_page]",
+                            "type": "number",
+                            "label": "تعداد سفارش در هر صفحه",
+                            "help": "در صفحهٔ «سفارش‌های من».",
+                            "default": "10",
+                            "min": 1
+                        }
+                    ]
+                },
+                {
+                    "id": "support",
+                    "title": "کارت پشتیبانی پنل",
+                    "note": "این دو فیلد امروز در تب «پالت» (کارت پنل کاربری) هستند؛ منطقی‌تر است این‌جا دیده شوند. name همان ardal_palette می‌ماند.",
+                    "fields": [
+                        {
+                            "key": "account_support_phone",
+                            "name": "ardal_palette[account_support_phone]",
+                            "type": "text",
+                            "label": "شماره پشتیبانی",
+                            "help": "در کارت پشتیبانی ستون کناری پنل کاربری و کشوی موبایل نمایش داده می‌شود. خالی بگذارید تا دکمهٔ تماس حذف شود.",
+                            "default": "",
+                            "dir": "ltr"
+                        },
+                        {
+                            "key": "account_support_hours",
+                            "name": "ardal_palette[account_support_hours]",
+                            "type": "text",
+                            "label": "ساعت پاسخگویی",
+                            "help": "متن کوتاه زیر عنوان کارت پشتیبانی در پنل کاربری.",
+                            "default": "هر روز از ۹ صبح تا ۹ شب پاسخگوی شما هستیم."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "tab": "wishlist",
+            "title": "علاقه‌مندی",
+            "lede": "رفتار دکمهٔ قلب، پیام‌ها و صفحهٔ علاقه‌مندی‌ها. ظاهر دکمه و فهرست در خود ویجت‌های المنتور تنظیم می‌شود.",
+            "cards": [
+                {
+                    "id": "status",
+                    "title": "وضعیت و رفتار",
+                    "fields": [
+                        {
+                            "key": "product_wishlist",
+                            "name": "ardal_palette[product_wishlist]",
+                            "type": "toggle",
+                            "label": "علاقه‌مندی فعال است",
+                            "help": "دکمهٔ قلب در کارت محصول، گالری و باکس خرید، صفحهٔ «علاقه‌مندی‌ها» در پنل و ویجت‌های علاقه‌مندی. با خاموش‌کردن همه‌جا حذف می‌شود.",
+                            "default": "1"
+                        },
+                        {
+                            "key": "guest_mode",
+                            "name": "ardal_wishlist[guest_mode]",
+                            "type": "select",
+                            "label": "کاربر مهمان (واردنشده)",
+                            "help": "در حالت «ذخیره در مرورگر»، فهرست مهمان بعد از ورود یک بار با حسابش ادغام می‌شود.",
+                            "default": "local",
+                            "options": {
+                                "local": "ذخیره در مرورگر خودش",
+                                "login": "پیام «اول وارد شو» با دکمهٔ ورود"
+                            }
+                        },
+                        {
+                            "key": "merge_on_login",
+                            "name": "ardal_wishlist[merge_on_login]",
+                            "type": "toggle",
+                            "label": "ادغام فهرست مهمان بعد از ورود",
+                            "help": "محصول‌هایی که پیش از ورود قلب خورده‌اند به حساب اضافه شوند.",
+                            "default": "1"
+                        },
+                        {
+                            "key": "max",
+                            "name": "ardal_wishlist[max]",
+                            "type": "number",
+                            "label": "بیشترین تعداد قابل ذخیره",
+                            "help": "از این بیشتر، پیام «فهرست پر است» نمایش داده می‌شود.",
+                            "default": "200",
+                            "min": 1
+                        },
+                        {
+                            "key": "hide_unstock",
+                            "name": "ardal_wishlist[hide_unstock]",
+                            "type": "toggle",
+                            "label": "کالاهای ناموجود در فهرست نشان داده نشوند",
+                            "help": "در فهرست می‌مانند و با موجود شدن دوباره دیده می‌شوند.",
+                            "default": "0"
+                        }
+                    ],
+                    "hint": "علاقه‌مندی برای کاربر واردشده همیشه روی حسابش ذخیره می‌شود و هر کلیک همان لحظه ثبت می‌شود."
+                },
+                {
+                    "id": "texts",
+                    "title": "متن‌ها و پیام‌ها",
+                    "fields": [
+                        {
+                            "key": "toast",
+                            "name": "ardal_wishlist[toast]",
+                            "type": "toggle",
+                            "label": "پیام شناور بعد از افزودن و حذف",
+                            "help": "پیام ورود و خطا همیشه نمایش داده می‌شود.",
+                            "default": "1"
+                        },
+                        {
+                            "key": "text_add",
+                            "name": "ardal_wishlist[text_add]",
+                            "type": "text",
+                            "label": "متن دکمه (افزودن)",
+                            "help": "برچسب و راهنمای دکمهٔ قلب.",
+                            "default": "افزودن به علاقه‌مندی‌ها"
+                        },
+                        {
+                            "key": "text_remove",
+                            "name": "ardal_wishlist[text_remove]",
+                            "type": "text",
+                            "label": "متن دکمه (حذف)",
+                            "default": "حذف از علاقه‌مندی‌ها"
+                        },
+                        {
+                            "key": "msg_added",
+                            "name": "ardal_wishlist[msg_added]",
+                            "type": "text",
+                            "label": "پیام افزودن",
+                            "default": "به علاقه‌مندی‌ها اضافه شد.",
+                            "show_when": "toast"
+                        },
+                        {
+                            "key": "msg_removed",
+                            "name": "ardal_wishlist[msg_removed]",
+                            "type": "text",
+                            "label": "پیام حذف",
+                            "default": "از علاقه‌مندی‌ها حذف شد.",
+                            "show_when": "toast"
+                        },
+                        {
+                            "key": "view_text",
+                            "name": "ardal_wishlist[view_text]",
+                            "type": "text",
+                            "label": "دکمهٔ «مشاهدهٔ فهرست» در پیام",
+                            "default": "مشاهدهٔ فهرست",
+                            "show_when": "toast"
+                        },
+                        {
+                            "key": "msg_login",
+                            "name": "ardal_wishlist[msg_login]",
+                            "type": "text",
+                            "label": "پیام نیاز به ورود",
+                            "default": "برای ذخیرهٔ علاقه‌مندی‌ها ابتدا وارد حساب شو."
+                        },
+                        {
+                            "key": "login_text",
+                            "name": "ardal_wishlist[login_text]",
+                            "type": "text",
+                            "label": "متن دکمهٔ ورود",
+                            "default": "ورود به حساب"
+                        },
+                        {
+                            "key": "msg_full",
+                            "name": "ardal_wishlist[msg_full]",
+                            "type": "text",
+                            "label": "پیام پر بودن فهرست",
+                            "default": "فهرست علاقه‌مندی‌ها پر است؛ چند مورد قدیمی را حذف کن."
+                        }
+                    ]
+                },
+                {
+                    "id": "page",
+                    "title": "صفحهٔ علاقه‌مندی در پنل کاربری",
+                    "fields": [
+                        {
+                            "key": "wishlist_title",
+                            "name": "ardal_account[wishlist_title]",
+                            "type": "text",
+                            "label": "عنوان صفحه",
+                            "default": "علاقه‌مندی‌ها"
+                        },
+                        {
+                            "key": "wishlist_columns",
+                            "name": "ardal_account[wishlist_columns]",
+                            "type": "number",
+                            "label": "تعداد ستون",
+                            "help": "در موبایل خودکار کمتر می‌شود.",
+                            "default": "4",
+                            "min": 1
+                        },
+                        {
+                            "key": "wishlist_add_all",
+                            "name": "ardal_account[wishlist_add_all]",
+                            "type": "toggle",
+                            "label": "دکمهٔ «افزودن همه به سبد»",
+                            "help": "وقتی دست‌کم یک کالای موجود در فهرست باشد.",
+                            "default": "1"
+                        },
+                        {
+                            "key": "wishlist_empty_title",
+                            "name": "ardal_account[wishlist_empty_title]",
+                            "type": "text",
+                            "label": "عنوان حالت خالی",
+                            "default": "هنوز کالایی ذخیره نکرده‌ای"
+                        },
+                        {
+                            "key": "wishlist_empty_text",
+                            "name": "ardal_account[wishlist_empty_text]",
+                            "type": "text",
+                            "label": "توضیح حالت خالی",
+                            "default": "با زدن آیکون قلب روی هر محصول، آن را اینجا نگه دار تا بعداً سراغش بیایی."
+                        },
+                        {
+                            "key": "wishlist_empty_btn",
+                            "name": "ardal_account[wishlist_empty_btn]",
+                            "type": "text",
+                            "label": "متن دکمهٔ حالت خالی",
+                            "help": "خالی بگذارید تا دکمه حذف شود.",
+                            "default": "دیدن محصول‌ها"
+                        }
+                    ],
+                    "hint": "نام آیتم منو و ترتیبش در تب «پنل کاربری» تنظیم می‌شود."
+                },
+                {
+                    "id": "shortcodes",
+                    "title": "شورت‌کدها و ویجت‌ها",
+                    "component": "reference_table (فقط خواندنی، دکمهٔ کپی کنار هر کد)",
+                    "rows": [
+                        {
+                            "code": "[ardal_wishlist_button]",
+                            "desc": "دکمهٔ قلب محصول جاری (یا id=\"12\" برای محصول دلخواه، text=\"yes\" برای نمایش متن)."
+                        },
+                        {
+                            "code": "[ardal_wishlist]",
+                            "desc": "فهرست علاقه‌مندی‌های کاربر در هر صفحه‌ای."
+                        },
+                        {
+                            "code": "[ardal_wishlist_count]",
+                            "desc": "آیکون قلب با شمارنده برای هدر (hide_zero=\"no\" برای نمایش صفر)."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "tab": "wallet",
+            "title": "کیف پول",
+            "lede": "کیف پول، شارژ آنلاین، پرداخت در تسویه، کش‌بگ، برداشت و پیامک.",
+            "requires": "WooCommerce فعال؛ در غیر این صورت فقط پیام «کیف پول به ووکامرس نیاز دارد».",
+            "link": {
+                "label": "گزارش کیف پول و ابزارهای شارژ دستی و گروهی",
+                "page": "admin.php?page=ardal-wallet-report"
+            },
+            "cards": [
+                {
+                    "id": "status",
+                    "title": "وضعیت کلی",
+                    "fields": [
+                        {
+                            "key": "enabled",
+                            "name": "ardal_wallet[enabled]",
+                            "type": "toggle",
+                            "label": "کیف پول فعال است",
+                            "help": "صفحهٔ کیف پول در پنل، پرداخت در تسویه، کش‌بگ، گزارش و ویجت‌ها. خاموش‌کردن موجودی کسی را پاک نمی‌کند.",
+                            "default": "1"
+                        },
+                        {
+                            "key": "title",
+                            "name": "ardal_wallet[title]",
+                            "type": "text",
+                            "label": "عنوان صفحهٔ کیف پول",
+                            "help": "عنوان بالای صفحه در پنل کاربری. نام آیتم منو در تب «پنل کاربری» است.",
+                            "default": "کیف پول"
+                        }
+                    ]
+                },
+                {
+                    "id": "topup",
+                    "title": "افزایش اعتبار",
+                    "fields": [
+                        {
+                            "key": "topup_enabled",
+                            "name": "ardal_wallet[topup_enabled]",
+                            "type": "toggle",
+                            "label": "کاربر بتواند کیف پولش را شارژ کند",
+                            "default": "1"
+                        },
+                        {
+                            "key": "min_topup",
+                            "name": "ardal_wallet[min_topup]",
+                            "type": "money",
+                            "label": "کمترین مبلغ شارژ (تومان)",
+                            "default": "10000",
+                            "show_when": "topup_enabled",
+                            "unit": "تومان",
+                            "format": "جداکنندهٔ هزارگان، ارقام فارسی هم پذیرفته می‌شود"
+                        },
+                        {
+                            "key": "max_topup",
+                            "name": "ardal_wallet[max_topup]",
+                            "type": "money",
+                            "label": "بیشترین مبلغ شارژ (تومان)",
+                            "help": "صفر یعنی بی‌سقف.",
+                            "default": "50000000",
+                            "show_when": "topup_enabled",
+                            "unit": "تومان",
+                            "format": "جداکنندهٔ هزارگان، ارقام فارسی هم پذیرفته می‌شود"
+                        },
+                        {
+                            "key": "quick_amounts",
+                            "name": "ardal_wallet[quick_amounts]",
+                            "type": "text",
+                            "label": "مبلغ‌های پیشنهادی",
+                            "help": "با کاما جدا کنید؛ مثلاً 100000,200000,500000",
+                            "default": "100000,200000,500000",
+                            "show_when": "topup_enabled"
+                        },
+                        {
+                            "key": "short_amounts",
+                            "name": "ardal_wallet[short_amounts]",
+                            "type": "toggle",
+                            "label": "نمایش کوتاه مبلغ‌ها («۱۰۰ هزار تومان»)",
+                            "default": "1",
+                            "show_when": "topup_enabled"
+                        },
+                        {
+                            "key": "topup_note",
+                            "name": "ardal_wallet[topup_note]",
+                            "type": "text",
+                            "label": "متن راهنمای زیر کارت",
+                            "help": "خالی بگذارید تا نمایش داده نشود.",
+                            "default": "با هر خرید، بخشی از مبلغ به‌صورت کش‌بگ به کیف پولت برمی‌گردد."
+                        },
+                        {
+                            "key": "hero_image",
+                            "name": "ardal_wallet[hero_image]",
+                            "type": "image",
+                            "label": "تصویر کیف پول",
+                            "help": "خالی بماند، طرح پیش‌فرض با رنگ‌های پالت نمایش داده می‌شود.",
+                            "default": "",
+                            "ui": "انتخاب از کتابخانهٔ رسانهٔ وردپرس + پیش‌نمایش + حذف"
+                        }
+                    ],
+                    "hint": "شارژ با ساخت یک سفارش ووکامرس انجام می‌شود، پس همهٔ درگاه‌های فعال فروشگاه بدون تنظیم اضافه کار می‌کنند. اعتبار فقط بعد از پرداخت موفق اضافه می‌شود."
+                },
+                {
+                    "id": "checkout",
+                    "title": "پرداخت از کیف پول در تسویه حساب",
+                    "fields": [
+                        {
+                            "key": "checkout",
+                            "name": "ardal_wallet[checkout]",
+                            "type": "toggle",
+                            "label": "پرداخت از کیف پول در تسویه حساب",
+                            "help": "گزینهٔ «پرداخت از کیف پول» داخل باکس شیوهٔ پرداخت.",
+                            "default": "1"
+                        },
+                        {
+                            "key": "partial",
+                            "name": "ardal_wallet[partial]",
+                            "type": "toggle",
+                            "label": "پرداخت جزئی مجاز است",
+                            "help": "خاموش باشد، کیف پول فقط وقتی قابل استفاده است که کل مبلغ را بپوشاند.",
+                            "default": "1",
+                            "show_when": "checkout"
+                        },
+                        {
+                            "key": "max_percent",
+                            "name": "ardal_wallet[max_percent]",
+                            "type": "number",
+                            "label": "حداکثر درصد قابل پرداخت با کیف پول",
+                            "help": "از ۱ تا ۱۰۰. مثلاً ۵۰ یعنی نیمی از مبلغ سفارش.",
+                            "default": "100",
+                            "min": 1,
+                            "max": 100,
+                            "show_when": "checkout"
+                        },
+                        {
+                            "key": "auto_apply",
+                            "name": "ardal_wallet[auto_apply]",
+                            "type": "toggle",
+                            "label": "تیک کیف پول از اول زده باشد",
+                            "default": "0",
+                            "show_when": "checkout"
+                        },
+                        {
+                            "key": "checkout_label",
+                            "name": "ardal_wallet[checkout_label]",
+                            "type": "text",
+                            "label": "عنوان ردیف در تسویه و فاکتور",
+                            "default": "پرداخت از کیف پول",
+                            "show_when": "checkout"
+                        },
+                        {
+                            "key": "refund_cancel",
+                            "name": "ardal_wallet[refund_cancel]",
+                            "type": "toggle",
+                            "label": "بازگشت اعتبار با لغو سفارش",
+                            "help": "شامل لغو خودکار سفارش‌های پرداخت‌نشده هم می‌شود.",
+                            "default": "1"
+                        },
+                        {
+                            "key": "refund_refunded",
+                            "name": "ardal_wallet[refund_refunded]",
+                            "type": "toggle",
+                            "label": "بازگشت اعتبار با مسترد شدن سفارش",
+                            "default": "1"
+                        }
+                    ]
+                },
+                {
+                    "id": "cashback",
+                    "title": "کش‌بگ",
+                    "fields": [
+                        {
+                            "key": "cashback",
+                            "name": "ardal_wallet[cashback]",
+                            "type": "toggle",
+                            "label": "کش‌بگ خودکار فعال است",
+                            "default": "0"
+                        },
+                        {
+                            "key": "cashback_percent",
+                            "name": "ardal_wallet[cashback_percent]",
+                            "type": "number",
+                            "label": "درصد کش‌بگ",
+                            "default": "5",
+                            "min": 0,
+                            "max": 100,
+                            "step": "0.1",
+                            "show_when": "cashback"
+                        },
+                        {
+                            "key": "cashback_max",
+                            "name": "ardal_wallet[cashback_max]",
+                            "type": "money",
+                            "label": "سقف کش‌بگ هر سفارش (تومان)",
+                            "help": "صفر یعنی بی‌سقف.",
+                            "default": "0",
+                            "show_when": "cashback",
+                            "unit": "تومان",
+                            "format": "جداکنندهٔ هزارگان، ارقام فارسی هم پذیرفته می‌شود"
+                        },
+                        {
+                            "key": "cashback_min_total",
+                            "name": "ardal_wallet[cashback_min_total]",
+                            "type": "money",
+                            "label": "حداقل مبلغ سفارش (تومان)",
+                            "default": "0",
+                            "show_when": "cashback",
+                            "unit": "تومان",
+                            "format": "جداکنندهٔ هزارگان، ارقام فارسی هم پذیرفته می‌شود"
+                        },
+                        {
+                            "key": "cashback_status",
+                            "name": "ardal_wallet[cashback_status]",
+                            "type": "select",
+                            "label": "زمان واریز کش‌بگ",
+                            "default": "completed",
+                            "options": {
+                                "completed": "وقتی سفارش «تکمیل‌شده» شد",
+                                "processing": "وقتی سفارش «در حال انجام» شد"
+                            },
+                            "show_when": "cashback"
+                        },
+                        {
+                            "key": "cashback_days",
+                            "name": "ardal_wallet[cashback_days]",
+                            "type": "number",
+                            "label": "مهلت استفاده (روز)",
+                            "help": "صفر یعنی بدون انقضا. کش‌بگ منقضی‌شده هر روز خودکار از موجودی کسر می‌شود.",
+                            "default": "30",
+                            "min": 0,
+                            "show_when": "cashback"
+                        },
+                        {
+                            "key": "cashback_on_wallet",
+                            "name": "ardal_wallet[cashback_on_wallet]",
+                            "type": "toggle",
+                            "label": "به بخشی که با کیف پول پرداخت شده هم کش‌بگ تعلق بگیرد",
+                            "default": "0",
+                            "show_when": "cashback"
+                        }
+                    ],
+                    "hint": "بخشی از مبلغ هر خرید به کیف پول مشتری برمی‌گردد. مبلغ از خود سفارش و پس از کسر تخفیف حساب می‌شود؛ سفارش شارژ کیف پول کش‌بگ ندارد."
+                },
+                {
+                    "id": "withdraw",
+                    "title": "برداشت از کیف پول",
+                    "fields": [
+                        {
+                            "key": "withdraw_enabled",
+                            "name": "ardal_wallet[withdraw_enabled]",
+                            "type": "toggle",
+                            "label": "برداشت از کیف پول فعال است",
+                            "help": "دکمهٔ «برداشت» کنار «افزایش موجودی» در صفحهٔ کیف پول.",
+                            "default": "0"
+                        },
+                        {
+                            "key": "min_withdraw",
+                            "name": "ardal_wallet[min_withdraw]",
+                            "type": "money",
+                            "label": "کمترین مبلغ برداشت (تومان)",
+                            "default": "100000",
+                            "show_when": "withdraw_enabled",
+                            "unit": "تومان",
+                            "format": "جداکنندهٔ هزارگان، ارقام فارسی هم پذیرفته می‌شود"
+                        },
+                        {
+                            "key": "max_withdraw",
+                            "name": "ardal_wallet[max_withdraw]",
+                            "type": "money",
+                            "label": "بیشترین مبلغ هر برداشت (تومان)",
+                            "help": "صفر یعنی تا سقف موجودی.",
+                            "default": "0",
+                            "show_when": "withdraw_enabled",
+                            "unit": "تومان",
+                            "format": "جداکنندهٔ هزارگان، ارقام فارسی هم پذیرفته می‌شود"
+                        },
+                        {
+                            "key": "withdraw_cashback",
+                            "name": "ardal_wallet[withdraw_cashback]",
+                            "type": "toggle",
+                            "label": "کش‌بگ هم قابل برداشت باشد",
+                            "help": "خاموش باشد، کش‌بگ مصرف‌نشده از مبلغ قابل برداشت کم می‌شود و فقط برای خرید قابل استفاده است.",
+                            "default": "0",
+                            "show_when": "withdraw_enabled"
+                        },
+                        {
+                            "key": "withdraw_notify",
+                            "name": "ardal_wallet[withdraw_notify]",
+                            "type": "toggle",
+                            "label": "ایمیل به مدیر برای هر درخواست تازه",
+                            "default": "1",
+                            "show_when": "withdraw_enabled"
+                        },
+                        {
+                            "key": "withdraw_note",
+                            "name": "ardal_wallet[withdraw_note]",
+                            "type": "text",
+                            "label": "توضیح زیر فرم برداشت",
+                            "help": "مثلاً زمان بررسی و واریز.",
+                            "default": "درخواست برداشت حداکثر تا ۷۲ ساعت کاری بررسی و به حساب بانکی شما واریز می‌شود.",
+                            "show_when": "withdraw_enabled"
+                        }
+                    ],
+                    "hint": "کاربر مبلغ و شمارهٔ شبا را می‌فرستد و مبلغ همان لحظه از موجودی کسر (نگه داشته) می‌شود. درخواست‌ها در «گزارش کیف پول ← درخواست‌های برداشت» بررسی می‌شوند: «پرداخت شد» با کد پیگیری بانک، یا «رد» که مبلغ را به کیف پول برمی‌گرداند. کاربر هم تا پیش از بررسی می‌تواند درخواستش را لغو کند."
+                },
+                {
+                    "id": "sms",
+                    "title": "پیامک (از درگاه نیاس لاگین)",
+                    "fields": [
+                        {
+                            "key": "sms_enabled",
+                            "name": "ardal_wallet[sms_enabled]",
+                            "type": "toggle",
+                            "label": "پیامک کیف پول فعال است",
+                            "help": "ارسال در پس‌زمینه انجام می‌شود تا بازگشت از درگاه پرداخت و شارژ گروهی کند نشود.",
+                            "default": "0"
+                        },
+                        {
+                            "key": "sms_topup",
+                            "name": "ardal_wallet[sms_topup]",
+                            "type": "toggle",
+                            "label": "بعد از شارژ موفق توسط خود کاربر",
+                            "default": "1",
+                            "show_when": "sms_enabled"
+                        },
+                        {
+                            "key": "sms_topup_pattern",
+                            "name": "ardal_wallet[sms_topup_pattern]",
+                            "type": "text",
+                            "label": "کد پترن",
+                            "help": "خالی بماند، متن آزاد زیر فرستاده می‌شود.",
+                            "default": "",
+                            "show_when": "sms_topup",
+                            "dir": "ltr",
+                            "action": {
+                                "type": "sms_test",
+                                "event": "topup",
+                                "ui": "فیلد شمارهٔ موبایل + دکمهٔ «ارسال پیامک آزمایشی» + نتیجهٔ زنده (ajax: ardal_wallet_sms_test)"
+                            }
+                        },
+                        {
+                            "key": "sms_topup_vars",
+                            "name": "ardal_wallet[sms_topup_vars]",
+                            "type": "text",
+                            "label": "متغیرهای پترن",
+                            "help": "به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}",
+                            "default": "amount:{amount_raw},balance:{balance_raw}",
+                            "show_when": "sms_topup",
+                            "dir": "ltr"
+                        },
+                        {
+                            "key": "sms_topup_text",
+                            "name": "ardal_wallet[sms_topup_text]",
+                            "type": "textarea",
+                            "label": "متن آزاد",
+                            "help": "جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}",
+                            "default": "کیف پول شما {amount} شارژ شد.\nموجودی فعلی: {balance}\n{site}",
+                            "show_when": "sms_topup"
+                        },
+                        {
+                            "key": "sms_admin",
+                            "name": "ardal_wallet[sms_admin]",
+                            "type": "toggle",
+                            "label": "بعد از شارژ دستی یا گروهی توسط مدیر",
+                            "default": "1",
+                            "show_when": "sms_enabled"
+                        },
+                        {
+                            "key": "sms_admin_pattern",
+                            "name": "ardal_wallet[sms_admin_pattern]",
+                            "type": "text",
+                            "label": "کد پترن",
+                            "help": "خالی بماند، متن آزاد زیر فرستاده می‌شود.",
+                            "default": "",
+                            "show_when": "sms_admin",
+                            "dir": "ltr",
+                            "action": {
+                                "type": "sms_test",
+                                "event": "admin",
+                                "ui": "فیلد شمارهٔ موبایل + دکمهٔ «ارسال پیامک آزمایشی» + نتیجهٔ زنده (ajax: ardal_wallet_sms_test)"
+                            }
+                        },
+                        {
+                            "key": "sms_admin_vars",
+                            "name": "ardal_wallet[sms_admin_vars]",
+                            "type": "text",
+                            "label": "متغیرهای پترن",
+                            "help": "به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}",
+                            "default": "amount:{amount_raw},balance:{balance_raw}",
+                            "show_when": "sms_admin",
+                            "dir": "ltr"
+                        },
+                        {
+                            "key": "sms_admin_text",
+                            "name": "ardal_wallet[sms_admin_text]",
+                            "type": "textarea",
+                            "label": "متن آزاد",
+                            "help": "جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}",
+                            "default": "{amount} به کیف پول شما اضافه شد.\nموجودی فعلی: {balance}\n{site}",
+                            "show_when": "sms_admin"
+                        },
+                        {
+                            "key": "sms_cashback",
+                            "name": "ardal_wallet[sms_cashback]",
+                            "type": "toggle",
+                            "label": "بعد از واریز کش‌بگ خرید",
+                            "default": "0",
+                            "show_when": "sms_enabled"
+                        },
+                        {
+                            "key": "sms_cashback_pattern",
+                            "name": "ardal_wallet[sms_cashback_pattern]",
+                            "type": "text",
+                            "label": "کد پترن",
+                            "help": "خالی بماند، متن آزاد زیر فرستاده می‌شود.",
+                            "default": "",
+                            "show_when": "sms_cashback",
+                            "dir": "ltr",
+                            "action": {
+                                "type": "sms_test",
+                                "event": "cashback",
+                                "ui": "فیلد شمارهٔ موبایل + دکمهٔ «ارسال پیامک آزمایشی» + نتیجهٔ زنده (ajax: ardal_wallet_sms_test)"
+                            }
+                        },
+                        {
+                            "key": "sms_cashback_vars",
+                            "name": "ardal_wallet[sms_cashback_vars]",
+                            "type": "text",
+                            "label": "متغیرهای پترن",
+                            "help": "به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}",
+                            "default": "amount:{amount_raw},balance:{balance_raw}",
+                            "show_when": "sms_cashback",
+                            "dir": "ltr"
+                        },
+                        {
+                            "key": "sms_cashback_text",
+                            "name": "ardal_wallet[sms_cashback_text]",
+                            "type": "textarea",
+                            "label": "متن آزاد",
+                            "help": "جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site}",
+                            "default": "کش‌بگ خرید شما ({amount}) به کیف پول اضافه شد.\nموجودی فعلی: {balance}\n{site}",
+                            "show_when": "sms_cashback"
+                        },
+                        {
+                            "key": "sms_withdraw_paid",
+                            "name": "ardal_wallet[sms_withdraw_paid]",
+                            "type": "toggle",
+                            "label": "بعد از واریز درخواست برداشت ({ref} = کد پیگیری)",
+                            "default": "1",
+                            "show_when": "sms_enabled"
+                        },
+                        {
+                            "key": "sms_withdraw_paid_pattern",
+                            "name": "ardal_wallet[sms_withdraw_paid_pattern]",
+                            "type": "text",
+                            "label": "کد پترن",
+                            "help": "خالی بماند، متن آزاد زیر فرستاده می‌شود.",
+                            "default": "",
+                            "show_when": "sms_withdraw_paid",
+                            "dir": "ltr",
+                            "action": {
+                                "type": "sms_test",
+                                "event": "withdraw_paid",
+                                "ui": "فیلد شمارهٔ موبایل + دکمهٔ «ارسال پیامک آزمایشی» + نتیجهٔ زنده (ajax: ardal_wallet_sms_test)"
+                            }
+                        },
+                        {
+                            "key": "sms_withdraw_paid_vars",
+                            "name": "ardal_wallet[sms_withdraw_paid_vars]",
+                            "type": "text",
+                            "label": "متغیرهای پترن",
+                            "help": "به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}",
+                            "default": "amount:{amount_raw},ref:{ref}",
+                            "show_when": "sms_withdraw_paid",
+                            "dir": "ltr"
+                        },
+                        {
+                            "key": "sms_withdraw_paid_text",
+                            "name": "ardal_wallet[sms_withdraw_paid_text]",
+                            "type": "textarea",
+                            "label": "متن آزاد",
+                            "help": "جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}",
+                            "default": "برداشت {amount} از کیف پول به حساب شما واریز شد.\nکد پیگیری: {ref}\n{site}",
+                            "show_when": "sms_withdraw_paid"
+                        },
+                        {
+                            "key": "sms_withdraw_rejected",
+                            "name": "ardal_wallet[sms_withdraw_rejected]",
+                            "type": "toggle",
+                            "label": "بعد از رد درخواست برداشت ({reason} = دلیل)",
+                            "default": "1",
+                            "show_when": "sms_enabled"
+                        },
+                        {
+                            "key": "sms_withdraw_rejected_pattern",
+                            "name": "ardal_wallet[sms_withdraw_rejected_pattern]",
+                            "type": "text",
+                            "label": "کد پترن",
+                            "help": "خالی بماند، متن آزاد زیر فرستاده می‌شود.",
+                            "default": "",
+                            "show_when": "sms_withdraw_rejected",
+                            "dir": "ltr",
+                            "action": {
+                                "type": "sms_test",
+                                "event": "withdraw_rejected",
+                                "ui": "فیلد شمارهٔ موبایل + دکمهٔ «ارسال پیامک آزمایشی» + نتیجهٔ زنده (ajax: ardal_wallet_sms_test)"
+                            }
+                        },
+                        {
+                            "key": "sms_withdraw_rejected_vars",
+                            "name": "ardal_wallet[sms_withdraw_rejected_vars]",
+                            "type": "text",
+                            "label": "متغیرهای پترن",
+                            "help": "به ترتیب پترن پنل و با کاما: «نام:{جای‌گذار}» برای درگاه‌های نام‌دار (کاوه‌نگار، SMS.ir) یا فقط «{جای‌گذار}» برای درگاه‌های ترتیبی. جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}",
+                            "default": "amount:{amount_raw},reason:{reason}",
+                            "show_when": "sms_withdraw_rejected",
+                            "dir": "ltr"
+                        },
+                        {
+                            "key": "sms_withdraw_rejected_text",
+                            "name": "ardal_wallet[sms_withdraw_rejected_text]",
+                            "type": "textarea",
+                            "label": "متن آزاد",
+                            "help": "جای‌گذارها: {name} {amount} {amount_raw} {balance} {balance_raw} {site} {ref} {reason} {iban}",
+                            "default": "درخواست برداشت {amount} رد شد و مبلغ به کیف پول برگشت.\n{reason}\n{site}",
+                            "show_when": "sms_withdraw_rejected"
+                        }
+                    ],
+                    "hint": "اردال درگاه پیامکی خودش را ندارد؛ پیامک‌ها با همان درگاه و حسابی می‌روند که در تنظیمات نیاس لاگین انتخاب شده و در «گزارش پیام‌ها»ی نیاس هم ثبت می‌شوند. کد پترن پر باشد با پترن ارسال می‌شود، خالی باشد با متن آزاد (بیشتر پنل‌ها متن آزاد را فقط از خط اختصاصی می‌فرستند).",
+                    "status_banner": {
+                        "source": "وضعیت اتصال به افزونهٔ نیاس لاگین (درگاه پیامک)",
+                        "states": {
+                            "ok": "درگاه فعال در نیاس: {نام درگاه} — هم پترن و هم متن آزاد / فقط پترن",
+                            "no_gateway": "نیاس لاگین فعال است ولی درگاه پیامکی انتخاب نشده + لینک تنظیمات نیاس",
+                            "not_installed": "نیاس لاگین نسخهٔ ۱.۴ یا بالاتر نصب و فعال نیست"
+                        }
+                    },
+                    "note": "پنج رویداد پیامک هرکدام ۴ فیلد تکراری دارند (روشن/خاموش، کد پترن، متغیرها، متن آزاد). پیشنهاد: هر رویداد یک ردیف تاشو (accordion) با سوییچ روی سرش؛ متغیرهای قابل درج به‌صورت چیپ کلیک‌خور."
+                },
+                {
+                    "id": "shortcodes",
+                    "title": "شورت‌کدها و ویجت‌ها",
+                    "component": "reference_table (فقط خواندنی، دکمهٔ کپی کنار هر کد)",
+                    "rows": [
+                        {
+                            "code": "[ardal_wallet]",
+                            "desc": "کارت موجودی و شارژ کیف پول (quick=\"50000,100000\" art=\"no\" button=\"شارژ\")."
+                        },
+                        {
+                            "code": "[ardal_wallet_balance]",
+                            "desc": "فقط عدد موجودی با لینک به کیف پول (before=\"موجودی:\" link=\"no\")."
+                        },
+                        {
+                            "code": "[ardal_wallet_transactions]",
+                            "desc": "تراکنش‌های کاربر (style=\"table\" per_page=\"20\" hide_cashback=\"yes\")."
+                        },
+                        {
+                            "code": "[ardal_wallet_cashback]",
+                            "desc": "تاریخچهٔ کش‌بگ با وضعیت و تاریخ انقضا."
+                        },
+                        {
+                            "code": "[ardal_wallet_withdraw]",
+                            "desc": "فرم برداشت از کیف پول و فهرست درخواست‌های کاربر."
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "related_screen_optional": {
+        "title": "گزارش کیف پول (submenu under اردال, capability manage_woocommerce)",
+        "sections": [
+            "درخواست‌های برداشت: فیلتر وضعیت (همه/در انتظار/پرداخت شد/رد شد/لغو شد)، جدول (شماره، کاربر و موجودی، مبلغ، شبا و صاحب حساب، تاریخ، وضعیت، فرم بررسی با کد پیگیری/دلیل رد و دکمه‌های «پرداخت شد»/«رد»)، صفحه‌بندی؛ نشان تعداد در منو.",
+            "فیلترها: بازهٔ زمانی، نوع تراکنش، وضعیت، کاربر، مبلغ.",
+            "کارت‌های خلاصه، نمودار روزانه، تفکیک بر اساس نوع، کاربران فعال، جدول تراکنش‌ها با مرتب‌سازی و خروجی CSV.",
+            "ابزارها: تغییر موجودی یک کاربر، شارژ گروهی با پیش‌نمایش و تأیید، ثبت کش‌بگ سفارش‌های گذشته."
+        ]
+    }
+}
