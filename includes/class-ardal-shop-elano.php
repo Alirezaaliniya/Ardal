@@ -744,7 +744,8 @@ class Ardal_Shop_Elano {
 		$meta   = $first ? wp_strip_all_tags( wc_display_item_meta( $first, array( 'echo' => false, 'separator' => ' · ', 'before' => '', 'after' => '', 'label_before' => '', 'label_after' => ': ' ) ) ) : '';
 		$more   = count( $items ) - 1;
 		$date   = $order->get_date_created();
-		$status = $failed ? 'پرداخت نشده' : ( $order->is_paid() ? 'پرداخت شده' : wc_get_order_status_name( $order->get_status() ) );
+		// «پرداخت شده» فقط وقتی واقعاً پولی رسیده؛ پرداخت در محل هم «در حال انجام» است ولی هنوز پرداخت نشده.
+		$status = $failed ? 'پرداخت نشده' : ( $order->get_date_paid() ? 'پرداخت شده' : wc_get_order_status_name( $order->get_status() ) );
 		$back   = trim( (string) self::opt( 'thanks_url' ) );
 		$back   = '' !== $back ? $back : home_url( '/' );
 
@@ -760,7 +761,7 @@ class Ardal_Shop_Elano {
 		}
 
 		if ( $image ) {
-			$extra .= '<img class="ard-elc__th-img" src="' . esc_url( $image ) . '" alt="" loading="lazy" decoding="async" />';
+			$extra .= '<span class="ard-elc__th-img"><img src="' . esc_url( $image ) . '" alt="" loading="lazy" decoding="async" /></span>';
 		}
 
 		$rows = array(
@@ -808,6 +809,8 @@ class Ardal_Shop_Elano {
 		</div>
 		<?php
 		if ( $hooks && ! $failed ) {
+			echo '<div class="ard-elc__th-extra">';
+
 			// جدول جزئیات پیش‌فرض ووکامرس فقط اگر در ویجت روشن باشد؛ ردیف‌های بالا خلاصه‌اش را دارند.
 			$details = 'yes' !== self::opt( 'thanks_details' ) && remove_action( 'woocommerce_thankyou', 'woocommerce_order_details_table', 10 );
 
@@ -817,6 +820,8 @@ class Ardal_Shop_Elano {
 			if ( $details ) {
 				add_action( 'woocommerce_thankyou', 'woocommerce_order_details_table', 10 );
 			}
+
+			echo '</div>';
 		}
 	}
 

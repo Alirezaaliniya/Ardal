@@ -56,7 +56,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 			<?php endif; ?>
 
 			<?php echo Ardal_Shop_Elano::section_head( Ardal_Shop_Elano::opt( 'pay_title' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<?php do_action( 'woocommerce_checkout_payment' ); ?>
+			<?php woocommerce_checkout_payment(); ?>
 		</main>
 
 		<aside class="ard-elc__side">
@@ -68,7 +68,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 					<?php do_action( 'woocommerce_checkout_before_order_review' ); ?>
 
 					<div id="order_review" class="woocommerce-checkout-review-order">
-						<?php do_action( 'woocommerce_order_review' ); ?>
+						<?php woocommerce_order_review(); // همان تابعی که ووکامرس روی woocommerce_checkout_order_review گذاشته. ?>
 					</div>
 
 					<?php do_action( 'woocommerce_checkout_after_order_review' ); ?>

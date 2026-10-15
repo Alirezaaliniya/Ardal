@@ -534,7 +534,13 @@
 }
 
 .ard-elc[data-ard-elc] .ard-elc__qty .quantity {
+	display: flex;
 	margin: 0;
+}
+
+/* دکمه‌های +/− که قالب یا افزونه‌ها کنار ورودی تعداد می‌گذارند؛ الانو دکمهٔ خودش را دارد. */
+.ard-elc[data-ard-elc] .ard-elc__qty .quantity > :not(input):not(label) {
+	display: none !important;
 }
 
 .ard-elc[data-ard-elc] .ard-elc__qty input.qty {
@@ -1352,15 +1358,40 @@
 
 .ard-elc__th-img {
 	position: absolute;
-	inset-block-start: -35px;
-	inset-inline-end: 95px;
+	inset-block-start: -24px;
+	inset-inline-end: 72px;
 	z-index: 1;
-	inline-size: 88px;
-	block-size: 206px;
-	object-fit: contain;
-	border-radius: 16px;
-	filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .15));
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 120px;
+	block-size: 150px;
+	padding: 10px;
+	border-radius: 24px;
+	background: var(--el-card);
+	box-shadow: 0 16px 32px rgba(0, 0, 0, .14);
 	pointer-events: none;
+}
+
+.ard-elc__th-img img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: contain;
+	border-radius: 14px;
+}
+
+/* توضیح درگاه و هر چیز دیگری که به قلاب تشکر وصل است */
+.ard-elc__th-extra {
+	max-inline-size: 698px;
+	margin: 16px auto 0;
+	color: var(--el-label);
+	font-size: 13px;
+	line-height: 1.9;
+	text-align: center;
+}
+
+.ard-elc__th-extra:empty {
+	display: none;
 }
 
 .ard-elc__card--thanks {
@@ -1417,6 +1448,8 @@
 }
 
 /* جدول جزئیات ووکامرس اگر روشن باشد */
+.ard-elc__th-extra .woocommerce-order-details,
+.ard-elc__th-extra .woocommerce-customer-details,
 .ard-elc--thanks .woocommerce-order-details,
 .ard-elc--thanks .woocommerce-customer-details {
 	max-inline-size: 698px;
@@ -1543,13 +1576,15 @@
 
 	.ard-elc__th-img {
 		inset-block-start: -14px;
-		inset-inline-end: 24px;
-		inline-size: 80px;
-		block-size: 186px;
+		inset-inline-end: 18px;
+		inline-size: 92px;
+		block-size: 118px;
+		padding: 8px;
+		border-radius: 18px;
 	}
 
 	.ard-elc__th-info {
-		inset-inline-start: 4px;
+		inset-inline-start: 14px;
 		inline-size: min(160px, calc(50% - 50px));
 	}
 

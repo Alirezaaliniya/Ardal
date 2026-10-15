@@ -80,7 +80,7 @@ $ard_hours   = trim( (string) Ardal_Palette::get( 'account_support_hours' ) );
 						<span class="ard-shop__section-rule" aria-hidden="true"></span>
 						شیوه پرداخت
 					</h2>
-					<?php do_action( 'woocommerce_checkout_payment' ); ?>
+					<?php woocommerce_checkout_payment(); ?>
 				</section>
 			</div>
 
@@ -89,7 +89,7 @@ $ard_hours   = trim( (string) Ardal_Palette::get( 'account_support_hours' ) );
 				<?php do_action( 'woocommerce_checkout_before_order_review' ); ?>
 
 				<div id="order_review" class="woocommerce-checkout-review-order">
-					<?php do_action( 'woocommerce_order_review' ); ?>
+					<?php woocommerce_order_review(); // همان تابعی که ووکامرس روی woocommerce_checkout_order_review گذاشته. ?>
 				</div>
 
 				<?php do_action( 'woocommerce_checkout_after_order_review' ); ?>
