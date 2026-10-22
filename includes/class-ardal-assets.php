@@ -104,6 +104,8 @@ class Ardal_Assets {
 		wp_register_script( 'ardal', ARDAL_URL . 'assets/js/ardal.js', array(), self::ver( 'assets/js/ardal.js' ), true );
 		wp_register_style( 'ardal-monster-rating', ARDAL_URL . 'assets/css/ardal-monster-rating.css', array(), self::ver( 'assets/css/ardal-monster-rating.css' ) );
 		wp_register_style( 'ardal-mega-menu', ARDAL_URL . 'assets/css/ardal-mega-menu.css', array( 'ardal' ), self::ver( 'assets/css/ardal-mega-menu.css' ) );
+		wp_register_style( 'ardal-offcanvas', ARDAL_URL . 'assets/css/ardal-offcanvas.css', array(), self::ver( 'assets/css/ardal-offcanvas.css' ) );
+		wp_register_script( 'ardal-offcanvas', ARDAL_URL . 'assets/js/ardal-offcanvas.js', array(), self::ver( 'assets/js/ardal-offcanvas.js' ), true );
 		wp_register_script( 'ardal-mega-menu', ARDAL_URL . 'assets/js/ardal-mega-menu.js', array(), self::ver( 'assets/js/ardal-mega-menu.js' ), true );
 		wp_register_style( 'ardal-account', ARDAL_URL . 'assets/css/ardal-account.css', array( 'ardal' ), self::ver( 'assets/css/ardal-account.css' ) );
 		wp_register_script( 'ardal-account', ARDAL_URL . 'assets/js/ardal-account.js', array(), self::ver( 'assets/js/ardal-account.js' ), true );

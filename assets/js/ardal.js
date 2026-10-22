@@ -1975,7 +1975,9 @@
 			return variantState.map;
 		}
 
-		var box = document.querySelector( '[data-ard-buybox][data-is-variable="true"]' );
+		// باکس خرید اولویت دارد؛ اگر در صفحه نبود، نقشه از ویجت قیمت خوانده می‌شود.
+		var box = document.querySelector( '[data-ard-buybox][data-is-variable="true"]' ) ||
+			document.querySelector( '[data-ard-price][data-is-variable="true"]' );
 		var raw = box ? box.getAttribute( 'data-variations' ) : '';
 
 		try {
@@ -2285,6 +2287,14 @@
 		paintVariantTargets();
 		narrowVariantOptions();
 
+		if ( document.querySelector( '[data-ard-price][data-is-variable="true"]' ) ) {
+			var priceMatch = currentVariation();
+
+			if ( priceMatch ) {
+				paintPriceWidgets( priceMatch.price, priceMatch.reg, priceMatch.stock && priceMatch.buy );
+			}
+		}
+
 		var buyboxes = document.querySelectorAll( '[data-ard-buybox]' );
 		Array.prototype.forEach.call( buyboxes, function ( buybox ) {
 			if ( 'true' !== buybox.getAttribute( 'data-is-variable' ) ) {
@@ -2355,6 +2365,58 @@
 				 * چیزی کلیک می‌کند که وجود ندارد.
 				 */
 				setAddState( buybox, btnAdd, false );
+			}
+		} );
+	}
+
+	/**
+	 * به‌روزرسانی ویجت‌های قیمت با قیمت یک واریاسیون.
+	 *
+	 * فقط متن‌ها عوض می‌شوند تا واحد پول (نماد، آیکون یا تصویر دلخواه)
+	 * دست نخورد.
+	 *
+	 * @param {number}  price
+	 * @param {number}  reg
+	 * @param {boolean} available
+	 */
+	function paintPriceWidgets( price, reg, available ) {
+		var off = reg > price && reg > 0 ? Math.round( ( ( reg - price ) / reg ) * 100 ) : 0;
+
+		Array.prototype.forEach.call( document.querySelectorAll( '[data-ard-price][data-is-variable="true"]' ), function ( box ) {
+			var num = box.querySelector( '.ard-price__num' );
+			var deal = box.querySelector( '.ard-price__deal' );
+			var old = box.querySelector( '.ard-price__old' );
+			var badge = box.querySelector( '.ard-price__badge' );
+
+			if ( num ) {
+				num.textContent = formatPriceNumber( price );
+			}
+
+			if ( old ) {
+				old.textContent = off > 0 ? formatPriceNumber( reg ) : '';
+			}
+
+			if ( badge ) {
+				badge.textContent = ( box.getAttribute( 'data-badge' ) || '{p}%' ).replace( '{p}', toFa( off ) );
+			}
+
+			if ( deal ) {
+				deal.hidden = off < 1;
+			}
+
+			box.classList.toggle( 'has-deal', off > 0 );
+			box.classList.toggle( 'is-out', ! available );
+		} );
+	}
+
+	/*
+	 * فرم واریاسیون خودِ ووکامرس (وقتی به‌جای ویجت‌های رنگ و سایز اردال
+	 * استفاده شده) رویدادهایش را با jQuery می‌فرستد.
+	 */
+	if ( window.jQuery ) {
+		window.jQuery( document ).on( 'found_variation', 'form.variations_form', function ( e, v ) {
+			if ( v && '' !== v.display_price ) {
+				paintPriceWidgets( parseFloat( v.display_price ), parseFloat( v.display_regular_price ), !! ( v.is_in_stock && v.is_purchasable ) );
 			}
 		} );
 	}

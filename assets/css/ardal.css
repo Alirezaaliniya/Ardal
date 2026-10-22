@@ -4585,29 +4585,35 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-color {
+	position: relative;
 	box-sizing: border-box;
 	display: flex;
 	align-items: center;
 	gap: 9px;
-	border: 1.5px solid color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted));
-	background: var(--ard-base);
+	border: 1.5px solid var(--ard-pc-ring-normal, color-mix(in srgb, var(--ard-border) 70%, var(--ard-muted)));
+	background: var(--ard-pc-bg-normal, var(--ard-base));
 	border-radius: 11px;
 	padding: 9px 14px;
 	cursor: pointer;
 	font-size: 12.5px;
 	font-weight: 700;
-	color: var(--ard-text);
-	transition: border-color 0.2s, background 0.2s;
+	color: var(--ard-pc-ink-normal, var(--ard-text));
+	transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
 	font-family: inherit;
 }
 
 .ard-prod-color:hover {
-	border-color: var(--ard-accent, var(--ard-accent));
+	border-color: var(--ard-pc-ring-hover, var(--ard-accent));
+	background: var(--ard-pc-bg-hover, var(--ard-pc-bg-normal, var(--ard-base)));
+	color: var(--ard-pc-ink-hover, var(--ard-pc-ink-normal, var(--ard-text)));
+	transform: scale(var(--ard-pc-scale-hover, 1));
 }
 
 .ard-prod-color.is-active {
-	border-color: var(--ard-accent, var(--ard-accent));
-	background: color-mix(in srgb, var(--ard-tint-green) 55%, var(--ard-base));
+	border-color: var(--ard-pc-ring-active, var(--ard-accent));
+	background: var(--ard-pc-bg-active, color-mix(in srgb, var(--ard-tint-green) 55%, var(--ard-base)));
+	color: var(--ard-pc-ink-active, var(--ard-pc-ink-normal, var(--ard-text)));
+	transform: scale(var(--ard-pc-scale-active, 1));
 }
 
 /*
@@ -4629,6 +4635,7 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-color.is-disabled {
+	opacity: var(--ard-pc-disabled, 1);
 	border-color: var(--ard-border-soft);
 	background: var(--ard-surface-alt);
 	color: color-mix(in srgb, var(--ard-muted) 55%, var(--ard-base));
@@ -4660,13 +4667,139 @@ a.ard-breadcrumb__item:hover {
 }
 
 .ard-prod-color__swatch {
-	width: 18px;
-	height: 18px;
+	width: var(--ard-pc-size, 18px);
+	height: var(--ard-pc-size, 18px);
 	border-radius: 50%;
 	background: var(--swatch-color, var(--ard-text));
-	border: 1px solid rgba(0, 0, 0, 0.12);
+	border: var(--ard-pc-sw-bw, 1px) solid var(--ard-pc-sw-bc, rgba(0, 0, 0, 0.12));
+	box-sizing: border-box;
 	display: inline-block;
 	flex: none;
+	transition: box-shadow 0.2s;
+}
+
+/* تولتیپ فقط در حالت‌های دایره‌ای و مربعی نشان داده می‌شود؛ کاشی نامش را دارد. */
+.ard-prod-color__tip {
+	display: none;
+}
+
+/* ---------------------------------------------------------------- دایره‌ای و مربعی */
+
+.ard-pcolor--dot .ard-prod-color,
+.ard-pcolor--square .ard-prod-color {
+	gap: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: none;
+}
+
+.ard-pcolor--square .ard-prod-color {
+	border-radius: 10px;
+}
+
+.ard-pcolor--dot .ard-prod-color:hover,
+.ard-pcolor--dot .ard-prod-color.is-active,
+.ard-pcolor--square .ard-prod-color:hover,
+.ard-pcolor--square .ard-prod-color.is-active {
+	background: none;
+}
+
+.ard-pcolor--dot .ard-prod-color__swatch,
+.ard-pcolor--square .ard-prod-color__swatch {
+	width: var(--ard-pc-size, 32px);
+	height: var(--ard-pc-size, 32px);
+	border-color: var(--ard-pc-sw-bc, rgba(0, 0, 0, 0.06));
+	box-shadow: 0 0 0 var(--ard-pc-ring-gap, 3px) var(--ard-pc-ring-gap-c, var(--ard-base, #fff)), 0 0 0 calc(var(--ard-pc-ring-gap, 3px) + var(--ard-pc-ring-w, 2px)) var(--ard-pc-ring-normal, transparent);
+}
+
+.ard-pcolor--square .ard-prod-color__swatch {
+	border-radius: 8px;
+}
+
+.ard-pcolor--dot .ard-prod-color__name,
+.ard-pcolor--square .ard-prod-color__name {
+	display: none !important;
+}
+
+.ard-pcolor--dot .ard-prod-color:hover .ard-prod-color__swatch,
+.ard-pcolor--square .ard-prod-color:hover .ard-prod-color__swatch {
+	box-shadow: 0 0 0 var(--ard-pc-ring-gap, 3px) var(--ard-pc-ring-gap-c, var(--ard-base, #fff)), 0 0 0 calc(var(--ard-pc-ring-gap, 3px) + var(--ard-pc-ring-w, 2px)) var(--ard-pc-ring-hover, color-mix(in srgb, var(--ard-text) 25%, transparent));
+}
+
+.ard-pcolor--dot .ard-prod-color.is-active .ard-prod-color__swatch,
+.ard-pcolor--square .ard-prod-color.is-active .ard-prod-color__swatch {
+	box-shadow: 0 0 0 var(--ard-pc-ring-gap, 3px) var(--ard-pc-ring-gap-c, var(--ard-base, #fff)), 0 0 0 calc(var(--ard-pc-ring-gap, 3px) + var(--ard-pc-ring-w, 2px)) var(--ard-pc-ring-active, var(--ard-text, #2f2f33));
+}
+
+.ard-pcolor--dot .ard-prod-color.is-disabled,
+.ard-pcolor--square .ard-prod-color.is-disabled {
+	background: none;
+	opacity: var(--ard-pc-disabled, .55);
+}
+
+.ard-pcolor--dot .ard-prod-color:focus-visible,
+.ard-pcolor--square .ard-prod-color:focus-visible {
+	outline: 2px solid var(--ard-primary, #0b62ce);
+	outline-offset: 5px;
+}
+
+/* ---------------------------------------------------------------- تولتیپ */
+
+.ard-pcolor--dot:not(.ard-pcolor-tip--none) .ard-prod-color__tip,
+.ard-pcolor--square:not(.ard-pcolor-tip--none) .ard-prod-color__tip {
+	position: absolute;
+	bottom: calc(100% + var(--ard-pc-tip-off, 10px));
+	left: 50%;
+	z-index: 20;
+	display: block;
+	padding: 6px 10px;
+	border-radius: var(--ard-pc-tip-r, 6px);
+	background: var(--ard-pc-tip-bg, #2f2f33);
+	color: var(--ard-pc-tip-ink, #fff);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.5;
+	white-space: nowrap;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transform: translate(-50%, 4px);
+	transition: opacity .18s, transform .18s, visibility 0s linear .18s;
+}
+
+.ard-pcolor-arrow-yes .ard-prod-color__tip::after {
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border: 5px solid transparent;
+	border-top-color: var(--ard-pc-tip-bg, #2f2f33);
+}
+
+.ard-pcolor--dot:not(.ard-pcolor-tip--none) .ard-prod-color:hover .ard-prod-color__tip,
+.ard-pcolor--dot:not(.ard-pcolor-tip--none) .ard-prod-color:focus-visible .ard-prod-color__tip,
+.ard-pcolor--square:not(.ard-pcolor-tip--none) .ard-prod-color:hover .ard-prod-color__tip,
+.ard-pcolor--square:not(.ard-pcolor-tip--none) .ard-prod-color:focus-visible .ard-prod-color__tip,
+.ard-pcolor-tip--active.ard-pcolor--dot .ard-prod-color.is-active .ard-prod-color__tip,
+.ard-pcolor-tip--active.ard-pcolor--square .ard-prod-color.is-active .ard-prod-color__tip {
+	opacity: 1;
+	visibility: visible;
+	transform: translate(-50%, 0);
+	transition: opacity .18s, transform .18s, visibility 0s;
+}
+
+/* وقتی ماوس روی رنگ دیگری است، تولتیپ رنگ انتخاب‌شده کنار می‌رود. */
+.ard-pcolor-tip--active .ard-prod-colors:hover .ard-prod-color.is-active:not(:hover) .ard-prod-color__tip {
+	opacity: 0;
+	visibility: hidden;
+}
+
+/* جای تولتیپ همیشه‌پیدا بالای ردیف رنگ‌ها */
+.ard-pcolor-tip--active.ard-pcolor--dot .ard-prod-colors,
+.ard-pcolor-tip--active.ard-pcolor--square .ard-prod-colors {
+	padding-top: var(--ard-pc-tip-space, 40px);
 }
 
 .ard-prod-sizes {
@@ -7179,4 +7312,153 @@ a.ard-ptags__chip:focus-visible {
 	.ard-comments__heading { font-size: 21px; }
 	.ard-comments__text { font-size: 15px; }
 	.ard-comments__rating-display { font-size: 18px; }
+}
+
+/* ================================================================
+   ویجت قیمت محصول
+   ================================================================ */
+
+.ard-price {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: var(--ard-price-align, center);
+	justify-content: var(--ard-price-justify, flex-start);
+	gap: var(--ard-price-gap, 16px);
+	direction: rtl;
+	transition: opacity .2s;
+}
+
+.ard-price__deal {
+	display: flex;
+	flex-direction: var(--ard-price-deal-dir, column);
+	align-items: var(--ard-price-deal-align, center);
+	gap: var(--ard-price-deal-gap, 4px);
+}
+
+.ard-price__deal[hidden] {
+	display: none;
+}
+
+.ard-price__badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 10px;
+	border-radius: var(--ard-price-badge-r, 999px);
+	background: var(--ard-price-badge-bg, var(--ard-danger, var(--ard-sale, #ef4056)));
+	color: var(--ard-price-badge-ink, #fff);
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.7;
+	white-space: nowrap;
+	/* قالب نشان («-{p}%») همان‌طور که تایپ شده دیده شود، نه برعکس. */
+	direction: ltr;
+	unicode-bidi: isolate;
+}
+
+.ard-price__old-wrap {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	color: var(--ard-price-old-ink, var(--ard-muted, #9aa7b4));
+}
+
+.ard-price__old {
+	color: inherit;
+	font-size: 14px;
+	font-weight: 500;
+	text-decoration: line-through;
+	text-decoration-color: var(--ard-price-old-line, currentColor);
+	text-decoration-thickness: var(--ard-price-old-line-w, 1px);
+	white-space: nowrap;
+}
+
+.ard-price__now {
+	display: inline-flex;
+	align-items: var(--ard-price-unit-align, center);
+	gap: var(--ard-price-unit-gap, 6px);
+	color: var(--ard-price-ink, var(--ard-text, #20303f));
+}
+
+.ard-price__num {
+	font-size: 30px;
+	font-weight: 800;
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+.ard-price__unit {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	color: var(--ard-price-unit-ink, currentColor);
+	line-height: 1;
+	transform: translateY(var(--ard-price-unit-y, 0));
+}
+
+.ard-price__unit svg,
+.ard-price__unit img {
+	display: block;
+	inline-size: auto;
+	max-inline-size: none;
+	block-size: var(--ard-price-unit-h, 26px);
+}
+
+.ard-price__unit--vertical svg {
+	block-size: var(--ard-price-unit-h, 30px);
+}
+
+.ard-price__unit--icon svg {
+	fill: currentColor;
+}
+
+.ard-price__unit--icon i {
+	font-size: var(--ard-price-unit-h, 26px);
+}
+
+.ard-price__unit--text {
+	font-size: var(--ard-price-unit-h, 13px);
+	font-weight: 500;
+}
+
+/* واحدِ کوچک کنار قیمت قبل */
+.ard-price__old-wrap .ard-price__unit {
+	color: inherit;
+	transform: none;
+}
+
+.ard-price__old-wrap .ard-price__unit svg,
+.ard-price__old-wrap .ard-price__unit img {
+	block-size: 1.35em;
+}
+
+.ard-price__old-wrap .ard-price__unit i,
+.ard-price__old-wrap .ard-price__unit--text {
+	font-size: .85em;
+}
+
+.ard-price-dealfirst-yes .ard-price__deal,
+.ard-price--stack .ard-price__deal {
+	order: 0;
+}
+
+.ard-price--side:not(.ard-price-dealfirst-yes) .ard-price__deal,
+.ard-price--below .ard-price__deal {
+	order: 2;
+}
+
+.ard-price--stack .ard-price,
+.ard-price--below .ard-price {
+	flex-direction: column;
+	align-items: var(--ard-price-justify, flex-start);
+	gap: var(--ard-price-gap, 6px);
+}
+
+.ard-price--stack .ard-price__deal,
+.ard-price--below .ard-price__deal {
+	flex-direction: var(--ard-price-deal-dir, row);
+}
+
+.ard-price-dimout-yes .ard-price.is-out {
+	opacity: .5;
 }

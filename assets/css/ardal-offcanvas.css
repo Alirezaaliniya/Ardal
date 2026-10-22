@@ -1,0 +1,394 @@
+/*!
+ * Ardal — منوی کشویی (offcanvas).
+ *
+ * کشو موقع باز شدن به انتهای body منتقل می‌شود (ardal-offcanvas.js) تا
+ * transform یا overflow والدهای المنتور جای fixed را خراب نکنند؛ همراهش
+ * پوستهٔ کلاس‌های ویجت هم می‌رود تا استایل‌های تب «استایل» همچنان بنشینند.
+ */
+
+.ard-oc {
+	--ard-oc-w: 340px;
+	--ard-oc-speed: 320ms;
+	--ard-oc-bg: var(--ard-base, #fff);
+	--ard-oc-overlay: rgba(16, 24, 40, .45);
+	--ard-oc-blur: 2px;
+	--ard-oc-radius: 0px;
+	--ard-oc-head-bg: transparent;
+	--ard-oc-head-ink: var(--ard-text, #20303f);
+	--ard-oc-logo-h: 40px;
+	--ard-oc-close-ink: var(--ard-text, #20303f);
+	--ard-oc-close-bg: var(--ard-surface, #f4f7fa);
+	--ard-oc-item-ink: var(--ard-text, #20303f);
+	--ard-oc-item-ink-hover: var(--ard-primary, #0b62ce);
+	--ard-oc-item-ink-active: var(--ard-primary, #0b62ce);
+	--ard-oc-item-bg: transparent;
+	--ard-oc-item-bg-hover: var(--ard-surface, #f4f7fa);
+	--ard-oc-item-bg-active: var(--ard-tint-blue, #eaf4ff);
+	--ard-oc-item-radius: 10px;
+	--ard-oc-gap: 2px;
+	--ard-oc-line: var(--ard-border-soft, #eef1f5);
+	--ard-oc-sub-bg: transparent;
+	--ard-oc-indent: 14px;
+
+	position: fixed;
+	inset: 0;
+	z-index: 100050;
+	direction: rtl;
+	font-family: var(--ard-font, inherit);
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.ard-oc[hidden] {
+	display: none !important;
+}
+
+.ard-oc,
+.ard-oc *,
+.ard-oc *::before,
+.ard-oc *::after {
+	box-sizing: border-box;
+}
+
+.ard-oc.is-open {
+	visibility: visible;
+	pointer-events: auto;
+}
+
+.ard-oc__overlay {
+	position: absolute;
+	inset: 0;
+	background: var(--ard-oc-overlay);
+	opacity: 0;
+	transition: opacity var(--ard-oc-speed) ease;
+	-webkit-backdrop-filter: blur(var(--ard-oc-blur));
+	backdrop-filter: blur(var(--ard-oc-blur));
+}
+
+.ard-oc.is-open .ard-oc__overlay {
+	opacity: 1;
+}
+
+.ard-oc__panel {
+	position: absolute;
+	inset-block: 0;
+	display: flex;
+	flex-direction: column;
+	inline-size: min(var(--ard-oc-w), 100vw);
+	max-inline-size: 100vw;
+	overflow: hidden;
+	background: var(--ard-oc-bg);
+	box-shadow: 0 0 60px rgba(0, 0, 0, .18);
+	outline: none;
+	transition: transform var(--ard-oc-speed) cubic-bezier(.22, .8, .24, 1);
+}
+
+.ard-oc--right .ard-oc__panel {
+	right: 0;
+	border-radius: var(--ard-oc-radius) 0 0 var(--ard-oc-radius);
+	transform: translateX(100%);
+}
+
+.ard-oc--left .ard-oc__panel {
+	left: 0;
+	border-radius: 0 var(--ard-oc-radius) var(--ard-oc-radius) 0;
+	transform: translateX(-100%);
+}
+
+.ard-oc.is-open .ard-oc__panel {
+	transform: none;
+}
+
+/* سربرگ */
+.ard-oc__head {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	min-block-size: 64px;
+	padding: 12px 16px;
+	background: var(--ard-oc-head-bg);
+}
+
+.ard-oc-headline-yes .ard-oc__head {
+	border-bottom: 1px solid var(--ard-oc-line);
+}
+
+.ard-oc__title {
+	overflow: hidden;
+	color: var(--ard-oc-head-ink);
+	font-size: 16px;
+	font-weight: 700;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ard-oc__logo {
+	display: inline-flex;
+	align-items: center;
+	min-inline-size: 0;
+}
+
+.ard-oc__logo img {
+	inline-size: auto;
+	max-inline-size: 100%;
+	block-size: var(--ard-oc-logo-h);
+	object-fit: contain;
+}
+
+.ard-oc__close[class] {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	inline-size: 40px;
+	block-size: 40px;
+	margin: 0;
+	margin-inline-start: auto;
+	padding: 0;
+	border: 0;
+	border-radius: 12px;
+	background: var(--ard-oc-close-bg);
+	color: var(--ard-oc-close-ink);
+	cursor: pointer;
+	transition: transform .2s;
+}
+
+.ard-oc__close[class]:hover {
+	transform: rotate(90deg);
+	background: var(--ard-oc-close-bg);
+	color: var(--ard-oc-close-ink);
+}
+
+/* بدنه */
+.ard-oc__body {
+	flex: 1;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: 12px 12px 24px;
+	-webkit-overflow-scrolling: touch;
+}
+
+.ard-oc__tpl + .ard-oc__nav,
+.ard-oc__nav + .ard-oc__tpl {
+	margin-block-start: 16px;
+}
+
+.ard-oc__hint {
+	margin: 12px 4px;
+	color: var(--ard-muted, #9aa7b4);
+	font-size: 13px;
+}
+
+.ard-oc__foot {
+	flex: none;
+	padding: 14px 16px;
+	border-top: 1px solid var(--ard-oc-line);
+	color: var(--ard-text-soft, #5d6b7a);
+	font-size: 12.5px;
+	line-height: 1.9;
+}
+
+/* منو */
+.ard-oc__menu,
+.ard-oc__menu .sub-menu {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ard-oc-gap);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-oc__menu li {
+	position: relative;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-oc-divider-yes .ard-oc__menu > li + li {
+	border-top: 1px solid var(--ard-oc-line);
+}
+
+.ard-oc__row {
+	display: flex;
+	align-items: stretch;
+}
+
+.ard-oc__menu a {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 8px;
+	min-inline-size: 0;
+	min-block-size: 46px;
+	padding: 10px 12px;
+	border-radius: var(--ard-oc-item-radius);
+	background: var(--ard-oc-item-bg);
+	color: var(--ard-oc-item-ink);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.6;
+	text-decoration: none;
+	transition: background .15s, color .15s;
+}
+
+.ard-oc__menu a:hover,
+.ard-oc__menu a:focus-visible {
+	background: var(--ard-oc-item-bg-hover);
+	color: var(--ard-oc-item-ink-hover);
+}
+
+.ard-oc__menu .current-menu-item > .ard-oc__row > a,
+.ard-oc__menu .current-menu-item > a {
+	background: var(--ard-oc-item-bg-active);
+	color: var(--ard-oc-item-ink-active);
+	font-weight: 600;
+}
+
+.ard-oc__menu .current-menu-ancestor > .ard-oc__row > a {
+	color: var(--ard-oc-item-ink-active);
+}
+
+.ard-oc__sub[class] {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	inline-size: 44px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: var(--ard-oc-item-radius);
+	background: transparent;
+	color: inherit;
+	cursor: pointer;
+}
+
+.ard-oc__sub[class]:hover {
+	background: var(--ard-oc-item-bg-hover);
+	color: var(--ard-oc-item-ink-hover);
+}
+
+.ard-oc__sub svg {
+	transition: transform .2s;
+}
+
+.ard-oc__menu li.is-sub-open > .ard-oc__row .ard-oc__sub svg {
+	transform: rotate(-180deg);
+}
+
+.ard-oc__menu .sub-menu {
+	display: none;
+	margin: 2px 0 6px;
+	padding-inline-start: var(--ard-oc-indent);
+	border-radius: var(--ard-oc-item-radius);
+	background: var(--ard-oc-sub-bg);
+}
+
+.ard-oc__menu li.is-sub-open > .sub-menu {
+	display: flex;
+}
+
+/* بدون جاوااسکریپت، زیرمنوها باز بمانند */
+.ard-oc:not(.is-ready) .ard-oc__menu .sub-menu {
+	display: flex;
+}
+
+.ard-oc__menu .sub-menu a {
+	min-block-size: 40px;
+	font-size: 13px;
+	font-weight: 400;
+}
+
+/* قفل اسکرول صفحه */
+html.ard-oc-lock,
+html.ard-oc-lock body {
+	overflow: hidden;
+}
+
+/* دکمهٔ همبرگری داخلی ویجت */
+.ard-oc-btnwrap {
+	display: flex;
+}
+
+.ard-oc-btn[class] {
+	--ard-oc-btn: 44px;
+
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-inline-size: var(--ard-oc-btn);
+	block-size: var(--ard-oc-btn);
+	margin: 0;
+	padding: 0 10px;
+	border: 0;
+	border-radius: 12px;
+	background: var(--ard-surface, #f4f7fa);
+	color: var(--ard-text, #20303f);
+	font-family: inherit;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.ard-oc-btn__bars {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	inline-size: 20px;
+}
+
+.ard-oc-btn__bars i {
+	display: block;
+	block-size: 2px;
+	border-radius: 2px;
+	background: currentColor;
+}
+
+.ard-oc-btn__bars i:nth-child(2) {
+	inline-size: 70%;
+}
+
+/* هر المانی که باز می‌کند، نشانگر کلیک بگیرد */
+.ard-oc-open,
+[class*="ard-oc-open-"],
+[class*="ard-oc-toggle-"],
+.ard-oc-toggle,
+.ard-oc-close {
+	cursor: pointer;
+}
+
+/* پیش‌نمایش باز داخل ویرایشگر المنتور */
+.ard-oc.ard-oc--preview {
+	position: relative;
+	inset: auto;
+	z-index: auto;
+	display: block;
+	visibility: visible;
+	pointer-events: auto;
+	min-block-size: 480px;
+	overflow: hidden;
+	border-radius: 12px;
+	outline: 1px dashed rgba(0, 0, 0, .15);
+}
+
+.ard-oc--preview .ard-oc__overlay {
+	opacity: 1;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+
+.ard-oc--preview .ard-oc__panel {
+	transform: none;
+	transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-oc__panel,
+	.ard-oc__overlay {
+		transition: none;
+	}
+}
