@@ -100,6 +100,29 @@
 	display: flex;
 }
 
+/*
+ * درون‌خطی: کنار ویجت‌های امتیاز و تعداد نظرات، مثل یک آیتم متنی با آیکون.
+ * اندازه و رنگ‌ها همان متغیرهای .ard-pstat را دارند تا ردیف یکدست بماند.
+ */
+.ard-wish--inline[class] {
+	--ard-wish-size: auto;
+	--ard-wish-icon: 20px;
+	--ard-wish-color: var(--ard-text-soft, #5d6b7a);
+
+	gap: 6px;
+	min-inline-size: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.6;
+}
+
+.ard-wish--inline .ard-wish__icon {
+	stroke-width: 1.6;
+}
+
 /* ============================================================
    شمارندهٔ هدر
    ============================================================ */

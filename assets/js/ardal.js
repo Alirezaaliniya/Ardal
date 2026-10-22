@@ -2951,6 +2951,51 @@
 		} );
 	}
 
+	/*
+	 * لینک «رفتن به نظرات» (ویجت‌های امتیاز و تعداد نظر). اول تب نظرات ویجت
+	 * تب‌های اردال، بعد تب‌های خود ووکامرس، وگرنه همان #reviews معمولی.
+	 */
+	document.addEventListener( 'click', function ( e ) {
+		var link = e.target.closest ? e.target.closest( '[data-ard-jump]' ) : null;
+
+		if ( ! link ) {
+			return;
+		}
+
+		var key = link.getAttribute( 'data-ard-jump' );
+		var gap = parseInt( link.getAttribute( 'data-offset' ), 10 ) || 0;
+		var tab = document.querySelector( '[data-ard-product-tabs] .ard-ptabs__btn[data-tab-target="' + key + '"]' );
+		var target = null;
+
+		if ( tab ) {
+			var tabsRoot = tab.closest( '[data-ard-product-tabs]' );
+
+			tab.click();
+			target = 'sections' === tabsRoot.getAttribute( 'data-layout' )
+				? tabsRoot.querySelector( '[data-tab-panel="' + key + '"]' )
+				: tabsRoot;
+		} else {
+			var wcTab = document.querySelector( '#tab-title-' + key + ' a' );
+
+			if ( wcTab ) {
+				wcTab.click();
+				target = document.querySelector( '.woocommerce-tabs' );
+			} else {
+				target = document.getElementById( key );
+			}
+		}
+
+		if ( ! target ) {
+			return;
+		}
+
+		e.preventDefault();
+		window.scrollTo( {
+			top: Math.max( 0, target.getBoundingClientRect().top + window.pageYOffset - gap ),
+			behavior: prefersReducedMotion() ? 'auto' : 'smooth'
+		} );
+	} );
+
 	if ( 'loading' === document.readyState ) {
 		document.addEventListener( 'DOMContentLoaded', function () {
 			init();

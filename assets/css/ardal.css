@@ -7462,3 +7462,69 @@ a.ard-ptags__chip:focus-visible {
 .ard-price-dimout-yes .ard-price.is-out {
 	opacity: .5;
 }
+
+/* ================================================================
+   آمار کوتاه محصول: امتیاز و تعداد نظرات
+   ================================================================ */
+
+.ard-pstat-wrap {
+	display: flex;
+}
+
+.ard-pstat {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--ard-pstat-gap, 6px);
+	border: 0 solid var(--ard-pstat-line, transparent);
+	background: var(--ard-pstat-bg, transparent);
+	color: var(--ard-pstat-ink, var(--ard-text-soft, #5d6b7a));
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 1.6;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: color .2s, background-color .2s, border-color .2s;
+}
+
+.ard-pstat__icon {
+	display: inline-flex;
+	flex: none;
+	color: var(--ard-pstat-icon, currentColor);
+	transition: color .2s;
+}
+
+.ard-pstat__icon svg {
+	display: block;
+	inline-size: var(--ard-pstat-icon-size, 20px);
+	block-size: var(--ard-pstat-icon-size, 20px);
+}
+
+.ard-pstat__icon i {
+	font-size: var(--ard-pstat-icon-size, 20px);
+}
+
+.ard-pstat__stars {
+	display: inline-flex;
+	font-size: 14px;
+	line-height: 1;
+}
+
+a.ard-pstat:hover,
+a.ard-pstat:focus-visible {
+	border-color: var(--ard-pstat-line-hover, var(--ard-pstat-line, transparent));
+	background: var(--ard-pstat-bg-hover, var(--ard-pstat-bg, transparent));
+	color: var(--ard-pstat-ink-hover, var(--ard-primary, #0b62ce));
+}
+
+a.ard-pstat:hover .ard-pstat__icon,
+a.ard-pstat:focus-visible .ard-pstat__icon {
+	color: var(--ard-pstat-icon-hover, var(--ard-pstat-icon, currentColor));
+}
+
+.ard-pstat.is-empty .ard-pstat__num {
+	opacity: .7;
+}
+
+.ard-pstat__stars .ard-stars {
+	font-size: inherit;
+}

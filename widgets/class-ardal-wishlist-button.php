@@ -84,8 +84,9 @@ class Ardal_Widget_Wishlist_Button extends Ardal_Widget_Base {
 				'type'    => Controls_Manager::SELECT,
 				'default' => 'boxed',
 				'options' => array(
-					'boxed' => 'با زمینه و حاشیه',
-					'plain' => 'بدون قاب (فقط قلب)',
+					'boxed'  => 'با زمینه و حاشیه',
+					'plain'  => 'بدون قاب (فقط قلب)',
+					'inline' => 'درون‌خطی (هم‌شکل امتیاز و تعداد نظرات)',
 				),
 			)
 		);
@@ -288,7 +289,7 @@ class Ardal_Widget_Wishlist_Button extends Ardal_Widget_Base {
 				'label'     => trim( (string) $s['label_off'] ),
 				'label_on'  => trim( (string) $s['label_on'] ),
 				'show_text' => 'text' === $s['layout'],
-				'class'     => 'plain' === $s['frame'] ? 'ard-wish--plain' : '',
+				'class'     => 'boxed' === $s['frame'] ? '' : 'ard-wish--plain' . ( 'inline' === $s['frame'] ? ' ard-wish--inline' : '' ),
 			)
 		);
 
