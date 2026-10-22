@@ -72,6 +72,18 @@ class Ardal_Widget_Product_Color extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'hide_wc',
+			array(
+				'label'        => 'پنهان کردن انتخابگر ووکامرس',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'سلکت همین ویژگی بالای دکمهٔ «افزودن به سبد» ووکامرس پنهان می‌شود (انتخاب این ویجت خودکار به آن منتقل می‌شود). خاموش کنید تا هر دو دیده شوند.',
+				'condition'    => array( 'source' => 'auto' ),
+			)
+		);
+
+		$this->add_control(
 			'layout',
 			array(
 				'label'        => 'حالت نمایش',
@@ -668,12 +680,18 @@ class Ardal_Widget_Product_Color extends Ardal_Widget_Base {
 		// کلید ویژگی به جاوااسکریپت می‌رسد تا تطبیق واریاسیون به نام ثابت
 		// attribute_pa_color گره نخورد؛ فروشگاه‌ها ویژگی‌شان را هرجور می‌نامند.
 		$attr_key = isset( $attr_key ) ? $attr_key : '';
+		$hide_wc  = '' !== $attr_key && 'auto' === $s['source'] && 'yes' === $s['hide_wc'];
 		?>
 		<div
 			class="ard-prod-variants ard-prod-variants--colors"
 			data-ard-color-group
 			data-attr="<?php echo esc_attr( $attr_key ); ?>"
+			<?php echo $hide_wc ? 'data-hide-wc' : ''; ?>
 		>
+		<?php if ( $hide_wc ) : ?>
+			<?php // پیش از اجرای جاوااسکریپت هم پنهان باشد تا سلکت یک لحظه دیده نشود. ?>
+			<style>form.variations_form .variations tr:has(select[name="<?php echo esc_attr( $attr_key ); ?>"]){display:none}</style>
+		<?php endif; ?>
 			<div class="ard-prod-variants__header">
 				<span class="ard-prod-variants__label"><?php echo esc_html( $s['label'] ); ?>:</span>
 				<?php if ( 'yes' === $s['show_selected'] ) : ?>

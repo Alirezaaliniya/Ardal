@@ -1986,7 +1986,56 @@
 			variantState.map = [];
 		}
 
+		if ( ! variantState.map.length ) {
+			variantState.map = wcVariationMap();
+		}
+
 		return variantState.map;
+	}
+
+	/**
+	 * نقشهٔ واریاسیون از فرم خود ووکامرس، وقتی باکس خرید اردال در صفحه نیست.
+	 *
+	 * ووکامرس فهرست را در data-product_variations می‌گذارد؛ برای محصول‌هایی با
+	 * واریاسیون خیلی زیاد این مقدار false است و نقشه خالی می‌ماند (آن وقت
+	 * فقط باریک‌کردن گزینه‌ها کار نمی‌کند، خرید درست کار می‌کند).
+	 */
+	function wcVariationMap() {
+		var form = document.querySelector( 'form.variations_form[data-product_variations]' );
+		var list;
+
+		try {
+			list = form ? JSON.parse( form.getAttribute( 'data-product_variations' ) ) : null;
+		} catch ( e ) {
+			list = null;
+		}
+
+		if ( ! Array.isArray( list ) ) {
+			return [];
+		}
+
+		return list.map( function ( v ) {
+			var attrs = {};
+			var price = parseFloat( v.display_price ) || 0;
+			var reg = parseFloat( v.display_regular_price ) || 0;
+
+			Object.keys( v.attributes || {} ).forEach( function ( k ) {
+				if ( v.attributes[ k ] ) {
+					attrs[ k ] = v.attributes[ k ];
+				}
+			} );
+
+			return {
+				id: v.variation_id,
+				attrs: attrs,
+				price: price,
+				reg: reg,
+				off: reg > price && reg > 0 ? Math.round( ( ( reg - price ) / reg ) * 100 ) : 0,
+				stock: !! v.is_in_stock,
+				buy: !! v.is_purchasable,
+				max: v.max_qty || 0
+			};
+		} );
 	}
 
 	/**
@@ -2283,9 +2332,104 @@
 		}
 	}
 
+	/*
+	 * هم‌گام‌سازی با فرم واریاسیون خود ووکامرس (دکمهٔ «افزودن به سبد»
+	 * پیش‌فرض یا ویجت Add to Cart المنتور). بدون این، سلکت‌های ووکامرس خالی
+	 * می‌مانند و با کلیک خرید پیام «لطفاً برخی گزینه‌ها را انتخاب کنید» می‌آید.
+	 */
+	var wcSyncing = false;
+
+	/**
+	 * گزینهٔ سلکت ووکامرس که با یک دکمهٔ اردال می‌خواند.
+	 *
+	 * ویژگی سراسری مقدارش اسلاگ است؛ ویژگی سفارشی خودِ متن، پس به برچسب هم
+	 * نگاه می‌شود.
+	 */
+	function wcOptionValue( select, slug, label ) {
+		var found = '';
+
+		Array.prototype.forEach.call( select.options, function ( o ) {
+			if ( found || ! o.value ) {
+				return;
+			}
+
+			if ( o.value === slug || o.value === label || o.text.trim() === label ) {
+				found = o.value;
+			}
+		} );
+
+		return found;
+	}
+
+	function pushToWcForms() {
+		if ( wcSyncing || ! window.jQuery ) {
+			return;
+		}
+
+		Array.prototype.forEach.call( document.querySelectorAll( 'form.variations_form' ), function ( form ) {
+			var changed = null;
+
+			Array.prototype.forEach.call(
+				document.querySelectorAll( '[data-ard-color-group],[data-ard-size-group]' ),
+				function ( group ) {
+					var key = group.getAttribute( 'data-attr' );
+					var active = group.querySelector( '.is-active' );
+					var select = key ? form.querySelector( 'select[name="' + key + '"]' ) : null;
+
+					if ( ! select || ! active ) {
+						return;
+					}
+
+					var value = wcOptionValue(
+						select,
+						active.getAttribute( 'data-color-slug' ) || active.getAttribute( 'data-size-slug' ) || '',
+						active.getAttribute( 'data-color-name' ) || active.getAttribute( 'data-size-label' ) || ''
+					);
+
+					if ( value && select.value !== value ) {
+						select.value = value;
+						changed = select;
+					}
+				}
+			);
+
+			if ( changed ) {
+				wcSyncing = true;
+				window.jQuery( changed ).trigger( 'change' );
+				wcSyncing = false;
+			}
+		} );
+	}
+
+	/**
+	 * پنهان کردن سطر سلکت ووکامرس برای ویژگی‌هایی که ویجت اردال جایشان را
+	 * گرفته (اگر در ویجت روشن باشد). سلکت در فرم می‌ماند تا مقدارش ارسال شود.
+	 */
+	function hideWcRows() {
+		Array.prototype.forEach.call( document.querySelectorAll( 'form.variations_form table.variations' ), function ( table ) {
+			Array.prototype.forEach.call(
+				document.querySelectorAll( '[data-ard-color-group][data-hide-wc],[data-ard-size-group][data-hide-wc]' ),
+				function ( group ) {
+					var select = table.querySelector( 'select[name="' + group.getAttribute( 'data-attr' ) + '"]' );
+					var row = select ? select.closest( 'tr' ) : null;
+
+					if ( row ) {
+						row.classList.add( 'ard-wc-hidden' );
+					}
+				}
+			);
+
+			var rows = table.querySelectorAll( 'tr' );
+			var hidden = table.querySelectorAll( 'tr.ard-wc-hidden' );
+
+			table.classList.toggle( 'ard-wc-hidden', rows.length > 0 && rows.length === hidden.length );
+		} );
+	}
+
 	function syncVariationState() {
 		paintVariantTargets();
 		narrowVariantOptions();
+		pushToWcForms();
 
 		if ( document.querySelector( '[data-ard-price][data-is-variable="true"]' ) ) {
 			var priceMatch = currentVariation();
@@ -2414,6 +2558,39 @@
 	 * استفاده شده) رویدادهایش را با jQuery می‌فرستد.
 	 */
 	if ( window.jQuery ) {
+		// ووکامرس فرم را دیرتر از ما راه می‌اندازد؛ آن موقع انتخاب فعلی دوباره فرستاده می‌شود.
+		window.jQuery( document ).on( 'wc_variation_form', 'form.variations_form', function () {
+			hideWcRows();
+			setTimeout( pushToWcForms, 0 );
+		} );
+
+		// برعکس: اگر سلکت ووکامرس دیده می‌شود و کاربر از آن انتخاب کرد، دکمهٔ اردال هم عوض شود.
+		window.jQuery( document ).on( 'change', 'form.variations_form .variations select', function () {
+			if ( wcSyncing || ! this.value ) {
+				return;
+			}
+
+			var select = this;
+			var group = document.querySelector( '[data-ard-color-group][data-attr="' + select.name + '"],[data-ard-size-group][data-attr="' + select.name + '"]' );
+
+			if ( ! group ) {
+				return;
+			}
+
+			var text = select.options[ select.selectedIndex ] ? select.options[ select.selectedIndex ].text.trim() : '';
+
+			Array.prototype.forEach.call( group.querySelectorAll( '.ard-prod-color,.ard-prod-size' ), function ( btn ) {
+				var slug = btn.getAttribute( 'data-color-slug' ) || btn.getAttribute( 'data-size-slug' ) || '';
+				var label = btn.getAttribute( 'data-color-name' ) || btn.getAttribute( 'data-size-label' ) || '';
+
+				if ( ( slug === select.value || label === select.value || label === text ) && ! btn.classList.contains( 'is-active' ) ) {
+					wcSyncing = true;
+					btn.click();
+					wcSyncing = false;
+				}
+			} );
+		} );
+
 		window.jQuery( document ).on( 'found_variation', 'form.variations_form', function ( e, v ) {
 			if ( v && '' !== v.display_price ) {
 				paintPriceWidgets( parseFloat( v.display_price ), parseFloat( v.display_regular_price ), !! ( v.is_in_stock && v.is_purchasable ) );
@@ -2834,6 +3011,8 @@
 
 	function init( scope ) {
 		var root = scope || document;
+
+		hideWcRows();
 
 		// پیام‌های ووکامرس یک بار در هر صفحه به توست تبدیل می‌شوند.
 		if ( ! document.body.ardNoticesReady ) {
