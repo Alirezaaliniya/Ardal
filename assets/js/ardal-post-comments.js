@@ -50,6 +50,16 @@
 	else restoreReactions();
 
 	document.addEventListener('click', function (event) {
+		var more = event.target.closest('[data-rv-more]');
+		if (more) {
+			var moreRoot = more.closest('[data-ard-comments]');
+			var hidden = moreRoot ? moreRoot.querySelectorAll('[data-rv-hidden][hidden]') : [];
+			var step = parseInt(more.dataset.step, 10) || 3;
+			Array.prototype.slice.call(hidden, 0, step).forEach(function (item) { item.hidden = false; });
+			if (hidden.length <= step) more.parentNode.removeChild(more);
+			return;
+		}
+
 		var reply = event.target.closest('[data-reply-to]');
 		if (reply) {
 			var root = reply.closest('[data-ard-comments]');

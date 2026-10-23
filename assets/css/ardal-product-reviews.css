@@ -1,0 +1,832 @@
+/*!
+ * Ardal — نظرات و امتیازدهی با طرح کارتی.
+ *
+ * شکل‌ها بدون تصویر ساخته شده‌اند:
+ * - لبهٔ مورب کارت: دو لایهٔ هم‌رنگ؛ یک مستطیل گرد و یک متوازی‌الاضلاع
+ *   (skewX) در سمت راست که گوشه‌های گردش با مورب‌شدن حفظ می‌شود.
+ * - زبانهٔ کاربر: یک SVG با اندازهٔ ثابت (نسبت ۱۹۰ به ۱۰۶) تا گوشه‌ها کشیده نشوند.
+ * - شکل تزئینی پشت فهرست: SVG کشسان؛ تزئینی است و دقت هندسی لازم ندارد.
+ */
+
+.ard-rv {
+	--rv-accent: var(--ard-primary, #ef1a63);
+	--rv-line: #1f1f25;
+	--rv-head-title: #45454d;
+	--rv-head-icon: #1f1f25;
+	--rv-badge-bg: var(--rv-accent);
+	--rv-badge-color: #ffffff;
+	--rv-deco-from: #eef0f7;
+	--rv-deco-to: #e1e5f0;
+	--rv-row-gap: 22px;
+	--rv-skew: 22deg;
+	--rv-card-bg: #ffffff;
+	--rv-card-shadow: rgba(40, 48, 80, 0.07);
+	--rv-card-radius: 24px;
+	--rv-text: #6f6f78;
+	--rv-author-w: 190px;
+	--rv-author-bg: #e6e9f3;
+	--rv-author: #1d1d22;
+	--rv-avatar: 56px;
+	--rv-action: #1f1f25;
+	--rv-action-size: 26px;
+	--rv-star: var(--rv-accent);
+	--rv-star-empty: #c9ccd8;
+	--rv-star-input: 30px;
+	--rv-form-bg: #e6e9f3;
+	--rv-label: #24242a;
+	--rv-input-bg: #ffffff;
+	--rv-input: #2b2b31;
+	--rv-button-bg: var(--rv-accent);
+	--rv-button: #ffffff;
+
+	position: relative;
+	direction: rtl;
+	text-align: right;
+}
+
+.ard-rv *,
+.ard-rv *::before,
+.ard-rv *::after {
+	box-sizing: border-box;
+}
+
+.ard-rv button {
+	font: inherit;
+}
+
+.ard-rv .screen-reader-text {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ───── زمینهٔ تزئینی ───── */
+
+.ard-rv__stage {
+	position: relative;
+	isolation: isolate;
+}
+
+.ard-rv__deco {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -1;
+	width: 100%;
+	height: calc(100% + 120px);
+	pointer-events: none;
+}
+
+.ard-rv__deco-from { stop-color: var(--rv-deco-from); }
+.ard-rv__deco-to { stop-color: var(--rv-deco-to); }
+
+/* ───── سربرگ‌ها ───── */
+
+.ard-rv__head,
+.ard-rv__form-head {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	min-height: 70px;
+	padding: 8px 22px 8px 0;
+	border-right: 1px solid var(--rv-line);
+	border-bottom: 1px solid var(--rv-line);
+	border-bottom-right-radius: 24px;
+}
+
+.ard-rv__head-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	color: var(--rv-head-icon);
+}
+
+.ard-rv__head-icon svg,
+.ard-rv__badge svg {
+	width: 26px;
+	height: 26px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.7;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.ard-rv__title {
+	margin: 0;
+	color: var(--rv-head-title);
+	font-size: 20px;
+	font-weight: 800;
+	line-height: 1.5;
+}
+
+.ard-rv__count {
+	margin-right: 4px;
+	font-size: 0.75em;
+	font-weight: 600;
+	opacity: 0.7;
+}
+
+.ard-rv__summary {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-right: auto;
+	padding-left: 16px;
+	color: var(--rv-text);
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.ard-rv__summary strong {
+	color: var(--rv-author);
+	font-size: 16px;
+}
+
+.ard-rv__badge {
+	position: relative;
+	isolation: isolate;
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 62px;
+	height: 54px;
+	margin-right: -8px;
+	color: var(--rv-badge-color);
+}
+
+.ard-rv__badge::before {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	border-radius: 18px;
+	background: var(--rv-badge-bg);
+	transform: skewX(-12deg);
+	transform-origin: 100% 0;
+	content: "";
+}
+
+/* ───── فهرست ───── */
+
+.ard-rv__list,
+.ard-rv__replies {
+	display: flex;
+	flex-direction: column;
+	gap: var(--rv-row-gap);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-rv__list {
+	margin-top: 40px;
+}
+
+.ard-rv__item {
+	min-width: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.ard-rv__item[hidden] {
+	display: none;
+}
+
+.ard-rv__replies {
+	margin-top: 12px;
+	padding-right: calc(var(--rv-author-w) * 0.45);
+}
+
+.ard-rv__row {
+	display: grid;
+	grid-template-columns: var(--rv-author-w) minmax(0, 1fr);
+	align-items: start;
+	column-gap: 10px;
+}
+
+/* زبانهٔ کاربر */
+
+.ard-rv__author {
+	position: relative;
+	isolation: isolate;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	aspect-ratio: 190 / 106;
+	/* درصد padding به عرض ردیف برمی‌گردد نه زبانه؛ در موبایل که زبانه تمام‌عرض نیست به‌هم می‌ریخت. */
+	padding: 0 14px calc(var(--rv-author-w) * 0.12) calc(var(--rv-author-w) * 0.26);
+}
+
+.ard-rv__author-shape {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	width: 100%;
+	height: 100%;
+	fill: var(--rv-author-bg);
+}
+
+.ard-rv__avatar {
+	display: inline-flex;
+	flex: 0 0 auto;
+	width: var(--rv-avatar);
+	height: var(--rv-avatar);
+	overflow: hidden;
+	border-radius: 50%;
+	background: #ffffff;
+}
+
+.ard-rv__avatar img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.ard-rv__initial {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	color: #ffffff;
+	background: var(--rv-accent);
+	font-size: calc(var(--rv-avatar) * 0.42);
+	font-weight: 700;
+}
+
+.ard-rv__who {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 4px;
+	min-width: 0;
+}
+
+.ard-rv__name {
+	display: -webkit-box;
+	overflow: hidden;
+	color: var(--rv-author);
+	font-size: 14.5px;
+	font-weight: 800;
+	line-height: 1.6;
+	overflow-wrap: anywhere;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+
+.ard-rv__verified {
+	color: #1f8a4c;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+/* کارت مورب */
+
+.ard-rv__card {
+	position: relative;
+	isolation: isolate;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 12px;
+	min-height: calc(var(--rv-author-w) * 106 / 190);
+	padding: 18px 46px 14px 22px;
+	filter: drop-shadow(0 8px 18px var(--rv-card-shadow));
+}
+
+.ard-rv__card::before,
+.ard-rv__card::after {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	z-index: -1;
+	border-radius: var(--rv-card-radius);
+	background: var(--rv-card-bg);
+	content: "";
+}
+
+.ard-rv__card::before {
+	left: 0;
+	right: 35%;
+}
+
+.ard-rv__card::after {
+	right: 0;
+	width: 50%;
+	transform: skewX(calc(var(--rv-skew) * -1));
+	transform-origin: 100% 0;
+}
+
+.ard-rv__text {
+	color: var(--rv-text);
+	font-size: 14px;
+	line-height: 2.05;
+	overflow-wrap: anywhere;
+}
+
+.ard-rv__text p {
+	margin: 0 0 0.5em;
+}
+
+.ard-rv__text > :last-child {
+	margin-bottom: 0;
+}
+
+.ard-rv--quotes .ard-rv__text > p:first-child::before { content: "«"; }
+.ard-rv--quotes .ard-rv__text > p:last-child::after { content: "»"; }
+
+.ard-rv__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 14px;
+}
+
+.ard-rv__date {
+	color: var(--rv-text);
+	font-size: 12px;
+	opacity: 0.85;
+}
+
+.ard-rv__reply {
+	padding: 2px 4px;
+	border: 0;
+	color: var(--rv-text);
+	background: none;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.ard-rv__reply:hover {
+	color: var(--rv-accent);
+}
+
+.ard-rv__buttons {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-right: auto;
+}
+
+.ard-rv__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	padding: 2px;
+	border: 0;
+	border-radius: 8px;
+	color: var(--rv-action);
+	background: none;
+	line-height: 1;
+	cursor: pointer;
+	transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.ard-rv__btn svg {
+	width: var(--rv-action-size);
+	height: var(--rv-action-size);
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	transition: fill 0.15s ease;
+}
+
+.ard-rv__btn b {
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.ard-rv--no-counts .ard-rv__btn b {
+	display: none;
+}
+
+.ard-rv__btn--like,
+.ard-rv__btn:hover,
+.ard-rv__btn.is-active,
+.ard-rv__btn.is-copied {
+	color: var(--rv-accent);
+}
+
+.ard-rv__btn.is-active svg {
+	fill: currentColor;
+	fill-opacity: 0.18;
+}
+
+.ard-rv__btn:active {
+	transform: scale(0.9);
+}
+
+.ard-rv__btn:disabled {
+	opacity: 0.5;
+	cursor: wait;
+}
+
+.ard-rv__btn:focus-visible,
+.ard-rv__reply:focus-visible,
+.ard-rv__more:focus-visible,
+.ard-rv__submit:focus-visible {
+	outline: 2px solid var(--rv-accent);
+	outline-offset: 2px;
+}
+
+.ard-rv__more-wrap {
+	display: flex;
+	justify-content: center;
+	margin-top: 24px;
+}
+
+.ard-rv__more {
+	padding: 10px 26px;
+	border: 1px solid var(--rv-accent);
+	border-radius: 14px;
+	color: var(--rv-accent);
+	background: var(--rv-card-bg);
+	font-size: 14px;
+	cursor: pointer;
+	transition: color 0.15s ease, background 0.15s ease;
+}
+
+.ard-rv__more:hover {
+	color: #ffffff;
+	background: var(--rv-accent);
+}
+
+.ard-rv__empty {
+	margin: 40px 0 0;
+	padding: 24px;
+	border-radius: var(--rv-card-radius);
+	color: var(--rv-text);
+	background: var(--rv-card-bg);
+	text-align: center;
+}
+
+/* ───── ستاره‌ها ───── */
+
+.ard-rv__stars {
+	--rv-star-size: 13px;
+
+	position: relative;
+	display: inline-flex;
+	line-height: 0;
+}
+
+.ard-rv__stars--summary {
+	--rv-star-size: 16px;
+}
+
+.ard-rv__stars-base,
+.ard-rv__stars-fill {
+	display: inline-flex;
+	gap: 2px;
+}
+
+.ard-rv__stars svg {
+	width: var(--rv-star-size);
+	height: var(--rv-star-size);
+}
+
+.ard-rv__stars-base svg { fill: var(--rv-star-empty); }
+
+.ard-rv__stars-fill {
+	position: absolute;
+	inset: 0;
+	clip-path: inset(0 0 0 calc(100% - var(--rv-fill, 0%)));
+}
+
+.ard-rv__stars-fill svg { fill: var(--rv-star); }
+
+/* ───── فرم ───── */
+
+.ard-rv__form-head {
+	margin-top: 64px;
+}
+
+.ard-rv__form-wrap {
+	margin-top: 40px;
+	padding: 30px 24px 32px;
+	border-radius: 26px;
+	color: var(--rv-label);
+	background: var(--rv-form-bg);
+}
+
+.ard-rv__notice {
+	margin: 0;
+	font-size: 15px;
+}
+
+.ard-rv__notice a {
+	margin-right: 6px;
+	color: var(--rv-accent);
+	font-weight: 600;
+}
+
+.ard-rv__as {
+	margin: 0 0 18px;
+	font-size: 14px;
+}
+
+.ard-rv__replying {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 18px;
+	padding: 10px 16px;
+	border-radius: 14px;
+	background: var(--rv-input-bg);
+	font-size: 14px;
+}
+
+.ard-rv__replying[hidden] {
+	display: none;
+}
+
+.ard-rv__replying button {
+	border: 0;
+	color: var(--rv-accent);
+	background: none;
+	cursor: pointer;
+}
+
+.ard-rv__fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 20px 28px;
+	margin-bottom: 20px;
+}
+
+.ard-rv__fields:not(:has(.ard-rv__field)) {
+	display: none;
+}
+
+.ard-rv__field {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	min-width: 0;
+	margin: 0;
+}
+
+.ard-rv__field > span,
+.ard-rv__rate legend {
+	color: var(--rv-label);
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 1.5;
+}
+
+.ard-rv__field input,
+.ard-rv__field textarea {
+	width: 100%;
+	height: 54px;
+	margin: 0;
+	padding: 0 20px;
+	border: 1px solid transparent;
+	border-radius: 16px;
+	outline: 0;
+	color: var(--rv-input);
+	background: var(--rv-input-bg);
+	box-shadow: none;
+	font: inherit;
+	font-size: 15px;
+	text-align: right;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ard-rv__field textarea {
+	display: block;
+	height: auto;
+	min-height: 112px;
+	padding: 16px 20px;
+	line-height: 1.9;
+	resize: vertical;
+}
+
+.ard-rv__field input::placeholder,
+.ard-rv__field textarea::placeholder {
+	color: #9b9ca8;
+	opacity: 1;
+}
+
+.ard-rv__field input:focus,
+.ard-rv__field textarea:focus {
+	border-color: var(--rv-accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--rv-accent) 16%, transparent);
+}
+
+.ard-rv__rate {
+	min-width: 0;
+	margin: 0 0 20px;
+	padding: 0;
+	border: 0;
+}
+
+.ard-rv__rate legend {
+	margin-bottom: 10px;
+	padding: 0;
+}
+
+.ard-rv__req {
+	color: var(--rv-accent);
+}
+
+/* ترتیب DOM پنج تا یک است؛ row-reverse در راست‌به‌چپ ستارهٔ یک را راست می‌نشاند
+   و «ستاره‌های بعدی» در DOM همان ستاره‌های کم‌امتیازتر سمت راست‌اند. */
+.ard-rv__rate-stars {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-end;
+	gap: 4px;
+	width: max-content;
+}
+
+.ard-rv__rate-stars label {
+	position: relative;
+	display: inline-flex;
+	cursor: pointer;
+}
+
+.ard-rv__rate-stars input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+}
+
+.ard-rv__rate-stars svg {
+	width: var(--rv-star-input);
+	height: var(--rv-star-input);
+	fill: var(--rv-star-empty);
+	transition: fill 0.15s ease, transform 0.15s ease;
+}
+
+.ard-rv__rate-stars label:has(input:checked) svg,
+.ard-rv__rate-stars label:has(input:checked) ~ label svg {
+	fill: var(--rv-star);
+}
+
+.ard-rv__rate-stars:hover label svg {
+	fill: var(--rv-star-empty);
+}
+
+.ard-rv__rate-stars:hover label:hover svg,
+.ard-rv__rate-stars:hover label:hover ~ label svg {
+	fill: var(--rv-star);
+}
+
+.ard-rv__rate-stars label:hover svg {
+	transform: scale(1.12);
+}
+
+.ard-rv__rate-stars label:has(input:focus-visible) svg {
+	outline: 2px solid var(--rv-accent);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+/* بدون جابه‌جایی منفی: در صفحهٔ راست‌به‌چپ، left منفی اسکرول افقی می‌سازد. */
+.ard-rv__honeypot {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	overflow: hidden !important;
+	clip-path: inset(50%) !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
+
+.ard-rv__footer {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px 18px;
+	margin-top: 36px;
+}
+
+.ard-rv__submit {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 18px;
+	width: 186px;
+	max-width: 100%;
+	height: 44px;
+	padding: 0 20px;
+	border: 0;
+	border-radius: 14px;
+	color: var(--rv-button);
+	background: var(--rv-button-bg);
+	font-size: 16px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.ard-rv__submit svg {
+	width: 20px;
+	height: 20px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.ard-rv__submit:hover {
+	filter: brightness(0.94);
+}
+
+.ard-rv__submit:hover svg {
+	transform: translateX(-3px);
+	transition: transform 0.15s ease;
+}
+
+.ard-rv__submit:disabled {
+	opacity: 0.6;
+	cursor: wait;
+}
+
+.ard-rv__status {
+	font-size: 14px;
+}
+
+/* ───── تبلت و موبایل ───── */
+
+@media (max-width: 1024px) {
+	.ard-rv {
+		--rv-skew: 16deg;
+	}
+}
+
+@media (max-width: 767px) {
+	.ard-rv {
+		--rv-skew: 8deg;
+		--rv-author-w: 180px;
+	}
+
+	.ard-rv__head,
+	.ard-rv__form-head {
+		flex-wrap: wrap;
+		min-height: 60px;
+		padding-right: 16px;
+	}
+
+	.ard-rv__summary {
+		padding-left: 8px;
+	}
+
+	.ard-rv__row {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 8px;
+	}
+
+	.ard-rv__author {
+		width: var(--rv-author-w);
+	}
+
+	.ard-rv__card {
+		min-height: 0;
+		padding-right: 30px;
+	}
+
+	.ard-rv__replies {
+		padding-right: 18px;
+	}
+
+	.ard-rv__fields {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.ard-rv__form-wrap {
+		padding: 22px 16px 24px;
+	}
+
+	.ard-rv__submit {
+		width: 100%;
+	}
+
+	.ard-rv-deco-mobile-hide .ard-rv__deco {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-rv__btn,
+	.ard-rv__btn svg,
+	.ard-rv__rate-stars svg,
+	.ard-rv__submit,
+	.ard-rv__submit svg {
+		transition: none;
+	}
+}

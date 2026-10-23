@@ -69,6 +69,12 @@ final class Ardal_Comments {
 			if ( $rating && ( $rating < 1 || $rating > 5 ) ) {
 				wp_send_json_error( array( 'message' => 'امتیاز انتخاب‌شده معتبر نیست.' ), 400 );
 			}
+		} elseif ( ! $is_product && ! $parent_id ) {
+			// امتیاز اختیاری نوشته‌ها (ویجت نظرات کارتی)؛ ووکامرس اینجا تنظیمی ندارد.
+			$rating = isset( $_POST['rating'] ) ? absint( wp_unslash( $_POST['rating'] ) ) : 0;
+			if ( $rating > 5 ) {
+				wp_send_json_error( array( 'message' => 'امتیاز انتخاب‌شده معتبر نیست.' ), 400 );
+			}
 		}
 		if ( $is_product && 'yes' === get_option( 'woocommerce_review_rating_verification_required' ) ) {
 			if ( ! is_user_logged_in() || ! function_exists( 'wc_customer_bought_product' ) || ! wc_customer_bought_product( $email, get_current_user_id(), $post_id ) ) {
@@ -100,7 +106,7 @@ final class Ardal_Comments {
 		if ( '' !== $phone ) {
 			update_comment_meta( $comment_id, 'ardal_author_phone', $phone );
 		}
-		if ( $is_product && $rating > 0 ) {
+		if ( $rating > 0 ) {
 			update_comment_meta( $comment_id, 'rating', $rating );
 		}
 		$comment = get_comment( $comment_id );
