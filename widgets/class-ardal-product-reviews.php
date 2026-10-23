@@ -21,6 +21,17 @@ class Ardal_Widget_Product_Reviews extends Ardal_Widget_Base {
 	/** مسیر ستاره در کادر ۲۴×۲۴. */
 	const STAR = 'M12 2.8l2.75 5.6 6.15.9-4.45 4.33 1.05 6.12L12 16.86 6.5 19.75l1.05-6.12L3.1 9.3l6.15-.9z';
 
+	/** زبانهٔ کاربر — عیناً از طرح (۱۹۴×۱۰۹). */
+	const TAB = 'M193.192 63.4295C193.192 75.3463 184.448 85.4583 172.656 87.1782L27.5355 108.345C6.1011 111.471 -8.17967 86.8443 5.18004 69.7937L52.6588 9.19778C57.2081 3.39172 64.1744 0 71.5505 0L169.192 0C182.447 0 193.192 10.7452 193.192 24V63.4295Z';
+
+	/*
+	 * سر مورب کارت — ۸۳ واحد انتهای راستِ مسیر کارت طرح (۷۸۳×۱۰۵). بدنهٔ کارت
+	 * عرض متغیر دارد و با CSS کشیده می‌شود؛ فقط این سر از SVG می‌آید تا انحنا و
+	 * زاویه‌اش با عریض‌شدن کارت تغییر نکند.
+	 */
+	const CAP      = 'M0 0H58.821C78.056 0 89.476 21.4969 78.707 37.436L40.196 94.436C35.733 101.042 28.282 105 20.31 105H0Z';
+	const CAP_LINE = 'M-4 0H58.821C78.056 0 89.476 21.4969 78.707 37.436L40.196 94.436C35.733 101.042 28.282 105 20.31 105H-4';
+
 	public function get_name() {
 		return 'ardal-product-reviews';
 	}
@@ -904,6 +915,18 @@ class Ardal_Widget_Product_Reviews extends Ardal_Widget_Base {
 		}
 		?>
 		<section id="<?php echo esc_attr( $uid ); ?>" class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-ard-comments data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( Ardal_Comments::NONCE_ACTION ) ); ?>" data-post-id="<?php echo esc_attr( $post_id ); ?>">
+			<?php // تعریف‌های مشترک همهٔ کارت‌ها و زبانه‌های این ویجت. ?>
+			<svg class="ard-rv__defs" width="0" height="0" aria-hidden="true" focusable="false">
+				<defs>
+					<linearGradient id="<?php echo esc_attr( $uid ); ?>-tab" x1="0.442744" y1="108.439" x2="144.107" y2="-41.0945" gradientUnits="userSpaceOnUse">
+						<stop class="ard-rv__tab-stop"/>
+						<stop offset="0.5" class="ard-rv__tab-stop" stop-opacity="0"/>
+						<stop offset="1" class="ard-rv__tab-stop"/>
+					</linearGradient>
+					<clipPath id="<?php echo esc_attr( $uid ); ?>-cap"><path d="<?php echo esc_attr( self::CAP ); ?>"/></clipPath>
+				</defs>
+			</svg>
+
 			<div class="ard-rv__stage">
 				<?php if ( 'yes' === $s['show_deco'] ) : ?>
 					<svg class="ard-rv__deco" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">

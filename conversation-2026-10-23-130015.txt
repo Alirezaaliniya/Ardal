@@ -1,0 +1,408 @@
+
+[Image #1]
+
+>  نک تقد و نک داجیا مارب اه رچیف و رهاظ نیمه اب اًقیقد ماوخیم تارظن تجیو هی
+   ریغ و لاعف هشب تجیو زا هشاب هتشاد مه یهد هراتس زایتما شخب و اًمتح هشاب یلوصا
+  درک لاعف
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● There's already a post-comments widget and an Ardal_Comments class. Let me
+  read them.
+
+  Read 1 file, ran 3 shell commands (ctrl+o to expand)
+
+● I'll build a new widget on the existing comments backend, rendering the
+  design's shapes with pure CSS/SVG. First I'll check the helpers, palette
+  variables, and edit-mode handling.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Let me look at a recent widget's style (features widget) to match conventions.
+
+  Ran 4 shell commands (ctrl+o to expand)
+
+● I'll build a new product-reviews widget using pure CSS/SVG for the design
+  shapes, reusing the existing Ardal_Comments backend and JS with an added "show
+  more" feature, plus a star rating system (form input, card display, header
+  average) with a master switch.
+
+● Write(widgets\class-ardal-product-reviews.php)
+  ⎿  Wrote 1349 lines to widgets\class-ardal-product-reviews.php
+       1 <?php
+       3 راک مان هٔنابز ،بروم تراک( یتراک حرط اب یهدزایتما و تارظن تجیو *
+         .)تبث مرف و رب
+       4  *
+         omments.js
+       6  تجیو نیا ؛دنکی‌م هدافتسا مه »لوصحم/هتشون تارظن« تجیو هک دیآی‌م *
+       7 ل یکسام ای ریوصت و دناه‌دش هتخاس SVG و CSS اب اهل‌کش .تسا یرگید *
+         .دنرادن مزا
+       8  *
+      10  */
+     … +1507 lines (ctrl+o to expand)
+
+● Removing novalidate so the browser enforces the required fields itself:
+
+● Update(widgets\class-ardal-product-reviews.php)
+  ⎿  Added 1 line, removed 1 line
+      1215        <?php else : ?>
+      1216          <div class="ard-rv__replying" data-replying hidden><s
+            pan></span><button type="button" data-cancel-reply>خساپ وغل</
+            button></div>
+      1217  
+      1218 -        <form class="ard-rv__form" data-comment-form novalida
+           -te>                                                          
+      1218 +        <form class="ard-rv__form" data-comment-form>        
+      1219            <?php if ( $logged_in ) : ?>
+      1220              <p class="ard-rv__as">مان اب لاسرا <strong><?php 
+            echo esc_html( wp_get_current_user()->display_name ); ?></str
+            ong></p>
+      1221            <?php endif; ?>
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Now the stylesheet. All colors and sizes are CSS variables, so the Elementor
+  controls change them and the theme palette (--ard-primary) sets the defaults.
+
+● Write(assets\css\ardal-product-reviews.css)
+  ⎿  Wrote 828 lines to assets\css\ardal-product-reviews.css
+      1 /*!
+      2  * Ardal — یتراک حرط اب یهدزایتما و تارظن.
+      3  *
+      5 لضالای‌زاوتم کی و درگ لیطتسم کی ؛گنرم‌ه هٔیال ود :تراک بروم هٔبل - *
+        عا
+      6  *   (skewX) دوشی‌م ظفح ندشب‌روم اب شدرگ یاهه‌شوگ هک تسار تمس رد.
+      7 ه‌شوگ ات )۱۰۶ هب ۱۹۰ تبسن( تباث هٔزادنا اب SVG کی :ربراک هٔنابز - *
+      8 مزال یسدنه تقد و تسا ینیئزت ؛ناسشک SVG :تسرهف تشپ ینیئزت لکش - *
+        .درادن
+      9  */
+     … +824 lines (ctrl+o to expand)
+
+● Now registering the style, the widget and its title, plus the "show more"
+  handler in the shared JS:
+
+● Bash(cd "C:/wamp64/www/caspiansport/wp-content/plugins/Ardal" && python -
+      <<'EOF'
+      import io…)
+  ⎿  Updated includes\class-ardal-assets.php (+1 -0)
+      128                  wp_register_script( 'ardal-search', ARDAL_URL 
+           . 'assets/js/ardal-search.js', array(), self::ver( 'assets/js/
+           ardal-search.js' ), true );
+      129                  wp_register_script( 'ardal-search-results', AR
+           DAL_URL . 'assets/js/ardal-search-results.js', array(), self::
+           ver( 'assets/js/ardal-search-results.js' ), true );
+      130                  wp_register_script( 'ardal-post-feed-tabs', AR
+           DAL_URL . 'assets/js/ardal-post-feed-tabs.js', array(), self::
+           ver( 'assets/js/ardal-post-feed-tabs.js' ), true );
+      131 +                wp_register_style( 'ardal-product-reviews', AR
+          +DAL_URL . 'assets/css/ardal-product-reviews.css', array( 'arda
+          +l' ), self::ver( 'assets/css/ardal-product-reviews.css' ) );  
+      132                  wp_register_script( 'ardal-post-comments', ARD
+           AL_URL . 'assets/js/ardal-post-comments.js', array(), self::ve
+           r( 'assets/js/ardal-post-comments.js' ), true );
+      133  
+      134                  /*
+  ⎿  Updated includes\class-ardal-elementor.php (+2 -0)
+      70                          'product-meta'        => 'Ardal_Widget_
+          Product_Meta',
+      71                          'product-rating'      => 'Ardal_Widget_
+          Product_Rating',
+      72                          'product-reviews-count' => 'Ardal_Widge
+          t_Product_Reviews_Count',
+      73 +                        'product-reviews'     => 'Ardal_Widget_
+         +Product_Reviews',                                              
+      74                          'product-color'       => 'Ardal_Widget_
+          Product_Color',
+      75                          'product-size'        => 'Ardal_Widget_
+          Product_Size',
+      76                          'product-specs'       => 'Ardal_Widget_
+          Product_Specs',
+     ...
+      158                          'product-meta'        => 'تاعالطا راون
+           ,'لوصحم 
+      159                          'product-rating'      => 'لوصحم زایتما
+           ',
+      160                          'product-reviews-count' => 'ارظن دادعت
+           ,'لوصحم ت
+      161 +                        'product-reviews'     => 'یتما و تارظن
+          +                                           ,')یتراک حرط( یهدزا
+      162                          'product-color'       => 'م گنر باختنا
+           ,'لوصح
+      163                          'product-size'        => 'زیاس باختنا 
+           ,'لوصحم
+      164                          'product-specs'       => 'هاتوک تاصخشم
+           ,'لوصحم 
+
+● Update(assets\js\ardal-post-comments.js)
+  ⎿  Added 10 lines
+      50    else restoreReactions();
+      51  
+      52    document.addEventListener('click', function (event) {
+      53 +    var more = event.target.closest('[data-rv-more]');         
+      54 +    if (more) {                                                
+      55 +      var moreRoot = more.closest('[data-ard-comments]');      
+      56 +      var hidden = moreRoot ? moreRoot.querySelectorAll('[data-
+         +rv-hidden][hidden]') : [];                                     
+      57 +      var step = parseInt(more.dataset.step, 10) || 3;         
+      58 +      Array.prototype.slice.call(hidden, 0, step).forEach(funct
+         +ion (item) { item.hidden = false; });                          
+      59 +      if (hidden.length <= step) more.parentNode.removeChild(mo
+         +re);                                                           
+      60 +      return;                                                  
+      61 +    }                                                          
+      62 +                                                               
+      63      var reply = event.target.closest('[data-reply-to]');
+      64      if (reply) {
+      65        var root = reply.closest('[data-ard-comments]');
+
+● Update(includes\class-ardal-comments.php)
+  ⎿  Added 6 lines
+      69        if ( $rating && ( $rating < 1 || $rating > 5 ) ) {
+      70          wp_send_json_error( array( 'message' => 'شب‌اختنا زایتما
+          ;) 400 ,) '.تسین ربتعم هد
+      71        }
+      72 +    } elseif ( ! $is_product && ! $parent_id ) {               
+      73 +نیا سرماکوو ؛)یتراک تارظن تجیو( اهه‌تشون یرایتخا زایتما //      
+         +                                               .درادن یمیظنت اج
+      74 +      $rating = isset( $_POST['rating'] ) ? absint( wp_unslash(
+         + $_POST['rating'] ) ) : 0;                                     
+      75 +      if ( $rating > 5 ) {                                     
+      76 +        wp_send_json_error( array( 'message' => 'شب‌اختنا زایتما
+         +                                      ;) 400 ,) '.تسین ربتعم هد
+      77 +      }                                                        
+      78      }
+      79      if ( $is_product && 'yes' === get_option( 'woocommerce_revi
+          ew_rating_verification_required' ) ) {
+      80        if ( ! is_user_logged_in() || ! function_exists( 'wc_cust
+          omer_bought_product' ) || ! wc_customer_bought_product( $email,
+           get_current_user_id(), $post_id ) ) {
+
+● Update(includes\class-ardal-comments.php)
+  ⎿  Added 1 line, removed 1 line
+      106      if ( '' !== $phone ) {
+      107        update_comment_meta( $comment_id, 'ardal_author_phone', 
+           $phone );
+      108      }
+      109 -    if ( $is_product && $rating > 0 ) {                       
+      109 +    if ( $rating > 0 ) {                                      
+      110        update_comment_meta( $comment_id, 'rating', $rating );
+      111      }
+      112      $comment = get_comment( $comment_id );
+
+● Now a PHP syntax check and a real render test inside WordPress:
+
+  Ran 6 shell commands (ctrl+o to expand)
+
+● The code is written; I'm testing an actual render of the widget inside
+  WordPress (CLI test script).
+
+  Read 1 file, ran 3 shell commands (ctrl+o to expand)
+
+● The failure was just my test's memory limit (from re-firing the registration
+  hook manually). I'll instantiate the widget directly instead:
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Server render works (3 reviews, average 4.5). Now a visual check: I'll put the
+  real output in an HTML page with the stylesheet and screenshot it with
+  headless Edge, to compare against the design.
+
+  Read 1 file, listed 1 directory, ran 4 shell commands (ctrl+o to expand)
+
+● Still setting up the screenshot (the first images came out blank); checking
+  whether the problem is the browser or the page.
+
+  Searched for 1 pattern, read 2 files, ran 3 shell commands (ctrl+o to expand)
+● The blank screenshots came from the browser, not the widget. Testing one more
+  variable (window size):
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Found the bug: the honeypot field's left: -10000px creates huge overflow on
+  RTL pages, pushing the viewport off-screen and causing a horizontal scrollbar.
+  I'll fix it by hiding the field with clip-path instead of a large offset.
+
+● Update(assets\css\ardal-product-reviews.css)
+  ⎿  Added 4 lines, removed 1 line
+      694    border-radius: 4px;
+      695  }
+      696  
+      697 +یقفا لورکسا یفنم left ،پچه‌بت‌سار هٔحفص رد :یفنم ییاجه‌باج نودب */
+          +                                                   /* .دزاسی‌م 
+      698  .ard-rv__honeypot {
+      699    position: absolute !important;
+      699 -  left: -10000px !important;                                  
+      700    width: 1px !important;
+      701    height: 1px !important;
+      702    overflow: hidden !important;
+      703 +  clip-path: inset(50%) !important;                           
+      704 +  opacity: 0 !important;                                      
+      705 +  pointer-events: none !important;                            
+      706  }
+      707  
+      708  .ard-rv__footer {
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● The desktop render matches the design well—header, slanted cards, author tab,
+  background, badge, and form all check out, with empty avatars just due to
+  Gravatar not loading over file://. Now checking the mobile view.
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Part of that is probably headless Chrome's minimum window width (~500px), not
+  the widget. I'll simulate at a 600px window (mobile breakpoint still applies)
+  with a 375px container:
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Found a mobile bug: the author tab's percentage padding was resolving against
+  the grid row width instead of its own width, causing the name to break letter
+  by letter. I'll fix it by switching the padding to use the tab-width variable.
+
+● Update(assets\css\ardal-product-reviews.css)
+  ⎿  Added 2 lines, removed 1 line
+      220    gap: 10px;
+      221    width: 100%;
+      222    aspect-ratio: 190 / 106;
+      223 -  padding: 0 14px 12% 26%;                                    
+      223 + هک لیابوم رد ؛هنابز هن ددرگی‌مرب فیدر ضرع هب padding دصرد */  
+          +                            /* .تخیری‌م مهه‌ب تسین ضرعم‌امت هنابز
+      224 +  padding: 0 14px calc(var(--rv-author-w) * 0.12) calc(var(--r
+          +v-author-w) * 0.26);                                          
+      225  }
+      226  
+      227  .ard-rv__author-shape {
+
+  Read 1 file, ran 1 shell command (ctrl+o to expand)
+
+● Mobile is fine now too. Cleaning up the temporary test files and doing a final
+  check:
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+●  — لادرا« هتسد رد مه و دش هتخاس »)یتراک حرط( یهدزایتما و تارظن — لادرا« تجیو
+   راک ود ره هتشون و لوصحم یور .»هاگشورف — لادرا« هتسد رد مه و تسه »لوصحم هحفص
+  پاتکسد هٔخسن زا و متفرگ ردنر سرپدرو رد لوصحم کی یعقاو یاهرظن اب ار یجورخ .دنکی‌م
+   ،درگ هٔشوگ و طخ اب گربرس :دناوخی‌م امش حرط اب شرهاظ .متفرگ تاشن‌یرکسا لیابوم و
+   ،اهرظن تشپ ینیئزت لکش ،مان و راتاوآ اب ربراک هٔنابز ،بروم هٔبل اب دیفس تراک
+   هب و دناه‌دش هتخاس SVG و CSS اب اهل‌کش نیا هٔمه .مرف و »تارظن تبث« یتروص نوکیآ
+  .دنرادن یزاین کسام ای ریوصت
+
+   نیا .دوشی‌م شوماخ و نشور »یاه‌راتس زایتما« شخب رد چییوس کی اب یاه‌راتس زایتما
+  :دنکی‌م لرتنک ار اج هس چییوس
+  - )تسار زا باختنا و رواه اب( مرف رد هراتس باختنا
+  - رظن ره یور اهه‌راتس
+  - ۴٫۵ لثم ییاهزایتما یارب رپه‌مین هٔراتس اب ،گربرس رد زایتما نیگنایم
+
+   رد هراتس باختنا ،دشاب »یرابجا« زایتما سرماکوو تامیظنت رد رگا :تسه انثتسا کی
+   مه رگا .تسین لاسرا لباق رگید مرف هنرگو .دوشی‌م هداد شیامن هشیمه لوصحم مرف
+  .دنوشی‌من هداد شیامن اهه‌راتس ،دشاب شوماخ سرماکوو رد یهدزایتما
+
+  :رگید یاهت‌یلباق
+  - مه اهدنسپ دادعت شیامن .دنوشی‌م شوماخ ادج مادکره هک ،یراذگک‌ارتشا و دنسپن ،دنسپ
+    .تسا یرایتخا
+  -  و خیرات ،اهخ‌ساپ شیامن ،»هدشدییأت رادیرخ« ناشن ،»رتشیب تارظن هدهاشم« هٔمکد
+    خساپ هٔمکد
+  -  مان اب هدشدراو ربراک .یرایتخا سامت هرامش دلیف و شیاریو لباق یاهب‌سچرب اب مرف
+    .دوشی‌م تیاعر مه »رادیرخ طقف« طرش و دورو مازلا ،اهه‌اگدید نتسب .دنکی‌م تبث شدوخ
+  - .دوشی‌م میظنت لیاتسا بت زا رهاظ هٔیقب و هنابز ضرع ،بروم شرب هٔیواز ،هزادنا ،گنر
+    .دیآی‌م تیاس تلاپ زا ضرفش‌یپ یلصا گنر
+  - هداد شیامن حرط هٔنومن رظن هس روتنملا رگشیاریو رد ،دشاب هدشن تبث یرظن زونه رگا
+    .دینیبب ار راک لکش ات دوشی‌م
+
+  :اهل‌یاف
+  - class-ardal-product-reviews.php (widgets/class-ardal-product-reviews.php) و
+    ardal-product-reviews.css (assets/css/ardal-product-reviews.css) دندیدج.
+  -  هب .دیآی‌م »لوصحم/هتشون تارظن« یلعف تجیو دناک‌ب نامه زا دنسپ و رظن تبث
+    class-ardal-comments.php (includes/class-ardal-comments.php) هٔریخذ طقف
+    .دش هفاضا )لوصحم طقف هن( اهه‌تشون یارب زایتما
+  - تارظن« هٔمکد طقف ardal-post-comments.js (assets/js/ardal-post-comments.js) هب
+    .دش هفاضا »رتشیب
+
+  :هتکن دنچ
+  -  مرف هب راکدوخ لیمیا دلیف ،دشاب یمازلا لیمیا و مان »وگوت‌فگ › تامیظنت« رد رگا
+     هداد شیامن لیمیا دلیف و تسا نشور هنیزگ نیا امش تیاس یور نالا .دوشی‌م هفاضا
+    .دیرادرب ار کیت نآ ،شدیهاوخی‌من رگا .دوشی‌م
+  -  تجیو دک نامه ناشق‌طنم نوچ .مدرکن ناحتما رگرورم رد ار دنسپ و مرف لاسرا دوخ
+    .دینک شتست لوصحم هٔحفص یور راب کی یلو ،دنکب دیاب راک ،تسا یلبق
+  - .مدرکن تیماک یزیچ
+  -  ،متشادن ار شفذح هٔزاجا .تسا هدنام c:\tmp\rv هٔشوپ رد متست تاشن‌یرکسا یاهل‌یاف
+    .دینک شکاپ ناتدوخ
+
+> <ide_opened_file>The user opened the file c:\wamp64\www\caspiansport\wp-conte
+  nt\plugins\Ardal\widgets\class-ardal-categories.php in the IDE. This may or
+  may not be related to the current task.</ide_opened_file>
+
+> دایب رد رهاظ نومه اًقیقد ات نک هدافتسا svg ود نیا زا دوبن هیبش اًلصا
+
+● I'll use exactly these two shapes. Because the card's width changes with the
+  page, the card SVG is split in two parts. The straight left part (rounded
+  corners and 2px border) is drawn with CSS so it can stretch. The slanted right
+  end is the exact path from your SVG at a fixed width, so the curve and slant
+  never distort. The author tab uses your SVG unchanged, including its gradient
+  and 0.85 opacity.
+
+● Update(widgets\class-ardal-product-reviews.php)
+  ⎿  Added 11 lines
+      21  /* .۲۴×۲۴ رداک رد هراتس ریسم **/  
+      22    const STAR = 'M12 2.8l2.75 5.6 6.15.9-4.45 4.33 1.05 6.12L12 
+          16.86 6.5 19.75l1.05-6.12L3.1 9.3l6.15-.9z';
+      23  
+      24 +                  /* .)۱۰۹×۱۹۴( حرط زا اًنیع — ربراک هٔنابز **/  
+      25 +  const TAB = 'M193.192 63.4295C193.192 75.3463 184.448 85.4583
+         + 172.656 87.1782L27.5355 108.345C6.1011 111.471 -8.17967 86.844
+         +3 5.18004 69.7937L52.6588 9.19778C57.2081 3.39172 64.1744 0 71.
+         +5505 0L169.192 0C182.447 0 193.192 10.7452 193.192 24V63.4295Z'
+         +;                                                              
+      26 +                                                               
+      27 +  /*                                                           
+      28 +)۱۰۵×۷۸۳( حرط تراک ریسم تِسار یاهتنا دحاو ۸۳ — تراک بروم رس *   
+         +                                                    تراک هٔندب .
+      29 +آی‌م SVG زا رس نیا طقف ؛دوشی‌م هدیشک CSS اب و دراد ریغتم ضرع *   
+         +                                                  و انحنا ات دی
+      30 +                       .دنکن رییغت تراک ندشض‌یرع اب شاه‌یواز *   
+      31 +   */                                                          
+      32 +  const CAP      = 'M0 0H58.821C78.056 0 89.476 21.4969 78.707 
+         +37.436L40.196 94.436C35.733 101.042 28.282 105 20.31 105H0Z';  
+      33 +  const CAP_LINE = 'M-4 0H58.821C78.056 0 89.476 21.4969 78.707
+         + 37.436L40.196 94.436C35.733 101.042 28.282 105 20.31 105H-4'; 
+      34 +                                                               
+      35    public function get_name() {
+      36      return 'ardal-product-reviews';
+      37    }
+
+● Update(widgets\class-ardal-product-reviews.php)
+  ⎿  Added 12 lines
+      915      }
+      916      ?>
+      917      <section id="<?php echo esc_attr( $uid ); ?>" class="<?php
+            echo esc_attr( implode( ' ', $classes ) ); ?>" data-ard-comme
+           nts data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php'
+            ) ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( Ar
+           dal_Comments::NONCE_ACTION ) ); ?>" data-post-id="<?php echo e
+           sc_attr( $post_id ); ?>">
+      918 +      <?php // تجیو نیا یاهه‌نابز و اهت‌راک هٔمه کرتشم یاهف‌یرعت. 
+          +?>                                                            
+      919 +      <svg class="ard-rv__defs" width="0" height="0" aria-hidd
+          +en="true" focusable="false">                                  
+      920 +        <defs>                                                
+      921 +          <linearGradient id="<?php echo esc_attr( $uid ); ?>-
+          +tab" x1="0.442744" y1="108.439" x2="144.107" y2="-41.0945" gra
+          +dientUnits="userSpaceOnUse">                                  
+      922 +            <stop class="ard-rv__tab-stop"/>                  
+      923 +            <stop offset="0.5" class="ard-rv__tab-stop" stop-o
+          +pacity="0"/>                                                  
+      924 +            <stop offset="1" class="ard-rv__tab-stop"/>       
+      925 +          </linearGradient>                                   
+      926 +          <clipPath id="<?php echo esc_attr( $uid ); ?>-cap"><
+          +path d="<?php echo esc_attr( self::CAP ); ?>"/></clipPath>    
+      927 +        </defs>                                               
+      928 +      </svg>                                                  
+      929 +                                                              
+      930        <div class="ard-rv__stage">
+      931          <?php if ( 'yes' === $s['show_deco'] ) : ?>
+      932            <svg class="ard-rv__deco" viewBox="0 0 100 100" pres
+           erveAspectRatio="none" aria-hidden="true" focusable="false">
+  ⎿  You've hit your weekly limit · resets Oct 24, 8:30pm (Asia/Tehran)
+     /upgrade to increase your usage limit.
