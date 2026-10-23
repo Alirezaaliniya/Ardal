@@ -262,6 +262,22 @@ class Ardal_Widget_Product_Reviews_Card extends Ardal_Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'mobile_layout',
+			array(
+				'label'        => 'چیدمان موبایل',
+				'type'         => Controls_Manager::SELECT,
+				'default'      => 'stacked',
+				'options'      => array(
+					'stacked' => 'زیر هم (زبانه بالا، کارت پایین)',
+					'inline'  => 'کنار هم (زبانه و کارت در یک ردیف)',
+				),
+				'prefix_class' => 'ard-rv-mobile-',
+				'separator'    => 'before',
+				'description'  => 'در عرض‌های زیر ۷۶۷px اعمال می‌شود.',
+			)
+		);
+
 		$this->end_controls_section();
 	}
 

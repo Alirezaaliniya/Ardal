@@ -774,8 +774,7 @@
 @media (max-width: 767px) {
 	.ard-rv {
 		--rv-skew: 8deg;
-		--rv-author-w: 120px;
-		--rv-avatar: 42px;
+		--rv-author-w: 180px;
 	}
 
 	.ard-rv__head,
@@ -789,38 +788,23 @@
 		padding-left: 8px;
 	}
 
-	/* زبانه و کارت کنار هم می‌مانند — فقط عرض زبانه کوچک‌تر می‌شود */
+	/* پیش‌فرض موبایل: زبانه بالا، کارت پایین */
 	.ard-rv__row {
-		grid-template-columns: var(--rv-author-w) minmax(0, 1fr);
-		column-gap: 6px;
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 8px;
 	}
 
 	.ard-rv__author {
-		width: 100%;
+		width: var(--rv-author-w);
 	}
 
 	.ard-rv__card {
-		min-height: calc(var(--rv-author-w) * 106 / 190);
-		padding: 12px 16px 10px 14px;
+		min-height: 0;
+		padding-right: 30px;
 	}
 
 	.ard-rv__replies {
 		padding-right: 18px;
-	}
-
-	/* تایپوگرافی کوچک‌تر برای فضای فشرده‌تر */
-	.ard-rv__name {
-		font-size: 12.5px;
-	}
-
-	.ard-rv__text {
-		font-size: 12.5px;
-		line-height: 1.85;
-	}
-
-	.ard-rv__btn svg {
-		width: 20px;
-		height: 20px;
 	}
 
 	.ard-rv__fields {
@@ -847,6 +831,44 @@
 	.ard-rv__submit,
 	.ard-rv__submit svg {
 		transition: none;
+	}
+}
+
+/* ───── layout موبایل: کنار هم (inline) ───── */
+
+@media (max-width: 767px) {
+	.ard-rv-mobile-inline .ard-rv {
+		--rv-author-w: 120px;
+		--rv-avatar: 42px;
+	}
+
+	.ard-rv-mobile-inline .ard-rv__row {
+		grid-template-columns: var(--rv-author-w) minmax(0, 1fr);
+		row-gap: 0;
+		column-gap: 6px;
+	}
+
+	.ard-rv-mobile-inline .ard-rv__author {
+		width: 100%;
+	}
+
+	.ard-rv-mobile-inline .ard-rv__card {
+		min-height: calc(var(--rv-author-w) * 106 / 190);
+		padding: 12px 16px 10px 14px;
+	}
+
+	.ard-rv-mobile-inline .ard-rv__name {
+		font-size: 12.5px;
+	}
+
+	.ard-rv-mobile-inline .ard-rv__text {
+		font-size: 12.5px;
+		line-height: 1.85;
+	}
+
+	.ard-rv-mobile-inline .ard-rv__btn svg {
+		width: 20px;
+		height: 20px;
 	}
 }
 

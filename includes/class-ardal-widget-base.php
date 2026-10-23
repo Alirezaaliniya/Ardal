@@ -613,6 +613,13 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				'icon_html'  => '',
 				// سبک نماد واحد پول: default | slim | text.
 				'currency'   => 'default',
+				/*
+				 * جایگزینِ ناحیهٔ قیمت:
+				 * null  = قیمت معمولی نمایش داده می‌شود (پیش‌فرض)
+				 * ''    = ناحیه قیمت کلاً پنهان می‌شود
+				 * string = HTML آماده جای قیمت را می‌گیرد (تصویر یا آیکون)
+				 */
+				'price_replace' => null,
 			)
 		);
 
@@ -732,6 +739,11 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 
 		echo '<div class="ard-pcard__prices">';
 
+		// اگر جایگزین تعریف شده: '' = پنهان، string = HTML سفارشی.
+		if ( null !== $opts['price_replace'] ) {
+			echo wp_kses_post( $opts['price_replace'] );
+		} else {
+
 		// در حالت روی‌هم، نشان و قیمتِ قبل یک ستون می‌شوند تا زیر هم بیفتند.
 		$stack = $opts['off_stack'] && ( '' !== $old || ( $opts['off_inline'] && '' !== $off ) );
 
@@ -765,6 +777,8 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				Ardal_Currency::unit( $opts['currency'] ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- خروجی ثابت و امن.
 			);
 		}
+
+		} // end else price_replace
 
 		echo '</div>';
 

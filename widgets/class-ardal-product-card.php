@@ -200,6 +200,86 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 		$this->add_tag_control( 'card_title_tag', 'تگ نام محصول', 'h3' );
 
 		$this->add_control(
+			'price_display',
+			array(
+				'label'     => 'ناحیه قیمت',
+				'type'      => Controls_Manager::SELECT,
+				'default'   => 'price',
+				'options'   => array(
+					'price' => 'قیمت (پیش‌فرض)',
+					'image' => 'تصویر دلخواه',
+					'icon'  => 'آیکون دلخواه',
+					'none'  => 'پنهان',
+				),
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'price_image',
+			array(
+				'label'     => 'تصویر ناحیه قیمت',
+				'type'      => Controls_Manager::MEDIA,
+				'condition' => array( 'price_display' => 'image' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'price_image_width',
+			array(
+				'label'      => 'عرض تصویر',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'range'      => array(
+					'px' => array( 'min' => 20, 'max' => 300 ),
+					'%'  => array( 'min' => 10, 'max' => 100 ),
+				),
+				'default'    => array( 'unit' => 'px', 'size' => 100 ),
+				'condition'  => array( 'price_display' => 'image' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard__price-replace img' => 'width:{{SIZE}}{{UNIT}};height:auto;',
+				),
+			)
+		);
+
+		$this->add_control(
+			'price_icon',
+			array(
+				'label'     => 'آیکون ناحیه قیمت',
+				'type'      => Controls_Manager::ICONS,
+				'condition' => array( 'price_display' => 'icon' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'price_icon_size',
+			array(
+				'label'      => 'اندازه آیکون',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 12, 'max' => 80 ) ),
+				'default'    => array( 'unit' => 'px', 'size' => 28 ),
+				'condition'  => array( 'price_display' => 'icon' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-pcard__price-replace' => 'font-size:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-pcard__price-replace svg' => 'width:{{SIZE}}{{UNIT}};height:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'price_icon_color',
+			array(
+				'label'     => 'رنگ آیکون',
+				'type'      => Controls_Manager::COLOR,
+				'condition' => array( 'price_display' => 'icon' ),
+				'selectors' => array(
+					'{{WRAPPER}} .ard-pcard__price-replace' => 'color:{{VALUE}};fill:{{VALUE}};',
+				),
+			)
+		);
+
+		$this->add_control(
 			'show_off',
 			array(
 				'label'        => 'نمایش نشان تخفیف',
@@ -379,6 +459,22 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 
 		echo '<div class="ard-pcard-solo">';
 
+		// ساختن HTML جایگزین قیمت.
+		$price_replace = null;
+		if ( 'image' === $s['price_display'] && ! empty( $s['price_image']['url'] ) ) {
+			$price_replace = sprintf(
+				'<div class="ard-pcard__price-replace"><img src="%s" alt="" loading="lazy"></div>',
+				esc_url( $s['price_image']['url'] )
+			);
+		} elseif ( 'icon' === $s['price_display'] && ! empty( $s['price_icon'] ) ) {
+			ob_start();
+			\Elementor\Icons_Manager::render_icon( $s['price_icon'], array( 'aria-hidden' => 'true' ) );
+			$icon_html     = ob_get_clean();
+			$price_replace = '<div class="ard-pcard__price-replace">' . $icon_html . '</div>';
+		} elseif ( 'none' === $s['price_display'] ) {
+			$price_replace = '';
+		}
+
 		$this->render_product_card(
 			$item,
 			array(
@@ -400,6 +496,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				// کارت تکی همسایه‌ای ندارد که بخواهد با آن هم‌تراز بماند.
 				'reserve_old'  => false,
 				'reserve_rate' => false,
+				'price_replace' => $price_replace,
 			)
 		);
 
