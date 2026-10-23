@@ -5842,6 +5842,36 @@ a.ard-breadcrumb__item:hover {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
+	/* هر آیتم دو‌سطری: عنوان بولد بالا، مقدار پایین */
+	.ard-prod-quick__item {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 3px;
+		padding: 10px 0;
+		border-bottom: 1px solid var(--ard-border-soft);
+	}
+
+	.ard-prod-quick__item:last-child {
+		border-bottom: 0;
+	}
+
+	.ard-prod-quick__dot {
+		display: none;
+	}
+
+	.ard-prod-quick__key {
+		min-width: 0;
+		font-weight: 700;
+		font-size: 13px;
+		color: var(--ard-text);
+	}
+
+	.ard-prod-quick__val {
+		font-weight: 400;
+		font-size: 13px;
+		color: var(--ard-text-soft);
+	}
+
 	.ard-ptabs-desc__text,
 	.ard-ptabs-desc__media,
 	.ard-ptabs-reviews__summary,
