@@ -62,6 +62,7 @@ class Ardal_Elementor {
 			'offcanvas'           => 'Ardal_Widget_Offcanvas',
 			'product-breadcrumb'  => 'Ardal_Widget_Product_Breadcrumb',
 			'product-gallery'     => 'Ardal_Widget_Product_Gallery',
+			'product-gallery-rail' => 'Ardal_Widget_Product_Gallery_Rail',
 			// ناحیهٔ اطلاعات محصول به ازای هر بخش یک ویجت مستقل دارد تا جایگاه
 			// هرکدام جداگانه در المنتور تعیین شود.
 			'product-title'       => 'Ardal_Widget_Product_Title',
@@ -72,6 +73,8 @@ class Ardal_Elementor {
 			'product-color'       => 'Ardal_Widget_Product_Color',
 			'product-size'        => 'Ardal_Widget_Product_Size',
 			'product-specs'       => 'Ardal_Widget_Product_Specs',
+			'product-specs-box'   => 'Ardal_Widget_Product_Specs_Box',
+			'product-description' => 'Ardal_Widget_Product_Description',
 			'product-features'    => 'Ardal_Widget_Product_Features',
 			'product-price'       => 'Ardal_Widget_Product_Price',
 			'product-price-date'  => 'Ardal_Widget_Product_Price_Date',
@@ -148,6 +151,7 @@ class Ardal_Elementor {
 			'offcanvas'           => 'منوی کشویی (Offcanvas، با کلاس باز می‌شود)',
 			'product-breadcrumb'  => 'مسیر صفحه محصول (Breadcrumb)',
 			'product-gallery'     => 'گالری تصاویر محصول',
+			'product-gallery-rail' => 'گالری محصول (ستون تصاویر کوچک)',
 			'product-title'       => 'عنوان محصول',
 			'product-brand'       => 'برند محصول',
 			'product-meta'        => 'نوار اطلاعات محصول',
@@ -156,6 +160,8 @@ class Ardal_Elementor {
 			'product-color'       => 'انتخاب رنگ محصول',
 			'product-size'        => 'انتخاب سایز محصول',
 			'product-specs'       => 'مشخصات کوتاه محصول',
+			'product-specs-box'   => 'مشخصات محصول (باکس جمع‌شونده)',
+			'product-description' => 'توضیحات محصول (جمع‌شونده)',
 			'product-features'    => 'ویژگی‌های کلیدی محصول (کارتی)',
 			'product-price'       => 'قیمت محصول (واحد عمودی یا آیکون دلخواه)',
 			'product-price-date'  => 'تاریخ به‌روزرسانی قیمت',

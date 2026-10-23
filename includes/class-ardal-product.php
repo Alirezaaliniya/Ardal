@@ -194,14 +194,19 @@ class Ardal_Product {
 	 * مشخصات محصول از ویژگی‌های ووکامرس.
 	 *
 	 * @param WC_Product $product
-	 * @param int        $limit صفر یعنی بدون محدودیت.
+	 * @param int        $limit        صفر یعنی بدون محدودیت.
+	 * @param bool       $visible_only فقط ویژگی‌هایی که تیک «نمایش در صفحه محصول» دارند.
 	 * @return array آرایه‌ای از array{key:string, value:string}
 	 */
-	public static function attributes( $product, $limit = 0 ) {
+	public static function attributes( $product, $limit = 0, $visible_only = false ) {
 		$out = array();
 
 		foreach ( $product->get_attributes() as $attribute ) {
 			if ( ! $attribute instanceof WC_Product_Attribute ) {
+				continue;
+			}
+
+			if ( $visible_only && ! $attribute->get_visible() ) {
 				continue;
 			}
 

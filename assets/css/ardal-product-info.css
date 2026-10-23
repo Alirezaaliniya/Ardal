@@ -1,0 +1,269 @@
+/*!
+ * Ardal — ویجت‌های «توضیحات محصول» و «مشخصات محصول (باکس جمع‌شونده)».
+ *
+ * هر پیش‌فرضی یک متغیر روی .ard-pi است و کنترل‌های استایل المنتور فقط همان
+ * متغیرها را بازنویسی می‌کنند؛ ویجتِ دست‌نخورده عین طرح است. رنگ‌ها از پالت
+ * اردال می‌آیند و رنگ طرح اصلی جایگزینشان است.
+ */
+
+.ard-pi {
+	--ard-pi-bg: var(--ard-surface, #f0f0f5);
+	--ard-pi-fade: var(--ard-pi-bg);
+	--ard-pi-fade-h: 56px;
+	--ard-pi-text: var(--ard-text-soft, #5b5b6b);
+	--ard-pi-accent: var(--ard-primary, #e5195e);
+	--ard-pi-accent-hover: var(--ard-primary-dark, #c00f4c);
+	--ard-pi-collapsed: 96px;
+	--ard-pi-speed: .45s;
+
+	--ard-pspec-gap: 10px;
+	--ard-pspec-from: rgba(255, 255, 255, .18);
+	--ard-pspec-to: rgba(255, 255, 255, .72);
+	--ard-pspec-k: var(--ard-text, #1f1f2b);
+	--ard-pspec-v: var(--ard-muted, #6f6f7e);
+	--ard-pspec-kw: 170px;
+
+	position: relative;
+	box-sizing: border-box;
+	padding: 18px 22px 16px;
+	border-radius: 16px;
+	background: var(--ard-pi-bg);
+	color: var(--ard-pi-text);
+}
+
+.ard-pi *,
+.ard-pi *::before,
+.ard-pi *::after {
+	box-sizing: border-box;
+}
+
+.ard-pi--specs {
+	/* ارتفاع معقول پیش از جاوااسکریپت (۵ ردیف)؛ اسکریپت مقدار واقعی را اندازه می‌گیرد. */
+	--ard-pi-collapsed: 322px;
+
+	padding: 30px 20px 18px;
+	border-radius: 20px;
+}
+
+/* عنوان */
+.ard-pi__title {
+	margin: 0 0 14px;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.6;
+	color: var(--ard-pspec-k);
+}
+
+/* بخش جمع‌شونده */
+.ard-pi__clip {
+	position: relative;
+}
+
+.ard-pi.is-collapsible .ard-pi__clip {
+	max-height: var(--ard-pi-collapsed);
+	overflow: hidden;
+	transition: max-height var(--ard-pi-speed) cubic-bezier(.4, 0, .2, 1);
+}
+
+.ard-pi.has-fade .ard-pi__clip::after {
+	content: "";
+	position: absolute;
+	inset: auto 0 0 0;
+	height: var(--ard-pi-fade-h);
+	background: linear-gradient(to bottom, transparent, var(--ard-pi-fade));
+	pointer-events: none;
+	transition: opacity var(--ard-pi-speed) ease;
+}
+
+.ard-pi.is-open .ard-pi__clip::after,
+.ard-pi.is-fit .ard-pi__clip::after {
+	opacity: 0;
+}
+
+/* محتوا جا می‌شود: نه برش، نه دکمه. */
+.ard-pi.is-fit .ard-pi__clip {
+	max-height: none;
+}
+
+.ard-pi.is-fit .ard-pi__foot {
+	display: none;
+}
+
+/* دکمهٔ مشاهده بیشتر */
+.ard-pi__foot {
+	display: flex;
+	justify-content: flex-start;
+	margin-top: 10px;
+}
+
+.ard-pi--specs .ard-pi__foot {
+	margin-top: 14px;
+}
+
+.ard-pi .ard-pi__toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	margin: 0;
+	padding: 4px 0;
+	border: 0;
+	border-radius: 8px;
+	background: var(--ard-pi-toggle-bg, transparent);
+	box-shadow: none;
+	color: var(--ard-pi-accent);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.6;
+	cursor: pointer;
+	transition: color .2s ease, background-color .2s ease;
+}
+
+/* :is() وزن را از رنگ‌آمیزی [type=button]:hover قالب بالاتر می‌برد. */
+.ard-pi .ard-pi__toggle:is(:hover, :focus, :active) {
+	background: var(--ard-pi-toggle-bg-hover, var(--ard-pi-toggle-bg, transparent));
+	color: var(--ard-pi-accent-hover);
+}
+
+.ard-pi .ard-pi__toggle:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+
+.ard-pi__toggle svg {
+	flex: none;
+	width: 12px;
+	height: 12px;
+	transition: transform var(--ard-pi-speed) ease;
+}
+
+.ard-pi.is-open .ard-pi__toggle svg {
+	transform: rotate(180deg);
+}
+
+/* متن توضیحات */
+.ard-pdesc {
+	font-size: 14px;
+	line-height: 2.15;
+	color: var(--ard-pi-text);
+	text-align: justify;
+	overflow-wrap: anywhere;
+}
+
+.ard-pdesc > :first-child {
+	margin-top: 0;
+}
+
+.ard-pdesc > :last-child {
+	margin-bottom: 0;
+}
+
+.ard-pdesc p {
+	margin: 0;
+}
+
+.ard-pdesc > * + * {
+	margin-top: .6em;
+}
+
+.ard-pdesc :is(h1, h2, h3, h4, h5, h6) {
+	margin-bottom: .3em;
+	font-size: 1.1em;
+	line-height: 1.8;
+	color: var(--ard-pspec-k);
+}
+
+.ard-pdesc :is(strong, b) {
+	color: var(--ard-pspec-k);
+}
+
+.ard-pdesc a {
+	color: var(--ard-pi-accent);
+}
+
+.ard-pdesc img,
+.ard-pdesc video,
+.ard-pdesc iframe {
+	max-width: 100%;
+	height: auto;
+	border-radius: 12px;
+}
+
+.ard-pdesc :is(ul, ol) {
+	margin-bottom: 0;
+	padding-inline-start: 1.4em;
+}
+
+/* ردیف‌های مشخصات */
+.ard-pspec {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ard-pspec-gap);
+	margin: 0;
+	padding: 0;
+}
+
+.ard-pspec__row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 6px 12px;
+	min-height: 50px;
+	margin: 0;
+	padding: 12px 20px;
+	border-radius: 10px;
+	background: linear-gradient(270deg, var(--ard-pspec-from), var(--ard-pspec-to));
+	transition: background-color .2s ease;
+}
+
+.ard-pspec__k,
+.ard-pspec__v {
+	margin: 0;
+	padding: 0;
+	line-height: 1.7;
+}
+
+.ard-pspec__k {
+	flex: 0 0 var(--ard-pspec-kw);
+	max-width: 100%;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--ard-pspec-k);
+}
+
+.ard-pspec__v {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: 13px;
+	color: var(--ard-pspec-v);
+	overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+	.ard-pi {
+		--ard-pspec-kw: 120px;
+	}
+
+	.ard-pi--specs {
+		padding: 20px 14px 14px;
+	}
+
+	.ard-pspec__row {
+		padding: 10px 14px;
+	}
+}
+
+/* نبود محتوا */
+.ard-pi__empty {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.9;
+	color: var(--ard-muted, #8a8a99);
+	text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-pi {
+		--ard-pi-speed: 0s;
+	}
+}

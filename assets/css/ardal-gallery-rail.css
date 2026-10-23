@@ -1,0 +1,255 @@
+/*!
+ * Ardal — گالری محصول با ستون (یا ردیف) تصاویر کوچک.
+ *
+ * چیدمان (ستون کناری یا ردیف پایین) مجموعه‌ای از متغیرهاست که کنترل «چیدمان»
+ * المنتور برای هر دستگاه می‌نویسد. پیش‌فرض‌های زیر همان «ستون کناری (راست)»
+ * دسکتاپ‌اند و یک جایگزین موبایل هم برای وقتی که CSS المنتور هنوز ساخته نشده.
+ */
+
+.ard-pg {
+	/* ظاهر (قالب ۱) */
+	--ard-pg-gap: 12px;
+	--ard-pg-thumb-gap: 8px;
+	--ard-pg-arrow-gap: 8px;
+	--ard-pg-main-bg: var(--ard-surface, #ededf0);
+	--ard-pg-main-radius: 22px;
+	--ard-pg-main-ratio: 8 / 7;
+	--ard-pg-fit: cover;
+	--ard-pg-thumb-bg: var(--ard-surface, #ededf0);
+	--ard-pg-thumb-radius: 12px;
+	--ard-pg-thumb-ratio: 1 / 1;
+	--ard-pg-thumb-fit: cover;
+	--ard-pg-thumb-bw: 1px;
+	--ard-pg-thumb-dim: 1;
+	--ard-pg-line: var(--ard-border, #e2e2e8);
+	--ard-pg-active: var(--ard-primary, #e5195e);
+	--ard-pg-arrow: 28px;
+	--ard-pg-arrow-icon: 13px;
+	--ard-pg-arrow-radius: 8px;
+	--ard-pg-arrow-bg: var(--ard-base, #ffffff);
+	--ard-pg-arrow-bg-hover: var(--ard-base, #ffffff);
+	--ard-pg-arrow-color: var(--ard-text, #1f1f2b);
+	--ard-pg-arrow-color-hover: var(--ard-primary, #e5195e);
+	--ard-pg-count: 3;
+	--ard-pg-thumb-w: 72px;
+
+	/* چیدمان: ستون کناری سمت راست */
+	--ard-pg-axis: y;
+	--ard-pg-rail-pos: absolute;
+	--ard-pg-rail-dir: column;
+	--ard-pg-rail-wrap: nowrap;
+	--ard-pg-track-dir: column;
+	--ard-pg-track-order: 0;
+	--ard-pg-track-flex: 1 1 0;
+	--ard-pg-thumb-basis: auto;
+	--ard-pg-prev-rot: 180deg;
+	--ard-pg-next-rot: 0deg;
+
+	display: grid;
+	grid-template-columns: var(--ard-pg-thumb-w) minmax(0, 1fr);
+	grid-template-areas: "thumbs main";
+	gap: var(--ard-pg-gap);
+	width: 100%;
+}
+
+@media (max-width: 767px) {
+	.ard-pg {
+		--ard-pg-axis: x;
+		--ard-pg-rail-pos: static;
+		--ard-pg-rail-dir: row;
+		--ard-pg-rail-wrap: wrap;
+		--ard-pg-track-dir: row;
+		--ard-pg-track-order: -1;
+		--ard-pg-track-flex: 0 0 100%;
+		--ard-pg-thumb-basis: calc((100% - (var(--ard-pg-count) - 1) * var(--ard-pg-thumb-gap)) / var(--ard-pg-count));
+		--ard-pg-prev-rot: -90deg;
+		--ard-pg-next-rot: 90deg;
+		--ard-pg-main-ratio: 4 / 3;
+		--ard-pg-thumb-ratio: 5 / 3;
+
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas: "main" "thumbs";
+	}
+}
+
+.ard-pg *,
+.ard-pg *::before,
+.ard-pg *::after {
+	box-sizing: border-box;
+}
+
+/* یک تصویر: ستون تصاویر کوچک نیست، هرچه کنترل چیدمان بگوید. */
+.ard-pg.ard-pg.has-single {
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-areas: "main";
+}
+
+/* تصویر اصلی */
+.ard-pg__main {
+	grid-area: main;
+	position: relative;
+	aspect-ratio: var(--ard-pg-main-ratio);
+	overflow: hidden;
+	border: 1px solid var(--ard-pg-line);
+	border-radius: var(--ard-pg-main-radius);
+	background: var(--ard-pg-main-bg);
+}
+
+.ard-pg__main-link {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.ard-pg__main-link[data-ard-pg-zoom] {
+	cursor: zoom-in;
+}
+
+.ard-pg .ard-pg__main-img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	margin: 0;
+	border-radius: 0;
+	object-fit: var(--ard-pg-fit);
+	transition: opacity .25s ease;
+}
+
+.ard-pg.is-swapping .ard-pg__main-img {
+	opacity: .35;
+}
+
+/* ستون تصاویر کوچک */
+.ard-pg__thumbs {
+	grid-area: thumbs;
+	position: relative;
+	min-width: 0;
+	min-height: 0;
+}
+
+.ard-pg__rail {
+	position: var(--ard-pg-rail-pos);
+	inset: 0;
+	display: flex;
+	flex-direction: var(--ard-pg-rail-dir);
+	flex-wrap: var(--ard-pg-rail-wrap);
+	align-items: center;
+	justify-content: center;
+	gap: var(--ard-pg-arrow-gap);
+}
+
+.ard-pg__track {
+	order: var(--ard-pg-track-order);
+	flex: var(--ard-pg-track-flex);
+	display: flex;
+	flex-direction: var(--ard-pg-track-dir);
+	gap: var(--ard-pg-thumb-gap);
+	align-self: stretch;
+	min-width: 0;
+	min-height: 0;
+	overflow: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: none;
+}
+
+.ard-pg__track::-webkit-scrollbar {
+	display: none;
+}
+
+.ard-pg .ard-pg__thumb {
+	flex: 0 0 var(--ard-pg-thumb-basis);
+	width: 100%;
+	aspect-ratio: var(--ard-pg-thumb-ratio);
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	border: var(--ard-pg-thumb-bw) solid var(--ard-pg-line);
+	border-radius: var(--ard-pg-thumb-radius);
+	background: var(--ard-pg-thumb-bg);
+	box-shadow: none;
+	opacity: var(--ard-pg-thumb-dim);
+	cursor: pointer;
+	transition: border-color .2s ease, opacity .2s ease;
+}
+
+.ard-pg .ard-pg__thumb:is(:hover, :focus, :active) {
+	background: var(--ard-pg-thumb-bg);
+	opacity: 1;
+}
+
+.ard-pg .ard-pg__thumb.is-active {
+	border-color: var(--ard-pg-active);
+	opacity: 1;
+}
+
+.ard-pg .ard-pg__thumb:focus-visible {
+	outline: 2px solid var(--ard-pg-active);
+	outline-offset: 2px;
+}
+
+.ard-pg .ard-pg__thumb img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	margin: 0;
+	border-radius: 0;
+	object-fit: var(--ard-pg-thumb-fit);
+}
+
+/* دکمه‌ها */
+.ard-pg .ard-pg__arrow {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--ard-pg-arrow);
+	height: var(--ard-pg-arrow);
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: var(--ard-pg-arrow-radius);
+	background: var(--ard-pg-arrow-bg);
+	box-shadow: 0 1px 3px rgba(20, 20, 40, .1), 0 0 0 1px rgba(20, 20, 40, .03);
+	color: var(--ard-pg-arrow-color);
+	cursor: pointer;
+	transition: color .2s ease, background-color .2s ease, opacity .2s ease;
+}
+
+.ard-pg .ard-pg__arrow:is(:hover, :focus, :active) {
+	background: var(--ard-pg-arrow-bg-hover);
+	color: var(--ard-pg-arrow-color-hover);
+}
+
+.ard-pg .ard-pg__arrow:focus-visible {
+	outline: 2px solid var(--ard-pg-active);
+	outline-offset: 2px;
+}
+
+.ard-pg .ard-pg__arrow[disabled] {
+	opacity: .4;
+	cursor: default;
+	color: var(--ard-pg-arrow-color);
+}
+
+.ard-pg__arrow svg {
+	width: var(--ard-pg-arrow-icon);
+	height: var(--ard-pg-arrow-icon);
+	transition: transform .2s ease;
+}
+
+.ard-pg__arrow--prev svg {
+	transform: rotate(var(--ard-pg-prev-rot));
+}
+
+.ard-pg__arrow--next svg {
+	transform: rotate(var(--ard-pg-next-rot));
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-pg .ard-pg__main-img,
+	.ard-pg .ard-pg__thumb {
+		transition: none;
+	}
+}
