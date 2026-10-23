@@ -64,12 +64,25 @@
 		if (reply) {
 			var root = reply.closest('[data-ard-comments]');
 			if (!root) return;
+			var form = root.querySelector('[data-comment-form]');
+			// اگر فرم در این ریشه نیست، ریشهٔ دیگری با همان post_id که فرم دارد پیدا کن
+			// (ویجت فهرست و ویجت فرم ممکن است جدا باشند).
+			if (!form) {
+				var postId = root.dataset.postId;
+				var roots = document.querySelectorAll('[data-ard-comments]');
+				for (var i = 0; i < roots.length; i++) {
+					if (roots[i].dataset.postId === postId && roots[i].querySelector('[data-comment-form]')) {
+						root = roots[i];
+						form = root.querySelector('[data-comment-form]');
+						break;
+					}
+				}
+			}
 			var bar = root.querySelector('[data-replying]');
 			var label = bar && bar.querySelector('span');
 			if (label) label.textContent = 'در حال پاسخ به ' + (reply.dataset.author || '');
 			if (bar) bar.hidden = false;
 			root.dataset.parentId = reply.dataset.replyTo;
-			var form = root.querySelector('[data-comment-form]');
 			if (form) { form.scrollIntoView({ behavior: 'smooth', block: 'center' }); form.querySelector('[name="content"]').focus({ preventScroll: true }); }
 			return;
 		}
