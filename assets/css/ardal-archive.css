@@ -692,21 +692,54 @@
 	background: var(--ard-fil-accent);
 }
 
-.ard-fil__range-input {
+/*
+ * سلکتور سنگین عمدی است: استایل «فیلدهای فرم» کیت المنتور
+ * (.elementor-kit-N input:not([type=button]):not([type=submit]) — ۰،۳،۱)
+ * روی range هم می‌نشست و زمینه، حاشیه، پدینگ و گردیِ کادر متنی را به آن
+ * می‌داد؛ نوار و پرشدگی زیرش پنهان می‌شد و دستگیره‌ها از دو سر بیرون می‌زدند.
+ */
+.ard-fil .ard-fil__range input.ard-fil__range-input[type="range"],
+.ard-fil .ard-fil__range input.ard-fil__range-input[type="range"]:hover,
+.ard-fil .ard-fil__range input.ard-fil__range-input[type="range"]:focus {
 	position: absolute;
 	top: 50%;
 	right: 0;
 	left: 0;
+	box-sizing: border-box;
 	width: 100%;
+	min-width: 0;
 	height: 20px;
+	min-height: 0;
 	margin: 0;
 	padding: 0;
 	border: 0;
-	background: none;
+	border-radius: 0;
+	outline: none;
+	background: transparent;
+	box-shadow: none;
+	color: inherit;
 	transform: translateY(-50%);
 	pointer-events: none;
 	-webkit-appearance: none;
 	appearance: none;
+}
+
+.ard-fil__range-input::-webkit-slider-runnable-track {
+	height: 20px;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+.ard-fil__range-input::-moz-range-track {
+	height: 20px;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+.ard-fil__range-input:focus-visible::-webkit-slider-thumb {
+	box-shadow: 0 0 0 4px rgba(var(--ard-primary-rgb), 0.25);
 }
 
 .ard-fil__range-input::-webkit-slider-thumb {
@@ -732,11 +765,11 @@
 	pointer-events: auto;
 }
 
-.ard-fil__range-input[data-ard-range-min] {
+.ard-fil .ard-fil__range input.ard-fil__range-input[data-ard-range-min] {
 	z-index: 3;
 }
 
-.ard-fil__range-input[data-ard-range-max] {
+.ard-fil .ard-fil__range input.ard-fil__range-input[data-ard-range-max] {
 	z-index: 4;
 }
 
@@ -1463,6 +1496,30 @@ body.ard-arch-sortbar .ard-sort-sheet {
 .ard-sort-sheet__close svg {
 	width: 1em;
 	height: 1em;
+}
+
+/*
+ * ریست قالب Hello روی همهٔ دکمه‌ها «button:hover, button:focus» زمینهٔ صورتی و
+ * متن سفید می‌گذارد (۰،۱،۱)؛ بعد از لمس، دکمهٔ بستن و دکمه‌های موبایل رنگ عوض
+ * می‌کردند. اینجا حالت هاور/فوکوس صریحاً همان حالت عادی است؛ رنگ‌های تب
+ * استایل المنتور ({{WRAPPER}}) سنگین‌ترند و همچنان رویش می‌نشینند.
+ */
+.ard-sort-sheet .ard-sort-sheet__close:hover,
+.ard-sort-sheet .ard-sort-sheet__close:focus {
+	background: none;
+	color: var(--ard-text);
+}
+
+.ard-sort .ard-sort__trigger:hover,
+.ard-sort .ard-sort__trigger:focus {
+	background: var(--ard-base);
+	color: var(--ard-text);
+}
+
+.ard-fil__fab:hover,
+.ard-fil__fab:focus {
+	background: var(--ard-primary);
+	color: #fff;
 }
 
 .ard-sort-sheet__list {
@@ -2300,18 +2357,35 @@ body.ard-arch-busy {
 		font-weight: 700;
 	}
 
-	.ard-fil__close {
+	/* هم‌شکل دکمهٔ بستن کشوی مرتب‌سازی (.ard-sort-sheet__close). */
+	.ard-fil .ard-fil__close {
 		display: inline-flex;
+		flex: 0 0 auto;
 		align-items: center;
 		justify-content: center;
-		width: 32px;
-		height: 32px;
+		width: auto;
+		height: auto;
+		min-height: 0;
 		padding: 0;
 		border: 0;
-		border-radius: var(--ard-radius-sm);
-		background: var(--ard-surface);
-		color: var(--ard-primary-dark);
+		border-radius: 0;
+		background: none;
+		box-shadow: none;
+		color: var(--ard-text);
+		font-size: 30px;
+		line-height: 1;
 		cursor: pointer;
+	}
+
+	.ard-fil .ard-fil__close:hover,
+	.ard-fil .ard-fil__close:focus {
+		background: none;
+		color: var(--ard-text);
+	}
+
+	.ard-fil .ard-fil__close svg {
+		width: 1em;
+		height: 1em;
 	}
 
 	.ard-fil--drawer .ard-fil__form {

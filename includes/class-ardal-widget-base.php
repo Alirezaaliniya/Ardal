@@ -680,7 +680,23 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		echo '<div class="ard-pcard__box">';
 
 		echo '<div class="ard-pcard__media">';
-		echo Ardal_Helpers::image( isset( $item['image'] ) ? $item['image'] : array(), $opts['placeholder'], $title, 'medium_large' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+		$image = Ardal_Helpers::image( isset( $item['image'] ) ? $item['image'] : array(), $opts['placeholder'], $title, 'medium_large' );
+
+		/*
+		 * لینک تصویر فقط دور خودِ تصویر است نه کل قاب، تا نشان‌های تخفیف بیرونش
+		 * بمانند. از دید صفحه‌خوان و تب پنهان است، چون لینک عنوان همان مقصد را
+		 * دارد و دو لینک پشت‌سرهم به یک جا فقط تکرار است.
+		 */
+		if ( 'image' === $opts['link_mode'] && ! empty( $link['url'] ) ) {
+			printf(
+				'<a class="ard-pcard__media-link"%s tabindex="-1" aria-hidden="true">%s</a>',
+				Ardal_Helpers::link_attrs( $link ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				$image // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
+		} else {
+			echo $image; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 
 		if ( $opts['show_off'] && '' !== $off ) {
 			printf( '<span class="ard-badge ard-badge--sale">%s</span>', esc_html( $off ) );

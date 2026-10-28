@@ -168,6 +168,7 @@ class Ardal_Widget_Product_Card extends Ardal_Widget_Base {
 				'default'     => 'button',
 				'options'     => array(
 					'button' => 'فقط عنوان و دکمه',
+					'image'  => 'عنوان، تصویر و دکمه',
 					'box'    => 'کل کارت به محصول لینک شود',
 				),
 				'description' => 'در حالت «کل کارت»، دکمه همچنان کار خودش را انجام می‌دهد و کلیک روی آن به محصول نمی‌رود.',

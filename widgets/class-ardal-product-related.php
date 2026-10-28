@@ -117,6 +117,7 @@ class Ardal_Widget_Product_Related extends Ardal_Widget_Base {
 				'default' => 'box',
 				'options' => array(
 					'button' => 'فقط عنوان و دکمه',
+					'image'  => 'عنوان، تصویر و دکمه',
 					'box'    => 'کل کارت به محصول لینک شود',
 				),
 			)

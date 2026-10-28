@@ -1081,7 +1081,7 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		);
 		printf(
 			'<button type="button" class="ard-fil__close" data-ard-arch-close aria-label="بستن">%s</button>',
-			Ardal_Archive::icon( 'close', 18, 2 ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			Ardal_Archive::icon( 'close-circle', 30 ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- همان آیکون کشوی مرتب‌سازی، تا دو کشو یک‌شکل باشند.
 		);
 		echo '</div>';
 

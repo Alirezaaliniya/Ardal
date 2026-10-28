@@ -1752,6 +1752,15 @@ a.ard-service__inner:hover {
 	object-fit: cover;
 }
 
+/* لینک تصویر همان جای تصویر را می‌گیرد؛ نه بیشتر، نه کمتر. */
+.ard-pcard__media-link {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	color: inherit;
+	text-decoration: none;
+}
+
 .ard-pcard--plain .ard-pcard__media .ard-badge--sale {
 	background: var(--ard-base);
 	color: var(--ard-sale);

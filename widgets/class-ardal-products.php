@@ -280,6 +280,7 @@ class Ardal_Widget_Products extends Ardal_Widget_Base {
 				'default'     => 'button',
 				'options'     => array(
 					'button' => 'فقط عنوان و دکمه',
+					'image'  => 'عنوان، تصویر و دکمه',
 					'box'    => 'کل کارت به محصول لینک شود',
 				),
 				'condition'   => array( 'card_style' => 'ardal' ),
