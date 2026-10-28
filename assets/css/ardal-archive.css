@@ -886,6 +886,7 @@
 /* دکمه شناور موبایل */
 
 .ard-fil__fab {
+	--ard-fab-side: 18px;
 	display: none;
 	position: fixed;
 	inset-inline-start: 50%;
@@ -893,6 +894,7 @@
 	z-index: 99;
 	align-items: center;
 	gap: 8px;
+	box-sizing: border-box;
 	padding: 12px 20px;
 	border: 0;
 	border-radius: var(--ard-radius-pill);
@@ -904,9 +906,33 @@
 	box-shadow: 0 10px 28px -10px rgba(var(--ard-primary-dark-rgb), 0.65);
 	transform: translateX(50%);
 	cursor: pointer;
+	transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+/* حالت «سر جای خودش»: در جریان صفحه می‌ماند. */
+.ard-fil__fab--static {
+	position: relative;
+	inset: auto;
+	z-index: auto;
+	transform: none;
+}
+
+.ard-fil__fab-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 18px;
+	line-height: 1;
+}
+
+.ard-fil__fab-icon svg.e-font-icon-svg {
+	width: 1em;
+	height: 1em;
+	fill: currentColor;
 }
 
 .ard-fil__fab-badge {
+	order: 2;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -2038,6 +2064,11 @@ body.ard-arch-busy {
 
 	.ard-fil__fab {
 		display: inline-flex;
+	}
+
+	.ard-fil__fab--static {
+		display: flex;
+		width: fit-content;
 	}
 
 	.ard-arch-scrim {

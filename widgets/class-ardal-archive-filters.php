@@ -13,7 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
+use Elementor\Icons_Manager;
 use Elementor\Repeater;
 
 class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
@@ -613,6 +616,426 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		$this->end_controls_section();
 
 		$this->add_box_controls( '.ard-fil--boxed .ard-fil__inner', 'fil_box', 'قاب ستون', array( 'top' => 8, 'right' => 20, 'bottom' => 14, 'left' => 20 ) );
+
+		$this->add_fab_controls();
+	}
+
+	/**
+	 * بخش استایل دکمه‌ی شناور فیلتر در موبایل.
+	 */
+	protected function add_fab_controls() {
+		$fab = '{{WRAPPER}} .ard-fil__fab';
+
+		$this->start_controls_section(
+			'section_style_fab',
+			array(
+				'label'     => 'دکمه فیلتر موبایل',
+				'tab'       => Controls_Manager::TAB_STYLE,
+				'condition' => array(
+					'fab'         => 'yes',
+					'mobile_mode' => 'drawer',
+				),
+			)
+		);
+
+		/* ---------------------------------------- جایگاه */
+
+		$this->add_control(
+			'fab_position',
+			array(
+				'label'   => 'جایگاه دکمه',
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'fixed',
+				'options' => array(
+					'fixed'  => 'شناور (ثابت روی صفحه)',
+					'static' => 'سر جای خودش در صفحه',
+				),
+			)
+		);
+
+		$this->add_control(
+			'fab_fixed_align',
+			array(
+				'label'                => 'چیدمان افقی',
+				'type'                 => Controls_Manager::CHOOSE,
+				'default'              => 'center',
+				'options'              => array(
+					'start'   => array( 'title' => 'راست', 'icon' => 'eicon-h-align-right' ),
+					'center'  => array( 'title' => 'وسط', 'icon' => 'eicon-h-align-center' ),
+					'end'     => array( 'title' => 'چپ', 'icon' => 'eicon-h-align-left' ),
+					'stretch' => array( 'title' => 'تمام‌عرض', 'icon' => 'eicon-h-align-stretch' ),
+				),
+				'selectors_dictionary' => array(
+					'start'   => 'inset-inline-start:var(--ard-fab-side);inset-inline-end:auto;transform:none;',
+					'center'  => 'inset-inline-start:50%;inset-inline-end:auto;transform:translateX(50%);',
+					'end'     => 'inset-inline-start:auto;inset-inline-end:var(--ard-fab-side);transform:none;',
+					'stretch' => 'inset-inline-start:var(--ard-fab-side);inset-inline-end:var(--ard-fab-side);transform:none;justify-content:center;',
+				),
+				'selectors'            => array(
+					'{{WRAPPER}} .ard-fil__fab--fixed' => '{{VALUE}}',
+				),
+				'condition'            => array( 'fab_position' => 'fixed' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_bottom',
+			array(
+				'label'      => 'فاصله از پایین',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'vh' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 200 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-fil__fab--fixed' => 'bottom:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array( 'fab_position' => 'fixed' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_side',
+			array(
+				'label'      => 'فاصله از کناره',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 100 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-fil__fab--fixed' => '--ard-fab-side:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array(
+					'fab_position'     => 'fixed',
+					'fab_fixed_align!' => 'center',
+				),
+			)
+		);
+
+		$this->add_control(
+			'fab_z',
+			array(
+				'label'     => 'z-index',
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 0,
+				'selectors' => array(
+					'{{WRAPPER}} .ard-fil__fab--fixed' => 'z-index:{{VALUE}};',
+				),
+				'condition' => array( 'fab_position' => 'fixed' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_static_align',
+			array(
+				'label'                => 'چیدمان افقی',
+				'type'                 => Controls_Manager::CHOOSE,
+				'default'              => 'start',
+				'options'              => array(
+					'start'   => array( 'title' => 'راست', 'icon' => 'eicon-h-align-right' ),
+					'center'  => array( 'title' => 'وسط', 'icon' => 'eicon-h-align-center' ),
+					'end'     => array( 'title' => 'چپ', 'icon' => 'eicon-h-align-left' ),
+					'stretch' => array( 'title' => 'تمام‌عرض', 'icon' => 'eicon-h-align-stretch' ),
+				),
+				'selectors_dictionary' => array(
+					'start'   => 'width:fit-content;margin-inline-start:0;margin-inline-end:auto;',
+					'center'  => 'width:fit-content;margin-inline:auto;',
+					'end'     => 'width:fit-content;margin-inline-start:auto;margin-inline-end:0;',
+					'stretch' => 'width:100%;margin-inline:0;justify-content:center;',
+				),
+				'selectors'            => array(
+					'{{WRAPPER}} .ard-fil__fab--static' => '{{VALUE}}',
+				),
+				'condition'            => array( 'fab_position' => 'static' ),
+			)
+		);
+
+		/* ---------------------------------------- محتوا */
+
+		$this->add_control(
+			'fab_content_heading',
+			array(
+				'label'     => 'متن و آیکون',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'fab_show_text',
+			array(
+				'label'        => 'نمایش متن',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+			)
+		);
+
+		$this->add_control(
+			'fab_text',
+			array(
+				'label'       => 'متن دکمه',
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '',
+				'placeholder' => 'خالی = عنوان بالای ستون',
+				'condition'   => array( 'fab_show_text' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'fab_show_icon',
+			array(
+				'label'        => 'نمایش آیکون',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+			)
+		);
+
+		$this->add_control(
+			'fab_icon',
+			array(
+				'label'       => 'آیکون',
+				'type'        => Controls_Manager::ICONS,
+				'skin'        => 'inline',
+				'label_block' => false,
+				'description' => 'خالی = آیکون فیلتر پیش‌فرض.',
+				'condition'   => array( 'fab_show_icon' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'fab_icon_pos',
+			array(
+				'label'                => 'جای آیکون',
+				'type'                 => Controls_Manager::CHOOSE,
+				'default'              => 'before',
+				'options'              => array(
+					'before' => array( 'title' => 'پیش از متن', 'icon' => 'eicon-h-align-right' ),
+					'after'  => array( 'title' => 'پس از متن', 'icon' => 'eicon-h-align-left' ),
+				),
+				'selectors_dictionary' => array(
+					'before' => 'order:0;',
+					'after'  => 'order:1;',
+				),
+				'selectors'            => array(
+					'{{WRAPPER}} .ard-fil__fab-icon' => '{{VALUE}}',
+				),
+				'condition'            => array(
+					'fab_show_icon' => 'yes',
+					'fab_show_text' => 'yes',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_icon_size',
+			array(
+				'label'      => 'اندازه آیکون',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 8, 'max' => 60 ) ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-fil__fab-icon'                                    => 'font-size:{{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .ard-fil__fab-icon svg, {{WRAPPER}} .ard-fil__fab-icon img' => 'width:{{SIZE}}{{UNIT}};height:{{SIZE}}{{UNIT}};',
+				),
+				'condition'  => array( 'fab_show_icon' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_gap',
+			array(
+				'label'      => 'فاصله آیکون و متن',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array(
+					$fab => 'gap:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		/* ---------------------------------------- ظاهر */
+
+		$this->add_control(
+			'fab_look_heading',
+			array(
+				'label'     => 'ظاهر',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'fab_typo',
+				'label'    => 'قلم',
+				'selector' => $fab,
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_width',
+			array(
+				'label'      => 'عرض',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%', 'vw' ),
+				'range'      => array( 'px' => array( 'min' => 40, 'max' => 600 ) ),
+				'selectors'  => array(
+					$fab => 'width:{{SIZE}}{{UNIT}};justify-content:center;',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_height',
+			array(
+				'label'      => 'ارتفاع',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 24, 'max' => 120 ) ),
+				'selectors'  => array(
+					$fab => 'height:{{SIZE}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_padding',
+			array(
+				'label'      => 'فاصله داخلی',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em' ),
+				'selectors'  => array(
+					$fab => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_margin',
+			array(
+				'label'      => 'فاصله بیرونی',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-fil__fab--static' => 'margin-top:{{TOP}}{{UNIT}};margin-bottom:{{BOTTOM}}{{UNIT}};',
+				),
+				'allowed_dimensions' => 'vertical',
+				'condition'  => array( 'fab_position' => 'static' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'fab_radius',
+			array(
+				'label'      => 'گردی گوشه',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%' ),
+				'selectors'  => array(
+					$fab => 'border-radius:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->start_controls_tabs( 'fab_tabs' );
+
+		foreach ( array( 'normal' => 'عادی', 'hover' => 'هاور' ) as $state => $state_label ) {
+			$sel = 'hover' === $state ? $fab . ':hover, ' . $fab . ':focus-visible' : $fab;
+
+			$this->start_controls_tab( 'fab_tab_' . $state, array( 'label' => $state_label ) );
+
+			$this->add_control(
+				'fab_color_' . $state,
+				array(
+					'label'     => 'رنگ متن',
+					'type'      => Controls_Manager::COLOR,
+					'selectors' => array( $sel => 'color:{{VALUE}};' ),
+				)
+			);
+
+			$this->add_control(
+				'fab_icon_color_' . $state,
+				array(
+					'label'     => 'رنگ آیکون',
+					'type'      => Controls_Manager::COLOR,
+					'selectors' => array(
+						str_replace( ',', ' .ard-fil__fab-icon,', $sel ) . ' .ard-fil__fab-icon' => 'color:{{VALUE}};',
+						str_replace( ',', ' .ard-fil__fab-icon svg.e-font-icon-svg,', $sel ) . ' .ard-fil__fab-icon svg.e-font-icon-svg' => 'fill:{{VALUE}};',
+					),
+				)
+			);
+
+			$this->add_control(
+				'fab_bg_' . $state,
+				array(
+					'label'     => 'رنگ زمینه',
+					'type'      => Controls_Manager::COLOR,
+					'selectors' => array( $sel => 'background:{{VALUE}};' ),
+				)
+			);
+
+			if ( 'normal' === $state ) {
+				$this->add_group_control(
+					Group_Control_Border::get_type(),
+					array(
+						'name'     => 'fab_border',
+						'selector' => $fab,
+					)
+				);
+			} else {
+				$this->add_control(
+					'fab_border_color_hover',
+					array(
+						'label'     => 'رنگ حاشیه',
+						'type'      => Controls_Manager::COLOR,
+						'selectors' => array( $sel => 'border-color:{{VALUE}};' ),
+					)
+				);
+			}
+
+			$this->add_group_control(
+				Group_Control_Box_Shadow::get_type(),
+				array(
+					'name'     => 'fab_shadow_' . $state,
+					'selector' => $sel,
+				)
+			);
+
+			$this->end_controls_tab();
+		}
+
+		$this->end_controls_tabs();
+
+		/* ---------------------------------------- نشان تعداد */
+
+		$this->add_control(
+			'fab_badge_heading',
+			array(
+				'label'     => 'نشان تعداد فیلتر فعال',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'fab_badge_bg',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-fil__fab-badge' => 'background:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'fab_badge_color',
+			array(
+				'label'     => 'رنگ عدد',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-fil__fab-badge' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->end_controls_section();
 	}
 
 	/* --------------------------------------------------------------------- */
@@ -698,13 +1121,44 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		Ardal_Archive::render_scrim();
 
 		if ( 'yes' === $s['fab'] && 'drawer' === $s['mobile_mode'] ) {
-			printf(
-				'<button type="button" class="ard-fil__fab" data-ard-arch-open="filters" aria-controls="ard-filters">%s<span>%s</span>%s</button>',
-				Ardal_Archive::icon( 'filter', 18 ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				esc_html( $s['panel_title'] ),
-				$active ? '<span class="ard-fil__fab-badge">' . esc_html( Ardal_Helpers::fa_digits( $active ) ) . '</span>' : ''
-			);
+			$this->render_fab( $s, $active );
 		}
+	}
+
+	/**
+	 * دکمه‌ی بازکردن کشوی فیلتر در موبایل.
+	 *
+	 * @param array $s
+	 * @param int   $active
+	 */
+	protected function render_fab( $s, $active ) {
+		$text = '' !== trim( (string) ( $s['fab_text'] ?? '' ) ) ? $s['fab_text'] : $s['panel_title'];
+		$icon = '';
+
+		if ( 'yes' === ( $s['fab_show_icon'] ?? 'yes' ) ) {
+			$pick = isset( $s['fab_icon'] ) ? $s['fab_icon'] : array();
+
+			if ( ! empty( $pick['value'] ) ) {
+				ob_start();
+				Icons_Manager::render_icon( $pick, array( 'aria-hidden' => 'true' ) );
+				$icon = (string) ob_get_clean();
+			} else {
+				$icon = Ardal_Archive::icon( 'filter', 18 );
+			}
+
+			$icon = '<span class="ard-fil__fab-icon" aria-hidden="true">' . $icon . '</span>';
+		}
+
+		$show_text = 'yes' === ( $s['fab_show_text'] ?? 'yes' );
+
+		printf(
+			'<button type="button" class="ard-fil__fab ard-fil__fab--%s" data-ard-arch-open="filters" aria-controls="ard-filters"%s>%s%s%s</button>',
+			'static' === ( $s['fab_position'] ?? '' ) ? 'static' : 'fixed',
+			$show_text ? '' : ' aria-label="' . esc_attr( $text ) . '"',
+			$icon, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$show_text ? '<span class="ard-fil__fab-text">' . esc_html( $text ) . '</span>' : '',
+			$active ? '<span class="ard-fil__fab-badge">' . esc_html( Ardal_Helpers::fa_digits( $active ) ) . '</span>' : ''
+		);
 	}
 
 	/**

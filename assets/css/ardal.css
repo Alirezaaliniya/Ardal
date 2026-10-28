@@ -2950,7 +2950,8 @@ a.ard-brand:hover img {
 	inset-inline-start: 50%;
 	inset-block-end: 14px;
 	z-index: 999;
-	transform: translateX(-50%);
+	right: 0;
+    left: 0;
 }
 
 .ard-mnav--normal {
