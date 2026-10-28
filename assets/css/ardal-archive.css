@@ -13,6 +13,7 @@
 .elementor-widget-ardal-archive-filters,
 .elementor-widget-ardal-archive-chips,
 .elementor-widget-ardal-archive-toolbar,
+.elementor-widget-ardal-archive-sort,
 .elementor-widget-ardal-archive-description,
 /* شبکهٔ محصولات هم می‌تواند کارت و صفحه‌بندی آرشیو را بگیرد. */
 .elementor-widget-ardal-products {
@@ -1250,6 +1251,274 @@ body.ard-arch-sort .ard-sheet {
 }
 
 /* ============================================================
+   ویجت مرتب‌سازی — نوار افقی دسکتاپ، کشوی پایینی موبایل
+   ============================================================ */
+
+.ard-sort {
+	display: flex;
+	flex-direction: column;
+}
+
+.ard-sort__bar {
+	--ard-sort-active: var(--ard-primary);
+	--ard-sort-line: var(--ard-sort-active);
+	--ard-sort-line-h: 2px;
+
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px 16px;
+}
+
+.ard-sort__cap {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--ard-text);
+	font-size: 13.5px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.ard-sort__cap-icon,
+.ard-sort__trigger-icon,
+.ard-sort-sheet__close,
+.ard-sort-sheet__check {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.ard-sort__cap-icon svg.e-font-icon-svg,
+.ard-sort__trigger-icon svg.e-font-icon-svg,
+.ard-sort-sheet__close svg.e-font-icon-svg,
+.ard-sort-sheet__check svg.e-font-icon-svg {
+	width: 1em;
+	height: 1em;
+	fill: currentColor;
+}
+
+.ard-sort__items {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 22px;
+}
+
+.ard-sort__item {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 0;
+	border: 0 solid transparent;
+	color: var(--ard-text-soft);
+	font-size: 13.5px;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.ard-sort__item:hover {
+	color: var(--ard-sort-active);
+}
+
+.ard-sort__item.is-on {
+	color: var(--ard-sort-active);
+	font-weight: 700;
+}
+
+.ard-sort__bar--links .ard-sort__item.is-on::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	bottom: -2px;
+	height: var(--ard-sort-line-h);
+	border-radius: 2px;
+	background: var(--ard-sort-line);
+}
+
+.ard-sort__bar--pills .ard-sort__items {
+	gap: 8px;
+}
+
+.ard-sort__bar--pills .ard-sort__item {
+	padding: 7px 16px;
+	border-width: 1px;
+	border-color: var(--ard-border);
+	border-radius: var(--ard-radius-pill);
+	background: var(--ard-base);
+}
+
+.ard-sort__bar--pills .ard-sort__item.is-on {
+	border-color: var(--ard-sort-active);
+	background: var(--ard-sort-active);
+	color: #fff;
+}
+
+/* دکمه و کشو فقط در موبایل؛ اینجا پنهان‌اند. */
+.ard-sort__trigger,
+.ard-sort-sheet {
+	display: none;
+}
+
+.ard-sort__trigger {
+	box-sizing: border-box;
+	align-items: center;
+	gap: 8px;
+	width: fit-content;
+	padding: 10px 16px;
+	border: 1px solid var(--ard-border);
+	border-radius: var(--ard-radius-pill);
+	background: var(--ard-base);
+	color: var(--ard-text);
+	font-family: inherit;
+	font-size: 13.5px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.ard-sort__trigger-icon {
+	font-size: 18px;
+}
+
+.ard-sort__trigger-current {
+	color: var(--ard-primary);
+	font-weight: 500;
+}
+
+.ard-sort__trigger-current::before {
+	content: "·";
+	margin-inline-end: 6px;
+	color: var(--ard-muted);
+}
+
+.ard-sort-sheet {
+	--ard-sort-sheet-x: 24px;
+
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 100001;
+	flex-direction: column;
+	max-height: var(--ard-sheet-max, 86vh);
+	padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+	border-radius: 24px 24px 0 0;
+	background: var(--ard-base);
+	box-shadow: 0 -10px 40px rgba(var(--ard-primary-dark-rgb), 0.22);
+	font-family: var(--ard-font);
+	direction: rtl;
+	text-align: right;
+	transform: translateY(105%);
+	transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+	visibility: hidden;
+}
+
+body.ard-arch-sortbar .ard-sort-sheet {
+	transform: translateY(0);
+	visibility: visible;
+}
+
+.ard-sort-sheet__grip {
+	display: block;
+	flex: 0 0 auto;
+	width: 44px;
+	height: 5px;
+	margin: 8px auto 0;
+	border-radius: 3px;
+	background: var(--ard-border);
+}
+
+.ard-sort-sheet__head {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 26px var(--ard-sort-sheet-x) 18px;
+	touch-action: none;
+	cursor: grab;
+	user-select: none;
+}
+
+.ard-sort-sheet__title {
+	color: var(--ard-text);
+	font-size: 17px;
+	font-weight: 700;
+}
+
+.ard-sort-sheet__close {
+	flex: 0 0 auto;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--ard-text);
+	font-size: 30px;
+	cursor: pointer;
+	touch-action: auto;
+}
+
+.ard-sort-sheet__close svg {
+	width: 1em;
+	height: 1em;
+}
+
+.ard-sort-sheet__list {
+	flex: 1 1 auto;
+	min-height: 0;
+	margin: 0;
+	padding: 0 var(--ard-sort-sheet-x);
+	list-style: none;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+.ard-sort-sheet__list > li {
+	margin: 0;
+	list-style: none;
+	border-top: 1px none var(--ard-border);
+}
+
+.ard-sort-sheet__item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	min-height: 64px;
+	padding: 18px 0;
+	box-sizing: border-box;
+	color: var(--ard-text-body);
+	font-size: 15px;
+	text-decoration: none;
+}
+
+.ard-sort-sheet__item.is-on {
+	color: var(--ard-text);
+}
+
+.ard-sort-sheet__check {
+	flex: 0 0 auto;
+	color: var(--ard-text);
+	font-size: 26px;
+}
+
+.ard-sort-sheet__check svg {
+	width: 1em;
+	height: 1em;
+}
+
+.ard-sort-sheet.is-dragging {
+	transition: none;
+	cursor: grabbing;
+}
+
+.ard-sort-sheet.is-full {
+	--ard-sheet-max: 96vh;
+}
+
+/* ============================================================
    شبکه محصولات
    ============================================================ */
 
@@ -2085,9 +2354,40 @@ body.ard-arch-busy {
 	}
 
 	body.ard-arch-filters .ard-arch-scrim,
-	body.ard-arch-sort .ard-arch-scrim {
+	body.ard-arch-sort .ard-arch-scrim,
+	body.ard-arch-sortbar .ard-arch-scrim {
 		opacity: 1;
 		visibility: visible;
+	}
+
+	/* ویجت مرتب‌سازی: نوار جایش را به دکمه و کشو می‌دهد. */
+	.ard-sort--drawer .ard-sort__bar {
+		display: none;
+	}
+
+	.ard-sort--drawer .ard-sort__trigger {
+		display: inline-flex;
+	}
+
+	.ard-sort-sheet {
+		display: flex;
+	}
+
+	/* حالت «همان نوار»: یک ردیف اسکرول‌شونده، بدون شکستن خط. */
+	.ard-sort--inline .ard-sort__bar,
+	.ard-sort--inline .ard-sort__items {
+		flex-wrap: nowrap;
+	}
+
+	.ard-sort--inline .ard-sort__items {
+		min-width: 0;
+		overflow-x: auto;
+		scrollbar-width: none;
+		padding-bottom: 4px;
+	}
+
+	.ard-sort--inline .ard-sort__items::-webkit-scrollbar {
+		display: none;
 	}
 
 	/* نوار بالای فهرست، به دو دکمه موبایلی تبدیل می‌شود. */

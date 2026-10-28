@@ -31,9 +31,154 @@ class Ardal_Search {
 	 */
 	const PAGE_CANDIDATES = 200;
 
+	/**
+	 * گزینهٔ شمارش عبارت‌های جست‌وجوشده (برای «جست‌وجوی پرمخاطب»).
+	 */
+	const POPULAR_OPTION = 'ardal_search_popular';
+
+	/**
+	 * بیشترین تعداد عبارتی که نگه داشته می‌شود؛ بیش از آن، کم‌شمارترها می‌روند.
+	 */
+	const POPULAR_CAP = 300;
+
 	public static function init() {
 		add_action( 'wp_ajax_' . self::ACTION, array( __CLASS__, 'ajax' ) );
 		add_action( 'wp_ajax_nopriv_' . self::ACTION, array( __CLASS__, 'ajax' ) );
+		add_action( 'wp_ajax_' . self::ACTION . '_log', array( __CLASS__, 'ajax_log' ) );
+		add_action( 'wp_ajax_nopriv_' . self::ACTION . '_log', array( __CLASS__, 'ajax_log' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'track_search_page' ) );
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* جست‌وجوهای پرمخاطب                                                     */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * شکل نمایشیِ یکدستِ یک عبارت: فاصله‌های اضافه و نیم‌فاصله‌های تکراری حذف.
+	 *
+	 * کلید شمارش، شکل یکدست‌شده (normalize) است تا «كرم» و «کرم» یکی شمرده
+	 * شوند؛ ولی برای نمایش، اولین شکلی که کاربر نوشته نگه داشته می‌شود.
+	 *
+	 * @param string $term
+	 * @return string
+	 */
+	private static function clean_term( $term ) {
+		$term = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) $term ) ) );
+
+		$length = function_exists( 'mb_strlen' ) ? mb_strlen( $term ) : strlen( $term );
+
+		return ( $length < 2 || $length > 60 ) ? '' : $term;
+	}
+
+	/**
+	 * یک بار شمردنِ یک عبارت.
+	 *
+	 * فقط عبارت‌هایی شمرده می‌شوند که دست‌کم یک محصول پیدا می‌کنند؛ وگرنه
+	 * غلط‌های تایپی هم می‌توانستند به فهرست پرمخاطب راه پیدا کنند.
+	 *
+	 * @param string $term
+	 */
+	public static function log_term( $term ) {
+		$term = self::clean_term( $term );
+
+		if ( '' === $term || ! self::query( $term, 1 ) ) {
+			return;
+		}
+
+		$key  = self::normalize( $term );
+		$data = get_option( self::POPULAR_OPTION, array() );
+		$data = is_array( $data ) ? $data : array();
+
+		if ( isset( $data[ $key ] ) ) {
+			$data[ $key ]['n'] = (int) $data[ $key ]['n'] + 1;
+		} else {
+			$data[ $key ] = array( 't' => $term, 'n' => 1 );
+		}
+
+		$data[ $key ]['at'] = time();
+
+		if ( count( $data ) > self::POPULAR_CAP ) {
+			uasort(
+				$data,
+				static function ( $a, $b ) {
+					return (int) $b['n'] - (int) $a['n'];
+				}
+			);
+
+			$data = array_slice( $data, 0, (int) ( self::POPULAR_CAP * 0.7 ), true );
+		}
+
+		update_option( self::POPULAR_OPTION, $data, false );
+	}
+
+	/**
+	 * پرتکرارترین عبارت‌ها.
+	 *
+	 * @param int $limit
+	 * @param int $min_count کمترین دفعه‌ای که باید جست‌وجو شده باشد.
+	 * @return string[]
+	 */
+	public static function popular( $limit = 8, $min_count = 1 ) {
+		$data = get_option( self::POPULAR_OPTION, array() );
+
+		if ( ! is_array( $data ) || ! $data ) {
+			return array();
+		}
+
+		uasort(
+			$data,
+			static function ( $a, $b ) {
+				return (int) $b['n'] - (int) $a['n'] ?: (int) $b['at'] - (int) $a['at'];
+			}
+		);
+
+		$out = array();
+
+		foreach ( $data as $row ) {
+			if ( (int) $row['n'] < $min_count ) {
+				break;
+			}
+
+			$out[] = (string) $row['t'];
+
+			if ( count( $out ) >= $limit ) {
+				break;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * شمردن جست‌وجویی که به صفحهٔ نتیجه‌ها رسیده (اینتر، دکمه، تاریخچه، چیپ).
+	 */
+	public static function track_search_page() {
+		if ( is_admin() || ! is_search() || is_paged() ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+
+		if ( 'product' !== $type ) {
+			return;
+		}
+
+		self::log_term( get_search_query( false ) );
+	}
+
+	/**
+	 * شمردن جست‌وجویی که با کلیک روی یک نتیجهٔ پنل زنده تمام شده؛ این‌ها هیچ‌وقت
+	 * به صفحهٔ نتیجه‌ها نمی‌رسند.
+	 */
+	public static function ajax_log() {
+		check_ajax_referer( self::ACTION, 'nonce' );
+
+		$term = isset( $_POST['term'] ) ? sanitize_text_field( wp_unslash( $_POST['term'] ) ) : '';
+
+		self::log_term( $term );
+
+		wp_send_json_success();
 	}
 
 	/* --------------------------------------------------------------------- */

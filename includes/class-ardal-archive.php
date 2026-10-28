@@ -1115,12 +1115,7 @@ class Ardal_Archive {
 			$options = array_intersect_key( $options, array_flip( (array) $allowed ) );
 		}
 
-		$default = Ardal_Helpers::has_woo()
-			? (string) apply_filters( 'woocommerce_default_catalog_orderby', get_option( 'woocommerce_default_catalog_orderby', 'menu_order' ) )
-			: 'menu_order';
-
-		$current = self::param( 'orderby' );
-		$current = '' !== $current ? $current : $default;
+		$current = self::current_orderby();
 
 		$out = array();
 
@@ -1134,6 +1129,23 @@ class Ardal_Archive {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * مرتب‌سازی جاری: پارامتر آدرس، وگرنه پیش‌فرض ووکامرس.
+	 *
+	 * @return string
+	 */
+	public static function current_orderby() {
+		$current = self::param( 'orderby' );
+
+		if ( '' !== $current ) {
+			return $current;
+		}
+
+		return Ardal_Helpers::has_woo()
+			? (string) apply_filters( 'woocommerce_default_catalog_orderby', get_option( 'woocommerce_default_catalog_orderby', 'menu_order' ) )
+			: 'menu_order';
 	}
 
 	/* --------------------------------------------------------------------- */
@@ -1211,6 +1223,8 @@ class Ardal_Archive {
 			'heart'   => '<path d="M12 20s-7.3-4.5-7.3-9.4A4.2 4.2 0 0 1 12 8.2a4.2 4.2 0 0 1 7.3 2.4C19.3 15.5 12 20 12 20z"/>',
 			'cart'    => '<path d="M3 4h2.2l2.3 11.2h10.2L20 7H6"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/>',
 			'refresh' => '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4.5V10h-5.5"/>',
+			'check-circle' => '<circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/>',
+			'close-circle' => '<circle cx="12" cy="12" r="9"/><path d="M9.3 9.3l5.4 5.4"/><path d="M14.7 9.3l-5.4 5.4"/>',
 		);
 
 		if ( ! isset( $paths[ $name ] ) ) {

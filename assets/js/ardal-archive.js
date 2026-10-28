@@ -30,11 +30,15 @@
 	 * بخش چسبان، افکت حرکتی. نتیجه‌اش این بود که کشو باز می‌شد ولی بیرون از کادر
 	 * دید می‌افتاد و کاربر فکر می‌کرد دکمه کار نمی‌کند.
 	 *
-	 * راه‌حل: موقع باز شدن، عنصر به body منتقل می‌شود. میزبانی که می‌سازیم
-	 * کلاس‌های المنتورِ ویجت اصلی را می‌گیرد، پس استایل‌های {{WRAPPER}} (رنگ‌ها،
-	 * فاصله‌ها، عرض) همچنان می‌چسبند. با بسته شدن، دقیقاً سر جای خودش برمی‌گردد.
+	 * راه‌حل: موقع باز شدن، عنصر به body منتقل می‌شود. با بسته شدن، دقیقاً سر
+	 * جای خودش برمی‌گردد.
+	 *
+	 * سلکتور {{WRAPPER}} المنتور «.elementor-123 .elementor-element.elementor-element-abc»
+	 * است، پس فقط کپی کلاس‌های ویجت کافی نیست: یک لایهٔ بیرونی با کلاس سند
+	 * المنتور (elementor-123) هم می‌سازیم تا رنگ‌ها و فاصله‌های تب استایل روی
+	 * کشوی منتقل‌شده هم بچسبند.
 	 */
-	var PORTALS = '.ard-fil--drawer, .ard-sheet, .ard-arch-scrim';
+	var PORTALS = '.ard-fil--drawer, .ard-sheet, .ard-sort-sheet, .ard-arch-scrim';
 
 	function portal( el ) {
 		if ( el.ardHost || 'fixed' !== window.getComputedStyle( el ).position ) {
@@ -42,10 +46,15 @@
 		}
 
 		var source = el.closest( '.elementor-element' );
+		var page = el.closest( '[data-elementor-id]' );
+		var outer = document.createElement( 'div' );
 		var host = document.createElement( 'div' );
 		var keep = [ 'ard-arch-portal' ];
+		var wrap = [ 'ard-arch-portal-page' ];
 
 		if ( source ) {
+			keep.push( 'elementor-element' );
+
 			Array.prototype.forEach.call( source.classList, function ( name ) {
 				// فقط کلاس‌هایی که سلکتورها به آن‌ها تکیه دارند؛ کلاس‌های
 				// انیمیشن المنتور (مثل elementor-invisible) نباید همراه بیایند.
@@ -55,15 +64,25 @@
 			} );
 		}
 
+		if ( page ) {
+			Array.prototype.forEach.call( page.classList, function ( name ) {
+				if ( /^elementor-\d+$/.test( name ) ) {
+					wrap.push( name );
+				}
+			} );
+		}
+
 		host.className = keep.join( ' ' );
+		outer.className = wrap.join( ' ' );
 
 		var mark = document.createComment( 'ard-portal' );
 
 		el.parentNode.insertBefore( mark, el );
 		host.appendChild( el );
-		document.body.appendChild( host );
+		outer.appendChild( host );
+		document.body.appendChild( outer );
 
-		el.ardHost = host;
+		el.ardHost = outer;
 		el.ardMark = mark;
 	}
 
@@ -113,6 +132,7 @@
 
 		body.classList.toggle( 'ard-arch-filters', 'filters' === name );
 		body.classList.toggle( 'ard-arch-sort', 'sort' === name );
+		body.classList.toggle( 'ard-arch-sortbar', 'sortbar' === name );
 		body.classList.toggle( 'ard-arch-locked', !! name );
 
 		Array.prototype.forEach.call(
@@ -174,7 +194,7 @@
 	   ================================================================== */
 
 	// ناحیه‌ای که می‌شود از آن کشید. بقیهٔ شیت باید آزاد بماند تا فرم اسکرول شود.
-	var DRAG_HANDLES = '.ard-fil__grip, .ard-fil__head, .ard-sheet__grip, .ard-sheet__title';
+	var DRAG_HANDLES = '.ard-fil__grip, .ard-fil__head, .ard-sheet__grip, .ard-sheet__title, .ard-sort-sheet__grip, .ard-sort-sheet__head';
 
 	// کمتر از این مقدار، حرکت را کشیدن حساب نمی‌کنیم تا تپ ساده گرفتار نشود.
 	var DRAG_SLOP = 4;
@@ -755,6 +775,8 @@
 	var AJAX_LINKS = [
 		'.ard-tool__sort',
 		'.ard-sheet__list a',
+		'.ard-sort__item',
+		'.ard-sort-sheet__item',
 		'.ard-chips__item',
 		'.ard-chips__clear',
 		'.ard-fil__clear',
@@ -1157,7 +1179,7 @@
 		// گرفته؛ پس اینجا مستقیم پیمایش می‌کنیم و خودِ initSheetDrag تکرار را
 		// می‌گیرد.
 		Array.prototype.forEach.call(
-			document.querySelectorAll( '.ard-fil--drawer, .ard-sheet' ),
+			document.querySelectorAll( '.ard-fil--drawer, .ard-sheet, .ard-sort-sheet' ),
 			initSheetDrag
 		);
 

@@ -92,6 +92,7 @@ class Ardal_Elementor {
 			'archive-filters'     => 'Ardal_Widget_Archive_Filters',
 			'archive-chips'       => 'Ardal_Widget_Archive_Chips',
 			'archive-toolbar'     => 'Ardal_Widget_Archive_Toolbar',
+			'archive-sort'        => 'Ardal_Widget_Archive_Sort',
 			'archive-description' => 'Ardal_Widget_Archive_Description',
 			// پنل کاربری
 			'account'             => 'Ardal_Widget_Account',
@@ -181,6 +182,7 @@ class Ardal_Elementor {
 			'archive-filters'     => 'فیلتر محصولات (ستون کناری)',
 			'archive-chips'       => 'فیلترهای فعال',
 			'archive-toolbar'     => 'نوار مرتب‌سازی آرشیو',
+			'archive-sort'        => 'مرتب‌سازی (افقی در دسکتاپ، کشویی در موبایل)',
 			'archive-description' => 'توضیحات دسته',
 			'account'             => 'پنل کاربری',
 			'elano-cart'          => 'سبد خرید (قالب الانو)',

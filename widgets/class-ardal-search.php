@@ -51,6 +51,20 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'template',
+			array(
+				'label'       => 'قالب ظاهری',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'classic',
+				'options'     => array(
+					'classic' => 'کلاسیک',
+					'modern'  => 'مدرن (کادر قرصی، تاریخچه و جست‌وجوی پرمخاطب)',
+				),
+				'label_block' => true,
+			)
+		);
+
+		$this->add_control(
 			'placeholder',
 			array(
 				'label'       => 'متن راهنمای داخل کادر',
@@ -175,6 +189,163 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 				'type'      => Controls_Manager::TEXT,
 				'default'   => 'دیدن همهٔ نتیجه‌ها',
 				'condition' => array( 'show_more' => 'yes' ),
+			)
+		);
+
+		$this->end_controls_section();
+
+		/* ------------------------------------------------ تاریخچه و پرمخاطب */
+
+		$this->start_controls_section(
+			'section_home',
+			array(
+				'label'     => 'تاریخچه و جست‌وجوی پرمخاطب',
+				'condition' => array( 'template' => 'modern' ),
+			)
+		);
+
+		$this->add_control(
+			'show_history',
+			array(
+				'label'        => 'تاریخچه جست‌وجوی کاربر',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'در مرورگر همان کاربر ذخیره می‌شود و هر مورد با ضربدر کنارش حذف می‌شود.',
+			)
+		);
+
+		$this->add_control(
+			'history_title',
+			array(
+				'label'     => 'عنوان تاریخچه',
+				'type'      => Controls_Manager::TEXT,
+				'default'   => 'تاریخچه جستجوی شما',
+				'condition' => array( 'show_history' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'history_limit',
+			array(
+				'label'     => 'تعداد موارد تاریخچه',
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 1,
+				'max'       => 20,
+				'default'   => 5,
+				'condition' => array( 'show_history' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'history_clear',
+			array(
+				'label'        => 'دکمه «پاک کردن همه»',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'condition'    => array( 'show_history' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'history_clear_text',
+			array(
+				'label'     => 'متن پاک کردن همه',
+				'type'      => Controls_Manager::TEXT,
+				'default'   => 'پاک کردن همه',
+				'condition' => array( 'show_history' => 'yes', 'history_clear' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'show_popular',
+			array(
+				'label'        => 'جست‌وجوی پرمخاطب',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'separator'    => 'before',
+			)
+		);
+
+		$this->add_control(
+			'popular_title',
+			array(
+				'label'     => 'عنوان پرمخاطب',
+				'type'      => Controls_Manager::TEXT,
+				'default'   => 'جستجوی پر مخاطب',
+				'condition' => array( 'show_popular' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'popular_source',
+			array(
+				'label'       => 'منبع عبارت‌ها',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'mixed',
+				'options'     => array(
+					'mixed'  => 'دستی، و بقیه خودکار',
+					'auto'   => 'خودکار (پرتکرارترین جست‌وجوهای سایت)',
+					'manual' => 'فقط دستی',
+				),
+				'label_block' => true,
+				'description' => 'حالت خودکار از جست‌وجوهای واقعی بازدیدکننده‌ها شمرده می‌شود؛ فقط عبارت‌هایی که محصولی پیدا کرده‌اند.',
+				'condition'   => array( 'show_popular' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'popular_manual',
+			array(
+				'label'       => 'عبارت‌های دستی',
+				'type'        => Controls_Manager::TEXTAREA,
+				'default'     => '',
+				'rows'        => 5,
+				'placeholder' => "هایلایتر\nرژگونه\nکانسیلر",
+				'description' => 'هر عبارت در یک خط.',
+				'condition'   => array( 'show_popular' => 'yes', 'popular_source!' => 'auto' ),
+			)
+		);
+
+		$this->add_control(
+			'popular_limit',
+			array(
+				'label'     => 'تعداد عبارت‌ها',
+				'type'      => Controls_Manager::NUMBER,
+				'min'       => 1,
+				'max'       => 30,
+				'default'   => 8,
+				'condition' => array( 'show_popular' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'popular_min',
+			array(
+				'label'       => 'کمترین دفعهٔ جست‌وجو',
+				'type'        => Controls_Manager::NUMBER,
+				'min'         => 1,
+				'max'         => 1000,
+				'default'     => 2,
+				'description' => 'عبارت خودکار باید دست‌کم این تعداد بار جست‌وجو شده باشد.',
+				'condition'   => array( 'show_popular' => 'yes', 'popular_source!' => 'manual' ),
+			)
+		);
+
+		$this->add_control(
+			'home_click',
+			array(
+				'label'       => 'با زدن روی یک عبارت',
+				'type'        => Controls_Manager::SELECT,
+				'default'     => 'go',
+				'options'     => array(
+					'go'   => 'برود به صفحهٔ نتیجه‌ها',
+					'fill' => 'در کادر بنشیند و نتیجهٔ زنده نشان دهد',
+				),
+				'label_block' => true,
+				'separator'   => 'before',
 			)
 		);
 
@@ -336,6 +507,296 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 		);
 
 		$this->end_controls_section();
+
+		$this->add_modern_style_controls();
+	}
+
+	/**
+	 * استایل قالب مدرن: دکمهٔ گرد، تیترها، تاریخچه و چیپ‌ها.
+	 */
+	protected function add_modern_style_controls() {
+		$this->start_controls_section(
+			'section_style_modern',
+			array(
+				'label'     => 'قالب مدرن',
+				'tab'       => Controls_Manager::TAB_STYLE,
+				'condition' => array( 'template' => 'modern' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_btn_size',
+			array(
+				'label'      => 'اندازه دکمه گرد',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 30, 'max' => 80 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-size:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'show_button' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_btn_icon',
+			array(
+				'label'      => 'اندازه آیکون دکمه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 12, 'max' => 48 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-icon:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'show_button' => 'yes' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'm_input_typo',
+				'label'    => 'قلم کادر',
+				'selector' => '{{WRAPPER}} .ard-se__input',
+			)
+		);
+
+		$this->add_control(
+			'm_placeholder',
+			array(
+				'label'     => 'رنگ متن راهنما',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se__input::placeholder' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_panel_heading',
+			array(
+				'label'     => 'پنل',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_panel_padding',
+			array(
+				'label'      => 'فاصله داخلی پنل',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-se--tpl-modern .ard-se__panel' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'm_panel_radius',
+			array(
+				'label'      => 'گردی پنل',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se--tpl-modern .ard-se__panel' => 'border-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_divider',
+			array(
+				'label'     => 'رنگ خط جداکننده',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-divider:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_head_heading',
+			array(
+				'label'     => 'عنوان بخش‌ها',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'm_head_color',
+			array(
+				'label'     => 'رنگ عنوان',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se__sec-title' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_head_icon',
+			array(
+				'label'     => 'رنگ آیکون عنوان',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se__sec-icon' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'm_head_typo',
+				'selector' => '{{WRAPPER}} .ard-se__sec-title',
+			)
+		);
+
+		$this->add_control(
+			'm_hist_heading',
+			array(
+				'label'     => 'تاریخچه',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'm_hist_color',
+			array(
+				'label'     => 'رنگ متن',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se__hist-link' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_hist_hover',
+			array(
+				'label'     => 'رنگ متن (هاور)',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se__hist-link:hover' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_hist_icon',
+			array(
+				'label'     => 'رنگ آیکون',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se__hist-icon' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_hist_del',
+			array(
+				'label'     => 'رنگ دکمه حذف',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se__hist-del' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'm_hist_typo',
+				'selector' => '{{WRAPPER}} .ard-se__hist-text',
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_hist_gap',
+			array(
+				'label'      => 'فاصله ردیف‌ها',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se__hist-item' => 'padding-block:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_chip_heading',
+			array(
+				'label'     => 'چیپ‌های پرمخاطب',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'm_chip_typo',
+				'selector' => '{{WRAPPER}} .ard-se__chip',
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_chip_padding',
+			array(
+				'label'      => 'فاصله داخلی',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-se__chip' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_control(
+			'm_chip_radius',
+			array(
+				'label'      => 'گردی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se__chip' => 'border-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_chip_gap',
+			array(
+				'label'      => 'فاصله چیپ‌ها',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 30 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se__chips' => 'gap:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->start_controls_tabs( 'm_chip_tabs' );
+
+		foreach ( array( 'normal' => 'عادی', 'hover' => 'هاور' ) as $state => $state_label ) {
+			$sel = '{{WRAPPER}} .ard-se__chip' . ( 'hover' === $state ? ':hover' : '' );
+
+			$this->start_controls_tab( 'm_chip_tab_' . $state, array( 'label' => $state_label ) );
+
+			$this->add_control(
+				'm_chip_color_' . $state,
+				array(
+					'label'     => 'رنگ متن',
+					'type'      => Controls_Manager::COLOR,
+					'selectors' => array( $sel => 'color:{{VALUE}};' ),
+				)
+			);
+
+			$this->add_control(
+				'm_chip_bg_' . $state,
+				array(
+					'label'     => 'رنگ زمینه',
+					'type'      => Controls_Manager::COLOR,
+					'selectors' => array( $sel => 'background:{{VALUE}};' ),
+				)
+			);
+
+			$this->add_control(
+				'm_chip_border_' . $state,
+				array(
+					'label'     => 'رنگ حاشیه',
+					'type'      => Controls_Manager::COLOR,
+					'selectors' => array( $sel => 'border-color:{{VALUE}};' ),
+				)
+			);
+
+			$this->end_controls_tab();
+		}
+
+		$this->end_controls_tabs();
+
+		$this->end_controls_section();
 	}
 
 	protected function render() {
@@ -365,19 +826,32 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 			$payload[ $key ] = 'yes' === $s[ 'card_' . $key ] ? 'yes' : 'no';
 		}
 
+		$modern = 'modern' === ( $s['template'] ?? 'classic' );
+
 		$classes = array_filter(
 			array(
 				'ard-se',
+				'ard-se--tpl-' . ( $modern ? 'modern' : 'classic' ),
 				'ard-se--w-' . $s['panel_width'],
 				'yes' === $s['show_button'] ? 'ard-se--has-btn' : '',
 			)
 		);
+
+		$home = '';
+
+		if ( $modern ) {
+			$home = sprintf(
+				' data-home="1" data-history="%d" data-home-click="%s"',
+				'yes' === $s['show_history'] ? max( 1, min( 20, (int) $s['history_limit'] ) ) : 0,
+				'fill' === $s['home_click'] ? 'fill' : 'go'
+			);
+		}
 		?>
 		<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
 			data-ard-search
 			data-min="<?php echo esc_attr( $min ); ?>"
 			data-delay="<?php echo esc_attr( max( 0, min( 2000, (int) $s['delay'] ) ) ); ?>"
-			data-args="<?php echo esc_attr( wp_json_encode( $payload ) ); ?>">
+			data-args="<?php echo esc_attr( wp_json_encode( $payload ) ); ?>"<?php echo $home; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- بالا با %d و مقدار ثابت ساخته شده. ?>>
 
 			<form class="ard-se__form" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 				<input type="hidden" name="post_type" value="product" />
@@ -412,8 +886,138 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 			<div class="ard-se__panel" id="<?php echo esc_attr( $uid ); ?>-panel" role="listbox" hidden aria-live="polite">
 				<div class="ard-se__hint"><?php echo esc_html( $hint ); ?></div>
 			</div>
+
+			<?php
+			if ( $modern ) {
+				$this->render_home( $s );
+			}
+			?>
 		</div>
 		<?php
+	}
+
+	/**
+	 * قالب پنلِ پیش از تایپ: تاریخچه و جست‌وجوی پرمخاطب.
+	 *
+	 * داخل <template> می‌نشیند و جاوااسکریپت هر بار از رویش یک نسخهٔ تازه
+	 * می‌سازد؛ تاریخچه در مرورگر است، پس ردیف‌هایش را همان‌جا پر می‌کند.
+	 *
+	 * @param array $s
+	 */
+	protected function render_home( $s ) {
+		$popular = 'yes' === $s['show_popular'] ? $this->popular_terms( $s ) : array();
+		?>
+		<template data-ard-se-home>
+			<div class="ard-se__home">
+				<?php if ( 'yes' === $s['show_history'] ) : ?>
+					<section class="ard-se__sec ard-se__sec--history" data-ard-se-history hidden>
+						<div class="ard-se__sec-head">
+							<span class="ard-se__sec-icon" aria-hidden="true"><?php echo $this->svg( 'clock', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+							<span class="ard-se__sec-title"><?php echo esc_html( $s['history_title'] ); ?></span>
+							<?php if ( 'yes' === $s['history_clear'] ) : ?>
+								<button type="button" class="ard-se__clear-all" data-ard-se-clear-all><?php echo esc_html( $s['history_clear_text'] ); ?></button>
+							<?php endif; ?>
+						</div>
+						<ul class="ard-se__hist" data-ard-se-hist-list></ul>
+					</section>
+				<?php endif; ?>
+
+				<?php if ( $popular ) : ?>
+					<section class="ard-se__sec ard-se__sec--popular">
+						<div class="ard-se__sec-head">
+							<span class="ard-se__sec-icon" aria-hidden="true"><?php echo $this->svg( 'bolt', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+							<span class="ard-se__sec-title"><?php echo esc_html( $s['popular_title'] ); ?></span>
+						</div>
+						<div class="ard-se__chips">
+							<?php foreach ( $popular as $term ) : ?>
+								<a class="ard-se__chip" href="<?php echo esc_url( Ardal_Search::results_url( $term ) ); ?>" data-ard-se-term="<?php echo esc_attr( $term ); ?>"><?php echo esc_html( $term ); ?></a>
+							<?php endforeach; ?>
+						</div>
+					</section>
+				<?php endif; ?>
+			</div>
+		</template>
+
+		<template data-ard-se-hist-item>
+			<li class="ard-se__hist-item">
+				<a class="ard-se__hist-link" href="#" data-ard-se-term="">
+					<span class="ard-se__hist-icon" aria-hidden="true"><?php echo $this->svg( 'history', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<span class="ard-se__hist-text"></span>
+				</a>
+				<button type="button" class="ard-se__hist-del" data-ard-se-del aria-label="حذف از تاریخچه"><?php echo $this->svg( 'close-circle', 26 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
+			</li>
+		</template>
+		<?php
+	}
+
+	/**
+	 * عبارت‌های پرمخاطب: دستی، خودکار یا هر دو.
+	 *
+	 * @param array $s
+	 * @return string[]
+	 */
+	protected function popular_terms( $s ) {
+		$limit  = max( 1, min( 30, (int) $s['popular_limit'] ) );
+		$source = $s['popular_source'];
+		$terms  = array();
+
+		if ( 'auto' !== $source ) {
+			foreach ( preg_split( '/\r\n|\r|\n/', (string) $s['popular_manual'] ) as $line ) {
+				$line = trim( $line );
+
+				if ( '' !== $line ) {
+					$terms[] = $line;
+				}
+			}
+		}
+
+		if ( 'manual' !== $source && count( $terms ) < $limit ) {
+			$terms = array_merge( $terms, Ardal_Search::popular( $limit * 2, max( 1, (int) $s['popular_min'] ) ) );
+		}
+
+		// تکراری‌ها با شکل یکدست‌شده شناخته می‌شوند؛ «كرم» و «کرم» یکی‌اند.
+		$out  = array();
+		$seen = array();
+
+		foreach ( $terms as $term ) {
+			$key = Ardal_Search::normalize( $term );
+
+			if ( isset( $seen[ $key ] ) ) {
+				continue;
+			}
+
+			$seen[ $key ] = true;
+			$out[]        = $term;
+
+			if ( count( $out ) >= $limit ) {
+				break;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * آیکون‌های قالب مدرن.
+	 *
+	 * @param string $name
+	 * @param int    $size
+	 * @return string
+	 */
+	private function svg( $name, $size ) {
+		$paths = array(
+			'clock'        => '<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>',
+			'bolt'         => '<path d="M13 3L5.5 13.5H12L11 21l7.5-10.5H12z"/>',
+			'history'      => '<path d="M19 12a7 7 0 1 1-4-6.3"/><path d="M14.5 8.5h4"/><path d="M15.5 11h3"/><path d="M17 17l3 3"/>',
+			'close-circle' => '<circle cx="12" cy="12" r="9"/><path d="M9.3 9.3l5.4 5.4"/><path d="M14.7 9.3l-5.4 5.4"/>',
+		);
+
+		return sprintf(
+			'<svg class="ard-i ard-i--%1$s" width="%2$d" height="%2$d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">%3$s</svg>',
+			esc_attr( $name ),
+			(int) $size,
+			$paths[ $name ]
+		);
 	}
 
 	/**
