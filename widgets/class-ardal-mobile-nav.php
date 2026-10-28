@@ -270,6 +270,13 @@ class Ardal_Widget_Mobile_Nav extends Ardal_Widget_Base {
 				'selectors' => array( '{{WRAPPER}} .ard-mnav__icon > svg' => 'width:{{SIZE}}{{UNIT}};height:{{SIZE}}{{UNIT}};', '{{WRAPPER}} .ard-mnav__icon > i' => 'font-size:{{SIZE}}{{UNIT}};' ),
 			)
 		);
+		/*
+		 * رنگ پرشدگی آیکون‌های SVG. آیکون‌های SVG آپلودی معمولاً fill ثابت روی
+		 * خودِ path دارند و color را نمی‌گیرند؛ پس fill صریحاً روی همهٔ اجزای
+		 * داخل svg نوشته می‌شود. خالی بماند، هیچ چیزی اعمال نمی‌شود.
+		 */
+		$this->add_control( 'icon_fill', array( 'label' => 'رنگ پرشدگی آیکون (fill)', 'type' => Controls_Manager::COLOR, 'separator' => 'before', 'selectors' => array( '{{WRAPPER}} .ard-mnav__item span.ard-mnav__icon svg *' => 'fill:{{VALUE}};' ) ) );
+		$this->add_control( 'active_icon_fill', array( 'label' => 'رنگ پرشدگی آیکون فعال (fill)', 'type' => Controls_Manager::COLOR, 'selectors' => array( '{{WRAPPER}} .ard-mnav__item.is-active span.ard-mnav__icon svg *' => 'fill:{{VALUE}};' ) ) );
 		$this->add_group_control( Group_Control_Typography::get_type(), array( 'name' => 'label_typography', 'selector' => '{{WRAPPER}} .ard-mnav__label' ) );
 		$this->add_control( 'label_color', array( 'label' => 'رنگ عنوان عادی', 'type' => Controls_Manager::COLOR, 'selectors' => array( '{{WRAPPER}} .ard-mnav__label' => 'color:{{VALUE}};' ) ) );
 		$this->add_control( 'active_label_color', array( 'label' => 'رنگ عنوان فعال', 'type' => Controls_Manager::COLOR, 'selectors' => array( '{{WRAPPER}} .ard-mnav__item.is-active .ard-mnav__label' => 'color:{{VALUE}};' ) ) );
