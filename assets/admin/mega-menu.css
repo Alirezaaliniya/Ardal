@@ -108,6 +108,19 @@
 	width: 100%;
 }
 
+/* پیش‌نمایش آیکون کوچک است، نه هم‌اندازهٔ بنر. */
+.ardal-mm-media--icon .ardal-mm-media__preview img {
+	width: 40px;
+	height: 40px;
+	padding: 6px;
+	object-fit: contain;
+	background: #fff;
+}
+
+.ardal-mm-media--icon .description {
+	display: block;
+}
+
 /* -------------------------------------------------------------------------
  * ۲. کارت تنظیمات تزریق خودکار زیردسته‌ها (Dynamic Taxonomy)
  * ------------------------------------------------------------------------- */

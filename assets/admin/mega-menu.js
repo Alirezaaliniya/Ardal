@@ -619,7 +619,7 @@
 
 			if ( ! frames[ key ] ) {
 				frames[ key ] = wp.media( {
-					title: 'انتخاب بنر مگا منو',
+					title: $media.hasClass( 'ardal-mm-media--icon' ) ? 'انتخاب آیکون آیتم منو' : 'انتخاب بنر مگا منو',
 					button: { text: 'استفاده از این تصویر' },
 					library: { type: 'image' },
 					multiple: false

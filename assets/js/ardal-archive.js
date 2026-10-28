@@ -145,6 +145,69 @@
 		);
 	}
 
+	/*
+	 * بازکننده‌های دلخواه: هر عنصری (معمولاً ویجتی که در تب «پیشرفته» المنتور
+	 * کلاس CSS گرفته) با این کلاس‌ها همان کار دکمه‌های خودِ اردال را می‌کند.
+	 */
+	var TRIGGER_SELECTOR = '.ard-open-filter, .ard-open-sort';
+
+	/**
+	 * کشویی که یک بازکنندهٔ دلخواه باید باز کند، یا '' اگر الان کشویی در کار
+	 * نیست.
+	 *
+	 * فقط وقتی باز می‌شود که کشو واقعاً در حالت شناور باشد (موبایل). در دسکتاپ
+	 * ستون فیلتر سر جایش است و نوار مرتب‌سازی افقی؛ اگر آنجا هم باز می‌کردیم،
+	 * صفحه بی‌دلیل قفل می‌شد و هیچ چیزی دیده نمی‌شد.
+	 *
+	 * @param {Element} el
+	 * @return {string}
+	 */
+	function triggerPanel( el ) {
+		var kind = el.classList.contains( 'ard-open-filter' ) ? 'filter' : 'sort';
+		var candidates = 'filter' === kind
+			? [ [ '.ard-fil--drawer', 'filters' ] ]
+			// ویجت مستقل مرتب‌سازی اولویت دارد؛ وگرنه شیتِ نوار مرتب‌سازی.
+			: [ [ '.ard-sort-sheet', 'sortbar' ], [ '.ard-sheet', 'sort' ] ];
+
+		for ( var i = 0; i < candidates.length; i++ ) {
+			var panel = document.querySelector( candidates[ i ][ 0 ] );
+
+			if ( ! panel ) {
+				continue;
+			}
+
+			var style = window.getComputedStyle( panel );
+
+			if ( 'fixed' === style.position && 'none' !== style.display ) {
+				return candidates[ i ][ 1 ];
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * بازکننده‌ای که خودش دکمه یا لینک نیست، با صفحه‌کلید هم باید کار کند.
+	 */
+	function initTriggers() {
+		Array.prototype.forEach.call( document.querySelectorAll( TRIGGER_SELECTOR ), function ( el ) {
+			if ( el.ardTriggerReady ) {
+				return;
+			}
+
+			el.ardTriggerReady = true;
+
+			var inner = el.querySelector( 'a, button' );
+
+			if ( ! inner && ! el.matches( 'a, button' ) ) {
+				el.setAttribute( 'role', 'button' );
+				el.setAttribute( 'tabindex', '0' );
+			}
+
+			el.style.cursor = 'pointer';
+		} );
+	}
+
 	document.addEventListener( 'click', function ( event ) {
 		var open = event.target.closest( '[data-ard-arch-open]' );
 
@@ -153,6 +216,20 @@
 			setPanel( open.getAttribute( 'data-ard-arch-open' ) );
 
 			return;
+		}
+
+		var trigger = event.target.closest( TRIGGER_SELECTOR );
+
+		if ( trigger ) {
+			var name = triggerPanel( trigger );
+
+			// در دسکتاپ لینکِ داخل ویجت کار عادی‌اش را می‌کند.
+			if ( name ) {
+				event.preventDefault();
+				setPanel( name );
+
+				return;
+			}
 		}
 
 		if ( event.target.closest( '[data-ard-arch-close]' ) ) {
@@ -164,6 +241,18 @@
 	document.addEventListener( 'keydown', function ( event ) {
 		if ( 'Escape' === event.key ) {
 			setPanel( '' );
+
+			return;
+		}
+
+		// اینتر و فاصله روی بازکنندهٔ دلخواهی که role="button" گرفته.
+		if ( ( 'Enter' === event.key || ' ' === event.key ) && event.target.matches && event.target.matches( TRIGGER_SELECTOR ) && 'button' === event.target.getAttribute( 'role' ) ) {
+			var name = triggerPanel( event.target );
+
+			if ( name ) {
+				event.preventDefault();
+				setPanel( name );
+			}
 		}
 	} );
 
@@ -1174,6 +1263,7 @@
 		each( '[data-ard-rail-track]', initRail );
 		each( '[data-ard-sort-select]', initSortSelect );
 		each( '[data-ard-desc]', initDesc );
+		initTriggers();
 
 		// each پرچمش را روی خودِ عنصر می‌گذارد و کشوی فیلتر بالاتر همان پرچم را
 		// گرفته؛ پس اینجا مستقیم پیمایش می‌کنیم و خودِ initSheetDrag تکرار را

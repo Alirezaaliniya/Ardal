@@ -1,0 +1,478 @@
+/*!
+ * Ardal — منوی دسته‌بندی (ard-cm)
+ *
+ * دسکتاپ: ستون آیتم‌ها + پنل زیردسته‌ها. زیر ۱۰۲۴ پیکسل: آکاردئون با کارت.
+ * همه سلکتورها با «.ard-cm» شروع می‌شوند؛ رنگ لینک کیت المنتور
+ * (.elementor-kit-N a) و ریست دکمهٔ قالب Hello در غیر این صورت رویشان می‌نشست.
+ */
+
+.elementor-widget-ardal-category-menu {
+	direction: rtl;
+	text-align: right;
+}
+
+.ard-cm {
+	--ard-cm-list-w: 32%;
+	--ard-cm-gap: 8px;
+	--ard-cm-cols: 3;
+	--ard-cm-card-cols: 3;
+	--ard-cm-line: #ececf2;
+	--ard-cm-ink: #2b2b33;
+	--ard-cm-active-from: #f8457f;
+	--ard-cm-active-to: #ef1767;
+	--ard-cm-dot: #f11763;
+	--ard-cm-sub-dot: #d9d9df;
+
+	font-family: var(--ard-font, inherit);
+	color: var(--ard-cm-ink);
+}
+
+.ard-cm *,
+.ard-cm *::before,
+.ard-cm *::after {
+	box-sizing: border-box;
+}
+
+.ard-cm__body {
+	display: grid;
+	grid-template-columns: var(--ard-cm-list-w) minmax(0, 1fr);
+	align-items: stretch;
+	gap: 28px;
+}
+
+/* ---------------------------------------- آیکون */
+
+.ard-cm .ard-cm__icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	font-size: 22px;
+	line-height: 1;
+}
+
+.ard-cm .ard-cm__icon:empty {
+	display: none;
+}
+
+.ard-cm .ard-cm__icon svg,
+.ard-cm .ard-cm__icon img {
+	display: block;
+	width: 1em;
+	height: 1em;
+	object-fit: contain;
+}
+
+/* آیکون آپلودی به‌شکل ماسک: رنگش همان رنگ متن است. */
+.ard-cm .ard-cm__mask {
+	display: block;
+	width: 1em;
+	height: 1em;
+	background: currentColor;
+	-webkit-mask: var(--ard-cm-mask) center / contain no-repeat;
+	mask: var(--ard-cm-mask) center / contain no-repeat;
+}
+
+/* ---------------------------------------- ستون آیتم‌ها */
+
+.ard-cm .ard-cm__list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ard-cm-gap);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-cm .ard-cm__item {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-cm .ard-cm__row,
+.ard-cm .ard-cm__row:hover,
+.ard-cm .ard-cm__row:focus {
+	text-decoration: none;
+}
+
+.ard-cm .ard-cm__row {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	min-height: 52px;
+	margin: 0;
+	padding: 0 20px;
+	border: 1.5px solid var(--ard-cm-line);
+	border-radius: 14px;
+	background: var(--ard-base, #fff);
+	box-shadow: none;
+	color: var(--ard-cm-ink);
+	font-family: inherit;
+	font-size: 15px;
+	font-weight: 500;
+	line-height: 1.5;
+	text-align: start;
+	cursor: pointer;
+	transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .25s ease;
+}
+
+.ard-cm .ard-cm__item:not(.is-active) > .ard-cm__row:hover,
+.ard-cm .ard-cm__item:not(.is-active) > .ard-cm__row:focus {
+	border-color: color-mix(in srgb, var(--ard-cm-active-to) 35%, var(--ard-cm-line));
+	background: var(--ard-base, #fff);
+	color: var(--ard-cm-ink);
+}
+
+.ard-cm .ard-cm__item.is-active > .ard-cm__row,
+.ard-cm .ard-cm__item.is-active > .ard-cm__row:hover,
+.ard-cm .ard-cm__item.is-active > .ard-cm__row:focus {
+	border-color: transparent;
+	background: linear-gradient(to left, var(--ard-cm-active-from), var(--ard-cm-active-to));
+	box-shadow: 0 16px 34px -14px color-mix(in srgb, var(--ard-cm-active-to) 70%, transparent);
+	color: #fff;
+}
+
+.ard-cm .ard-cm__row:focus-visible {
+	outline: 2px solid var(--ard-cm-active-to);
+	outline-offset: 2px;
+}
+
+.ard-cm .ard-cm__label {
+	flex: 1 1 auto;
+	min-width: 0;
+	text-align: center;
+}
+
+.ard-cm .ard-cm__arrow {
+	display: inline-flex;
+	flex: 0 0 auto;
+	transition: transform .2s ease;
+}
+
+.ard-cm .ard-cm__arrow svg {
+	display: block;
+}
+
+/* کارت‌ها فقط در موبایل. */
+.ard-cm .ard-cm__grid {
+	display: none;
+}
+
+/* ---------------------------------------- پنل دسکتاپ */
+
+.ard-cm .ard-cm__panel {
+	min-width: 0;
+	padding: 28px 36px;
+	border-radius: 24px;
+	background: #f7f7fa;
+}
+
+.ard-cm .ard-cm__pane[hidden] {
+	display: none;
+}
+
+.ard-cm .ard-cm__pane {
+	animation: ard-cm-fade .22s ease;
+}
+
+@keyframes ard-cm-fade {
+	from { opacity: 0; transform: translateY(4px); }
+	to   { opacity: 1; transform: none; }
+}
+
+.ard-cm .ard-cm__cols {
+	display: grid;
+	grid-template-columns: repeat(var(--ard-cm-cols), minmax(0, 1fr));
+	gap: 36px 32px;
+}
+
+.ard-cm .ard-cm__col {
+	min-width: 0;
+}
+
+.ard-cm .ard-cm__head {
+	display: flex;
+	align-items: baseline;
+	gap: 14px;
+	color: var(--ard-cm-ink);
+	font-size: 18px;
+	font-weight: 700;
+	line-height: 1.6;
+	text-decoration: none;
+	transition: color .15s ease;
+}
+
+.ard-cm a.ard-cm__head:hover {
+	color: var(--ard-cm-active-to);
+	text-decoration: none;
+}
+
+.ard-cm .ard-cm__head::before,
+.ard-cm .ard-cm__sub::before {
+	content: "";
+	flex: 0 0 auto;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--ard-cm-dot);
+	transform: translateY(-2px);
+}
+
+.ard-cm .ard-cm__subs {
+	display: flex;
+	flex-direction: column;
+	gap: 22px;
+	margin: 22px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-cm .ard-cm__subs > li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ard-cm .ard-cm__sub {
+	display: flex;
+	align-items: baseline;
+	gap: 14px;
+	color: #b9b9c3;
+	font-size: 15px;
+	line-height: 1.6;
+	text-decoration: none;
+	transition: color .15s ease;
+}
+
+.ard-cm .ard-cm__sub::before {
+	width: 6px;
+	height: 6px;
+	background: var(--ard-cm-sub-dot);
+}
+
+.ard-cm a.ard-cm__sub:hover,
+.ard-cm .ard-cm__sub.is-current {
+	color: var(--ard-cm-ink);
+	text-decoration: none;
+}
+
+.ard-cm .ard-cm__all {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 28px;
+	color: var(--ard-cm-active-to);
+	font-size: 14px;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.ard-cm .ard-cm__all:hover {
+	text-decoration: none;
+	filter: brightness(1.1);
+}
+
+/* ---------------------------------------- پنجره (حالت popup) */
+
+.ard-cm .ard-cm__bar {
+	display: none;
+}
+
+.ard-cm--popup:not(.ard-cm--preview) {
+	position: fixed;
+	inset: 0;
+	z-index: 100002;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.ard-cm--popup.is-open {
+	visibility: visible;
+	pointer-events: auto;
+}
+
+.ard-cm--popup:not(.ard-cm--preview) .ard-cm__scrim {
+	position: absolute;
+	inset: 0;
+	background: rgba(20, 22, 40, .45);
+	opacity: 0;
+	transition: opacity .25s ease;
+}
+
+.ard-cm--popup.is-open .ard-cm__scrim {
+	opacity: 1;
+}
+
+.ard-cm--popup:not(.ard-cm--preview) .ard-cm__dialog {
+	position: absolute;
+	top: var(--ard-cm-top, 90px);
+	left: 50%;
+	width: min(var(--ard-cm-popup-w, 1200px), calc(100vw - 32px));
+	max-height: calc(100vh - var(--ard-cm-top, 90px) - 24px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	border-radius: var(--ard-cm-popup-radius, 24px);
+	background: var(--ard-base, #fff);
+	box-shadow: 0 30px 70px -20px rgba(20, 22, 40, .35);
+	opacity: 0;
+	transform: translate(-50%, 12px);
+	transition: opacity .22s ease, transform .25s cubic-bezier(.22, .61, .36, 1);
+}
+
+.ard-cm--popup.is-open .ard-cm__dialog {
+	opacity: 1;
+	transform: translate(-50%, 0);
+}
+
+.ard-cm--popup:not(.ard-cm--preview) .ard-cm__body {
+	padding: 20px;
+}
+
+.ard-cm--preview .ard-cm__scrim {
+	display: none;
+}
+
+html.ard-cm-locked,
+html.ard-cm-locked body {
+	overflow: hidden;
+}
+
+.ard-cm .ard-cm__close,
+.ard-cm .ard-cm__close:hover,
+.ard-cm .ard-cm__close:focus {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 0;
+	background: none;
+	box-shadow: none;
+	color: var(--ard-cm-ink);
+	font-size: 30px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.ard-cm .ard-cm__close svg {
+	width: 1em;
+	height: 1em;
+}
+
+/* ==========================================================================
+   موبایل و تبلت: آکاردئون
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+	.ard-cm__body {
+		display: block;
+	}
+
+	.ard-cm .ard-cm__panel {
+		display: none;
+	}
+
+	.ard-cm .ard-cm__item.is-active > .ard-cm__grid {
+		display: grid;
+		grid-template-columns: repeat(var(--ard-cm-card-cols), minmax(0, 1fr));
+		gap: 8px;
+		margin-top: var(--ard-cm-gap);
+		animation: ard-cm-fade .22s ease;
+	}
+
+	/* فلش آیتم باز به پایین می‌چرخد. */
+	.ard-cm .ard-cm__item.is-active > .ard-cm__row .ard-cm__arrow {
+		transform: rotate(-90deg);
+	}
+
+	.ard-cm .ard-cm__card,
+	.ard-cm .ard-cm__card:hover,
+	.ard-cm .ard-cm__card:focus {
+		text-decoration: none;
+	}
+
+	.ard-cm .ard-cm__card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		min-width: 0;
+		min-height: 100px;
+		padding: 14px 8px;
+		border: 1px solid var(--ard-cm-line);
+		border-radius: 14px;
+		background: var(--ard-base, #fff);
+		color: var(--ard-cm-ink);
+		font-size: 13px;
+		line-height: 1.6;
+		text-align: center;
+		transition: border-color .15s ease, color .15s ease;
+	}
+
+	.ard-cm a.ard-cm__card:hover {
+		border-color: color-mix(in srgb, var(--ard-cm-active-to) 40%, var(--ard-cm-line));
+	}
+
+	.ard-cm .ard-cm__card .ard-cm__icon {
+		font-size: 28px;
+	}
+
+	.ard-cm .ard-cm__card-label {
+		display: block;
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* پنجره در موبایل تمام‌صفحه است و از کنار می‌آید. */
+	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__dialog {
+		top: 0;
+		right: 0;
+		left: 0;
+		bottom: 0;
+		display: flex;
+		flex-direction: column;
+		width: auto;
+		max-height: none;
+		border-radius: 0;
+		transform: translateX(100%);
+	}
+
+	.ard-cm--popup.is-open .ard-cm__dialog {
+		transform: none;
+	}
+
+	.ard-cm--popup .ard-cm__bar {
+		display: flex;
+		flex: 0 0 auto;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 18px 20px 10px;
+	}
+
+	.ard-cm .ard-cm__bar-title {
+		font-size: 17px;
+		font-weight: 700;
+	}
+
+	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__body {
+		flex: 1 1 auto;
+		overflow-y: auto;
+		padding: 10px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ard-cm .ard-cm__pane,
+	.ard-cm .ard-cm__grid,
+	.ard-cm--popup .ard-cm__dialog,
+	.ard-cm--popup .ard-cm__scrim {
+		animation: none;
+		transition: none;
+	}
+}

@@ -428,6 +428,18 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		);
 
 		$this->add_control(
+			'external_trigger',
+			array(
+				'label'        => 'باز شدن با ویجت دیگر',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'description'  => 'به ویجت دلخواه (دکمه، آیکون، متن…) در تب «پیشرفته» ← «کلاس‌های CSS» این کلاس را بدهید: <code>ard-open-filter</code><br>با روشن کردن این گزینه، دکمهٔ پیش‌فرض همین ویجت در موبایل نشان داده نمی‌شود.',
+				'condition'    => array( 'mobile_mode' => 'drawer' ),
+			)
+		);
+
+		$this->add_control(
 			'fab',
 			array(
 				'label'        => 'دکمه شناور فیلتر در موبایل',
@@ -435,7 +447,10 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 				'default'      => '',
 				'return_value' => 'yes',
 				'description'  => 'اگر ویجت «نوار مرتب‌سازی» را در صفحه ندارید، این را روشن کنید.',
-				'condition'    => array( 'mobile_mode' => 'drawer' ),
+				'condition'    => array(
+					'mobile_mode'       => 'drawer',
+					'external_trigger!' => 'yes',
+				),
 			)
 		);
 
@@ -632,8 +647,9 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 				'label'     => 'دکمه فیلتر موبایل',
 				'tab'       => Controls_Manager::TAB_STYLE,
 				'condition' => array(
-					'fab'         => 'yes',
-					'mobile_mode' => 'drawer',
+					'fab'               => 'yes',
+					'mobile_mode'       => 'drawer',
+					'external_trigger!' => 'yes',
 				),
 			)
 		);
@@ -1120,7 +1136,7 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 
 		Ardal_Archive::render_scrim();
 
-		if ( 'yes' === $s['fab'] && 'drawer' === $s['mobile_mode'] ) {
+		if ( 'yes' === $s['fab'] && 'drawer' === $s['mobile_mode'] && 'yes' !== ( $s['external_trigger'] ?? '' ) ) {
 			$this->render_fab( $s, $active );
 		}
 	}

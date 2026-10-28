@@ -36,6 +36,7 @@ class Ardal_Mega_Menu {
 			'mega'               => 'switch',
 			'cols'               => 'int',
 			'icon'               => 'key',
+			'icon_img'           => 'int',
 			'badge'              => 'text',
 			'badge_tone'         => 'key',
 			'desc'               => 'text',
@@ -216,6 +217,38 @@ class Ardal_Mega_Menu {
 					<?php endforeach; ?>
 				</select>
 			</p>
+
+			<?php
+			$icon_img_id  = (int) $values['icon_img'];
+			$icon_img_src = $icon_img_id ? wp_get_attachment_image_url( $icon_img_id, 'thumbnail' ) : '';
+
+			// SVG معمولاً اندازهٔ میانی ندارد؛ نشانی اصلی فایل جایگزین می‌شود.
+			if ( $icon_img_id && ! $icon_img_src ) {
+				$icon_img_src = wp_get_attachment_url( $icon_img_id );
+			}
+			?>
+			<div class="ardal-mm-row ardal-mm-media ardal-mm-media--icon" data-ardal-mm-media>
+				<label>یا آیکون دلخواه (SVG یا PNG)</label>
+
+				<span class="ardal-mm-media__preview" data-ardal-mm-preview>
+					<?php if ( $icon_img_src ) : ?>
+						<img src="<?php echo esc_url( $icon_img_src ); ?>" alt="">
+					<?php endif; ?>
+				</span>
+
+				<input
+					type="hidden"
+					name="<?php echo esc_attr( $name ); ?>[icon_img]"
+					value="<?php echo esc_attr( $icon_img_id ? $icon_img_id : '' ); ?>"
+					data-ardal-mm-image
+				>
+
+				<span class="ardal-mm-media__actions">
+					<button type="button" class="button" data-ardal-mm-pick>انتخاب آیکون</button>
+					<button type="button" class="button-link" data-ardal-mm-clear>حذف</button>
+				</span>
+				<span class="description">اگر انتخاب شود، جای آیکون بالا می‌نشیند. در «منوی دسته‌بندی اردال» آیکون تک‌رنگ با رنگ متن رنگ می‌گیرد.</span>
+			</div>
 
 			<p class="ardal-mm-row">
 				<label for="<?php echo esc_attr( $id ); ?>-desc">توضیح کوتاه</label>
@@ -1077,8 +1110,16 @@ class Ardal_Mega_Menu_Walker extends Walker_Nav_Menu {
 		$title = apply_filters( 'the_title', $item->title, $item->ID );
 
 		$out = '';
+		$img = (int) Ardal_Mega_Menu::get( $item->ID, 'icon_img' );
+		$src = $img ? wp_get_attachment_url( $img ) : '';
 
-		if ( '' !== $icon ) {
+		if ( $src ) {
+			$out .= sprintf(
+				'<span class="ard-mm__icon"><img src="%1$s" alt="" width="%2$d" height="%2$d" loading="lazy" style="width:%2$dpx;height:%2$dpx;object-fit:contain"></span>',
+				esc_url( $src ),
+				(int) $icon_size
+			);
+		} elseif ( '' !== $icon ) {
 			$out .= '<span class="ard-mm__icon">' . Ardal_Helpers::icon( $icon, $icon_size ) . '</span>';
 		}
 

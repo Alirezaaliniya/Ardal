@@ -181,12 +181,29 @@ class Ardal_Widget_Archive_Sort extends Ardal_Archive_Widget_Base {
 		);
 
 		$this->add_control(
+			'external_trigger',
+			array(
+				'label'        => 'باز شدن با ویجت دیگر',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+				'description'  => 'به ویجت دلخواه (دکمه، آیکون، متن…) در تب «پیشرفته» ← «کلاس‌های CSS» این کلاس را بدهید: <code>ard-open-sort</code><br>با روشن کردن این گزینه، دکمهٔ پیش‌فرض همین ویجت در موبایل نشان داده نمی‌شود.',
+				'condition'    => array( 'mobile_mode' => 'drawer' ),
+			)
+		);
+
+		$trigger_cond = array(
+			'mobile_mode'       => 'drawer',
+			'external_trigger!' => 'yes',
+		);
+
+		$this->add_control(
 			'trigger_text',
 			array(
 				'label'     => 'متن دکمه',
 				'type'      => Controls_Manager::TEXT,
 				'default'   => 'مرتب‌سازی',
-				'condition' => array( 'mobile_mode' => 'drawer' ),
+				'condition' => $trigger_cond,
 			)
 		);
 
@@ -197,7 +214,7 @@ class Ardal_Widget_Archive_Sort extends Ardal_Archive_Widget_Base {
 				'type'         => Controls_Manager::SWITCHER,
 				'default'      => 'yes',
 				'return_value' => 'yes',
-				'condition'    => array( 'mobile_mode' => 'drawer' ),
+				'condition'    => $trigger_cond,
 			)
 		);
 
@@ -209,7 +226,7 @@ class Ardal_Widget_Archive_Sort extends Ardal_Archive_Widget_Base {
 				'skin'        => 'inline',
 				'label_block' => false,
 				'description' => 'خالی = آیکون مرتب‌سازی پیش‌فرض.',
-				'condition'   => array( 'mobile_mode' => 'drawer' ),
+				'condition'   => $trigger_cond,
 			)
 		);
 
@@ -522,7 +539,10 @@ class Ardal_Widget_Archive_Sort extends Ardal_Archive_Widget_Base {
 			array(
 				'label'     => 'دکمه موبایل',
 				'tab'       => Controls_Manager::TAB_STYLE,
-				'condition' => array( 'mobile_mode' => 'drawer' ),
+				'condition' => array(
+					'mobile_mode'       => 'drawer',
+					'external_trigger!' => 'yes',
+				),
 			)
 		);
 
@@ -987,7 +1007,7 @@ class Ardal_Widget_Archive_Sort extends Ardal_Archive_Widget_Base {
 
 		$this->render_bar( $s, $options );
 
-		if ( $drawer ) {
+		if ( $drawer && 'yes' !== ( $s['external_trigger'] ?? '' ) ) {
 			printf(
 				'<button type="button" class="ard-sort__trigger" data-ard-arch-open="sortbar" aria-controls="%s" aria-expanded="false"><span class="ard-sort__trigger-icon" aria-hidden="true">%s</span><span class="ard-sort__trigger-text">%s</span>%s</button>',
 				esc_attr( $sheet ),
