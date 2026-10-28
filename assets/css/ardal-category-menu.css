@@ -277,7 +277,8 @@
 
 /* ---------------------------------------- پنجره (حالت popup) */
 
-.ard-cm .ard-cm__bar {
+.ard-cm .ard-cm__bar,
+.ard-cm .ard-cm__grip {
 	display: none;
 }
 
@@ -428,31 +429,99 @@ html.ard-cm-locked body {
 		white-space: nowrap;
 	}
 
-	/* پنجره در موبایل تمام‌صفحه است و از کنار می‌آید. */
-	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__dialog {
-		top: 0;
+	/*
+	 * کشوی پایینی موبایل — هم برای «پنهان در همه‌جا» و هم «موبایل کشویی».
+	 * همان شکل و حرکت کشوی فیلتر آرشیو: از پایین بالا می‌آید، گوشه‌های بالا
+	 * گرد، دستگیره و سربرگی که با کشیدن به پایین می‌بندد.
+	 */
+	.ard-cm--sheet:not(.ard-cm--preview) {
+		position: fixed;
+		inset: 0;
+		z-index: 100002;
+		visibility: hidden;
+		pointer-events: none;
+	}
+
+	.ard-cm--sheet.is-open {
+		visibility: visible;
+		pointer-events: auto;
+	}
+
+	.ard-cm--sheet:not(.ard-cm--preview) .ard-cm__scrim {
+		position: absolute;
+		inset: 0;
+		background: rgba(20, 22, 40, .45);
+		opacity: 0;
+		transition: opacity .28s ease;
+	}
+
+	.ard-cm--sheet.is-open .ard-cm__scrim {
+		opacity: 1;
+	}
+
+	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__dialog,
+	.ard-cm--sheet:not(.ard-cm--preview) .ard-cm__dialog {
+		position: absolute;
+		top: auto;
 		right: 0;
-		left: 0;
 		bottom: 0;
+		left: 0;
 		display: flex;
 		flex-direction: column;
 		width: auto;
-		max-height: none;
-		border-radius: 0;
-		transform: translateX(100%);
+		max-height: var(--ard-cm-sheet-max, 86vh);
+		overflow: hidden;
+		border-radius: var(--ard-cm-popup-radius, 24px) var(--ard-cm-popup-radius, 24px) 0 0;
+		background: var(--ard-base, #fff);
+		box-shadow: 0 -10px 40px rgba(20, 22, 40, .22);
+		opacity: 1;
+		transform: translateY(105%);
+		transition: transform .3s cubic-bezier(.22, .61, .36, 1);
 	}
 
-	.ard-cm--popup.is-open .ard-cm__dialog {
+	.ard-cm--popup.is-open .ard-cm__dialog,
+	.ard-cm--sheet.is-open .ard-cm__dialog {
 		transform: none;
 	}
 
-	.ard-cm--popup .ard-cm__bar {
+	/* حین کشیدن با انگشت، جابه‌جایی دقیقاً پای انگشت است نه با گذار. */
+	.ard-cm .ard-cm__dialog.is-dragging {
+		transition: none;
+	}
+
+	.ard-cm--popup .ard-cm__grip,
+	.ard-cm--sheet .ard-cm__grip {
+		display: block;
+		flex: 0 0 auto;
+		width: 44px;
+		height: 5px;
+		margin: 8px auto 0;
+		border-radius: 3px;
+		background: var(--ard-border, #e2e2e8);
+	}
+
+	.ard-cm--popup .ard-cm__bar,
+	.ard-cm--sheet .ard-cm__bar {
 		display: flex;
 		flex: 0 0 auto;
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
-		padding: 18px 20px 10px;
+		padding: 18px 20px 12px;
+	}
+
+	/* دستگیره و سربرگ ناحیهٔ کشیدن‌اند؛ دکمهٔ بستن کلیک‌پذیر می‌ماند. */
+	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__grip,
+	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__bar,
+	.ard-cm--sheet:not(.ard-cm--preview) .ard-cm__grip,
+	.ard-cm--sheet:not(.ard-cm--preview) .ard-cm__bar {
+		touch-action: none;
+		cursor: grab;
+		user-select: none;
+	}
+
+	.ard-cm .ard-cm__bar .ard-cm__close {
+		touch-action: auto;
 	}
 
 	.ard-cm .ard-cm__bar-title {
@@ -460,10 +529,25 @@ html.ard-cm-locked body {
 		font-weight: 700;
 	}
 
-	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__body {
+	.ard-cm--popup:not(.ard-cm--preview) .ard-cm__body,
+	.ard-cm--sheet:not(.ard-cm--preview) .ard-cm__body {
 		flex: 1 1 auto;
+		min-height: 0;
 		overflow-y: auto;
-		padding: 10px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+		overscroll-behavior: contain;
+		padding: 4px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+	}
+
+	/* در ویرایشگر، کشو همان‌جا باز دیده می‌شود. */
+	.ard-cm--preview .ard-cm__grip {
+		display: none;
+	}
+}
+
+/* دسکتاپ: حالت «موبایل کشویی» یعنی همان منوی همیشه‌در‌صفحه. */
+@media (min-width: 1025px) {
+	.ard-cm--sheet .ard-cm__scrim {
+		display: none;
 	}
 }
 
@@ -471,7 +555,9 @@ html.ard-cm-locked body {
 	.ard-cm .ard-cm__pane,
 	.ard-cm .ard-cm__grid,
 	.ard-cm--popup .ard-cm__dialog,
-	.ard-cm--popup .ard-cm__scrim {
+	.ard-cm--popup .ard-cm__scrim,
+	.ard-cm--sheet .ard-cm__dialog,
+	.ard-cm--sheet .ard-cm__scrim {
 		animation: none;
 		transition: none;
 	}

@@ -165,8 +165,15 @@
 			} );
 		} );
 
+		initDrag( root );
+
 		if ( MOBILE ) {
 			var onChange = function () {
+				// کشوی موبایلی که باز مانده، در دسکتاپ معنایی ندارد.
+				if ( openRoot === root && root.classList.contains( 'ard-cm--sheet' ) && ! isMobile() ) {
+					closePopup();
+				}
+
 				reset( root );
 			};
 
@@ -306,6 +313,24 @@
 	}
 
 	/**
+	 * آیا این منو الان می‌تواند به‌شکل پنجره/کشو باز شود؟
+	 *
+	 * «موبایل کشویی» در دسکتاپ همیشه در صفحه است؛ آنجا بازکننده کاری نمی‌کند
+	 * و لینکش (اگر داشته باشد) کار عادی‌اش را انجام می‌دهد.
+	 */
+	function openable( root ) {
+		if ( ! root || root.classList.contains( 'ard-cm--preview' ) ) {
+			return false;
+		}
+
+		if ( root.classList.contains( 'ard-cm--popup' ) ) {
+			return true;
+		}
+
+		return root.classList.contains( 'ard-cm--sheet' ) && isMobile();
+	}
+
+	/**
 	 * پنجره‌ای که یک کلیک باید باز کند، یا null.
 	 */
 	function popupFor( target ) {
@@ -317,17 +342,115 @@
 			if ( hash ) {
 				var byId = document.getElementById( hash );
 
-				if ( byId && byId.matches( '.ard-cm--popup:not(.ard-cm--preview)' ) ) {
+				if ( byId && byId.hasAttribute( 'data-ard-cm' ) && openable( byId ) ) {
 					return byId;
 				}
 			}
 		}
 
 		if ( target.closest( '.ard-open-catmenu' ) ) {
-			return document.querySelector( '.ard-cm--popup:not(.ard-cm--preview)' );
+			var all = document.querySelectorAll( '.ard-cm--popup, .ard-cm--sheet' );
+
+			for ( var i = 0; i < all.length; i++ ) {
+				if ( openable( all[ i ] ) ) {
+					return all[ i ];
+				}
+			}
 		}
 
 		return null;
+	}
+
+	/*
+	 * کشیدن کشو با انگشت، مثل کشوی فیلتر: از دستگیره یا سربرگ می‌گیری،
+	 * کشو پای انگشت پایین می‌آید؛ اگر از یک‌چهارم ارتفاع یا با سرعت رها شود
+	 * بسته می‌شود، وگرنه برمی‌گردد.
+	 */
+	function initDrag( root ) {
+		var dialog = root.querySelector( '.ard-cm__dialog' );
+
+		if ( ! dialog || dialog.ardDragReady ) {
+			return;
+		}
+
+		dialog.ardDragReady = true;
+
+		var drag = null;
+
+		dialog.addEventListener( 'pointerdown', function ( event ) {
+			if ( ! isMobile() || ( event.button && 0 !== event.button ) ) {
+				return;
+			}
+
+			if ( event.target.closest( 'button, a' ) || ! event.target.closest( '.ard-cm__grip, .ard-cm__bar' ) ) {
+				return;
+			}
+
+			drag = { id: event.pointerId, y: event.clientY, at: Date.now(), moved: false };
+
+			if ( dialog.setPointerCapture ) {
+				dialog.setPointerCapture( event.pointerId );
+			}
+		} );
+
+		dialog.addEventListener( 'pointermove', function ( event ) {
+			if ( ! drag ) {
+				return;
+			}
+
+			var dy = event.clientY - drag.y;
+
+			if ( ! drag.moved && Math.abs( dy ) < 4 ) {
+				return;
+			}
+
+			drag.moved = true;
+			dialog.classList.add( 'is-dragging' );
+
+			// بالا کشیدن جایی ندارد؛ با مقاومت حرکت می‌کند.
+			dialog.style.transform = 'translateY(' + ( dy < 0 ? dy / 4 : dy ) + 'px)';
+			event.preventDefault();
+		} );
+
+		function finish( event ) {
+			if ( ! drag ) {
+				return;
+			}
+
+			var dy = event.clientY - drag.y;
+			var speed = dy / Math.max( 1, Date.now() - drag.at );
+			var shut = drag.moved && dy > 0 && ( dy > dialog.getBoundingClientRect().height / 4 || ( speed > 0.5 && dy > 40 ) );
+
+			if ( dialog.releasePointerCapture && dialog.hasPointerCapture && dialog.hasPointerCapture( drag.id ) ) {
+				dialog.releasePointerCapture( drag.id );
+			}
+
+			drag = null;
+			dialog.classList.remove( 'is-dragging' );
+
+			if ( ! shut ) {
+				dialog.style.transform = '';
+
+				return;
+			}
+
+			// از همان‌جا که انگشت رها کرد پایین برود، بعد دست CSS بیفتد.
+			dialog.style.transform = 'translateY(105%)';
+			closePopup();
+
+			window.setTimeout( function () {
+				dialog.style.transform = '';
+			}, 320 );
+		}
+
+		dialog.addEventListener( 'pointerup', finish );
+		dialog.addEventListener( 'pointercancel', function () {
+			if ( drag ) {
+				drag = null;
+				dialog.classList.remove( 'is-dragging' );
+				dialog.style.transform = '';
+			}
+		} );
 	}
 
 	// در مرحلهٔ capture، پیش از اسکرول نرم المنتور روی لینک‌های «#».

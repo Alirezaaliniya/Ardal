@@ -277,11 +277,15 @@ class Ardal_Widget_Category_Menu extends Ardal_Widget_Base {
 				'default'     => 'inline',
 				'options'     => array(
 					'inline' => 'همیشه در صفحه',
-					'popup'  => 'پنهان؛ با کلیک روی لینک یا کلاس باز شود',
+					'sheet'  => 'دسکتاپ در صفحه؛ موبایل کشوی پایینی (با کلاس باز شود)',
+					'popup'  => 'پنهان در همه‌جا؛ با کلیک روی لینک یا کلاس باز شود',
 				),
 				'label_block' => true,
+				'description' => 'در موبایل، هر دو حالت پنهان مثل کشوی فیلتر از پایین بالا می‌آیند. این ویجت خودش دکمه‌ای برای باز شدن ندارد.',
 			)
 		);
+
+		$overlay = array( 'display_mode' => array( 'sheet', 'popup' ) );
 
 		$this->add_control(
 			'popup_id',
@@ -289,7 +293,7 @@ class Ardal_Widget_Category_Menu extends Ardal_Widget_Base {
 				'label'       => 'شناسهٔ ناحیه',
 				'type'        => Controls_Manager::TEXT,
 				'default'     => 'ard-catmenu',
-				'condition'   => array( 'display_mode' => 'popup' ),
+				'condition'   => $overlay,
 			)
 		);
 
@@ -297,19 +301,43 @@ class Ardal_Widget_Category_Menu extends Ardal_Widget_Base {
 			'popup_help',
 			array(
 				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => 'برای باز کردن، یکی از این‌ها کافی است:<br>• لینکی با نشانی <code>#ard-catmenu</code> (یا هر شناسه‌ای که بالا نوشته‌اید، با # جلویش)، مثلاً یک آیتم «پیوند دلخواه» در فهرست وردپرس یا لینک یک دکمهٔ المنتور.<br>• کلاس <code>ard-open-catmenu</code> روی هر ویجتی (تب «پیشرفته» ← «کلاس‌های CSS»).',
+				'raw'             => 'برای باز کردن، یکی از این‌ها کافی است:<br>• کلاس <code>ard-open-catmenu</code> روی هر ویجتی (تب «پیشرفته» ← «کلاس‌های CSS»).<br>• لینکی با نشانی <code>#ard-catmenu</code> (یا هر شناسه‌ای که بالا نوشته‌اید، با # جلویش)، مثلاً یک آیتم «پیوند دلخواه» در فهرست وردپرس یا لینک یک دکمهٔ المنتور.<br>در حالت «دسکتاپ در صفحه»، این بازکننده‌ها فقط در موبایل کار می‌کنند؛ در دسکتاپ منو همیشه دیده می‌شود.',
 				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
-				'condition'       => array( 'display_mode' => 'popup' ),
+				'condition'       => $overlay,
 			)
 		);
 
 		$this->add_control(
 			'popup_title',
 			array(
-				'label'     => 'عنوان بالای پنجره (موبایل)',
+				'label'     => 'عنوان بالای کشو (موبایل)',
 				'type'      => Controls_Manager::TEXT,
 				'default'   => 'دسته‌بندی‌ها',
-				'condition' => array( 'display_mode' => 'popup' ),
+				'condition' => $overlay,
+			)
+		);
+
+		$this->add_control(
+			'sheet_grip',
+			array(
+				'label'        => 'دستگیرهٔ کشیدن بالای کشو',
+				'type'         => Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+				'description'  => 'با کشیدن سربرگ کشو به پایین، کشو بسته می‌شود؛ این فقط نشانهٔ دیداری آن است.',
+				'condition'    => $overlay,
+			)
+		);
+
+		$this->add_responsive_control(
+			'sheet_max',
+			array(
+				'label'      => 'بیشترین ارتفاع کشو (موبایل)',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'vh' ),
+				'range'      => array( 'vh' => array( 'min' => 40, 'max' => 100 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-cm' => '--ard-cm-sheet-max:{{SIZE}}{{UNIT}};' ),
+				'condition'  => $overlay,
 			)
 		);
 
@@ -864,9 +892,9 @@ class Ardal_Widget_Category_Menu extends Ardal_Widget_Base {
 		$this->start_controls_section(
 			'section_style_popup',
 			array(
-				'label'     => 'پنجره',
+				'label'     => 'پنجره و کشو',
 				'tab'       => Controls_Manager::TAB_STYLE,
-				'condition' => array( 'display_mode' => 'popup' ),
+				'condition' => array( 'display_mode' => array( 'sheet', 'popup' ) ),
 			)
 		);
 
@@ -1083,7 +1111,8 @@ class Ardal_Widget_Category_Menu extends Ardal_Widget_Base {
 		}
 
 		$mono   = 'yes' === $s['mono_icons'];
-		$popup  = 'popup' === $s['display_mode'];
+		$mode    = in_array( $s['display_mode'], array( 'inline', 'sheet', 'popup' ), true ) ? $s['display_mode'] : 'inline';
+		$overlay = 'inline' !== $mode;
 		$uid    = 'ard-cm-' . $this->get_id();
 		$editor = class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->editor && \Elementor\Plugin::$instance->editor->is_edit_mode();
 
@@ -1108,32 +1137,37 @@ class Ardal_Widget_Category_Menu extends Ardal_Widget_Base {
 			}
 		}
 
-		$classes = array( 'ard-cm', $popup ? 'ard-cm--popup' : 'ard-cm--inline' );
+		$classes = array( 'ard-cm', 'ard-cm--' . $mode );
 
-		if ( $popup && $editor ) {
-			// در ویرایشگر، پنجره باید دیده و ویرایش شود.
+		if ( $overlay && $editor ) {
+			// در ویرایشگر، پنجره و کشو باید دیده و ویرایش شوند.
 			$classes[] = 'ard-cm--preview';
 		}
 
-		$popup_id = $popup ? sanitize_html_class( (string) $s['popup_id'] ) : '';
-		$popup_id = '' !== $popup_id ? $popup_id : ( $popup ? 'ard-catmenu' : '' );
+		$popup_id = $overlay ? sanitize_html_class( (string) $s['popup_id'] ) : '';
+		$popup_id = '' !== $popup_id ? $popup_id : ( $overlay ? 'ard-catmenu' : '' );
 
 		printf(
 			'<div class="%s"%s data-ard-cm data-open="%s" data-active="%d" data-single="%s" data-mobile-open="%s">',
 			esc_attr( implode( ' ', $classes ) ),
-			$popup ? ' id="' . esc_attr( $popup_id ) . '"' : '',
+			$overlay ? ' id="' . esc_attr( $popup_id ) . '"' : '',
 			'click' === $s['desktop_open'] ? 'click' : 'hover',
 			(int) $active,
 			'yes' === $s['mobile_single'] ? '1' : '0',
 			'yes' === $s['mobile_first_open'] ? '1' : '0'
 		);
 
-		if ( $popup ) {
+		if ( $overlay ) {
 			echo '<div class="ard-cm__scrim" data-ard-cm-close></div>';
 			printf(
 				'<div class="ard-cm__dialog" role="dialog" aria-modal="true" aria-label="%s">',
 				esc_attr( '' !== trim( (string) $s['popup_title'] ) ? $s['popup_title'] : $s['aria_label'] )
 			);
+
+			if ( 'yes' === ( $s['sheet_grip'] ?? 'yes' ) ) {
+				echo '<span class="ard-cm__grip" aria-hidden="true"></span>';
+			}
+
 			echo '<div class="ard-cm__bar">';
 			printf( '<span class="ard-cm__bar-title">%s</span>', esc_html( $s['popup_title'] ) );
 			printf(
@@ -1157,7 +1191,7 @@ class Ardal_Widget_Category_Menu extends Ardal_Widget_Base {
 
 		echo '</nav>';
 
-		if ( $popup ) {
+		if ( $overlay ) {
 			echo '</div>';
 		}
 
