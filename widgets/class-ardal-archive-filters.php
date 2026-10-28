@@ -1530,9 +1530,25 @@ class Ardal_Widget_Archive_Filters extends Ardal_Archive_Widget_Base {
 		$step = (int) $box['price_step'];
 
 		if ( $step < 1 ) {
-			// گام خودکار: صد پله روی کل بازه، گرد شده به عدد رُند.
-			$step = max( 1000, (int) ( round( ( $max - $min ) / 100 / 1000 ) * 1000 ) );
+			/*
+			 * گام خودکار: کوچک‌ترین عدد «رُند» که بازه را به حداکثر حدود ۲۰۰ پله
+			 * می‌برد. قبلاً یک‌صدمِ بازه بود (مثلاً ۸۴۹٬۰۰۰) و چون range از min
+			 * می‌شمارد، قیمت‌ها روی عددهای ناجور مثل ۲٬۶۴۷٬۰۰۰ می‌نشستند.
+			 */
+			$step = 1000;
+
+			foreach ( array( 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000, 2000000, 5000000 ) as $nice ) {
+				$step = $nice;
+
+				if ( ( $max - $min ) / $nice <= 200 ) {
+					break;
+				}
+			}
 		}
+
+		// دو سرِ بازه روی مضرب گام، تا هر پله یک قیمت رُند باشد.
+		$min = (int) ( floor( $min / $step ) * $step );
+		$max = (int) ( ceil( $max / $step ) * $step );
 
 		$current_min = Ardal_Archive::param( 'min_price' );
 		$current_max = Ardal_Archive::param( 'max_price' );

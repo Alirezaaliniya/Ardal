@@ -433,12 +433,12 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			$this->add_control(
 				'archive_limit',
 				array(
-					'label'       => 'تعداد کل محصولات',
+					'label'       => 'تعداد محصولات پیش‌نمایش',
 					'type'        => Controls_Manager::NUMBER,
 					'min'         => 0,
 					'max'         => 96,
 					'default'     => 0,
-					'description' => 'صفر یعنی هرچه در صفحهٔ جاری آرشیو هست.',
+					'description' => 'فقط برای ویرایشگر و صفحه‌های غیرآرشیو. روی خودِ فروشگاه و دسته‌ها، تعداد در هر صفحه را تنظیمات اردال ← «تعداد محصول در هر صفحه آرشیو» تعیین می‌کند تا صفحه‌بندی محصولی را جا نیندازد.',
 					'condition'   => array( 'source' => 'archive' ),
 				)
 			);
@@ -512,7 +512,14 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 				// فقط وقتی روی کوئری اصلی نشسته‌ایم صفحه‌بندی معنا دارد.
 				$this->archive_query = $main;
 
-				return Ardal_Helpers::cards_from_posts( $main->posts, $limit );
+				/*
+				 * اینجا archive_limit عمداً نادیده گرفته می‌شود. صفحه‌بندی و شمارش
+				 * («نمایش ۱ تا ۱۶ از ۱۲۲») بر پایهٔ تعداد کوئری اصلی است؛ اگر ویجت
+				 * فهرست را کوتاه می‌کرد (مثلاً ۱۲ از ۱۶)، محصولات ۱۳ تا ۱۶ هر صفحه
+				 * هیچ‌جا دیده نمی‌شدند، چون صفحهٔ بعد از ۱۷ شروع می‌شود. تعداد در هر
+				 * صفحه را تنظیم «تعداد محصول در هر صفحه آرشیو» اردال تعیین می‌کند.
+				 */
+				return Ardal_Helpers::cards_from_posts( $main->posts, 0 );
 			}
 		}
 

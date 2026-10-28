@@ -196,7 +196,7 @@ class Ardal_Search {
 		$text = strtr( $text, self::replacements() );
 
 		// هر اعرابی که در جدول نیامده باشد.
-		$text = (string) preg_replace( '/[\x{064B}-\x{0652}]/u', '', $text );
+		$text = (string) preg_replace( '/[\x{064B}-\x{065F}\x{0670}]/u', '', $text );
 		$text = (string) preg_replace( '/\s+/u', ' ', $text );
 		$text = trim( $text );
 
@@ -236,7 +236,10 @@ class Ardal_Search {
 			'ِ' => '',
 			'ّ' => '',
 			'ْ' => '',
+			'ٓ' => '', // مد ترکیبی؛ «آ» گاهی «ا» + این ذخیره شده و LIKE پیدایش نمی‌کرد.
 			'ٔ' => '',
+			'ٕ' => '',
+			'ٰ' => '',
 
 			/* ارقام فارسی و عربی، تا «۱۰۰» و «100» یکی شوند */
 			'۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4',
@@ -330,6 +333,23 @@ class Ardal_Search {
 			),
 			'total'    => count( $rows ),
 		);
+	}
+
+	/**
+	 * شناسهٔ همهٔ محصولات منطبق با یک عبارت، با همان یکدست‌سازی فارسی.
+	 *
+	 * برای جست‌وجوی داخل فیلتر آرشیو: جست‌وجوی خود وردپرس بایت‌به‌بایت مقایسه
+	 * می‌کند و «آدیداس» تایپ‌شده را با عنوانی که «آ» را دو کاراکتری ذخیره کرده
+	 * (ا + مد) یکی نمی‌داند.
+	 *
+	 * @param string $term عبارت خام کاربر.
+	 * @param int    $cap
+	 * @return int[]
+	 */
+	public static function matching_ids( $term, $cap = 2000 ) {
+		$term = self::normalize( $term );
+
+		return '' === $term ? array() : self::candidates( $term, $cap );
 	}
 
 	/**

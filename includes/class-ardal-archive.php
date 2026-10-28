@@ -688,7 +688,22 @@ class Ardal_Archive {
 		$search = self::param( self::PREFIX . 's' );
 
 		if ( '' !== $search && '' === (string) $q->get( 's' ) ) {
-			$q->set( 's', $search );
+			/*
+			 * جست‌وجوی خود وردپرس (s) نویسه‌های فارسی را یکدست نمی‌کند: «ي/ی»،
+			 * «ك/ک» و «آ» که گاهی دو کاراکتری (ا + مد) ذخیره شده با هم جور
+			 * نمی‌شدند و «آدیداس» هیچ نتیجه‌ای نمی‌داد. موتور جست‌وجوی اردال همان
+			 * یکدست‌سازی را روی دیتابیس اجرا می‌کند؛ نتیجه‌اش به‌صورت post__in
+			 * اعمال می‌شود تا با بقیهٔ فیلترها اشتراک بگیرد.
+			 */
+			if ( class_exists( 'Ardal_Search' ) ) {
+				$found   = Ardal_Search::matching_ids( $search );
+				$current = array_filter( (array) $q->get( 'post__in' ) );
+				$post_in = $current ? array_intersect( $current, $found ) : $found;
+
+				$q->set( 'post__in', $post_in ? array_values( $post_in ) : array( 0 ) );
+			} else {
+				$q->set( 's', $search );
+			}
 		}
 
 		self::apply_price( $q );
