@@ -3183,6 +3183,44 @@
 		init();
 	}
 
+	/* --------------------------------------------------------
+	   کارت آشکارشونده روی صفحهٔ لمسی (تنظیم «مثل دسکتاپ»)
+
+	   لمس اول کارت فقط دکمه را بالا می‌آورد و جلوی رفتن به صفحهٔ محصول را
+	   می‌گیرد؛ لمس دوم (یا زدن خودِ دکمه) کار معمولش را می‌کند. لمسِ بیرون
+	   از کارت، دکمه را دوباره پایین می‌برد. یک شنوندهٔ سراسری است، پس کارت‌هایی
+	   که بعداً با ایجکس می‌آیند هم پوشش داده می‌شوند.
+	   -------------------------------------------------------- */
+
+	( function () {
+		var noHover = window.matchMedia ? window.matchMedia( 'not all and (hover: hover) and (pointer: fine)' ) : null;
+
+		function release( except ) {
+			Array.prototype.forEach.call( document.querySelectorAll( '.ard-pcard--reveal.is-touched' ), function ( card ) {
+				if ( card !== except ) {
+					card.classList.remove( 'is-touched' );
+				}
+			} );
+		}
+
+		document.addEventListener( 'click', function ( event ) {
+			if ( ! noHover || ! noHover.matches ) {
+				return;
+			}
+
+			var card = event.target.closest( '.ard-reveal-touch-hover .ard-pcard--reveal' );
+
+			release( card );
+
+			if ( ! card || card.classList.contains( 'is-touched' ) || event.target.closest( '.ard-pcard__btn' ) ) {
+				return;
+			}
+
+			event.preventDefault();
+			card.classList.add( 'is-touched' );
+		}, true );
+	}() );
+
 	// راه‌اندازی دوباره داخل ویرایشگر المنتور، بعد از رندر هر ویجت.
 	window.addEventListener( 'elementor/frontend/init', function () {
 		if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {

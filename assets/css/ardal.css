@@ -7143,25 +7143,38 @@ a.ard-ptags__chip:focus-visible {
 
 /* ---------------------------------------- دکمه */
 
-.ard-pcard--reveal .ard-pcard__btn {
+/*
+ * سلکتورها عمداً سنگین‌اند: در محصولات ووکامرس دکمه یک a.button است و قانون
+ * «.woocommerce a.button» خود ووکامرس (۰،۲،۱) از «.ard-pcard--reveal .ard-pcard__btn»
+ * (۰،۲،۰) قوی‌تر بود؛ اندازهٔ قلم، فاصله، رنگ زمینه و حتی position دکمه را
+ * می‌بلعید و آشکارشدن با هاور هم خراب می‌شد.
+ */
+.ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn {
+	position: relative;
+	inset: auto;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: var(--ard-reveal-icon-gap);
+	margin: 0;
 	padding: 0;
 	block-size: var(--ard-reveal-foot);
 	border: 0;
 	border-radius: var(--ard-reveal-btn-radius);
 	background: var(--ard-reveal-btn-bg);
+	box-shadow: none;
 	color: var(--ard-reveal-btn-ink);
+	font-family: inherit;
 	font-size: 13.5px;
 	font-weight: 800;
+	line-height: 1.4;
+	text-shadow: none;
 	/* دکمه است، نه پیوندِ متنی؛ خطِ زیرِ پوسته نباید رویش بیفتد. */
 	text-decoration: none;
 }
 
-.ard-pcard--reveal .ard-pcard__btn:hover,
-.ard-pcard--reveal .ard-pcard__btn:focus-visible {
+.ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn:hover,
+.ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn:focus-visible {
 	background: var(--ard-reveal-btn-bg-hover);
 	color: var(--ard-reveal-btn-ink-hover);
 	text-decoration: none;
@@ -7215,7 +7228,7 @@ a.ard-ptags__chip:focus-visible {
 		text-overflow: ellipsis;
 	}
 
-	.ard-pcard--reveal .ard-pcard__btn {
+	.ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn {
 		position: absolute;
 		inset-inline: 0;
 		inset-block-end: 0;
@@ -7223,8 +7236,8 @@ a.ard-ptags__chip:focus-visible {
 		transition: transform .28s cubic-bezier(.2, .8, .3, 1);
 	}
 
-	.ard-pcard--reveal:hover .ard-pcard__btn,
-	.ard-pcard--reveal:focus-within .ard-pcard__btn {
+	.ard-pcard.ard-pcard--reveal:hover .ard-pcard__foot .ard-pcard__btn,
+	.ard-pcard.ard-pcard--reveal:focus-within .ard-pcard__foot .ard-pcard__btn {
 		transform: none;
 	}
 
@@ -7239,14 +7252,63 @@ a.ard-ptags__chip:focus-visible {
 	}
 }
 
+/*
+ * دستگاه‌های لمسی (و هر جا هاور واقعی نیست) — تنظیم «دکمه در موبایل».
+ *
+ * «show»: همان رفتار پیش‌فرض بالا؛ دکمه همیشه زیر قیمت است.
+ * «hover»: همان آشکارشدنِ دسکتاپ، ولی با کلاس is-touched که ardal.js با لمس
+ *          اول کارت می‌گذارد (هاورِ لمسی چسبنده و غیرقابل‌اعتماد است).
+ * «hide»: دکمه اصلاً نیست.
+ */
+@media not all and (hover: hover) and (pointer: fine) {
+	.ard-reveal-touch-hide .ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn {
+		display: none;
+	}
+
+	.ard-reveal-touch-hover .ard-pcard--reveal .ard-pcard__foot {
+		display: block;
+		block-size: var(--ard-reveal-foot);
+		overflow: hidden;
+	}
+
+	.ard-reveal-touch-hover .ard-pcard--reveal .ard-pcard__prices {
+		flex-wrap: nowrap;
+		block-size: 100%;
+		transition: opacity .2s ease;
+	}
+
+	.ard-reveal-touch-hover .ard-pcard--reveal .ard-pcard__old {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.ard-reveal-touch-hover .ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn {
+		position: absolute;
+		inset-inline: 0;
+		inset-block-end: 0;
+		transform: translateY(105%);
+		transition: transform .28s cubic-bezier(.2, .8, .3, 1);
+	}
+
+	.ard-reveal-touch-hover .ard-pcard.ard-pcard--reveal.is-touched .ard-pcard__foot .ard-pcard__btn {
+		transform: none;
+	}
+
+	.ard-reveal-touch-hover .ard-pcard--reveal.is-touched .ard-pcard__prices {
+		opacity: 0;
+	}
+}
+
 /* فاصلهٔ دکمه از پایین کارت، در هر دو حالت. */
 .ard-pcard--reveal .ard-pcard__box {
 	padding-block-end: calc(var(--ard-reveal-pad) + var(--ard-reveal-btn-gap));
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ard-pcard--reveal .ard-pcard__btn,
-	.ard-pcard--reveal .ard-pcard__prices {
+	.ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn,
+	.ard-pcard.ard-pcard--reveal .ard-pcard__prices,
+	.ard-reveal-touch-hover .ard-pcard.ard-pcard--reveal .ard-pcard__foot .ard-pcard__btn,
+	.ard-reveal-touch-hover .ard-pcard--reveal .ard-pcard__prices {
 		transition: none;
 	}
 }

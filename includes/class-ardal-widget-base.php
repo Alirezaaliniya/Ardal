@@ -17,6 +17,15 @@ use Elementor\Widget_Base;
 abstract class Ardal_Widget_Base extends Widget_Base {
 
 	/**
+	 * سلکتور دکمهٔ کارت آشکارشونده برای کنترل‌های قلم و حاشیه.
+	 *
+	 * در محصولات ووکامرس دکمه یک a.button است و قانون «.woocommerce a.button»
+	 * خود ووکامرس (font-size:100%، line-height:1، padding) رویش می‌نشیند؛ پس
+	 * شکل a.button هم صریح آمده و متن داخلی هم جدا گرفته می‌شود.
+	 */
+	const REVEAL_BTN = '{{WRAPPER}} .ard-pcard.ard-pcard--reveal .ard-pcard__btn, {{WRAPPER}} .ard-pcard.ard-pcard--reveal a.ard-pcard__btn.button';
+
+	/**
 	 * کوئری آرشیوی که آخرین بار محصولات از آن خوانده شد.
 	 *
 	 * فقط وقتی پر است که ویجت روی کوئری اصلی نشسته باشد؛ همان شرطی که
@@ -1282,6 +1291,22 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 		);
 
 		$this->add_control(
+			'reveal_touch',
+			array(
+				'label'        => 'دکمه در موبایل و صفحه‌های لمسی',
+				'type'         => Controls_Manager::SELECT,
+				'default'      => 'show',
+				'options'      => array(
+					'show'  => 'همیشه دیده شود',
+					'hover' => 'مثل دسکتاپ؛ با لمس کارت بالا بیاید',
+					'hide'  => 'نمایش داده نشود',
+				),
+				'description'  => 'در حالت «مثل دسکتاپ»، لمس اول کارت دکمه را نشان می‌دهد و لمس دوم وارد صفحهٔ محصول می‌شود.',
+				'prefix_class' => 'ard-reveal-touch-',
+			)
+		);
+
+		$this->add_control(
 			'reveal_icon',
 			array(
 				'label'   => 'آیکون',
@@ -1382,7 +1407,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			array(
 				'name'     => 'reveal_btn_typo',
 				'label'    => 'قلم دکمه',
-				'selector' => '{{WRAPPER}} .ard-pcard--reveal .ard-pcard__btn',
+				'selector' => self::REVEAL_BTN . ', {{WRAPPER}} .ard-pcard.ard-pcard--reveal .ard-pcard__btn .ard-pcard__btn-text',
 			)
 		);
 
@@ -1391,7 +1416,7 @@ abstract class Ardal_Widget_Base extends Widget_Base {
 			array(
 				'name'     => 'reveal_btn_border',
 				'label'    => 'حاشیه دکمه',
-				'selector' => '{{WRAPPER}} .ard-pcard--reveal .ard-pcard__btn',
+				'selector' => self::REVEAL_BTN,
 			)
 		);
 
