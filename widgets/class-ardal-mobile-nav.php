@@ -48,6 +48,7 @@ class Ardal_Widget_Mobile_Nav extends Ardal_Widget_Base {
 				'type'        => Controls_Manager::TEXT,
 				'default'     => 'خانه',
 				'label_block' => true,
+				'dynamic'     => array( 'active' => true ),
 			)
 		);
 		$repeater->add_control(
@@ -77,6 +78,8 @@ class Ardal_Widget_Mobile_Nav extends Ardal_Widget_Base {
 				'type'        => Controls_Manager::URL,
 				'default'     => array( 'url' => '' ),
 				'placeholder' => 'https://example.com/page/',
+				// تگ داینامیک: مثلاً «لینک سبد خرید»، «حساب کاربری» یا «لینک سایت».
+				'dynamic'     => array( 'active' => true ),
 			)
 		);
 		$repeater->add_control(
