@@ -722,7 +722,7 @@ class Ardal_Account_Elano {
 					<span>نوع ارسال : <?php echo esc_html( '' !== $ship ? $ship : '—' ); ?></span>
 					<span>شماره سفارش : <?php echo esc_html( Ardal_Helpers::fa_digits( $order->get_order_number() ) ); ?></span>
 				</div>
-				<h3 class="ard-el__ocard-title"><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( Ardal_Account::order_title( $order ) ); ?></a></h3>
+				<span class="ard-el__ocard-title"><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( Ardal_Account::order_title( $order ) ); ?></a></span>
 				<div class="ard-el__ocard-foot">
 					<div class="ard-el__price">
 						<?php if ( '' !== $off ) : ?>
@@ -807,13 +807,13 @@ class Ardal_Account_Elano {
 				<article class="ard-el__item-card">
 					<div class="ard-el__item-media"><?php echo Ardal_Account::thumb( $product, 'woocommerce_thumbnail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 					<div class="ard-el__item-body">
-						<h3 class="ard-el__item-name">
+						<span class="ard-el__item-name">
 							<?php if ( $product && $product->is_visible() ) : ?>
 								<a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $item->get_name() ); ?></a>
 							<?php else : ?>
 								<?php echo esc_html( $item->get_name() ); ?>
 							<?php endif; ?>
-						</h3>
+						</span>
 						<?php $meta = wc_display_item_meta( $item, array( 'echo' => false, 'separator' => ' · ', 'before' => '', 'after' => '' ) ); ?>
 						<?php if ( '' !== trim( wp_strip_all_tags( $meta ) ) ) : ?>
 							<span class="ard-el__item-meta"><?php echo wp_kses_post( $meta ); ?></span>

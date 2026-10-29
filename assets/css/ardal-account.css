@@ -581,12 +581,12 @@
 
 .ard-ac__btn--primary {
 	background: var(--ac-navy);
-	color: #fff;
+	color: #fff!important;
 }
 
 .ard-ac__btn--primary:hover {
 	background: var(--ac-navy-hover);
-	color: #fff;
+	color: #fff!important;
 }
 
 .ard-ac__btn--accent,
