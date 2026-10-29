@@ -471,6 +471,21 @@ class Ardal_Widget_Countdown extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
+			'clock_order',
+			array(
+				'label'        => 'ترتیب خانه‌ها',
+				'type'         => Controls_Manager::SELECT,
+				'default'      => 'ltr',
+				'options'      => array(
+					'ltr' => 'مثل ساعت (روز : ساعت : دقیقه : ثانیه از چپ)',
+					'rtl' => 'راست‌به‌چپ (روز در سمت راست)',
+				),
+				'description'  => 'زمان در فارسی هم مثل عدد از چپ نوشته می‌شود («۱۲:۳۰»)؛ حالت پیش‌فرض همین را رعایت می‌کند.',
+				'prefix_class' => 'ard-clock-order-',
+			)
+		);
+
+		$this->add_control(
 			'head_color',
 			array(
 				'label'     => 'رنگ عنوان و آیکون',

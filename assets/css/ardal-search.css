@@ -62,6 +62,38 @@
 	outline: none;
 }
 
+/*
+ * خنثی کردن استایل قالب و کیت روی فیلد.
+ *
+ * ریست Hello روی input[type=search] حاشیهٔ تیره، گردی، پدینگ و حلقهٔ فوکوس
+ * سیاه می‌گذارد و «فیلدهای فرم» کیت المنتور (.elementor-kit-N input:not(…) —
+ * ۰،۳،۱) زمینه و حاشیهٔ خودش را؛ نتیجه یک کادر دوم داخل کادر جست‌وجو بود.
+ * فیلد باید کاملاً شفاف و بی‌حاشیه باشد؛ ظاهر را خودِ .ard-se__box می‌دهد.
+ * قلم و رنگ اینجا نیامده تا تنظیمات تب استایل المنتور رویش بنشیند.
+ */
+.ard-se .ard-se__form .ard-se__box input.ard-se__input,
+.ard-se .ard-se__form .ard-se__box input.ard-se__input:hover,
+.ard-se .ard-se__form .ard-se__box input.ard-se__input:focus,
+.ard-se .ard-se__form .ard-se__box input.ard-se__input:focus-visible {
+	flex: 1 1 auto;
+	width: auto;
+	min-width: 0;
+	height: 100%;
+	min-height: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	outline: none;
+	background: transparent;
+	box-shadow: none;
+	color: var(--ard-ink, #1f2937);
+	font-family: inherit;
+	font-size: var(--ard-se-fs, 13.5px);
+	line-height: normal;
+	transition: none;
+}
+
 /* ضربدرِ پیش‌فرض مرورگر روی input[type=search] تکراری است. */
 .ard-se__input::-webkit-search-cancel-button,
 .ard-se__input::-webkit-search-decoration {
@@ -111,6 +143,20 @@
 
 .ard-se__btn[class]:hover {
 	filter: brightness(1.08);
+}
+
+/* ریست Hello روی هاور و فوکوس دکمه زمینهٔ صورتی و متن سفید می‌گذارد. */
+.ard-se__btn[class]:hover,
+.ard-se__btn[class]:focus {
+	background: var(--ard-se-btn-bg);
+	color: var(--ard-se-btn-ink);
+}
+
+.ard-se__btn-icon,
+.ard-se__btn-icon svg {
+	display: inline-flex;
+	inline-size: var(--ard-se-btn-icon, 18px);
+	block-size: var(--ard-se-btn-icon, 18px);
 }
 
 /* نوار باریک بارگذاری، زیر کادر. */
@@ -383,8 +429,8 @@
 	box-shadow: 0 0 0 3px color-mix(in srgb, var(--ard-se-btn-bg) 10%, transparent);
 }
 
-.ard-se--tpl-modern .ard-se__input {
-	font-size: 14px;
+.ard-se--tpl-modern {
+	--ard-se-fs: 14px;
 }
 
 .ard-se--tpl-modern .ard-se__input::placeholder {

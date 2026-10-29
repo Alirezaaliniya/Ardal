@@ -13,6 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Border;
+use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 
 class Ardal_Widget_Search extends Ardal_Widget_Base {
@@ -372,12 +374,428 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 
 		$this->end_controls_section();
 
-		/* ------------------------------------------------ ظاهر */
+		$this->add_box_style_controls();
+		$this->add_button_style_controls();
+		$this->add_panel_style_controls();
+		$this->add_modern_style_controls();
+	}
 
+	/*
+	 * سلکتورهای استایل عمداً سنگین‌اند. ریست قالب Hello روی input[type=search]
+	 * حاشیهٔ تیره، گردی و پدینگ می‌گذارد (۰،۱،۱) و «فیلدهای فرم» کیت المنتور
+	 * تا (۰،۳،۱) می‌رسد؛ هر دو از سلکتورهای ساده‌ی ویجت قوی‌تر بودند و یک کادر
+	 * دوم با حاشیهٔ سیاه داخل کادر جست‌وجو می‌ساختند.
+	 */
+	const SEL_BOX   = '{{WRAPPER}} .ard-se .ard-se__box';
+	const SEL_INPUT = '{{WRAPPER}} .ard-se .ard-se__box input.ard-se__input';
+	const SEL_BTN   = '{{WRAPPER}} .ard-se .ard-se__btn[class]';
+	const SEL_PANEL = '{{WRAPPER}} .ard-se .ard-se__panel';
+
+	/**
+	 * کادر جست‌وجو و فیلد متنی.
+	 */
+	protected function add_box_style_controls() {
 		$this->start_controls_section(
 			'section_style',
 			array(
-				'label' => 'ظاهر',
+				'label' => 'کادر و فیلد جست‌وجو',
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->add_responsive_control(
+			'box_height',
+			array(
+				'label'      => 'ارتفاع کادر',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 30, 'max' => 90 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-h:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'box_radius',
+			array(
+				'label'      => 'گردی کادر',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 60 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'box_border_w',
+			array(
+				'label'      => 'ضخامت حاشیه',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 6 ) ),
+				'selectors'  => array( self::SEL_BOX => 'border-width:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'box_padding',
+			array(
+				'label'              => 'فاصله داخلی افقی',
+				'type'               => Controls_Manager::DIMENSIONS,
+				'size_units'         => array( 'px' ),
+				'allowed_dimensions' => 'horizontal',
+				'selectors'          => array(
+					self::SEL_BOX => 'padding-right:{{RIGHT}}{{UNIT}};padding-left:{{LEFT}}{{UNIT}};',
+				),
+				'description'        => 'در قالب مدرن، سمتی که دکمه است دست‌کم به اندازهٔ دکمه فاصله بگذارید.',
+			)
+		);
+
+		$this->start_controls_tabs( 'box_tabs' );
+
+		$this->start_controls_tab( 'box_tab_normal', array( 'label' => 'عادی' ) );
+
+		$this->add_control(
+			'box_bg',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-box-bg:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'box_line',
+			array(
+				'label'     => 'رنگ حاشیه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-line:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'box_shadow',
+				'selector' => self::SEL_BOX,
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab( 'box_tab_focus', array( 'label' => 'فوکوس / باز' ) );
+
+		$focus = '{{WRAPPER}} .ard-se.is-open .ard-se__box, {{WRAPPER}} .ard-se .ard-se__box:focus-within';
+
+		$this->add_control(
+			'box_bg_focus',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( $focus => 'background:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'box_line_focus',
+			array(
+				'label'     => 'رنگ حاشیه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( $focus => 'border-color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'box_shadow_focus',
+				'selector' => $focus,
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
+
+		/* ---------------------------------------- فیلد متن */
+
+		$this->add_control(
+			'input_heading',
+			array(
+				'label'     => 'متن داخل کادر',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'm_input_typo',
+				'label'    => 'قلم',
+				'selector' => self::SEL_INPUT,
+			)
+		);
+
+		$this->add_control(
+			'input_color',
+			array(
+				'label'     => 'رنگ متن',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( self::SEL_INPUT => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'm_placeholder',
+			array(
+				'label'     => 'رنگ متن راهنما',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( self::SEL_INPUT . '::placeholder' => 'color:{{VALUE}};opacity:1;' ),
+			)
+		);
+
+		$this->add_control(
+			'icon_heading',
+			array(
+				'label'     => 'ذره‌بین داخل کادر و دکمهٔ پاک کردن',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'icon_color',
+			array(
+				'label'     => 'رنگ ذره‌بین',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__icon' => 'color:{{VALUE}};' ),
+				'condition' => array( 'show_icon' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'icon_size',
+			array(
+				'label'      => 'اندازه ذره‌بین',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 10, 'max' => 40 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se .ard-se__icon svg' => 'width:{{SIZE}}{{UNIT}};height:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'show_icon' => 'yes' ),
+			)
+		);
+
+		$this->add_control(
+			'clear_color',
+			array(
+				'label'     => 'رنگ دکمهٔ پاک کردن',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__clear[class]' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'clear_bg',
+			array(
+				'label'     => 'زمینه دکمهٔ پاک کردن',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__clear[class]' => 'background:{{VALUE}};' ),
+			)
+		);
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * دکمهٔ جست‌وجو.
+	 */
+	protected function add_button_style_controls() {
+		$this->start_controls_section(
+			'section_style_btn',
+			array(
+				'label'     => 'دکمه جست‌وجو',
+				'tab'       => Controls_Manager::TAB_STYLE,
+				'condition' => array( 'show_button' => 'yes' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_btn_size',
+			array(
+				'label'      => 'اندازه دکمه گرد',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 24, 'max' => 90 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-size:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'template' => 'modern' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'btn_offset',
+			array(
+				'label'       => 'فاصله دکمه از لبهٔ کادر',
+				'type'        => Controls_Manager::SLIDER,
+				'size_units'  => array( 'px' ),
+				'range'       => array( 'px' => array( 'min' => -20, 'max' => 40 ) ),
+				'selectors'   => array( '{{WRAPPER}} .ard-se.ard-se--tpl-modern .ard-se__btn[class]' => 'inset-inline-end:{{SIZE}}{{UNIT}};' ),
+				'description' => 'صفر = چسبیده به لبه؛ عدد مثبت دکمه را داخل کادر می‌برد.',
+				'condition'   => array( 'template' => 'modern' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'btn_padding',
+			array(
+				'label'              => 'فاصله داخلی افقی',
+				'type'               => Controls_Manager::DIMENSIONS,
+				'size_units'         => array( 'px' ),
+				'allowed_dimensions' => 'horizontal',
+				'selectors'          => array( self::SEL_BTN => 'padding-right:{{RIGHT}}{{UNIT}};padding-left:{{LEFT}}{{UNIT}};' ),
+				'condition'          => array( 'template' => 'classic' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'btn_gap',
+			array(
+				'label'      => 'فاصله دکمه از کادر',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 30 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se .ard-se__form' => 'gap:{{SIZE}}{{UNIT}};' ),
+				'condition'  => array( 'template' => 'classic' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_btn_icon',
+			array(
+				'label'      => 'اندازه آیکون',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 10, 'max' => 48 ) ),
+				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-icon:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'btn_radius',
+			array(
+				'label'      => 'گردی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', '%' ),
+				'range'      => array(
+					'px' => array( 'min' => 0, 'max' => 60 ),
+					'%'  => array( 'min' => 0, 'max' => 50 ),
+				),
+				'selectors'  => array( self::SEL_BTN => 'border-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'btn_typo',
+				'label'    => 'قلم متن دکمه',
+				'selector' => self::SEL_BTN,
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'btn_border',
+				'selector' => self::SEL_BTN,
+			)
+		);
+
+		$this->start_controls_tabs( 'btn_tabs' );
+
+		$this->start_controls_tab( 'btn_tab_normal', array( 'label' => 'عادی' ) );
+
+		$this->add_control(
+			'btn_bg',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-bg:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'btn_ink',
+			array(
+				'label'     => 'رنگ متن و آیکون',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-ink:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'btn_shadow',
+				'selector' => self::SEL_BTN,
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab( 'btn_tab_hover', array( 'label' => 'هاور' ) );
+
+		$hover = self::SEL_BTN . ':hover, ' . self::SEL_BTN . ':focus-visible';
+
+		$this->add_control(
+			'btn_bg_hover',
+			array(
+				'label'     => 'رنگ زمینه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( $hover => 'background:{{VALUE}};filter:none;' ),
+			)
+		);
+
+		$this->add_control(
+			'btn_ink_hover',
+			array(
+				'label'     => 'رنگ متن و آیکون',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( $hover => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'btn_border_hover',
+			array(
+				'label'     => 'رنگ حاشیه',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( $hover => 'border-color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'btn_shadow_hover',
+				'selector' => $hover,
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
+
+		$this->end_controls_section();
+	}
+
+	/**
+	 * پنل نتیجه‌ها (و پنل تاریخچه در قالب مدرن).
+	 */
+	protected function add_panel_style_controls() {
+		$this->start_controls_section(
+			'section_style_panel',
+			array(
+				'label' => 'پنل نتیجه‌ها',
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -414,6 +832,17 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 		);
 
 		$this->add_responsive_control(
+			'panel_offset',
+			array(
+				'label'      => 'فاصله پنل از کادر',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array( self::SEL_PANEL => 'inset-block-start:calc(100% + {{SIZE}}{{UNIT}});' ),
+			)
+		);
+
+		$this->add_responsive_control(
 			'rows',
 			array(
 				'label'       => 'ردیف‌های دیده‌شده پیش از اسکرول',
@@ -428,69 +857,9 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 		);
 
 		$this->add_control(
-			'box_bg',
-			array(
-				'label'     => 'زمینه کادر',
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-box-bg:{{VALUE}};' ),
-			)
-		);
-
-		$this->add_control(
-			'box_line',
-			array(
-				'label'     => 'رنگ حاشیه کادر',
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-line:{{VALUE}};' ),
-			)
-		);
-
-		$this->add_control(
-			'box_radius',
-			array(
-				'label'      => 'گردی کادر',
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
-				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-radius:{{SIZE}}{{UNIT}};' ),
-			)
-		);
-
-		$this->add_responsive_control(
-			'box_height',
-			array(
-				'label'      => 'ارتفاع کادر',
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 34, 'max' => 72 ) ),
-				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-h:{{SIZE}}{{UNIT}};' ),
-			)
-		);
-
-		$this->add_control(
-			'btn_bg',
-			array(
-				'label'     => 'زمینه دکمه',
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-bg:{{VALUE}};' ),
-				'condition' => array( 'show_button' => 'yes' ),
-			)
-		);
-
-		$this->add_control(
-			'btn_ink',
-			array(
-				'label'     => 'رنگ متن دکمه',
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-ink:{{VALUE}};' ),
-				'condition' => array( 'show_button' => 'yes' ),
-			)
-		);
-
-		$this->add_control(
 			'panel_bg',
 			array(
-				'label'     => 'زمینه پنل',
+				'label'     => 'رنگ زمینه',
 				'type'      => Controls_Manager::COLOR,
 				'separator' => 'before',
 				'selectors' => array( '{{WRAPPER}} .ard-se' => '--ard-se-panel-bg:{{VALUE}};' ),
@@ -498,17 +867,141 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 		);
 
 		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'panel_border',
+				'selector' => self::SEL_PANEL,
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_panel_radius',
+			array(
+				'label'      => 'گردی',
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px' ),
+				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
+				'selectors'  => array( self::SEL_PANEL => 'border-radius:{{SIZE}}{{UNIT}};' ),
+			)
+		);
+
+		$this->add_responsive_control(
+			'm_panel_padding',
+			array(
+				'label'      => 'فاصله داخلی',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px' ),
+				'selectors'  => array(
+					self::SEL_PANEL => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'panel_shadow',
+				'selector' => self::SEL_PANEL,
+			)
+		);
+
+		/* ---------------------------------------- متن راهنما */
+
+		$this->add_control(
+			'hint_heading',
+			array(
+				'label'     => 'متن راهنما و «پیدا نشد»',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_control(
+			'hint_color',
+			array(
+				'label'     => 'رنگ',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__hint, {{WRAPPER}} .ard-se .ard-se__empty' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'hint_typo',
+				'selector' => '{{WRAPPER}} .ard-se .ard-se__hint, {{WRAPPER}} .ard-se .ard-se__empty',
+			)
+		);
+
+		$this->add_responsive_control(
+			'hint_padding',
+			array(
+				'label'      => 'فاصله داخلی',
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .ard-se .ard-se__hint, {{WRAPPER}} .ard-se .ard-se__empty' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			)
+		);
+
+		/* ---------------------------------------- نتیجه‌ها */
+
+		$this->add_control(
+			'result_heading',
+			array(
+				'label'     => 'ردیف نتیجه‌ها',
+				'type'      => Controls_Manager::HEADING,
+				'separator' => 'before',
+			)
+		);
+
+		$this->add_group_control(
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'title_typo',
-				'label'    => 'قلم عنوان نتیجه‌ها',
-				'selector' => '{{WRAPPER}} .ard-se__title',
+				'label'    => 'قلم عنوان',
+				'selector' => '{{WRAPPER}} .ard-se .ard-se__title',
+			)
+		);
+
+		$this->add_control(
+			'result_title_color',
+			array(
+				'label'     => 'رنگ عنوان',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__card' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'result_price_color',
+			array(
+				'label'     => 'رنگ قیمت',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__now' => 'color:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'result_hover_bg',
+			array(
+				'label'     => 'زمینه ردیف هاور/انتخاب',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__card:hover, {{WRAPPER}} .ard-se .ard-se__card.is-active' => 'background:{{VALUE}};' ),
+			)
+		);
+
+		$this->add_control(
+			'more_color',
+			array(
+				'label'     => 'رنگ لینک «دیدن همه»',
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array( '{{WRAPPER}} .ard-se .ard-se__more' => 'color:{{VALUE}};' ),
 			)
 		);
 
 		$this->end_controls_section();
-
-		$this->add_modern_style_controls();
 	}
 
 	/**
@@ -521,80 +1014,6 @@ class Ardal_Widget_Search extends Ardal_Widget_Base {
 				'label'     => 'قالب مدرن',
 				'tab'       => Controls_Manager::TAB_STYLE,
 				'condition' => array( 'template' => 'modern' ),
-			)
-		);
-
-		$this->add_responsive_control(
-			'm_btn_size',
-			array(
-				'label'      => 'اندازه دکمه گرد',
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 30, 'max' => 80 ) ),
-				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-size:{{SIZE}}{{UNIT}};' ),
-				'condition'  => array( 'show_button' => 'yes' ),
-			)
-		);
-
-		$this->add_responsive_control(
-			'm_btn_icon',
-			array(
-				'label'      => 'اندازه آیکون دکمه',
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 12, 'max' => 48 ) ),
-				'selectors'  => array( '{{WRAPPER}} .ard-se' => '--ard-se-btn-icon:{{SIZE}}{{UNIT}};' ),
-				'condition'  => array( 'show_button' => 'yes' ),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			array(
-				'name'     => 'm_input_typo',
-				'label'    => 'قلم کادر',
-				'selector' => '{{WRAPPER}} .ard-se__input',
-			)
-		);
-
-		$this->add_control(
-			'm_placeholder',
-			array(
-				'label'     => 'رنگ متن راهنما',
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array( '{{WRAPPER}} .ard-se__input::placeholder' => 'color:{{VALUE}};' ),
-			)
-		);
-
-		$this->add_control(
-			'm_panel_heading',
-			array(
-				'label'     => 'پنل',
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
-			)
-		);
-
-		$this->add_responsive_control(
-			'm_panel_padding',
-			array(
-				'label'      => 'فاصله داخلی پنل',
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px' ),
-				'selectors'  => array(
-					'{{WRAPPER}} .ard-se--tpl-modern .ard-se__panel' => 'padding:{{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'm_panel_radius',
-			array(
-				'label'      => 'گردی پنل',
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array( 'px' => array( 'min' => 0, 'max' => 40 ) ),
-				'selectors'  => array( '{{WRAPPER}} .ard-se--tpl-modern .ard-se__panel' => 'border-radius:{{SIZE}}{{UNIT}};' ),
 			)
 		);
 
