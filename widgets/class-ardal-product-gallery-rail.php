@@ -141,7 +141,8 @@ class Ardal_Widget_Product_Gallery_Rail extends Ardal_Widget_Base {
 				'toggle'               => false,
 				'description'          => 'برای دسکتاپ و موبایل جداگانه تنظیم کنید (آیکن نمایشگر کنار عنوان).',
 				'selectors_dictionary' => self::layout_css(),
-				'selectors'            => array( '{{WRAPPER}} .ard-pg' => '{{VALUE}}' ),
+				// فقط وقتی تصویر کوچک هست؛ وگرنه ستون خالی‌شان کنار تصویر تکی جا می‌گرفت.
+				'selectors'            => array( '{{WRAPPER}} .ard-pg.has-thumbs' => '{{VALUE}}' ),
 			)
 		);
 
