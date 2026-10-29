@@ -555,7 +555,7 @@ class Ardal_Account_Elano {
 			<a class="ard-el__pcard-media" href="<?php echo esc_url( $product->get_permalink() ); ?>" tabindex="-1">
 				<?php echo Ardal_Account::thumb( $product, 'woocommerce_thumbnail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
-			<h3 class="ard-el__pcard-title"><a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></h3>
+			<span class="ard-el__pcard-title"><a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></span>
 			<div class="ard-el__pcard-price"><?php echo wp_kses_post( $product->get_price_html() ); ?></div>
 			<div class="ard-el__pcard-foot">
 				<?php
