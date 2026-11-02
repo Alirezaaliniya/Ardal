@@ -212,8 +212,9 @@
 }
 
 /*
- * کادر سفید با استروک نازک در حالت عادی و متن مشکی؛ آیتم انتخاب‌شده صورتی.
- * انتخابگرها با .ard-el شروع می‌شوند تا رنگ لینک پوسته روی منو ننشیند.
+ * عین فیگما: حالت عادی شفاف با استروک نازک و متن مشکی؛ هاور استروک صورتی و
+ * انتخاب‌شده گرادیان صورتی. انتخابگرها با .ard-el شروع می‌شوند تا رنگ لینک
+ * پوسته روی منو ننشیند.
  */
 .ard-el .ard-el__item {
 	display: flex;
@@ -222,8 +223,8 @@
 	block-size: 48px;
 	padding: 12px 16px;
 	border-radius: 12px;
-	background: var(--el-card);
-	box-shadow: inset 0 0 0 1px var(--el-border);
+	background: transparent;
+	box-shadow: inset 0 0 0 1px var(--el-soft);
 	color: var(--el-text);
 	font-size: 12px;
 	font-weight: 600;
@@ -234,25 +235,21 @@
 	color: #292d32;
 }
 
-.ard-el .ard-el__item:hover {
-	transform: translateX(-3px);
-	box-shadow: inset 0 0 0 1px var(--el-primary), 0 10px 24px rgba(253, 86, 144, .18);
-	color: var(--el-text);
+.ard-el .ard-el__item--logout {
+	color: var(--el-danger);
 }
 
+/* هاور همان حالت انتخاب‌شده است. */
+.ard-el .ard-el__item:hover,
 .ard-el .ard-el__item.is-active {
 	background: linear-gradient(90deg, var(--el-primary), var(--el-primary-2));
 	box-shadow: inset 0 0 0 1px var(--el-primary), 0 20px 36px var(--el-glow);
 	color: #fff;
 }
 
+.ard-el .ard-el__item:hover .ard-el__i,
 .ard-el .ard-el__item.is-active .ard-el__i {
 	color: #fff;
-}
-
-.ard-el .ard-el__item--logout,
-.ard-el .ard-el__item--logout:hover {
-	color: var(--el-danger);
 }
 
 /* دکمهٔ منو و اجزای پنل کشویی فقط در موبایل؛ در دسکتاپ منو همیشه باز است. */
