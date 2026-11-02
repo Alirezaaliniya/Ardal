@@ -167,6 +167,10 @@
 	box-shadow: inset 0 0 0 1px var(--el-primary);
 }
 
+.ard-el .ard-el__dash-text {
+	color: var(--el-text);
+}
+
 .ard-el__dash-text {
 	display: flex;
 	flex-direction: column;
@@ -207,42 +211,47 @@
 	box-shadow: inset 0 0 0 1px var(--el-bg), 0 0 80px rgba(0, 0, 0, .08);
 }
 
-.ard-el__item {
+/*
+ * کادر سفید با استروک نازک در حالت عادی و متن مشکی؛ آیتم انتخاب‌شده صورتی.
+ * انتخابگرها با .ard-el شروع می‌شوند تا رنگ لینک پوسته روی منو ننشیند.
+ */
+.ard-el .ard-el__item {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	block-size: 48px;
 	padding: 12px 16px;
 	border-radius: 12px;
-	box-shadow: inset 0 0 0 1px var(--el-soft);
+	background: var(--el-card);
+	box-shadow: inset 0 0 0 1px var(--el-border);
 	color: var(--el-text);
 	font-size: 12px;
 	font-weight: 600;
 	transition: transform .2s, box-shadow .2s, background .2s, color .2s;
 }
 
-.ard-el__item .ard-el__i {
+.ard-el .ard-el__item .ard-el__i {
 	color: #292d32;
 }
 
-.ard-el__item:hover {
+.ard-el .ard-el__item:hover {
 	transform: translateX(-3px);
 	box-shadow: inset 0 0 0 1px var(--el-primary), 0 10px 24px rgba(253, 86, 144, .18);
 	color: var(--el-text);
 }
 
-.ard-el__item.is-active {
+.ard-el .ard-el__item.is-active {
 	background: linear-gradient(90deg, var(--el-primary), var(--el-primary-2));
 	box-shadow: inset 0 0 0 1px var(--el-primary), 0 20px 36px var(--el-glow);
 	color: #fff;
 }
 
-.ard-el__item.is-active .ard-el__i {
+.ard-el .ard-el__item.is-active .ard-el__i {
 	color: #fff;
 }
 
-.ard-el__item--logout,
-.ard-el__item--logout:hover {
+.ard-el .ard-el__item--logout,
+.ard-el .ard-el__item--logout:hover {
 	color: var(--el-danger);
 }
 
@@ -276,24 +285,85 @@
 }
 
 .ard-el__titlebar {
-	block-size: 63px;
+	min-block-size: 63px;
 	padding: 0 20px;
 }
 
-.ard-el__h1,
-.ard-el__h2 {
+/*
+ * تیترهای پنل با فونت معمولی سایت؛ بدون .ard-el جلو، تیترهای پوسته/المنتور
+ * (فونت نمایشی و ۴۸ پیکسل) رویشان می‌نشیند.
+ */
+.ard-el :is(h1, h2, h3, h4, h5, h6) {
+	font-family: var(--el-font);
+	letter-spacing: normal;
+	text-transform: none;
+}
+
+.ard-el .ard-el__h1,
+.ard-el .ard-el__h2 {
 	margin: 0;
-	font-size: 20px;
+	font-size: 18px;
 	font-weight: 700;
-	line-height: 1;
+	line-height: 1.2;
 	color: var(--el-text);
 }
 
-.ard-el__h3 {
+/* مسیر بالای صفحه: «پیشخوان › ذخیره شده ها» با حلقهٔ آخر صورتی. */
+.ard-el .ard-el__crumbs {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	font-size: 18px;
+	font-weight: 600;
+	line-height: 1.4;
+	color: var(--el-label);
+}
+
+.ard-el .ard-el__crumb {
+	color: var(--el-label);
+	transition: color .2s;
+}
+
+.ard-el a.ard-el__crumb:hover {
+	color: var(--el-primary);
+}
+
+.ard-el .ard-el__crumb.is-current {
+	color: var(--el-primary);
+	font-weight: 700;
+}
+
+.ard-el__crumbs .ard-el__i {
+	color: var(--el-text);
+}
+
+.ard-el[dir="ltr"] .ard-el__crumbs .ard-el__i {
+	transform: scaleX(-1);
+}
+
+.ard-el .ard-el__h3 {
 	margin: 0;
 	font-size: 16px;
 	font-weight: 600;
+	line-height: 1.4;
 	color: var(--el-text);
+}
+
+.ard-el .ard-ac__ptitle {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.6;
+}
+
+.ard-el .ard-ac__ctitle,
+.ard-el .ard-ac__addr-title {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.6;
 }
 
 .ard-el__screen {
@@ -321,8 +391,8 @@
 	flex-wrap: wrap;
 	gap: 12px;
 	min-block-size: 63px;
-	padding-inline-end: 4px;
-	padding-block-end: 4px;
+	padding-inline: 8px 4px;
+	padding-block: 4px 10px;
 }
 
 .ard-el__shead-main {
@@ -338,6 +408,7 @@
 }
 
 .ard-el__shead-sub {
+	color: var(--el-label);
 	font-size: 12px;
 	line-height: 1;
 }

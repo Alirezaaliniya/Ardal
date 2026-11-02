@@ -146,6 +146,9 @@ class Ardal_Account_Elano {
 			'plus'    => array( '0 0 24 24', 1.5, '<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>' ),
 			'wallet'  => array( '0 0 24 24', 1.5, '<rect x="2.5" y="5" width="19" height="15" rx="3"/><path d="M21.5 10h-4a2.5 2.5 0 0 0 0 5h4"/>' ),
 			'user'    => array( '0 0 24 24', 1.5, '<circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.2-3.4 4-5 7.5-5s6.3 1.6 7.5 5"/>' ),
+			'location' => array( '0 0 24 24', 1.5, '<path d="M12 21.5s-7-6.1-7-11.75a7 7 0 0 1 14 0C19 15.4 12 21.5 12 21.5z"/><circle cx="12" cy="9.75" r="2.5"/>' ),
+			'comment' => array( '0 0 24 24', 1.5, '<path d="M8.5 19H8c-4 0-6-1-6-6V8c0-4 2-6 6-6h8c4 0 6 2 6 6v5c0 4-2 6-6 6h-.5c-.31 0-.61.15-.8.4l-1.5 2c-.66.88-1.74.88-2.4 0l-1.5-2a1.13 1.13 0 0 0-.8-.4zM7 8h10M7 13h6"/>' ),
+			'download' => array( '0 0 24 24', 1.5, '<path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 16.5v1.5A3 3 0 0 0 7 21h10a3 3 0 0 0 3-3v-1.5"/>' ),
 			'coin'    => array( '0 0 24 24', 1.5, '<path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM14.5 9.5c0-1.1-1.12-2-2.5-2s-2.5.9-2.5 2 1.12 1.75 2.5 2 2.5.9 2.5 2-1.12 2-2.5 2-2.5-.9-2.5-2M12 6v1.5M12 16.5V18"/>' ),
 			'card'    => array( '0 0 24 24', 1.5, '<path d="M2 8.5h20M6 16.5h2M10.5 16.5h4M6.44 3.5h11.11C21.11 3.5 22 4.38 22 7.89v8.21c0 3.51-.89 4.39-4.44 4.39H6.44C2.89 20.5 2 19.62 2 16.11V7.89C2 4.38 2.89 3.5 6.44 3.5z"/>' ),
 			'gift'    => array( '0 0 24 24', 1.5, '<path d="M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/>' ),
@@ -168,13 +171,6 @@ class Ardal_Account_Elano {
 	}
 
 	/**
-	 * صفحهٔ جاری سربرگ بخش با عنوان خودش دارد؛ آن‌وقت عنوان بالای صفحه تکراری است.
-	 *
-	 * @var bool
-	 */
-	private static $headed = false;
-
-	/**
 	 * نشان صورتی کنار عنوان هر بخش (همان شکل قطره‌ای دیزاین).
 	 *
 	 * @param string $icon
@@ -183,7 +179,6 @@ class Ardal_Account_Elano {
 	 * @param string $actions HTML آماده.
 	 */
 	private static function section_head( $icon, $title, $sub = '', $actions = '' ) {
-		self::$headed = true;
 		?>
 		<div class="ard-el__shead">
 			<div class="ard-el__shead-main">
@@ -331,21 +326,14 @@ class Ardal_Account_Elano {
 
 				<main class="ard-el__main">
 					<?php
-					/*
-					 * صفحه اول ساخته می‌شود تا معلوم شود سربرگ بخش دارد یا نه؛ اگر
-					 * دارد، عنوان بالای صفحه حذف می‌شود تا تیتر دو بار نیاید. پیشخوان
-					 * استثناست: سربرگش «ذخیره‌شده‌ها»ست، نه خود پیشخوان.
-					 */
-					self::$headed = false;
+					// صفحه اول ساخته می‌شود تا اعلان‌هایی که حین ساختش ثبت می‌شوند هم چاپ شوند.
 					ob_start();
 					self::render_screen( $route );
 					$screen = (string) ob_get_clean();
 					?>
-					<?php if ( ! self::$headed || '' === $route['key'] ) : ?>
-						<div class="ard-el__titlebar">
-							<h1 class="ard-el__h1"><?php echo esc_html( $title ); ?></h1>
-						</div>
-					<?php endif; ?>
+					<nav class="ard-el__titlebar" aria-label="مسیر صفحه">
+						<h1 class="ard-el__crumbs"><?php self::render_crumbs( $route, $title ); ?></h1>
+					</nav>
 
 					<div class="ard-el__notices"><?php wc_print_notices(); ?></div>
 
@@ -393,6 +381,48 @@ class Ardal_Account_Elano {
 		$title = WC()->query ? WC()->query->get_endpoint_title( $key ) : '';
 
 		return '' !== $title ? wp_strip_all_tags( $title ) : self::opt( 'dash_title' );
+	}
+
+	/**
+	 * مسیر بالای صفحه: «پیشخوان › … › صفحهٔ جاری»؛ آخرین حلقه صورتی است.
+	 *
+	 * @param array  $route
+	 * @param string $title عنوان صفحهٔ جاری.
+	 */
+	private static function render_crumbs( $route, $title ) {
+		$dash   = wc_get_page_permalink( 'myaccount' );
+		$crumbs = array( array( self::opt( 'dash_title' ), $dash ) );
+
+		if ( '' === $route['key'] ) {
+			// سربرگ پیشخوان «ذخیره‌شده‌ها»ست؛ مسیر هم همان را نشان می‌دهد.
+			if ( class_exists( 'Ardal_Wishlist' ) && Ardal_Wishlist::enabled() ) {
+				$crumbs[] = array( self::opt( 'saved_title' ), '' );
+			}
+		} elseif ( 'view-order' === $route['key'] ) {
+			$order    = wc_get_order( absint( $route['value'] ) );
+			$crumbs[] = array( $title, wc_get_account_endpoint_url( 'orders' ) );
+			$crumbs[] = array( $order ? sprintf( 'سفارش %s', Ardal_Helpers::fa_digits( $order->get_order_number() ) ) : 'جزییات سفارش', '' );
+		} elseif ( 'wallet' === $route['key'] && ( $wallet = wp_strip_all_tags( wc_get_account_menu_items()['wallet'] ?? 'کیف پول' ) ) !== $title ) {
+			// افزایش موجودی و برداشت زیرمجموعهٔ کیف پول‌اند.
+			$crumbs[] = array( $wallet, wc_get_account_endpoint_url( 'wallet' ) );
+			$crumbs[] = array( $title, '' );
+		} else {
+			$crumbs[] = array( $title, '' );
+		}
+
+		$last = count( $crumbs ) - 1;
+
+		foreach ( $crumbs as $i => $crumb ) {
+			if ( $i > 0 ) {
+				echo self::icon( 'chevron', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+
+			if ( $i === $last ) {
+				printf( '<span class="ard-el__crumb is-current" aria-current="page">%s</span>', esc_html( $crumb[0] ) );
+			} else {
+				printf( '<a class="ard-el__crumb" href="%s">%s</a>', esc_url( $crumb[1] ), esc_html( $crumb[0] ) );
+			}
+		}
 	}
 
 	/**
@@ -485,7 +515,10 @@ class Ardal_Account_Elano {
 			esc_html( self::opt( 'saved_all' ) )
 		);
 
-		self::section_head( 'saved', self::opt( 'saved_title' ), '', $products ? $action : '' );
+		$shown = array_slice( $products, ( $page - 1 ) * $per, $per );
+		$sub   = sprintf( 'مرسوله %s از %s', Ardal_Helpers::fa_digits( count( $shown ) ), Ardal_Helpers::fa_digits( count( $products ) ) );
+
+		self::section_head( 'saved', self::opt( 'saved_title' ), $sub, $products ? $action : '' );
 
 		if ( ! $products ) {
 			self::empty_state( 'saved', self::opt( 'empty_saved' ) );
@@ -493,7 +526,7 @@ class Ardal_Account_Elano {
 			return;
 		}
 
-		self::product_grid( array_slice( $products, ( $page - 1 ) * $per, $per ), 'saved' );
+		self::product_grid( $shown, 'saved' );
 		self::pager( $pages, $page, 'ard_wp' );
 	}
 
@@ -1295,9 +1328,10 @@ class Ardal_Account_Elano {
 	 */
 	private static function screen_generic( $route ) {
 		$icons = array(
-			'edit-address'    => 'user',
+			'edit-address'    => 'location',
 			'payment-methods' => 'card',
-			'reviews'         => 'saved',
+			'reviews'         => 'comment',
+			'downloads'       => 'download',
 		);
 
 		self::section_head( isset( $icons[ $route['key'] ] ) ? $icons[ $route['key'] ] : 'grid', self::page_title( $route['key'] ) );
