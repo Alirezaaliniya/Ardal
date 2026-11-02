@@ -113,6 +113,7 @@
 	inset-inline: 24px;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 10px;
 	color: #fff;
 }
@@ -1427,7 +1428,8 @@
 	justify-content: space-between;
 	gap: 12px;
 	min-block-size: 63px;
-	padding: 0 0 4px 12px;
+	padding-block: 0 4px;
+	padding-inline: 20px 12px;
 	border-block-end: 1px solid var(--el-border);
 	border-inline-start: 1px solid var(--el-border);
 	border-end-start-radius: 20px;
