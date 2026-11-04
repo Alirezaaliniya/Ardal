@@ -589,15 +589,18 @@ class Ardal_Account_Elano {
 				<?php echo Ardal_Account::thumb( $product, 'woocommerce_thumbnail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
 			<span class="ard-el__pcard-title"><a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $product->get_name() ); ?></a></span>
-			<div class="ard-el__pcard-price"><?php echo wp_kses_post( $product->get_price_html() ); ?></div>
 			<div class="ard-el__pcard-foot">
 				<?php
 				if ( Ardal_Wishlist::enabled() ) {
+					// آیکون همان دیزاین: نشانک برای ذخیره‌شده‌ها، قلب برای علاقه‌مندی.
+					$mark = str_replace( 'ard-el__i ', 'ard-el__i ard-wish__icon ', self::icon( 'saved' === $kind ? 'saved' : 'heart', 20 ) );
+
 					echo Ardal_Wishlist::button( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						array(
 							'product' => $id,
 							'class'   => 'ard-el__mark ard-el__mark--' . $kind,
 							'size'    => 20,
+							'icon'    => $mark,
 						)
 					);
 				}

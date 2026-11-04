@@ -415,7 +415,7 @@ class Ardal_Wishlist {
 	/**
 	 * دکمهٔ علاقه‌مندی؛ رفتارش با همان data-ard-wishlist سراسری است.
 	 *
-	 * @param array $args product، label، label_on، class، size، show_text.
+	 * @param array $args product، label، label_on، class، size، show_text، icon (SVG آماده به‌جای قلب).
 	 * @return string
 	 */
 	public static function button( $args = array() ) {
@@ -428,6 +428,7 @@ class Ardal_Wishlist {
 				'class'     => '',
 				'size'      => 22,
 				'show_text' => false,
+				'icon'      => '',
 			)
 		);
 
@@ -451,7 +452,7 @@ class Ardal_Wishlist {
 			esc_attr( $on ),
 			$is ? 'true' : 'false',
 			esc_attr( $is ? $on : $off ),
-			self::heart( (int) $a['size'] ),
+			'' !== $a['icon'] ? $a['icon'] : self::heart( (int) $a['size'] ),
 			$a['show_text'] ? '<span class="ard-wish__text" data-ard-wish-text>' . esc_html( $is ? $on : $off ) . '</span>' : ''
 		);
 	}

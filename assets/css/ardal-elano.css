@@ -137,7 +137,8 @@
 .ard-el__dash {
 	position: absolute;
 	inset-block-start: 98px;
-	inset-inline-start: calc(50% - 35px);
+	/* وسط خمیدگی منو (مرکز ۱۵۸px از چپ در دیزاین)، نه وسط دقیق ستون. */
+	inset-inline-start: calc(50% - 39px);
 	z-index: 2;
 	inline-size: 70px;
 	display: flex;
@@ -186,30 +187,28 @@
 .ard-el__navbox {
 	position: relative;
 	margin: 20px 3px 0;
+	/* سایه روی قاب است نه خود منو، تا دور خمیدگی بریده‌شده هم بیفتد. */
+	filter: drop-shadow(0 0 40px rgba(0, 0, 0, .08));
 }
 
+/* خمیدگی با mask از خود منو بریده می‌شود؛ SVG رنگی دیگر لازم نیست. */
 .ard-el__notch {
-	position: absolute;
-	inset-block-start: 0;
-	inset-inline: 0;
-	z-index: 1;
-	display: block;
-	inline-size: 100%;
-	block-size: 24px;
-}
-
-.ard-el__notch path {
-	fill: var(--el-bg);
+	display: none;
 }
 
 .ard-el__nav {
+	--el-notch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 308 24' preserveAspectRatio='none'%3E%3Cpath d='M 105.473 0 C 114.126 0 121.14 7.014 121.14 15.667 C 121.14 19.993 124.647 23.5 128.973 23.5 L 187.855 23.5 C 192.181 23.5 195.688 19.993 195.688 15.667 C 195.688 7.014 202.702 0 211.355 0 Z'/%3E%3C/svg%3E");
+
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 	padding: 56px 42px 20px;
 	border-radius: 40px;
 	background: linear-gradient(141.756deg, var(--el-soft) 5.41%, var(--el-card) 100%);
-	box-shadow: inset 0 0 0 1px var(--el-bg), 0 0 80px rgba(0, 0, 0, .08);
+	box-shadow: inset 0 0 0 1px var(--el-bg);
+	-webkit-mask: var(--el-notch) top center / 308px 24px no-repeat, linear-gradient(#000 0 0);
+	-webkit-mask-composite: xor;
+	mask: var(--el-notch) top center / 308px 24px no-repeat exclude, linear-gradient(#000 0 0);
 }
 
 /*
@@ -660,7 +659,7 @@
 .ard-el__pcard {
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: 20px;
 	padding: 12px 12px 16px;
 	border-radius: 24px;
 	background: var(--el-card);
@@ -703,98 +702,126 @@
 	mix-blend-mode: darken;
 }
 
-/* span است نه تیتر؛ عنوان کارت در پنل کاربری جزو ساختار تیترهای صفحه نیست. */
-.ard-el__pcard-title {
+/*
+ * span است نه تیتر؛ عنوان کارت در پنل کاربری جزو ساختار تیترهای صفحه نیست.
+ * اندازه و رنگ روی خود لینک هم تکرار شده تا استایل لینک پوسته رویش ننشیند.
+ */
+.ard-el .ard-el__pcard-title {
 	display: block;
 	flex: 1;
-	margin: 4px 0 0;
+	margin: 0;
+	color: var(--el-text);
 	font-size: 16px;
 	font-weight: 400;
 	line-height: 1.5;
+	text-align: right;
 	text-wrap: pretty;
 }
 
-.ard-el__pcard-title a:hover {
-	color: var(--el-primary);
-}
-
-.ard-el__pcard-price {
-	font-size: 14px;
-	font-weight: 600;
-}
-
-.ard-el__pcard-price del {
-	color: var(--el-muted);
-	font-weight: 400;
-}
-
-.ard-el__pcard-price ins {
+.ard-el .ard-el__pcard-title a {
+	color: inherit;
+	font: inherit;
 	text-decoration: none;
 }
 
+.ard-el .ard-el__pcard-title a:hover {
+	color: var(--el-primary);
+}
+
+/* ۲۰ فاصلهٔ کارت + ۴ = همان ۲۴ دیزاین بین عنوان و دکمه‌ها. */
 .ard-el__pcard-foot {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
+	margin-block-start: 4px;
 }
 
-/* دکمهٔ ذخیره/قلب: همان دکمهٔ علاقه‌مندی اردال با پوستهٔ دیزاین. */
-.ard-el .ard-el__mark[class] {
-	--ard-wish-size: 40px;
-	--ard-wish-icon: 20px;
-	--ard-wish-radius: 12px;
-	--ard-wish-bg: var(--el-primary);
-	--ard-wish-color: #fff;
-	--ard-wish-border: var(--el-primary);
-	--ard-wish-hover: #fff;
-	--ard-wish-hover-bg: var(--el-primary);
-	--ard-wish-on: var(--el-primary);
-	--ard-wish-on-bg: #fff;
-	--ard-wish-on-border: var(--el-primary);
-
+/*
+ * دکمهٔ ذخیره/قلب: همان دکمهٔ علاقه‌مندی اردال با پوستهٔ دیزاین؛ مربع ۴۰ صورتی
+ * با آیکون خطی سفید. در این صفحه همه ذخیره‌شده‌اند، پس حالت فعال هم همین است.
+ */
+.ard-el .ard-el__pcard-foot .ard-el__mark[class],
+.ard-el .ard-el__pcard-foot .ard-el__mark[class].is-active {
 	flex: none;
 	inline-size: 40px;
+	min-inline-size: 40px;
+	block-size: 40px;
+	min-block-size: 0;
+	margin: 0;
+	padding: 0;
+	border: 0;
 	border-radius: 12px;
+	background: var(--el-primary);
+	box-shadow: inset 0 0 0 1px var(--el-primary);
+	color: #fff;
+	transition: background .2s, color .2s, box-shadow .2s;
 }
 
-.ard-el .ard-el__mark[class]:hover {
-	box-shadow: 0 8px 20px rgba(253, 86, 144, .35);
+.ard-el .ard-el__pcard-foot .ard-el__mark[class]:hover,
+.ard-el .ard-el__pcard-foot .ard-el__mark[class]:focus-visible {
+	background: #fff;
+	box-shadow: inset 0 0 0 1px var(--el-primary), 0 8px 20px rgba(253, 86, 144, .35);
+	color: var(--el-primary);
 }
 
-.ard-el__add[class] {
+.ard-el .ard-el__pcard-foot .ard-el__mark .ard-wish__icon {
+	inline-size: 20px;
+	block-size: 20px;
+	fill: none;
+}
+
+.ard-el .ard-el__pcard-foot .ard-el__add[class] {
 	display: inline-flex;
 	flex: 1;
 	align-items: center;
 	justify-content: center;
 	gap: 4px;
+	inline-size: auto;
 	min-inline-size: 0;
 	block-size: 42px;
+	min-block-size: 0;
 	margin: 0;
 	padding: 10px 8px;
 	border: 0;
 	border-radius: 12px;
 	background: rgba(239, 240, 244, .6);
+	box-shadow: none;
 	color: var(--el-text);
 	font-family: inherit;
 	font-size: 14px;
 	font-weight: 600;
 	line-height: 1;
+	letter-spacing: 0;
+	text-transform: none;
+	text-decoration: none;
 	white-space: nowrap;
 	transition: background .2s, color .2s;
 }
 
-.ard-el__add[class]:hover,
-.ard-el__add[class].added {
+/* آیکون بعد از متن (سمت چپ در راست‌چین)؛ ووکامرس آن را اول می‌گذارد. */
+.ard-el .ard-el__pcard-foot .ard-el__add .ard-el__i {
+	order: 1;
+	inline-size: 16px;
+	block-size: 16px;
+}
+
+.ard-el .ard-el__pcard-foot .ard-el__add[class]::before,
+.ard-el .ard-el__pcard-foot .ard-el__add[class]::after {
+	content: none;
+}
+
+.ard-el .ard-el__pcard-foot .ard-el__add[class]:hover,
+.ard-el .ard-el__pcard-foot .ard-el__add[class].added {
 	background: rgba(241, 23, 99, .1);
 	color: var(--el-primary);
 }
 
-.ard-el__add[class].loading {
+.ard-el .ard-el__pcard-foot .ard-el__add[class].loading {
 	opacity: .6;
 }
 
-.ard-el__add--off[class] {
+.ard-el .ard-el__pcard-foot .ard-el__add--off[class] {
 	color: var(--el-muted);
 }
 
@@ -1566,10 +1593,12 @@
 
 	.ard-el__navbox {
 		margin-block-start: 30px;
+		filter: none;
 	}
 
-	.ard-el__notch {
-		display: none;
+	.ard-el__nav {
+		-webkit-mask: none;
+		mask: none;
 	}
 
 	/*
@@ -1736,11 +1765,11 @@
 		border-radius: 18px;
 	}
 
-	.ard-el__pcard-title {
+	.ard-el .ard-el__pcard-title {
 		font-size: 13px;
 	}
 
-	.ard-el__add[class] {
+	.ard-el .ard-el__pcard-foot .ard-el__add[class] {
 		font-size: 11px;
 	}
 
