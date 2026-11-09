@@ -446,6 +446,7 @@ class Ardal_Widget_Account extends Ardal_Widget_Base {
 			'img_saved'    => 'تصویر ذخیره‌شده خالی',
 			'img_wishlist' => 'تصویر علاقه‌مندی خالی',
 			'img_wallet'   => 'تصویر کارت کیف پول',
+			'img_logo'     => 'لوگوی منوی موبایل',
 		) as $key => $label ) {
 			$this->add_control(
 				'elano_' . $key,

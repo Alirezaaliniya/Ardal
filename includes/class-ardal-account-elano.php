@@ -69,6 +69,7 @@ class Ardal_Account_Elano {
 			'img_saved'       => '',
 			'img_wishlist'    => '',
 			'img_wallet'      => '',
+			'img_logo'        => '',
 			'show_logout'     => 'yes',
 			'logout_label'    => 'خروج',
 			'preview'         => '',
@@ -110,6 +111,26 @@ class Ardal_Account_Elano {
 	}
 
 	/**
+	 * لوگوی بالای منوی کشویی موبایل: تصویر ویجت، وگرنه لوگوی سایت، وگرنه نام سایت.
+	 *
+	 * @return string
+	 */
+	private static function logo() {
+		$url = self::opt( 'img_logo' );
+
+		if ( '' === $url ) {
+			$id  = (int) get_theme_mod( 'custom_logo' );
+			$url = $id ? (string) wp_get_attachment_image_url( $id, 'medium' ) : '';
+		}
+
+		$name = get_bloginfo( 'name' );
+
+		return '' !== $url
+			? sprintf( '<img class="ard-el__oc-logo-img" src="%s" alt="%s">', esc_url( $url ), esc_attr( $name ) )
+			: '<span class="ard-el__oc-logo-text">' . esc_html( $name ) . '</span>';
+	}
+
+	/**
 	 * مبلغ با قالب اردال: ارقام تنظیمات و واحد «تومان» یا نماد آن.
 	 *
 	 * @param float $amount
@@ -143,6 +164,8 @@ class Ardal_Account_Elano {
 			'saved'   => array( '0 0 20 20', 1.5, '<path d="M4.167 4.167c0-.92.746-1.667 1.666-1.667h8.334c.92 0 1.666.746 1.666 1.667V17.5L10 13.75 4.167 17.5z"/>' ),
 			'heart'   => array( '0 0 20 20', 1.5, '<path d="M10 17.083S1.667 12.6 1.667 7.25C1.667 4.8 3.55 2.737 5.9 2.737c1.75 0 3.25 1 4.1 2.45.85-1.45 2.35-2.45 4.1-2.45 2.35 0 4.233 2.063 4.233 4.513 0 5.35-8.333 9.833-8.333 9.833z"/>' ),
 			'print'   => array( '0 0 20 20', 1.25, '<path d="M5 15H3.333a1.667 1.667 0 0 1-1.666-1.667V6.667A1.667 1.667 0 0 1 3.333 5h13.334a1.667 1.667 0 0 1 1.666 1.667v6.666A1.667 1.667 0 0 1 16.667 15H15M5 5V3.333c0-.92.746-1.666 1.667-1.666h6.666c.92 0 1.667.746 1.667 1.666V5M5 11.667h10v5c0 .92-.746 1.666-1.667 1.666H6.667c-.92 0-1.667-.746-1.667-1.666zM7.5 14.167h5"/>' ),
+			'grid-o'  => array( '0 0 24 24', 1.6, '<circle cx="7.5" cy="7.5" r="3.5"/><circle cx="16.5" cy="7.5" r="3.5"/><circle cx="7.5" cy="16.5" r="3.5"/><circle cx="16.5" cy="16.5" r="3.5"/>' ),
+			'bag'     => array( '0 0 24 24', 1.5, '<path d="M7.5 7.67V6.7c0-2.25 1.81-4.46 4.06-4.67a4.5 4.5 0 0 1 4.94 4.48v1.38M9 22h6c4.02 0 4.74-1.61 4.95-3.57l.75-6C20.97 9.99 20.27 8 16 8H8c-4.27 0-4.97 1.99-4.7 4.43l.75 6C4.26 20.39 4.98 22 9 22zM15.5 12h.01M8.5 12h.01"/>' ),
 			'plus'    => array( '0 0 24 24', 1.5, '<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>' ),
 			'wallet'  => array( '0 0 24 24', 1.5, '<rect x="2.5" y="5" width="19" height="15" rx="3"/><path d="M21.5 10h-4a2.5 2.5 0 0 0 0 5h4"/>' ),
 			'user'    => array( '0 0 24 24', 1.5, '<circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.2-3.4 4-5 7.5-5s6.3 1.6 7.5 5"/>' ),
@@ -299,24 +322,25 @@ class Ardal_Account_Elano {
 					<div class="ard-el__navbox">
 						<svg class="ard-el__notch" viewBox="0 0 308 24" preserveAspectRatio="none" aria-hidden="true"><path d="M 105.473 0 C 114.126 0 121.14 7.014 121.14 15.667 C 121.14 19.993 124.647 23.5 128.973 23.5 L 187.855 23.5 C 192.181 23.5 195.688 19.993 195.688 15.667 C 195.688 7.014 202.702 0 211.355 0 Z"/></svg>
 
-						<button type="button" class="ard-el__menu-toggle" aria-expanded="false" aria-controls="ard-el-nav" data-ard-el-toggle>
-							<?php echo self::icon( 'menu', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-							<span>منوی حساب کاربری</span>
+						<?php // نوار صورتی بالای صفحه در موبایل: عنوان همین صفحه؛ با لمس، منو باز می‌شود. ?>
+						<button type="button" class="ard-el__menu-toggle" aria-expanded="false" aria-controls="ard-el-nav" aria-label="منوی حساب کاربری" data-ard-el-toggle>
+							<span class="ard-el__mt-main">
+								<?php echo self::icon( 'grid-o', 30 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								<span class="ard-el__mt-title"><?php echo esc_html( $title ); ?></span>
+							</span>
+							<?php echo self::icon( 'chevron', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</button>
 
-						<nav class="ard-el__nav" id="ard-el-nav" aria-label="منوی حساب کاربری" data-ard-el-nav>
-							<?php // سربرگ پنل کشویی؛ فقط در موبایل دیده می‌شود. ?>
+						<nav class="ard-el__nav" id="ard-el-nav" aria-label="منوی حساب کاربری" tabindex="-1" data-ard-el-nav>
+							<?php // سربرگ پنل کشویی (فقط موبایل): لوگو و دکمهٔ پیشخوان، وسط‌چین. ?>
 							<div class="ard-el__oc-head">
-								<span class="ard-el__oc-user">
-									<?php echo get_avatar( get_current_user_id(), 40, '', '', array( 'class' => 'ard-el__oc-avatar' ) ); ?>
-									<span><?php echo esc_html( Ardal_Account::name() ); ?></span>
-								</span>
-								<button type="button" class="ard-el__oc-close" data-ard-el-close aria-label="بستن منو">
-									<?php echo self::icon( 'close', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								</button>
+								<a class="ard-el__oc-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo self::logo(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+								<a class="ard-el__oc-dash<?php echo '' === $active ? ' is-active' : ''; ?>" href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>">
+									<span class="ard-el__oc-dash-icon"><?php echo self::icon( 'grid-o', 34 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+									<span class="ard-el__oc-dash-title"><?php echo esc_html( self::opt( 'dash_title' ) ); ?></span>
+									<span class="ard-el__oc-dash-sub"><?php echo esc_html( self::opt( 'dash_sub' ) ); ?></span>
+								</a>
 							</div>
-
-							<a class="ard-el__item ard-el__oc-dash<?php echo '' === $active ? ' is-active' : ''; ?>" href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>"><span><?php echo esc_html( self::opt( 'dash_title' ) ); ?></span><?php echo self::icon( 'chevron', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
 
 							<?php self::render_menu( $active ); ?>
 						</nav>
@@ -611,7 +635,7 @@ class Ardal_Account_Elano {
 						array( 'ard-el__add' ),
 						$product->is_type( 'simple' ) ? 'افزودن به سبد خرید' : $product->add_to_cart_text(),
 						array(),
-						self::icon( 'plus', 16 )
+						str_replace( 'ard-el__i ', 'ard-el__i ard-el__add-bag ', self::icon( 'bag', 20 ) ) . self::icon( 'plus', 16 )
 					);
 				} else {
 					printf( '<a class="ard-el__add ard-el__add--off" href="%s">ناموجود</a>', esc_url( $product->get_permalink() ) );

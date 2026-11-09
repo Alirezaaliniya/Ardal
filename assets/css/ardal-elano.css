@@ -799,6 +799,10 @@
 	block-size: 16px;
 }
 
+.ard-el .ard-el__pcard-foot .ard-el__add .ard-el__add-bag {
+	display: none;
+}
+
 .ard-el .ard-el__pcard-foot .ard-el__add[class]::before,
 .ard-el .ard-el__pcard-foot .ard-el__add[class]::after {
 	content: none;
@@ -1562,41 +1566,85 @@
 		padding-block-end: 32px;
 	}
 
+	/* سربرگ صورتی و دکمهٔ پیشخوانِ ستون کناری در طرح موبایل نیستند. */
+	.ard-el__hero,
+	.ard-el__dash {
+		display: none;
+	}
+
+	/* نوار صورتی بالای صفحه: آیکن و عنوان صفحه راست، فلش چپ؛ منو را باز می‌کند. */
 	.ard-el__menu-toggle[class] {
 		position: relative;
 		z-index: 2;
 		display: flex;
 		align-items: center;
-		justify-content: center;
-		gap: 8px;
+		justify-content: space-between;
+		gap: 12px;
 		inline-size: 100%;
-		block-size: 48px;
+		block-size: 52px;
 		margin: 0;
-		padding: 0 16px;
+		padding: 0 16px 0 20px;
 		border: 0;
 		border-radius: 16px;
-		background: var(--el-card);
-		box-shadow: inset 0 0 0 1px var(--el-border);
+		background: var(--el-tint);
+		box-shadow: none;
 		color: var(--el-text);
 		font-family: inherit;
-		font-size: 13px;
-		font-weight: 600;
+		font-size: 15px;
+		font-weight: 500;
+		line-height: 1;
+		text-transform: none;
 		cursor: pointer;
 	}
 
+	.ard-el__menu-toggle[class]:hover,
+	.ard-el__menu-toggle[class]:focus {
+		background: var(--el-tint);
+		color: var(--el-text);
+	}
+
+	.ard-el__mt-main {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		min-inline-size: 0;
+	}
+
+	.ard-el__mt-main .ard-el__i {
+		inline-size: 26px;
+		block-size: 26px;
+		color: var(--el-primary);
+	}
+
+	.ard-el__mt-title {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.ard-el__menu-toggle > .ard-el__i {
+		inline-size: 16px;
+		block-size: 16px;
+		color: var(--el-primary);
+	}
+
+	.ard-el[dir="ltr"] .ard-el__menu-toggle > .ard-el__i {
+		transform: scaleX(-1);
+	}
+
+	.ard-el__side {
+		flex-basis: 100%;
+		inline-size: 100%;
+	}
+
 	.ard-el__navbox {
-		margin-block-start: 30px;
+		margin: 0;
 		filter: none;
 	}
 
-	.ard-el__nav {
-		-webkit-mask: none;
-		mask: none;
-	}
-
 	/*
-	 * منوی کشویی (offcanvas) از سمت راست؛ همان آیتم‌ها و رنگ‌های دسکتاپ، روی
-	 * یک پس‌زمینهٔ تیره که با لمس بسته می‌شود.
+	 * منوی کشویی از راست: سفید، گوشه‌های سمت چپ گرد؛ بالایش لوگو و
+	 * دکمهٔ پیشخوان وسط‌چین، بعد آیتم‌های منو با کادر نازک.
 	 */
 	.ard-el__nav {
 		position: fixed;
@@ -1604,16 +1652,19 @@
 		inset-inline-start: 0;
 		z-index: 100001;
 		gap: 8px;
-		inline-size: min(320px, 86vw);
+		inline-size: min(300px, 78vw);
 		margin: 0;
-		padding: 16px 16px max(16px, env(safe-area-inset-bottom));
+		padding: 48px 16px max(24px, env(safe-area-inset-bottom));
 		overflow-y: auto;
 		overscroll-behavior: contain;
 		border-radius: 0;
 		border-start-end-radius: 28px;
 		border-end-end-radius: 28px;
-		background-color: var(--el-card);
-		box-shadow: 0 0 60px rgba(0, 0, 0, .18);
+		background: var(--el-card);
+		box-shadow: none;
+		-webkit-mask: none;
+		mask: none;
+		outline: 0;
 		visibility: hidden;
 		transform: translateX(100%);
 		transition: transform .32s cubic-bezier(.22, .8, .24, 1), visibility 0s linear .32s;
@@ -1634,12 +1685,10 @@
 		inset: 0;
 		z-index: 100000;
 		display: block;
-		background: rgba(17, 17, 24, .45);
+		background: rgba(0, 0, 0, .4);
 		opacity: 0;
 		visibility: hidden;
 		transition: opacity .32s, visibility 0s linear .32s;
-		-webkit-backdrop-filter: blur(2px);
-		backdrop-filter: blur(2px);
 	}
 
 	.ard-el.is-menu-open .ard-el__backdrop {
@@ -1650,66 +1699,72 @@
 
 	.ard-el__oc-head {
 		display: flex;
+		flex: none;
+		flex-direction: column;
 		align-items: center;
-		justify-content: space-between;
-		gap: 12px;
-		margin: -16px -16px 8px;
-		padding: 20px 16px;
-		border-start-end-radius: 28px;
-		background: linear-gradient(90deg, var(--el-primary), var(--el-primary-2));
-		color: #fff;
+		gap: 40px;
+		margin-block-end: 40px;
 	}
 
-	.ard-el__oc-user {
+	.ard-el .ard-el__oc-logo {
 		display: flex;
-		align-items: center;
-		gap: 10px;
-		min-inline-size: 0;
-		font-size: 14px;
+		justify-content: center;
+		inline-size: 100%;
+		color: var(--el-text);
+	}
+
+	.ard-el__oc-logo-img {
+		display: block;
+		inline-size: auto;
+		max-inline-size: 190px;
+		max-block-size: 64px;
+		object-fit: contain;
+	}
+
+	.ard-el__oc-logo-text {
+		font-size: 22px;
 		font-weight: 700;
+		letter-spacing: .04em;
 	}
 
-	.ard-el__oc-user span {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+	.ard-el .ard-el__oc-dash {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		color: var(--el-text);
+		text-align: center;
 	}
 
-	.ard-el__oc-avatar[class] {
-		flex: none;
-		inline-size: 40px;
-		block-size: 40px;
-		border: 2px solid rgba(255, 255, 255, .7);
-		border-radius: 50%;
-	}
-
-	.ard-el__oc-close[class] {
-		display: inline-flex;
-		flex: none;
+	.ard-el__oc-dash-icon {
+		display: flex;
 		align-items: center;
 		justify-content: center;
-		inline-size: 40px;
-		block-size: 40px;
-		margin: 0;
-		padding: 0;
-		border: 0;
+		inline-size: 60px;
+		block-size: 56px;
+		margin-block-end: 12px;
 		border-radius: 12px;
-		background: rgba(255, 255, 255, .18);
-		color: #fff;
-		cursor: pointer;
+		background: var(--el-tint);
+		color: var(--el-primary);
 	}
 
-	.ard-el__oc-close[class]:hover,
-	.ard-el__oc-close[class]:focus-visible {
-		background: rgba(255, 255, 255, .3);
+	.ard-el__oc-dash-title {
+		font-size: 15px;
+		font-weight: 600;
+		line-height: 1.4;
 	}
 
-	.ard-el__oc-dash[class] {
-		display: flex;
+	.ard-el__oc-dash-sub {
+		margin-block-start: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		line-height: 1.4;
 	}
 
 	.ard-el__nav .ard-el__item {
 		flex: none;
+		background: var(--el-card);
+		box-shadow: inset 0 0 0 1px var(--el-border);
+		font-size: 13px;
 	}
 
 	html.ard-el-lock,
@@ -1728,15 +1783,20 @@
 	}
 
 	.ard-el__tab-body {
-		left: 17%;
-		inline-size: 66%;
-		block-size: 82%;
-		gap: 6px;
+		left: 4%;
+		inline-size: 92%;
+		block-size: 86%;
+		gap: 10px;
 	}
 
 	.ard-el__tab-icon {
-		inline-size: 46px;
-		block-size: 42px;
+		inline-size: 50px;
+		block-size: 50px;
+		border-radius: 12px;
+	}
+
+	.ard-el__tab:not(.is-active) .ard-el__tab-icon {
+		color: var(--el-text);
 	}
 
 	.ard-el__tab-icon .ard-el__i {
@@ -1745,7 +1805,41 @@
 	}
 
 	.ard-el__tab-label {
-		font-size: 11px;
+		font-size: clamp(11px, 3.5vw, 14px);
+		font-weight: 700;
+	}
+
+	/* سربرگ بخش («ذخیره شده ها» + «همه محصولات») در یک ردیف و بدون خط. */
+	.ard-el__screen .ard-el__shead {
+		flex-wrap: nowrap;
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+	}
+
+	.ard-el__badge,
+	.ard-el__badge > svg:first-child {
+		inline-size: 62px;
+		block-size: 50px;
+	}
+
+	.ard-el__badge .ard-el__i {
+		inset-block-start: 15px;
+		left: 31px;
+	}
+
+	.ard-el .ard-el__shead .ard-el__h2 {
+		font-size: 17px;
+	}
+
+	.ard-el__head-actions {
+		flex: none;
+	}
+
+	.ard-el__head-actions .ard-el__ghost[class] {
+		block-size: 44px;
+		padding: 0 22px;
+		font-size: 14px;
 	}
 
 	.ard-el__grid {
@@ -1754,15 +1848,60 @@
 	}
 
 	.ard-el__pcard {
-		padding: 8px 8px 12px;
-		border-radius: 18px;
+		gap: 14px;
+		padding: 10px;
+		border-radius: 20px;
+	}
+
+	.ard-el__pcard-media {
+		padding: 8px;
+		border-radius: 20px;
 	}
 
 	.ard-el .ard-el__pcard-title {
-		font-size: 13px;
+		font-size: 15px;
+		line-height: 1.55;
 	}
 
+	.ard-el__pcard-foot {
+		margin-block-start: 0;
+	}
+
+	/* دکمهٔ ذخیره: مربع صورتی پُر، سمت راست. */
+	.ard-el .ard-el__pcard-foot .ard-el__mark[class],
+	.ard-el .ard-el__pcard-foot .ard-el__mark[class].is-active {
+		inline-size: 38px;
+		min-inline-size: 38px;
+		block-size: 38px;
+		border-radius: 10px;
+	}
+
+	/* افزودن به سبد: فقط آیکن سبد و «+» در یک بیضی خاکستری، سمت چپ. */
 	.ard-el .ard-el__pcard-foot .ard-el__add[class] {
+		flex: none;
+		gap: 8px;
+		block-size: 38px;
+		padding: 0 10px;
+		border-radius: 12px;
+		background: var(--el-soft);
+		font-size: 0;
+	}
+
+	.ard-el .ard-el__pcard-foot .ard-el__add .ard-el__add-bag {
+		display: block;
+		order: 1;
+		inline-size: 20px;
+		block-size: 20px;
+	}
+
+	.ard-el .ard-el__pcard-foot .ard-el__add .ard-el__i:not(.ard-el__add-bag) {
+		order: 2;
+		inline-size: 14px;
+		block-size: 14px;
+	}
+
+	.ard-el .ard-el__pcard-foot .ard-el__add--off[class] {
+		padding: 0 12px;
 		font-size: 11px;
 	}
 
