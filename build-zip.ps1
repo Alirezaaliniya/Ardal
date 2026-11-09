@@ -4,7 +4,7 @@
   اجرا: روی build-zip.bat دوبار کلیک کنید، یا:
       powershell -ExecutionPolicy Bypass -File build-zip.ps1
 
-  خروجی: پوشهٔ «ardal-builds» کنار پوشهٔ افزونه، با نام Ardal-<نسخه>.zip
+  خروجی: پوشه «dist» داخل همین پوشه افزونه، با نام Ardal-<نسخه>.zip
   نسخه از سربرگ ardal.php (Version:) خوانده می‌شود.
 
   داخل zip یک پوشهٔ «Ardal» است، همان نام پوشهٔ فعلی افزونه؛ پس نصب یا
@@ -19,12 +19,13 @@ $ErrorActionPreference = 'Stop'
 
 $root   = $PSScriptRoot
 $slug   = Split-Path $root -Leaf
-$outDir = Join-Path (Split-Path $root -Parent) 'ardal-builds'
+$outDir = Join-Path $root 'dist'
 
 # ------------------------------------------------------------- چیزهایی که نمی‌روند
 # مسیرها نسبت به ریشهٔ افزونه‌اند؛ پوشه‌ها با هرچه زیرشان است حذف می‌شوند.
 $excludeDirs = @(
     '.git',
+    'dist',
     '.github',
     '.vscode',
     '.idea',
